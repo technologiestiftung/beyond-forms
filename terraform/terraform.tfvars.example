@@ -1,0 +1,47 @@
+# Copy to terraform.tfvars (gitignored) and fill with real values.
+# The real terraform.tfvars is kept in 1Password, not committed.
+
+# --- GCP project & location ---
+project_id        = "my-gcp-project"
+pubsub_project_id = "my-gcp-project"
+domain_name       = "example.org"
+app_name          = "myapp"
+
+# --- Storage buckets (globally unique) ---
+dev_bucket_name            = "myapp-dev-bucket"
+prod_bucket_name           = "myapp-prod-bucket"
+rag_bucket_name            = "myapp-rag-storage"
+loki_logs_bucket_name      = "myapp-loki-logs"
+migrations_bucket_name     = "myapp-migrations"
+migrations_bucket_prd_name = "myapp-migrations-prd"
+
+# --- Networking (CIDRs) ---
+subnet_cidr       = "10.20.0.0/24"
+subnet_west1_cidr = "10.20.1.0/24"
+subnet_west3_cidr = "10.20.2.0/24"
+gke_pods_cidr     = "10.30.0.0/17"
+
+# --- Registry ---
+registry_project = "my-registry-project"
+registry_repo    = "myapp"
+artifact_repo_id = "myapp-artifact-images"
+
+# --- Vertex RAG ---
+rag_corpus = "0000000000000000000"
+
+# --- DNS ---
+dns_zone_name = "myapp-zone"
+
+# --- IAM ---
+cloud_run_sa_account_id = "generic-cloud-run-myapp"
+
+# --- Load balancer ---
+lb_ip_name = "myapp-ip"
+
+# --- OIDC (real secret injected from Secret Manager at deploy; placeholder here) ---
+oidc_client_id     = "myapp"
+oidc_client_secret = "changeme"
+
+# --- Internal service-to-service key (real value injected from Secret Manager; placeholder here) ---
+internal_key_stg = "changeme"
+internal_key_prd = "changeme"

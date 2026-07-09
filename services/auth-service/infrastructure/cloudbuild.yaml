@@ -1,0 +1,38 @@
+steps:
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "gcloud"
+    args:
+      - "run"
+      - "deploy"
+      - "${_SERVICE_NAME}"
+      - "--image=${_IMAGE_URI}"
+      - "--region=${_GCP_REGION}"
+      - "--platform=managed"
+      - "--set-env-vars"
+      - "OIDC_REDIRECT_URI=${_OIDC_REDIRECT_URI},AUTHENTIK_SERVER_URL=${_AUTHENTIK_SERVER_URL},DB_HOST=${_DB_HOST},DB_PORT=${_DB_PORT},DB_NAME=${_DB_NAME},OIDC_CLIENT_ID=${_OIDC_CLIENT_ID},AUTHENTIK_PUBLIC_KEY_PATH=${_AUTHENTIK_PUBLIC_KEY_PATH},ENV=${_ENV}"
+      - "--set-secrets"
+      - "DB_USER=AUTH_SERVICE_DB_USER:latest,DB_PASSWORD=AUTH_SERVICE_DB_PASSWORD:latest,OIDC_CLIENT_SECRET=BEYONDFORMS_OIDC_CLIENT_SECRET:latest,TEST_ACCOUNT_PASSWORD=TEST_ACCOUNT_PASSWORD:latest,PROD_TEST_BYPASS_KEY=PROD_TEST_BYPASS_KEY:latest,/app/auth/certs/pub/oidc_public.pem=GOAUTHENTIK_KEY_PUB:latest"
+      - "--no-invoker-iam-check"
+      - "--network=${_NETWORK}"
+      - "--subnet=${_SUBNET}"
+      - "--vpc-egress=private-ranges-only"
+
+substitutions:
+  # Injected by CI from GitHub environment vars/secrets. Sentinel = fail loudly if not injected.
+  _SERVICE_NAME: "auth-service"
+  _IMAGE_URI: ""
+  _AUTHENTIK_SERVER_URL: "REQUIRED_INJECTED_AT_DEPLOY"
+  _OIDC_REDIRECT_URI: "REQUIRED_INJECTED_AT_DEPLOY"
+  _DB_HOST: "REQUIRED_INJECTED_AT_DEPLOY"
+  _DB_NAME: "REQUIRED_INJECTED_AT_DEPLOY"
+  _NETWORK: "REQUIRED_INJECTED_AT_DEPLOY"
+  _SUBNET: "REQUIRED_INJECTED_AT_DEPLOY"
+  _ENV: "REQUIRED_INJECTED_AT_DEPLOY"
+  # Non-sensitive config — kept as real defaults.
+  _DB_PORT: "5432"
+  _OIDC_CLIENT_ID: "beyondforms"
+  _AUTHENTIK_PUBLIC_KEY_PATH: "/app/auth/certs/pub/oidc_public.pem"
+  _GCP_REGION: "europe-west10"
+
+options:
+  logging: CLOUD_LOGGING_ONLY

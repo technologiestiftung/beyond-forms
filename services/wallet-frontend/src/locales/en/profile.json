@@ -1,0 +1,705 @@
+{
+	"header": {
+		"new": {
+			"title": "Complete Profile",
+			"desc": "With a complete profile, we can better guide you through the process.",
+			"item1": "Add personal information",
+			"item2": "Get more suitable support",
+			"item3": "Continue faster later",
+			"cta": "Complete Now"
+		},
+		"returning": {
+			"progress": "Profile {{count}}% complete",
+			"hint": "With a complete profile, Klaro can show you more suitable services."
+		}
+	},
+	"income": {
+		"question": "What type of money do you receive monthly?",
+		"multiple_choice": "(Multiple choices possible)",
+		"why": {
+			"desc": "We clarify what income you receive and what proof the welfare office requires. This helps us verify the amount of support you are entitled to."
+		},
+		"options": {
+			"pension_title": "State Pension",
+			"pension_hinweis": "Find your pension statement.",
+			"survivor_pension_title": "Survivor's Pension",
+			"survivor_pension_hinweis": "This is a separate statement from your own pension. It often says 'Survivor's pension' or 'Widow's pension' at the top.",
+			"minor_employment_title": "Income from minor employment",
+			"minor_employment_hinweis": "Please have your last three payslips ready.",
+			"other_benefits_title": "Other benefits like housing benefit or maintenance",
+			"other_benefits_hinweis": "Find the notification of approval.",
+			"none_title": "I have no monthly income.",
+			"none_hinweis": "Please confirm if you have no current income at all."
+		}
+	},
+	"savings": {
+		"why": {
+			"desc": "We check if your savings are below the exemption limit. It is important for the welfare office that you are allowed to keep your savings as long as they do not exceed certain thresholds."
+		},
+		"saving_01": {
+			"title": "Do you possess savings, real estate or valuables?",
+			"option_yes_title": "Yes",
+			"option_yes_hinweis": "In the next step, we will record which assets you hold.",
+			"option_no_title": "No",
+			"option_no_hinweis": "Thank you. If you have no significant savings at all, this helps us confirm your entitlement faster."
+		},
+		"saving_02": {
+			"title": "What type of assets do you hold?",
+			"option_savings_title": "Balance/Savings Account",
+			"option_savings_hinweis": "We require your account statements for the last 3 months.",
+			"option_car_title": "Motor Vehicle",
+			"option_car_hinweis": "Please specify the brand and year of construction.",
+			"option_life_insurance_title": "Life Insurance",
+			"option_life_insurance_hinweis": "We require proof of the current surrender value."
+		}
+	},
+	"health": {
+		"why": {
+			"desc": "For the initial assessment, it is important to know if you are permanently unable to work at least 3 hours a day due to health reasons. In that case, welfare benefits from the social welfare office are more likely to apply."
+		},
+		"health_01": {
+			"title": "Do you possess an official disability ID card?",
+			"option_yes_title": "Yes",
+			"option_yes_hinweis": "Please check if the letters 'G' or 'aG' (marks) are included. This may indicate eligibility for additional cost coverage.",
+			"option_no_title": "No"
+		},
+		"health_02": {
+			"title": "Do you require a special, costly diet due to an illness?",
+			"option_yes_title": "Yes",
+			"option_yes_hinweis": "You will need a special form (additional cost allowance coverage).",
+			"option_no_title": "No"
+		},
+		"actions": {
+			"go_to_page_2": "Go to question 2 of 2"
+		},
+		"care_dependency": {
+			"title": "Do you require care?"
+		},
+		"inpatient_details": {
+			"move_in_date": "Move-in date"
+		},
+		"earning_temp": {
+			"start_date": "Start date",
+			"end_date": "Expected end date"
+		},
+		"earning_perm": {
+			"start_date": "Start date"
+		},
+		"disability": {
+			"title": "Disability ID details",
+			"valid_until": "Valid until"
+		},
+		"marks": {
+			"G": "G (Significant mobility impairment)",
+			"aG": "aG (Exceptional mobility impairment)",
+			"H": "H (Helplessness)",
+			"B": "B (Accompaniment required)",
+			"Bl": "Bl (Blindness)",
+			"Gl": "Gl (Deafness)",
+			"TBl": "TBl (Deaf-blindness)",
+			"RF": "RF (Radio fee exemption)",
+			"1 Kl": "1 Kl (1st class rail travel)",
+			"EB": "EB (Entitled to compensation)",
+			"VB": "VB (Entitled to war pension/care)",
+			"T": "T (Entitled to travel)"
+		}
+	},
+	"welcome": "Hello {{name}}!",
+	"actions": {
+		"logout": "Logout from Klaro",
+		"delete_account": "Delete my Klaro Account"
+	},
+	"sections": {
+		"personal": {
+			"title": "Personal Data",
+			"desc": "Name, date of birth, and other personal information"
+		},
+		"address": {
+			"title": "Address",
+			"desc": "Street, house number, postal code, and city"
+		},
+		"bank": {
+			"title": "Bank Connection",
+			"desc": "Account information for payments and benefits"
+		},
+		"documents": {
+			"title": "My Documents",
+			"desc": "Documents for applications and other services"
+		},
+		"settings": {
+			"title": "Settings",
+			"desc": "Language, notifications, and personal address"
+		}
+	},
+	"status": {
+		"complete": "Complete",
+		"partial": "Partially complete",
+		"missing": "Still missing"
+	},
+	"personal": {
+		"title": "Personal Data",
+		"edit_title": "Edit Personal Data",
+		"view_desc": "Here you can view and edit your personal data.",
+		"groups": {
+			"identity": "Legal Identity",
+			"status": "Nationality and Status",
+			"address": "Registration Address"
+		},
+		"choice": {
+			"title": "How would you like to add your information?",
+			"description": "You can enter your information yourself or upload a document.",
+			"manual": {
+				"title": "Enter yourself",
+				"desc": "Fill in the information in a simple form."
+			},
+			"upload": {
+				"title": "Upload document",
+				"desc": "Upload a photo or PDF of your document.",
+				"button": "Tap or drag & drop"
+			},
+			"camera": {
+				"title": "Scan with camera",
+				"desc": "Upload a photo of your document.",
+				"button": "Open Camera"
+			}
+		},
+		"fields": {
+			"firstName": "First Name",
+			"firstName_placeholder": "e.g. Max",
+			"lastName": "Last Name",
+			"lastName_placeholder": "e.g. Mustermann",
+			"birthName": "Birth name / former names (if applicable)",
+			"dateOfBirth": "Date of Birth",
+			"placeOfBirth": "Place of Birth",
+			"placeOfBirth_placeholder": "e.g. Berlin",
+			"legalGender": "Legal Gender (as on ID)",
+			"nationality": "Nationality",
+			"secondNationality": "Second Nationality",
+			"residenceStatus": "Residence status / title (if applicable)",
+			"maritalStatus": "Marital Status",
+			"identificationNumbers": "Identification Numbers",
+			"taxId": "Tax ID",
+			"street": "Street",
+			"houseNumber": "House Number",
+			"city": "City",
+			"state": "State",
+			"zipCode": "Postal Code"
+		},
+		"step_title": {
+			"1": "Personal Data",
+			"2": "Further Details",
+			"3": "Address"
+		},
+		"step_page": "Question {{current}} of {{total}}",
+		"gender": {
+			"Male": "male",
+			"Female": "female",
+			"Diverse": "diverse / non-binary",
+			"hint": "This field matches the entry on your official ID card or birth certificate, as it is required for the official application."
+		},
+		"maritalStatus": {
+			"Single": "Single",
+			"Married": "Married",
+			"Divorced": "Divorced",
+			"Widowed": "Widowed",
+			"Registered Civil Partnership": "Registered Civil Partnership"
+		},
+		"actions": {
+			"save": "Save Changes",
+			"saving": "Saving...",
+			"saved": "Saved",
+			"cancel": "Cancel",
+			"edit": "Edit personal data",
+			"back_to_profile": "Back to Profile"
+		},
+		"upload": {
+			"drag_drop": "Click to upload or drag and drop",
+			"formats": "PDF, JPG or PNG (max. 10MB)",
+			"start_upload": "Upload Document",
+			"start_camera": "Open Camera",
+			"uploading": "Uploading...",
+			"processing": "Processing...",
+			"processing_desc": "This usually takes a few seconds.",
+			"success_title": "Document Uploaded!",
+			"success_desc": "We are now processing your document. You will be redirected shortly.",
+			"background_processing_title": "Processing in background",
+			"background_processing_desc": "Your document is being analyzed in the background. You can continue with other categories.",
+			"page": "Page",
+			"add_page": "Add Page",
+			"confirm": "Process Document",
+			"confirm_camera": "Use & Process Photo"
+		},
+		"countries": {
+			"DE": "Germany",
+			"FR": "France",
+			"AT": "Austria",
+			"CH": "Switzerland",
+			"PL": "Poland",
+			"CZ": "Czech Republic",
+			"NL": "Netherlands",
+			"GB": "United Kingdom",
+			"UA": "Ukraine",
+			"TR": "Turkey",
+			"US": "United States",
+			"CA": "Canada"
+		},
+		"errors": {
+			"update_failed": "Update failed",
+			"system_error": "A system error occurred"
+		}
+	},
+	"address_placeholder": {
+		"title": "Address Details",
+		"desc": "We are preparing this section to securely store your residence information. This will help us automatically fill out your Grundsicherung application later.",
+		"return": "Return to Profile"
+	},
+	"bank_placeholder": {
+		"title": "Bank Connection",
+		"desc": "This section will securely hold your account details for future social benefit payments. We are working to ensure this information is protected by the highest security standards.",
+		"return": "Return to Profile"
+	},
+	"common": {
+		"back": "Back",
+		"back_to_overview": "Back to overview",
+		"close": "Close",
+		"cancel": "Cancel",
+		"edit": "Edit",
+		"save": "Save",
+		"saving": "Saving...",
+		"delete": "Delete",
+		"yes": "Yes",
+		"no": "No",
+		"error_title": "Error",
+		"error_desc": "Failed to load documents.",
+		"retry": "Retry",
+		"loading": "Loading...",
+		"please_select": "Please select",
+		"save_close": "Save and close",
+		"continue": "Continue",
+		"done": "Done!",
+		"save_and_continue": "Save and continue",
+		"remove_file": "Remove",
+		"download": "Download",
+		"edit_field": "Edit {{field}}"
+	},
+	"success": {
+		"headline": "Data Accepted",
+		"summary_title": "What was saved?",
+		"milestone": {
+			"imported": "Data imported",
+			"saved": "Document saved",
+			"updated": "Application updated"
+		},
+		"back_action": "Continue"
+	},
+	"review": {
+		"title": "Review data",
+		"subtitle": "Review the extracted data and confirm it.",
+		"detected_type": "A document was detected",
+		"detected_data": "The following data was detected",
+		"delete_document": "Delete document",
+		"confirm_all": "Confirm",
+		"delete_title": "Delete document?",
+		"delete_confirm": "Do you really want to delete this document?",
+		"doc_type_other": "Other",
+		"no_data": "No data was extracted from this document.",
+		"errors": {
+			"empty_field": "The confirmed field \"{{field}}\" must not be empty.",
+			"verification_failed": "Error confirming the data.",
+			"system_error": "An unexpected system error occurred."
+		},
+		"warning_title": "Review recommended",
+		"warnings": {
+			"PAGINATION_MISSING_PAGES": "It looks like some pages of this document might be missing. Please verify that everything is complete.",
+			"LEGIBILITY_ISSUES": "The document is difficult to read in some places (e.g. due to blurriness or glare). Please double-check the extracted data.",
+			"DATA_CONFLICTS": "Some extracted data does not match your previous details. Please confirm the correct information.",
+			"OLD_STATEMENT_WARNING": "This document seems to be older than 3 months. You can proceed, but clerks may ask for an update later.",
+			"default": "Please review the extracted data carefully."
+		},
+		"fields": {
+			"description": "Description",
+			"given_names": "Given Name(s)",
+			"first_name": "First Name",
+			"family_name": "Last Name",
+			"last_name": "Last Name",
+			"birth_date": "Date of Birth",
+			"birth_place": "Place of Birth",
+			"city_of_birth": "City of Birth",
+			"sex": "Gender",
+			"gender": "Gender",
+			"legal_gender": "Gender",
+			"street": "Street",
+			"house_number": "House Number",
+			"city": "City",
+			"state": "State",
+			"street_name": "Street",
+			"zip_code": "Zip Code",
+			"postal_code": "Postal Code",
+			"monthly_total_rent": "Warm Rent (total)",
+			"monthly_rent": "Warm Rent",
+			"rent_total": "Warm Rent (total)",
+			"monthly_heating_costs": "Heating Costs",
+			"heating_costs": "Heating Costs",
+			"square_meters": "Living Area (m²)",
+			"living_area": "Living Area (m²)",
+			"rooms": "Number of Rooms",
+			"number_of_rooms": "Number of Rooms",
+			"income": "Income",
+			"earnings": "Earnings",
+			"monthly_income": "Monthly Income",
+			"document_id": "Document ID",
+			"card_number": "Card Number",
+			"identification_numbers": "Identification Numbers",
+			"social_security_number": "Social Security No.",
+			"social_security_no": "Social Security No.",
+			"pension_insurance_number": "Pension Insurance No.",
+			"has_self_employment_income": "Has Self-Employment Income",
+			"total_monthly_net": "Total Monthly Net Income",
+			"total_liquid_assets": "Total Liquid Assets",
+			"owns_real_estate": "Owns Real Estate",
+			"base_rent": "Cold Rent",
+			"heating_type": "Heating Type",
+			"iban": "IBAN",
+			"account_holder": "Account Holder",
+			"account_holder_name": "Account Holder",
+			"member_count": "Number of Household Members",
+			"has_partner_in_household": "Has Partner in Household",
+			"valid_until": "Valid Until",
+			"date_of_issue": "Date of Issue",
+			"place_of_issue": "Place of Issue",
+			"nationality": "Nationality",
+			"second_nationality": "Second Nationality",
+			"place_of_birth": "Place of Birth",
+			"country_of_birth": "Country of Birth",
+			"residence_status": "Residence Status",
+			"hot_water_costs": "Hot Water Costs",
+			"date_of_birth": "Date of Birth",
+			"address": "Address",
+			"issuing_authority": "Issuing Authority",
+			"marital_status": "Marital Status",
+			"is_living_with_spouse": "Living with Spouse",
+			"is_living_with_children": "Living with Children",
+			"is_living_with_parent": "Living with Parent(s)",
+			"owner_name": "Landlord Name",
+			"owner_address": "Landlord Address",
+			"is_moving_in": "Is Moving In",
+			"date_of_moving": "Moving In Date",
+			"tenant_name": "Tenant Name",
+			"tenant_address": "Tenant Address",
+			"confirmation_date": "Confirmation Date",
+			"remarks": "Remarks",
+			"employment_permitted": "Employment Permitted",
+			"permit_type": "Residence Permit",
+			"file_number": "File Number",
+			"status_granted": "Granted Status",
+			"limited_to_state": "Limited to State",
+			"statement_period_start": "Period From",
+			"statement_period_end": "Period To",
+			"statement_date": "Statement Date",
+			"account_balance": "Account Balance",
+			"amount_health_insurance": "Health Insurance (amount in EUR)",
+			"amount_liability_insurance": "Liability Insurance (amount in EUR)",
+			"amount_rent": "Rent (amount in EUR)",
+			"amount_pension": "Pension (amount in EUR)",
+			"employee_name": "Employee Name",
+			"employee_address": "Employee Address",
+			"tax_id": "Tax ID",
+			"health_insurance_provider": "Health Insurance Provider",
+			"employer_name": "Employer Name",
+			"employer_address": "Employer Address",
+			"gross_amount": "Gross Amount",
+			"net_amount": "Net Amount",
+			"pay_period": "Pay Period",
+			"date_issued": "Date Issued",
+			"accumulated_yearly_gross_income": "Accumulated Yearly Gross Income",
+			"accumulated_yearly_net_income": "Accumulated Yearly Net Income",
+			"benefit_type": "Benefit Type",
+			"reference_number": "Reference Number",
+			"bg_number": "Bedarfsgemeinschaft (BG) No.",
+			"date_of_application": "Date of Application",
+			"is_granted": "Is Granted",
+			"recipient_name": "Recipient",
+			"monthly_payment": "Monthly Payment",
+			"payment_reason": "Reason for Payment",
+			"amount": "Amount",
+			"pension_reason": "Pension Type",
+			"case_number": "Case Number",
+			"start_date_of_pension": "Start Date of Pension",
+			"end_date_of_pension": "End Date of Pension",
+			"monthly_amount": "Monthly Amount",
+			"back_pay_amount": "Back Pay Amount",
+			"name_of_pensioner": "Pensioner Name",
+			"provider_name": "Insurance Name",
+			"insurance_policy_number": "Policy Number",
+			"monthly_payout_amount": "Monthly Payout Amount",
+			"current_monthly_pension_amount": "Current Monthly Pension Amount",
+			"current_one_time_payout_amount": "Current One-Time Payout Amount",
+			"estimated_start_of_pension": "Estimated Start of Pension",
+			"start_of_pension_monthly_pension_amount": "Monthly Pension Amount at Start",
+			"year": "Year",
+			"is_permanent": "Is Permanent",
+			"decision_date": "Decision Date",
+			"current_balance": "Current Balance",
+			"bank_name": "Bank Name",
+			"portfolio_value": "Portfolio Value",
+			"surrender_value": "Surrender Value",
+			"contract_end_date": "Contract End Date",
+			"property_address": "Property Address",
+			"property_type": "Property Type",
+			"outstanding_mortgage": "Outstanding Mortgage",
+			"net_cold_rent": "Net Cold Rent",
+			"operating_costs": "Operating Costs",
+			"start_date_of_rent": "Start Date of Rent",
+			"end_date_of_rent": "End Date of Rent",
+			"new_total_rent": "New Warm Rent",
+			"effective_date": "Effective Date",
+			"billing_period": "Billing Period",
+			"balance_due": "Balance Due",
+			"fuel_type": "Fuel Type",
+			"annual_total_heating_costs": "Annual Heating Costs",
+			"annual_consumption_amount_kwh_per_square_meter": "Annual Consumption (kWh/m²)",
+			"heating_costs_regardless_of_usage": "Basic Heating Costs (regardless of usage)",
+			"heating_costs_usage_based": "Usage-based Heating Costs",
+			"warm_water_costs_regardless_of_usage": "Basic Hot Water Costs (regardless of usage)",
+			"warm_water_costs_usage_based": "Usage-based Hot Water Costs",
+			"insurance_name": "Insurance Name",
+			"health_insurance_status": "Insurance Type",
+			"compulsory_insurance": "Compulsory Insurance",
+			"voluntary_insurance": "Voluntary Insurance",
+			"family_insurance": "Family Insurance",
+			"private_insurance": "Private Insurance",
+			"care_by_health_insurance_under_264_sgb_v": "Care by Health Insurance under § 264 SGB V",
+			"is_private": "Private Insurance",
+			"full_name": "Full Name",
+			"care_level": "Care Level",
+			"effective_from": "Effective From",
+			"invoice_amount": "Invoice Amount",
+			"service_period": "Service Period",
+			"monthly_base_cost": "Monthly Base Cost",
+			"facility_name": "Care Facility Name",
+			"agreement_date": "Agreement Date",
+			"alimony_obligations_exist": "Alimony Obligations Exist",
+			"application_date": "Application Date",
+			"assignment_date": "Assignment Date",
+			"authority_areas": "Areas of Authority",
+			"catering_costs": "Catering Costs",
+			"diagnosis_summary": "Diagnosis Summary",
+			"disability_degree": "Degree of Disability",
+			"district_authority": "District Authority",
+			"divorce_date": "Divorce Date",
+			"expected_due_date": "Expected Due Date",
+			"facility_address": "Facility Address",
+			"guardian_name": "Guardian Name",
+			"has_sub_tenants": "Has Sub-Tenants",
+			"investment_costs": "Investment Costs",
+			"is_life_long": "Required for Life",
+			"is_main_tenant": "Main Tenant",
+			"is_signed": "Signed",
+			"landlord_address": "Landlord Address",
+			"landlord_name": "Landlord Name",
+			"marks": "Disability Marks",
+			"marriage_date": "Marriage Date",
+			"maternity_pass_number": "Maternity Passport Number",
+			"monthly_interest": "Monthly Interest",
+			"monthly_operating_costs": "Monthly Operating Costs",
+			"partner_name": "Partner Name",
+			"payment_periods": "Payment Periods",
+			"period_from": "Period From",
+			"period_to": "Period To",
+			"reason_for_diet": "Reason for Special Diet",
+			"report_date": "Report Date",
+			"representative_name": "Representative Name",
+			"scope_of_authority": "Scope of Authority"
+		}
+	},
+	"errors": {
+		"save_title": "Error Saving Profile",
+		"save_failed": "Failed to save data",
+		"firstName_required": "First name is required",
+		"lastName_required": "Last name is required",
+		"placeOfBirth_required": "Place of birth is required",
+		"upload_failed": "Upload failed",
+		"system_error": "A system error occurred"
+	},
+	"logout": "Logout",
+	"settings": {
+		"title": "Settings",
+		"modals": {
+			"delete": {
+				"title": "Permanently delete account?",
+				"desc": "Are you sure you want to delete your account? All your personal data and documents will be immediately and permanently removed from the device.",
+				"confirm": "Delete Account",
+				"cancel": "Cancel"
+			}
+		}
+	},
+	"housing": {
+		"question": "What is your living situation?",
+		"why": {
+			"desc": "The welfare office requires this information to verify which costs for accommodation and heating (the warm rent) can be covered at an appropriate level. This directly influences the amount of your total entitlement to Grundsicherung."
+		},
+		"questions": {
+			"address_title": "What is your current residential address?",
+			"last_fixed_address_title": "Where did you last reside permanently?",
+			"accomodation_type_title": "How do you reside at the moment?",
+			"tenancy_status_title": "Are you a main tenant or a subtenant?",
+			"sublet_title": "Do you sublet any rooms?",
+			"arrears_title": "Do you have rent arrears?",
+			"arrears_details_legal": "Has the landlord already initiated legal action (e.g. eviction lawsuit)?",
+			"costs_title": "How high are your monthly housing costs?",
+			"size_title": "How large is your apartment/house?",
+			"heating_type_title": "How is your apartment heated?"
+		},
+		"labels": {
+			"street": "Street",
+			"houseNumber": "House number",
+			"zipCode": "ZIP code",
+			"city": "City",
+			"no_fixed_address": "I currently do not have a fixed address",
+			"last_fixed_address": "Last permanent residence",
+			"free_housing_right_holder": "Free housing right at (Name of the person)",
+			"landlord_name": "Name of the landlord",
+			"arrears_amount": "How high are your rent arrears? (in Euro)",
+			"rent_paid_until": "Rent paid until (date)",
+			"rent_total": "Total rent (Warm rent in Euro)",
+			"heating_costs": "Heating costs (monthly in Euro)",
+			"hot_water_costs": "Hot water costs (€)",
+			"cable_tv_costs": "Cable TV costs (€)",
+			"living_area": "Living area (in sqm)",
+			"number_of_rooms": "Number of rooms",
+			"sublet_room_count": "How many rooms do you sublet?",
+			"sublet_rent_income": "Rent (Warm) in EUR"
+		},
+		"options": {
+			"rental_title": "I rent my apartment.",
+			"rental_hinweis": "Please have your rental contract and your last heating cost statement ready.",
+			"own_title": "I own my house or apartment.",
+			"own_hinweis": "Please have your property tax assessment and mortgage data ready.",
+			"care_title": "I live in a care facility or assisted living complex.",
+			"care_hinweis": "Please have your living contract and cost breakdown ready.",
+			"commercial_title": "I live in a commercial accommodation (hostel, shelter for refugees or the homeless).",
+			"commercial_hinweis": "If you have no permanent address or live in an accommodation, the specialized Soziale Wohnhilfe office is often responsible. There you will find support for imminent or actual homelessness.",
+			"accomodation_rental": "I live in a rented apartment",
+			"accomodation_own": "I live in my own home / owner-occupied apartment",
+			"accomodation_care": "I live in a care facility",
+			"accomodation_relative": "I live with relatives / acquaintances (without own rental contract)",
+			"accomodation_other": "I live in another accommodation (e.g. homeless shelter)",
+			"tenancy_main": "Main tenant",
+			"tenancy_sub": "Subtenant",
+			"tenancy_free": "I have free housing right",
+			"sublet_none": "No, no subletting",
+			"sublet_one": "Yes, I sublet 1 room",
+			"sublet_multiple": "Yes, I sublet 2 or more rooms",
+			"arrears_none": "No, no rent arrears",
+			"arrears_yes": "Yes, I have rent arrears",
+			"heating_sammelheizung": "Central heating",
+			"heating_warmwasser": "Central hot water supply",
+			"heating_gasheizung": "Gas heating",
+			"heating_nachtstrom": "Night storage heater",
+			"heating_ofenheizung": "Stove heating"
+		},
+		"details_title": "Housing Details",
+		"fields": {
+			"tenancyStatus": "Tenancy Status",
+			"rentTotal": "Warm Rent Total (€)",
+			"heatingCosts": "Heating Costs (€)",
+			"livingArea": "Living Area (m²)",
+			"numberOfRooms": "Number of Rooms"
+		},
+		"tenancyStatus": {
+			"Main Tenant": "Main Tenant",
+			"Subtenant": "Subtenant"
+		}
+	},
+	"validation": {
+		"empty_string": "This field cannot be empty.",
+		"invalid_phone": "Please enter a valid phone number (e.g., +49 176 12345678 or 0176 12345678).",
+		"invalid_zip": "German postal codes must consist of exactly five digits.",
+		"future_date_not_allowed": "The date cannot be in the future.",
+		"past_date_required": "The date must be in the past.",
+		"future_date_required": "The date must be in the future.",
+		"invalid_decimal": "Please enter a valid amount (e.g., 450.00).",
+		"invalid_number": "Please enter a positive number.",
+		"invalid_date": "Please enter a valid date (e.g., 01.01.1950).",
+		"invalid_country": "Invalid country code.",
+		"invalid_gender": "Invalid gender value.",
+		"value_error": "Invalid value."
+	},
+	"household": {
+		"why": {
+			"desc": "Your familial and living situation describes which people require financial support and how they are connected. This affects the total requirement for Grundsicherung."
+		},
+		"family_01": {
+			"title": "What is your current marital status?",
+			"option_married_title": "I am married or live in a registered civil partnership.",
+			"option_married_hinweis": "We must include your partner in this application. Please have their ID and proof of income ready.",
+			"option_widowed_title": "I am widowed.",
+			"option_widowed_hinweis": "I am very sorry for your loss. You may be entitled to a widow's pension. Please have the letter from the pension office ready explaining this payment.",
+			"option_single_title": "I am single or divorced.",
+			"option_single_hinweis": "Thank you. This helps us understand your personal situation."
+		},
+		"family_02": {
+			"title": "Do you live alone in your apartment?",
+			"option_alone_title": "Yes, I live alone.",
+			"option_alone_hinweis": "Thank you. This helps us understand your household situation.",
+			"option_not_alone_title": "No, I live together with other people.",
+			"option_not_alone_hinweis": "We will record in the next step who lives with you."
+		},
+		"family_03": {
+			"title": "Who lives with you in the apartment?",
+			"option_partner_title": "My spouse/civil partner.",
+			"option_partner_hinweis": "Since you live together, the office verifies your joint income. We will ask further questions about your household.",
+			"option_children_title": "My children or parents.",
+			"option_children_hinweis": "The office must know if your children or parents generate a high income (more than €100,000 per year). If so, they may be asked for financial support. We will ask further questions about your household.",
+			"option_others_title": "Roommates or other people.",
+			"option_others_hinweis": "The office must know if you share food and costs with the household community or if you only share the accommodation."
+		},
+		"q6_guardian": {
+			"title": "Are you under legal support or guardianship?",
+			"option_guardian": "Yes, I have a guardian",
+			"option_succor": "Yes, I have legal support",
+			"option_none": "No, neither"
+		},
+		"q7_displaced": {
+			"title": "Are you displaced from your home country?",
+			"option_yes": "Yes",
+			"option_no": "No",
+			"dropdown_title": "Please choose your displacement status",
+			"status_expellee": "Expellee (Resettler)",
+			"status_displaced": "Displaced Person (Resettler)",
+			"status_late_resettler": "Late Resettler",
+			"status_descendant": "Spouse/Descendant of a Late Resettler",
+			"status_refugee": "Soviet Zone Refugee"
+		},
+		"q8_insurance": {
+			"title": "Do you have any of these insurances?",
+			"option_social": "Social Security Insurance",
+			"option_health": "Health Insurance",
+			"option_none": "I am not insured",
+			"dropdown_social_title": "Which social security?",
+			"dropdown_health_title": "Which health insurance?",
+			"social_pension": "Pension Insurance",
+			"social_care": "Long-term Care Insurance",
+			"social_other": "Other",
+			"health_compulsory": "Compulsory Insurance",
+			"health_voluntary": "Voluntary Insurance",
+			"health_family": "Family Insurance",
+			"health_private": "Private Insurance",
+			"health_funds": "Care by Health Funds under § 264 SGB V",
+			"health_other": "Other"
+		},
+		"actions": {
+			"go_to_page_2": "Go to question 2 of 3",
+			"go_to_page_3": "Go to question 3 of 3"
+		}
+	},
+	"documents": {
+		"preview_title": "Document Preview",
+		"pdf_preview_title": "PDF Preview",
+		"errors": {
+			"previewUnavailableDueToTTL": "This document is no longer available as a live preview due to automated cloud storage retention policies. However, your verified extracted data remains safely saved in your user profile.",
+			"loadFailed": "An error occurred while loading the document preview.",
+			"loading_document": "Loading document..."
+		}
+	}
+}

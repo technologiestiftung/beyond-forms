@@ -1,0 +1,14 @@
+[project]
+name = "llm-eval"
+version = "0.1.0"
+description = "LLM Automated Field Mapping Evaluation Suite for Beyond Forms"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "litellm",
+    "pyjexl",
+    "pydantic",
+    "jinja2",
+    "google-auth",
+    "google-cloud-aiplatform"
+]

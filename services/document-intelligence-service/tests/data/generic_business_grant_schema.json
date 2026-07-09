@@ -1,0 +1,4162 @@
+﻿{
+  "program": {
+    "id": 245,
+    "adminName": "business_grant_application",
+    "adminDescription": "",
+    "externalLink": "https://charlotteopenforbusiness.com/wp-content/uploads/2023/05/Business-Matching-Grant-Program-Application.pdf",
+    "displayMode": "PUBLIC",
+    "notificationPreferences": [],
+    "localizedName": {
+      "translations": {
+        "am": ".",
+        "ru": "Small Business Matching Grant (Грант для малого бизнеса)",
+        "vi": "\tTrợ cấp phù hợp cho doanh nghiệp nhỏ",
+        "en_US": "Small Business Matching Grant",
+        "es_US": "\tSubvención para equiparación de pequeñas empresas",
+        "zh_TW": "小型企业同额资助"
+      },
+      "isRequired": true
+    },
+    "localizedDescription": {
+      "translations": {
+        "am": ".",
+        "ru": "В эту заявку входят гранты Façade Improvement Grant (Грант на ремонт фасадов), Security Improvement Grant (Грант на повышение безопасности) и Interior Uplift Improvement Grant (Грант на ремонт интерьера).",
+        "vi": "Đơn đăng ký này bao gồm tất cả Façade Improvement Grant (Trợ cấp cải thiện mặt tiền), Security Improvement Grant (Trợ cấp cải thiện an ninh) và Interior Uplift Improvement Grant (Trợ cấp cải thiện nâng cấp nội thất). ",
+        "en_US": "This application is all inclusive for the Façade Improvement Grant, Security Improvement Grant and Interior Uplift Improvement Grant.",
+        "es_US": "Esta aplicación abarca todo con respecto a Façade Improvement Grant (subsidio para mejoras de la fachada), Security Improvement Grant (subsidio para mejoras de la seguridad) e Interior Uplift Improvement Grant (subsidio para mejoras del interiorismo).",
+        "zh_TW": "该申请涵盖了Façade Improvement Grant（外立面改造补助金）、Security Improvement Grant（安保改造补助金）和Interior Uplift Improvement Grant（室内装修改造补助金）。"
+      },
+      "isRequired": true
+    },
+    "localizedShortDescription": {
+      "translations": {
+        "en_US": ""
+      },
+      "isRequired": true
+    },
+    "localizedConfirmationMessage": {
+      "translations": {
+        "am": ".",
+        "ru": "Благодарим Вас за Вашу заявку. Мы рассмотрим его и свяжемся с вами позже.",
+        "vi": "Cảm ơn bạn đã đăng ký của bạn. Chúng tôi sẽ xem xét và liên hệ lại với bạn sau.",
+        "en_US": "Thank you for your application. We will review it and get back to you later.",
+        "es_US": "Gracias por su solicitud. Lo revisaremos y nos pondremos en contacto con usted más tarde.",
+        "zh_TW": ""
+      },
+      "isRequired": true
+    },
+    "blockDefinitions": [
+      {
+        "id": 1,
+        "name": "Application selection",
+        "description": "Screen 1 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Application selection",
+            "es_US": "Selección de aplicaciones",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 1 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": null,
+        "eligibilityDefinition": {
+          "predicate": {
+            "rootNode": {
+              "node": {
+                "type": "leaf",
+                "questionId": 454,
+                "scalar": "SELECTIONS",
+                "operator": "ANY_OF",
+                "value": {
+                  "value": "[\"10\"]",
+                  "type": "LIST_OF_STRINGS"
+                }
+              }
+            },
+            "action": "ELIGIBLE_BLOCK"
+          }
+        },
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 454,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 477,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 478,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "name": "Interior grant only screen",
+        "description": "Screen 10 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Interior grant only screen",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 10 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": {
+          "rootNode": {
+            "node": {
+              "type": "leaf",
+              "questionId": 477,
+              "scalar": "SELECTIONS",
+              "operator": "NONE_OF",
+              "value": {
+                "value": "[\"4\", \"3\"]",
+                "type": "LIST_OF_STRINGS"
+              }
+            }
+          },
+          "action": "SHOW_BLOCK"
+        },
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 118,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "name": "Universal Applicant information",
+        "description": "Screen 2 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Universal Applicant information",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 2 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": null,
+        "eligibilityDefinition": {
+          "predicate": {
+            "rootNode": {
+              "node": {
+                "type": "leaf",
+                "questionId": 479,
+                "scalar": "SELECTION",
+                "operator": "IN",
+                "value": {
+                  "value": "[\"2\"]",
+                  "type": "LIST_OF_STRINGS"
+                }
+              }
+            },
+            "action": "ELIGIBLE_BLOCK"
+          }
+        },
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 458,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 459,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 460,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 447,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 446,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 479,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 480,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "name": "Taxes not current - why?",
+        "description": "Screen 22 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Taxes not current - why?",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 22 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": {
+          "rootNode": {
+            "node": {
+              "type": "leaf",
+              "questionId": 479,
+              "scalar": "SELECTION",
+              "operator": "IN",
+              "value": {
+                "value": "[\"3\"]",
+                "type": "LIST_OF_STRINGS"
+              }
+            }
+          },
+          "action": "SHOW_BLOCK"
+        },
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 126,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "name": "Property address, zoning, and square footage",
+        "description": "Screen 8 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Property address, zoning, and square footage",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 8 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 481,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 482,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 483,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "name": "Business yes/no",
+        "description": "Screen 5 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Business yes/no",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 5 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 484,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "name": "Type of business",
+        "description": "Only shows up if application selects that they are a business. ",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Type of business",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Only shows up if application selects that they are a business. ",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": {
+          "rootNode": {
+            "node": {
+              "type": "leaf",
+              "questionId": 484,
+              "scalar": "SELECTION",
+              "operator": "IN",
+              "value": {
+                "value": "[\"0\"]",
+                "type": "LIST_OF_STRINGS"
+              }
+            }
+          },
+          "action": "SHOW_BLOCK"
+        },
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 485,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "name": "Supporting business documentation",
+        "description": "Shown only if applicant is a business",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Supporting business documentation",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Shown only if applicant is a business",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": {
+          "rootNode": {
+            "node": {
+              "type": "leaf",
+              "questionId": 484,
+              "scalar": "SELECTION",
+              "operator": "IN",
+              "value": {
+                "value": "[\"0\"]",
+                "type": "LIST_OF_STRINGS"
+              }
+            }
+          },
+          "action": "SHOW_BLOCK"
+        },
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 486,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "name": "Multiple owners",
+        "description": "Screen 13 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Multiple owners",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 13 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": {
+          "rootNode": {
+            "node": {
+              "type": "leaf",
+              "questionId": 484,
+              "scalar": "SELECTION",
+              "operator": "IN",
+              "value": {
+                "value": "[\"0\"]",
+                "type": "LIST_OF_STRINGS"
+              }
+            }
+          },
+          "action": "SHOW_BLOCK"
+        },
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 487,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "name": "All business owners more than 10% enumerator ",
+        "description": "Screen 9 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "All business owners more than 10% enumerator ",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 9 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": {
+          "rootNode": {
+            "node": {
+              "type": "leaf",
+              "questionId": 487,
+              "scalar": "SELECTION",
+              "operator": "IN",
+              "value": {
+                "value": "[\"4\"]",
+                "type": "LIST_OF_STRINGS"
+              }
+            }
+          },
+          "action": "SHOW_BLOCK"
+        },
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 420,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "name": "Date of birth",
+        "description": "Screen 11 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Date of birth",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 11 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": 9,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 488,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 26,
+        "name": "Screen 26 (repeated from 9)",
+        "description": "Screen 26 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 26 (repeated from 9)",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 26 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": 9,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 489,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 27,
+        "name": "Screen 27 (repeated from 26)",
+        "description": "Screen 27 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 27 (repeated from 26)",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 27 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": 26,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 492,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "name": "Total years at property",
+        "description": "Screen 14 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Total years at property",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 14 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": 9,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 493,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "name": "Taxes current?",
+        "description": "Screen 15 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Taxes current?",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 15 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": 9,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 494,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "name": "Project information",
+        "description": "Screen 16 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Project information",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 16 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 495,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 496,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 497,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 24,
+        "name": "files",
+        "description": "Screen 24 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "files",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 24 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 498,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "name": "Upload building permits/site plans",
+        "description": "Screen 17 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Upload building permits/site plans",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 17 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": {
+          "rootNode": {
+            "node": {
+              "type": "or",
+              "children": [
+                {
+                  "node": {
+                    "type": "and",
+                    "children": [
+                      {
+                        "node": {
+                          "type": "leaf",
+                          "questionId": 497,
+                          "scalar": "SELECTION",
+                          "operator": "IN",
+                          "value": {
+                            "value": "[\"1\"]",
+                            "type": "LIST_OF_STRINGS"
+                          }
+                        }
+                      },
+                      {
+                        "node": {
+                          "type": "leaf",
+                          "questionId": 496,
+                          "scalar": "SELECTION",
+                          "operator": "IN",
+                          "value": {
+                            "value": "[\"0\"]",
+                            "type": "LIST_OF_STRINGS"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "node": {
+                    "type": "and",
+                    "children": [
+                      {
+                        "node": {
+                          "type": "leaf",
+                          "questionId": 497,
+                          "scalar": "SELECTION",
+                          "operator": "IN",
+                          "value": {
+                            "value": "[\"0\"]",
+                            "type": "LIST_OF_STRINGS"
+                          }
+                        }
+                      },
+                      {
+                        "node": {
+                          "type": "leaf",
+                          "questionId": 496,
+                          "scalar": "SELECTION",
+                          "operator": "IN",
+                          "value": {
+                            "value": "[\"1\"]",
+                            "type": "LIST_OF_STRINGS"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "action": "SHOW_BLOCK"
+        },
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 144,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "name": "Project information continued",
+        "description": "Screen 18 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Project information continued",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 18 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 499,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 500,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "name": "Code violation explain",
+        "description": "Only shown if applicant selected there was a code violation. ",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Code violation explain",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Only shown if applicant selected there was a code violation. ",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": {
+          "rootNode": {
+            "node": {
+              "type": "leaf",
+              "questionId": 500,
+              "scalar": "SELECTION",
+              "operator": "IN",
+              "value": {
+                "value": "[\"0\"]",
+                "type": "LIST_OF_STRINGS"
+              }
+            }
+          },
+          "action": "SHOW_BLOCK"
+        },
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 501,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "name": "Screen 4",
+        "description": "Screen 4 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 4",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 4 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 502,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 21,
+        "name": "Security improvement grant only",
+        "description": "Screen 21 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Security improvement grant only",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 21 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": {
+          "rootNode": {
+            "node": {
+              "type": "leaf",
+              "questionId": 477,
+              "scalar": "SELECTIONS",
+              "operator": "ANY_OF",
+              "value": {
+                "value": "[\"4\"]",
+                "type": "LIST_OF_STRINGS"
+              }
+            }
+          },
+          "action": "SHOW_BLOCK"
+        },
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 149,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 25,
+        "name": "Owner Consent Form",
+        "description": "Screen 25 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Owner Consent Form",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 25 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 503,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "name": "Signature",
+        "description": "Screen 3 description",
+        "localizedName": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Signature",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedDescription": {
+          "translations": {
+            "am": "",
+            "ru": "",
+            "vi": "",
+            "en_US": "Screen 3 description",
+            "es_US": "",
+            "zh_TW": ""
+          },
+          "isRequired": true
+        },
+        "localizedEligibilityMessage": null,
+        "repeaterId": null,
+        "hidePredicate": null,
+        "optionalPredicate": null,
+        "questionDefinitions": [
+          {
+            "id": 504,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          },
+          {
+            "id": 505,
+            "optional": false,
+            "addressCorrectionEnabled": false
+          }
+        ]
+      }
+    ],
+    "programType": "DEFAULT",
+    "eligibilityIsGating": false,
+    "acls": {
+      "tiProgramViewAcls": []
+    },
+    "localizedSummaryImageDescription": {
+      "translations": {
+        "am": "\"\"",
+        "ru": "",
+        "vi": "",
+        "en_US": "\"\"",
+        "es_US": "\"\"",
+        "zh_TW": ""
+      },
+      "isRequired": true
+    },
+    "categories": [],
+    "applicationSteps": []
+  },
+  "questions": [
+    {
+      "type": "multioption",
+      "config": {
+        "name": "service_interest",
+        "description": "Right now, the only option that would allow the applicant to continue in CiviForm is if they check Housing Services. ",
+        "questionText": {
+          "translations": {
+            "am": "¿En qué programa(s) o servicio(s) tiene interés principalmente hoy? ",
+            "fr": "Quel(s) est/sont le(s) programme(s) ou service(s) qui vous intéresse(nt) principalement aujourd’hui ? ",
+            "ru": "Какие программы или услуги вас сегодня интересуют в первую очередь?",
+            "vi": "Những chương trình hoặc (các) dịch vụ nào bạn chủ yếu quan tâm đến ngày hôm nay?",
+            "en_US": "What program(s) or service(s) are you primarily interested in today? ",
+            "es_US": "¿En qué programa(s) o servicio(s) tiene interés principalmente hoy? ",
+            "zh_TW": "您目前主要感兴趣的项目或服务是什么？ "
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "am": "Seleccione todas las opciones que correspondan. Esta información nos ayudará a entender en qué prefieren usar CiviForm los residentes.",
+            "fr": "Cochez toutes les réponses valables.",
+            "ru": "Отметьте все подходящие варианты. Эта информация поможет нам понять, для чего жители больше всего хотели бы использовать CiviForm.",
+            "vi": "Kiểm tra tất cả những gì áp dụng. Thông tin này sẽ giúp chúng tôi hiểu những gì cư dân muốn sử dụng CiviForm nhất.\r\n\r\n",
+            "en_US": "Check all that apply. This information will help us understand what residents would most like to use CiviForm for.",
+            "es_US": "Seleccione todas las opciones que correspondan. Esta información nos ayudará a entender en qué prefieren usar CiviForm los residentes.\r\n",
+            "zh_TW": "请勾选所有适用的选项. 这些信息将有助于我们了解居民最希望使用 CiviForm 的用途。"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": 1,
+          "maxChoicesAllowed": null
+        },
+        "id": 454,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 0,
+          "adminName": "housing_services",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Servicios de vivienda",
+              "fr": "Services de logemen",
+              "ru": " Жилищные услуги",
+              "vi": " Dịch vụ nhà ở       Chăm sóc trẻ em  Giáo dục  Trợ giúp pháp lý  Dịch vụ cư dân mới  Dịch vụ cây xanh / cảnh quan  Tài trợ và trợ cấp cho doanh nghiệp nhỏ  Tôi quan tâm đến mọi thứ!",
+              "en_US": "Housing Services",
+              "es_US": "Servicios de vivienda",
+              "zh_TW": "住房服务"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "payment_assistance",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Asistencia con la facturación y el pago",
+              "fr": "Aide en matière de facturation/paiement ",
+              "ru": "Помощь в выставлении счетов/оплате ",
+              "vi": " Hỗ trợ thanh toán/thanh toán",
+              "en_US": "Billing/Payment Assistance",
+              "es_US": "Asistencia con la facturación y el pago",
+              "zh_TW": "账单/付款协助"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        },
+        {
+          "id": 2,
+          "adminName": "home_supplies",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Alimentos, ropa o suministros para el hogar",
+              "fr": "Nourriture, vêtements ou fournitures pour le logement",
+              "ru": "Продукты питания, одежда или товары для дома",
+              "vi": "Thực phẩm, quần áo hoặc đồ dùng gia đình",
+              "en_US": "Food, Clothing, or Home Supplies",
+              "es_US": "Alimentos, ropa o suministros para el hogar",
+              "zh_TW": "食物、衣服或家庭用品"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 2
+        },
+        {
+          "id": 3,
+          "adminName": "healthcare",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Atención médica",
+              "fr": "Soins de santé",
+              "ru": "Здравоохранение",
+              "vi": "Y tế  ",
+              "en_US": "Healthcare",
+              "es_US": "Atención médica",
+              "zh_TW": "医疗保健服务"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 3
+        },
+        {
+          "id": 4,
+          "adminName": "transport",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Transporte",
+              "fr": "Transport",
+              "ru": "Транспорт",
+              "vi": "Giao thông vận tải",
+              "en_US": "Transportation",
+              "es_US": "Transporte",
+              "zh_TW": "交通"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 4
+        },
+        {
+          "id": 5,
+          "adminName": "childcare",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Cuidado infantil",
+              "fr": "Garde d’enfants ",
+              "ru": "Уход за детьми",
+              "vi": "Chăm sóc trẻ em ",
+              "en_US": "Childcare",
+              "es_US": "Cuidado infantil",
+              "zh_TW": "托儿服务"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 5
+        },
+        {
+          "id": 6,
+          "adminName": "education",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Educación",
+              "fr": "Éducation",
+              "ru": " Образование",
+              "vi": "Giáo dục",
+              "en_US": "Education",
+              "es_US": "Educación",
+              "zh_TW": "教育"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 6
+        },
+        {
+          "id": 7,
+          "adminName": "legal_aid",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Asistencia jurídica",
+              "fr": "Aide juridique",
+              "ru": "Юридическая помощь",
+              "vi": "Trợ giúp pháp lý",
+              "en_US": "Legal Aid",
+              "es_US": "Asistencia jurídica",
+              "zh_TW": "法律援助"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 7
+        },
+        {
+          "id": 8,
+          "adminName": "new_resident",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Servicios para residentes nuevos",
+              "fr": "Services aux nouveaux résidents",
+              "ru": " Услуги для новых резидентов",
+              "vi": "Dịch vụ cư dân mới",
+              "en_US": "New Resident Services",
+              "es_US": "Servicios para residentes nuevos",
+              "zh_TW": "新居民服务"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 8
+        },
+        {
+          "id": 9,
+          "adminName": "tree_services",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Servicios de árboles y paisajismo",
+              "fr": "Services pour les arbres/de paysagisme",
+              "ru": "Услуги по уходу за деревьями / ландшафтному дизайну ",
+              "vi": "Dịch vụ cây xanh / cảnh quan",
+              "en_US": "Tree/Landscaping Services",
+              "es_US": "Servicios de árboles y paisajismo",
+              "zh_TW": "树木/景观美化服务"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 9
+        },
+        {
+          "id": 10,
+          "adminName": "small_business",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Financiamiento y subvenciones para pequeñas empresas",
+              "fr": "Financement et subventions pour petites entreprises",
+              "ru": "Финансирование и гранты для малого бизнеса ",
+              "vi": "Tài trợ và trợ cấp cho doanh nghiệp nhỏ",
+              "en_US": "Small Business Funding and Grants",
+              "es_US": "Financiamiento y subvenciones para pequeñas empresas",
+              "zh_TW": "小型企业资助和补助金"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 10
+        },
+        {
+          "id": 11,
+          "adminName": "all",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Me interesa todo!",
+              "fr": "Tout m’intéresse !",
+              "ru": " Мне все интересно!",
+              "vi": "Tôi quan tâm đến mọi thứ!",
+              "en_US": "I'm interested in everything!",
+              "es_US": "Me interesa todo!",
+              "zh_TW": "我对一切都感兴趣！"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 11
+        }
+      ],
+      "multiOptionQuestionType": "CHECKBOX",
+      "optionAdminNames": [
+        "housing_services",
+        "payment_assistance",
+        "home_supplies",
+        "healthcare",
+        "transport",
+        "childcare",
+        "education",
+        "legal_aid",
+        "new_resident",
+        "tree_services",
+        "small_business",
+        "all"
+      ],
+      "options": [
+        {
+          "id": 0,
+          "adminName": "housing_services",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Servicios de vivienda",
+              "fr": "Services de logemen",
+              "ru": " Жилищные услуги",
+              "vi": " Dịch vụ nhà ở       Chăm sóc trẻ em  Giáo dục  Trợ giúp pháp lý  Dịch vụ cư dân mới  Dịch vụ cây xanh / cảnh quan  Tài trợ và trợ cấp cho doanh nghiệp nhỏ  Tôi quan tâm đến mọi thứ!",
+              "en_US": "Housing Services",
+              "es_US": "Servicios de vivienda",
+              "zh_TW": "住房服务"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "payment_assistance",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Asistencia con la facturación y el pago",
+              "fr": "Aide en matière de facturation/paiement ",
+              "ru": "Помощь в выставлении счетов/оплате ",
+              "vi": " Hỗ trợ thanh toán/thanh toán",
+              "en_US": "Billing/Payment Assistance",
+              "es_US": "Asistencia con la facturación y el pago",
+              "zh_TW": "账单/付款协助"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        },
+        {
+          "id": 2,
+          "adminName": "home_supplies",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Alimentos, ropa o suministros para el hogar",
+              "fr": "Nourriture, vêtements ou fournitures pour le logement",
+              "ru": "Продукты питания, одежда или товары для дома",
+              "vi": "Thực phẩm, quần áo hoặc đồ dùng gia đình",
+              "en_US": "Food, Clothing, or Home Supplies",
+              "es_US": "Alimentos, ropa o suministros para el hogar",
+              "zh_TW": "食物、衣服或家庭用品"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 2
+        },
+        {
+          "id": 3,
+          "adminName": "healthcare",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Atención médica",
+              "fr": "Soins de santé",
+              "ru": "Здравоохранение",
+              "vi": "Y tế  ",
+              "en_US": "Healthcare",
+              "es_US": "Atención médica",
+              "zh_TW": "医疗保健服务"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 3
+        },
+        {
+          "id": 4,
+          "adminName": "transport",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Transporte",
+              "fr": "Transport",
+              "ru": "Транспорт",
+              "vi": "Giao thông vận tải",
+              "en_US": "Transportation",
+              "es_US": "Transporte",
+              "zh_TW": "交通"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 4
+        },
+        {
+          "id": 5,
+          "adminName": "childcare",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Cuidado infantil",
+              "fr": "Garde d’enfants ",
+              "ru": "Уход за детьми",
+              "vi": "Chăm sóc trẻ em ",
+              "en_US": "Childcare",
+              "es_US": "Cuidado infantil",
+              "zh_TW": "托儿服务"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 5
+        },
+        {
+          "id": 6,
+          "adminName": "education",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Educación",
+              "fr": "Éducation",
+              "ru": " Образование",
+              "vi": "Giáo dục",
+              "en_US": "Education",
+              "es_US": "Educación",
+              "zh_TW": "教育"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 6
+        },
+        {
+          "id": 7,
+          "adminName": "legal_aid",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Asistencia jurídica",
+              "fr": "Aide juridique",
+              "ru": "Юридическая помощь",
+              "vi": "Trợ giúp pháp lý",
+              "en_US": "Legal Aid",
+              "es_US": "Asistencia jurídica",
+              "zh_TW": "法律援助"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 7
+        },
+        {
+          "id": 8,
+          "adminName": "new_resident",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Servicios para residentes nuevos",
+              "fr": "Services aux nouveaux résidents",
+              "ru": " Услуги для новых резидентов",
+              "vi": "Dịch vụ cư dân mới",
+              "en_US": "New Resident Services",
+              "es_US": "Servicios para residentes nuevos",
+              "zh_TW": "新居民服务"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 8
+        },
+        {
+          "id": 9,
+          "adminName": "tree_services",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Servicios de árboles y paisajismo",
+              "fr": "Services pour les arbres/de paysagisme",
+              "ru": "Услуги по уходу за деревьями / ландшафтному дизайну ",
+              "vi": "Dịch vụ cây xanh / cảnh quan",
+              "en_US": "Tree/Landscaping Services",
+              "es_US": "Servicios de árboles y paisajismo",
+              "zh_TW": "树木/景观美化服务"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 9
+        },
+        {
+          "id": 10,
+          "adminName": "small_business",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Financiamiento y subvenciones para pequeñas empresas",
+              "fr": "Financement et subventions pour petites entreprises",
+              "ru": "Финансирование и гранты для малого бизнеса ",
+              "vi": "Tài trợ và trợ cấp cho doanh nghiệp nhỏ",
+              "en_US": "Small Business Funding and Grants",
+              "es_US": "Financiamiento y subvenciones para pequeñas empresas",
+              "zh_TW": "小型企业资助和补助金"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 10
+        },
+        {
+          "id": 11,
+          "adminName": "all",
+          "localizedOptionText": {
+            "translations": {
+              "am": "Me interesa todo!",
+              "fr": "Tout m’intéresse !",
+              "ru": " Мне все интересно!",
+              "vi": "Tôi quan tâm đến mọi thứ!",
+              "en_US": "I'm interested in everything!",
+              "es_US": "Me interesa todo!",
+              "zh_TW": "我对一切都感兴趣！"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 11
+        }
+      ]
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "select a program",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Quel est le Business Matching Grant Program (programme de contrepartie pour entreprises) qui vous intéresse (choisissez un ou plusieurs programmes) ? ",
+            "ru": "В какой программе грантов Business Matching вы бы хотели принять участие (выберите одну или несколько)?:\r\n\r\n",
+            "vi": "Bạn muốn được xem xét tham gia Chương trình tài trợ kết nối kinh doanh nào (chọn một hoặc nhiều)?:",
+            "en_US": "Which Business Matching Grant Program would you like to be considered for (select one or multiple)?:",
+            "es_US": "¿En qué programa de subvenciones para equiparación de empresas le gustaría ser considerado (seleccione uno o varios)?:",
+            "zh_TW": "您希望申请哪项企业同额资助项目（选择一项或多项）？ "
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "fr": "Découvrez les différents types de subventions (ici)",
+            "ru": "Подробнее о различных типах грантов читайте (здесь).\r\n\r\n",
+            "vi": "Đọc thêm về các loại tài trợ khác nhau (nhấn vào đây).",
+            "en_US": "Read more about the different grant types (here).",
+            "es_US": "Lea más sobre los diferentes tipos de subvenciones (aquí)",
+            "zh_TW": "阅读更多关于不同资助类型的信息（此处）"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": null,
+          "maxChoicesAllowed": null
+        },
+        "id": 477,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 3,
+          "adminName": "selection1",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Façade Improvement Grant (subvention pour l’amélioration des façades)",
+              "ru": "Грант на улучшение фасада",
+              "vi": "Tài trợ cải thiện mặt tiền",
+              "en_US": "Façade Improvement Grant",
+              "es_US": "●\tFaçade Improvement Grant (subsidio para mejoras de la fachada)",
+              "zh_TW": "Façade Improvement Grant（外立面改造补助金）"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 4,
+          "adminName": "selection2",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Security Improvement Grant (subvention pour l’amélioration de la sécurité) ",
+              "ru": "Грант на повышение безопасности",
+              "vi": "Tài trợ cải thiện bảo mật",
+              "en_US": "Security Improvement Grant",
+              "es_US": "●\tSecurity Improvement Grant (subsidio para mejoras de la seguridad)",
+              "zh_TW": "Security Improvement Grant（安保改造补助金）"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        },
+        {
+          "id": 5,
+          "adminName": "selection3",
+          "localizedOptionText": {
+            "translations": {
+              "fr": " Interior Uplift Improvement Grant (subvention pour l’amélioration des espaces intérieurs)",
+              "ru": "Грант на модернизацию интерьера",
+              "vi": "Tài trợ Upfit nội thất",
+              "en_US": "Interior Upfit Grant",
+              "es_US": "●\tInterior Upfit Grant (subsidio para acondicionamiento de interiores)",
+              "zh_TW": "Interior Uplift Grant（室内装修补助金）"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 2
+        }
+      ],
+      "multiOptionQuestionType": "CHECKBOX",
+      "optionAdminNames": ["selection1", "selection2", "selection3"],
+      "options": [
+        {
+          "id": 3,
+          "adminName": "selection1",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Façade Improvement Grant (subvention pour l’amélioration des façades)",
+              "ru": "Грант на улучшение фасада",
+              "vi": "Tài trợ cải thiện mặt tiền",
+              "en_US": "Façade Improvement Grant",
+              "es_US": "●\tFaçade Improvement Grant (subsidio para mejoras de la fachada)",
+              "zh_TW": "Façade Improvement Grant（外立面改造补助金）"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 4,
+          "adminName": "selection2",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Security Improvement Grant (subvention pour l’amélioration de la sécurité) ",
+              "ru": "Грант на повышение безопасности",
+              "vi": "Tài trợ cải thiện bảo mật",
+              "en_US": "Security Improvement Grant",
+              "es_US": "●\tSecurity Improvement Grant (subsidio para mejoras de la seguridad)",
+              "zh_TW": "Security Improvement Grant（安保改造补助金）"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        },
+        {
+          "id": 5,
+          "adminName": "selection3",
+          "localizedOptionText": {
+            "translations": {
+              "fr": " Interior Uplift Improvement Grant (subvention pour l’amélioration des espaces intérieurs)",
+              "ru": "Грант на модернизацию интерьера",
+              "vi": "Tài trợ Upfit nội thất",
+              "en_US": "Interior Upfit Grant",
+              "es_US": "●\tInterior Upfit Grant (subsidio para acondicionamiento de interiores)",
+              "zh_TW": "Interior Uplift Grant（室内装修补助金）"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 2
+        }
+      ]
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "select date",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Cycle d’examen des demandes (choisissez une option) : ",
+            "ru": "Цикл рассмотрения заявки (выберите один):",
+            "vi": "Chu kỳ xem xét đơn đăng ký (chọn một):",
+            "en_US": "Application Review Cycle (select one):",
+            "es_US": "Ciclo de revisión de la solicitud (seleccione uno):",
+            "zh_TW": "申请审核周期（请选择一个）： "
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "fr": "Votre demande sera examinée après la date que vous choisissez. Nous devrions vous informer de l’état de votre demande dans les 30 jours suivant la date choisie ci-dessous.",
+            "ru": "Ваша заявка будет рассмотрена после выбранной вами даты. Ожидайте ответа от нас о статусе вашей заявки в течение 30 дней с даты, выбранной ниже",
+            "vi": "Đơn đăng ký của bạn sẽ được xem xét sau ngày bạn chọn. Hy vọng sẽ nhận được phản hồi từ chúng tôi về tình trạng đơn đăng ký của bạn trong vòng 30 ngày kể từ ngày được chọn bên dưới",
+            "en_US": "Your application will be reviewed following the date you select. Expect to hear back from us regarding your application status within **30 days** of the date selected below",
+            "es_US": "Su solicitud será revisada a partir de la fecha que seleccione. Espere recibir noticias nuestras sobre el estado de su solicitud dentro de los 30 días posteriores a la fecha seleccionada a continuación.",
+            "zh_TW": "您的申请将在您选择的日期之后进行审核。预计将在以下选定日期后的 30 天内收到我们关于您的申请状态的回复\r\n"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": null,
+          "maxChoicesAllowed": null
+        },
+        "id": 478,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 0,
+          "adminName": "feb",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "15 février",
+              "ru": "15 февраля",
+              "vi": "Ngày 15/2",
+              "en_US": "February 15th",
+              "es_US": "15 de febrero",
+              "zh_TW": "2 月 15 日"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "march",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "15 mars",
+              "ru": "15 марта",
+              "vi": "Ngày 15/3",
+              "en_US": "March 15th",
+              "es_US": "15 de marzo",
+              "zh_TW": "3 月 15 日 "
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        },
+        {
+          "id": 2,
+          "adminName": "august",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "15 août",
+              "ru": "15 августа",
+              "vi": "Ngày 15/8",
+              "en_US": "August 15th",
+              "es_US": "15 de agosto",
+              "zh_TW": "8 月 15 日"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 2
+        },
+        {
+          "id": 3,
+          "adminName": "nov",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "15 novembre",
+              "ru": "15 ноября",
+              "vi": "Ngày 15/11",
+              "en_US": "November 15th",
+              "es_US": "15 de noviembre",
+              "zh_TW": "11 月 15 日"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 3
+        }
+      ],
+      "multiOptionQuestionType": "CHECKBOX",
+      "optionAdminNames": ["feb", "march", "august", "nov"],
+      "options": [
+        {
+          "id": 0,
+          "adminName": "feb",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "15 février",
+              "ru": "15 февраля",
+              "vi": "Ngày 15/2",
+              "en_US": "February 15th",
+              "es_US": "15 de febrero",
+              "zh_TW": "2 月 15 日"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "march",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "15 mars",
+              "ru": "15 марта",
+              "vi": "Ngày 15/3",
+              "en_US": "March 15th",
+              "es_US": "15 de marzo",
+              "zh_TW": "3 月 15 日 "
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        },
+        {
+          "id": 2,
+          "adminName": "august",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "15 août",
+              "ru": "15 августа",
+              "vi": "Ngày 15/8",
+              "en_US": "August 15th",
+              "es_US": "15 de agosto",
+              "zh_TW": "8 月 15 日"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 2
+        },
+        {
+          "id": 3,
+          "adminName": "nov",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "15 novembre",
+              "ru": "15 ноября",
+              "vi": "Ngày 15/11",
+              "en_US": "November 15th",
+              "es_US": "15 de noviembre",
+              "zh_TW": "11 月 15 日"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 3
+        }
+      ]
+    },
+    {
+      "type": "static",
+      "config": {
+        "name": "interior_grant_only",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "en_US": "Applications for Interior grants are only considered for projects proposing overall revitalization of a commercial property with Façade and Security Improvement Grants. Applications for Interior only grants will not be considered."
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "static"
+        },
+        "id": 118,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "name",
+      "config": {
+        "name": "applicant_name",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Veuillez indiquer votre nom légal complet (pas de surnom). ",
+            "ru": "Пожалуйста, введите свое полное официальное имя (без псевдонимов).",
+            "vi": "Vui lòng nhập tên pháp lý đầy đủ của bạn (không có biệt danh).",
+            "en_US": "Please enter your full legal name (no nicknames).",
+            "es_US": "Ingrese su nombre legal completo (sin apodos).",
+            "zh_TW": "請輸入您的法定全名（不要輸入暱稱）"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "name"
+        },
+        "id": 458,
+        "universal": true,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "email",
+      "config": {
+        "name": "email",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Quelle est votre adresse électronique ?",
+            "ru": "Какой у Вас адрес электронной почты?",
+            "vi": "Địa chỉ email của bạn là gì?",
+            "en_US": "What is your email address?",
+            "es_US": "Cuál es su dirección de correo electrónico? ",
+            "zh_TW": "你的電子郵件地址是什麼？"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "email"
+        },
+        "id": 459,
+        "universal": true,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "phone",
+      "config": {
+        "name": "phone_number",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Quel est votre numéro de téléphone ? ",
+            "ru": "Какой у Вас номер телефона?",
+            "vi": "Số điện thoại của bạn là gì?\r\n\r\n",
+            "en_US": "What is your phone number?",
+            "es_US": "¿Cuál es su número de teléfono?",
+            "zh_TW": "你的電話號碼是多少？\r\n\r\n"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "fr": "Il peut s’agit d’un téléphone portable ou fixe",
+            "ru": "Может быть сотовый телефон или стационарный телефон.",
+            "vi": "Có thể là điện thoại di động hoặc điện thoại cố định.",
+            "en_US": "Can be a cell phone or landline. ",
+            "es_US": "Puede ser un teléfono celular o fijo.",
+            "zh_TW": "可以是手機或固定電話。\r\n\r\n"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "phone"
+        },
+        "id": 460,
+        "universal": true,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "date",
+      "config": {
+        "name": "applicant_dob",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "ru": "Какая у вас дата рождения?",
+            "vi": "Ngày sinh của bạn là gì?",
+            "en_US": "What is your date of birth?",
+            "es_US": "¿Cuál es tu fecha de nacimiento?",
+            "zh_TW": "您的出生日期是幾歲？\r\n\r\n"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "date"
+        },
+        "id": 447,
+        "universal": true,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "address",
+      "config": {
+        "name": "business_address",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "ru": "По какому адресу вы работаете?\r\n\r\n",
+            "vi": "Địa chỉ doanh nghiệp của bạn là gì?\r\n\r\n",
+            "en_US": "What is your business address?",
+            "es_US": "¿Cuál es la dirección de su empresa?",
+            "zh_TW": "您的公司地址是什麼？\r\n"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "ru": "Пожалуйста, укажите свой домашний адрес, если у вашего бизнеса нет постоянного адреса.",
+            "vi": "Vui lòng đặt địa chỉ nhà của bạn nếu doanh nghiệp của bạn không có địa chỉ thường trú.",
+            "en_US": "Please put your home address if your business does not have a permanent address.",
+            "es_US": "Ponga la dirección de su casa si su empresa no tiene una dirección permanente.",
+            "zh_TW": "如果您的公司沒有永久位址，請輸入您的家庭住址。"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "address",
+          "disallowPoBox": false
+        },
+        "id": 446,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "applicant_taxes_current",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Le demandeur a-t-il acquitté tous ses impôts locaux, étatiques et fédéraux ? ",
+            "ru": "Все ли местные, государственные и федеральные налоги заявителя актуальны?\r\n",
+            "vi": "Có phải tất cả các loại thuế địa phương, tiểu bang và liên bang của người nộp đơn hiện hành không?",
+            "en_US": "Are all of the applicant's local, state and federal taxes current?",
+            "es_US": "¿Están al día todos los impuestos locales, estatales y federales del solicitante?",
+            "zh_TW": "申请人的所有地方税、州税和联邦税是否都已缴纳？ "
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": 1,
+          "maxChoicesAllowed": 1
+        },
+        "id": 479,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 2,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "es_US": "Sí",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 3,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": "Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ],
+      "multiOptionQuestionType": "RADIO_BUTTON",
+      "optionAdminNames": ["yes", "no"],
+      "options": [
+        {
+          "id": 2,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "es_US": "Sí",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 3,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": "Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "config": {
+        "name": "tax_parsel",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Quel est votre numéro de parcelle fiscal ? ",
+            "ru": "Какой у вас номер налоговой посылки?",
+            "vi": "Số bưu kiện thuế của bạn là gì?\r\n\r\n",
+            "en_US": "What is your tax parcel number?",
+            "es_US": "¿Cuál es su número de parcela fiscal?",
+            "zh_TW": "您的税务地块编号是多少？"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "text",
+          "minLength": null,
+          "maxLength": null
+        },
+        "id": 480,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "text",
+      "config": {
+        "name": "taxes_explain",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "en_US": "Please explain why your local, state, and/or federal taxes are not current. "
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "text",
+          "minLength": null,
+          "maxLength": null
+        },
+        "id": 126,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "text",
+      "config": {
+        "name": "zoning",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Quelle est votre désignation de zonage ?",
+            "ru": "Каково ваше обозначение зонирования?",
+            "vi": "Chỉ định phân vùng của bạn là gì?",
+            "en_US": "What is your Zoning Designation?\r\n",
+            "es_US": "¿Cuál es la designación de la zonificación?",
+            "zh_TW": "您的分区名称是什么？"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "text",
+          "minLength": null,
+          "maxLength": null
+        },
+        "id": 481,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "text",
+      "config": {
+        "name": "footage",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Quelle est la superficie de votre bâtiment ? ",
+            "ru": "Какова площадь вашего здания?\r\n\r\n",
+            "vi": "Diện tích xây dựng của bạn là bao nhiêu?\r\n\r\n",
+            "en_US": "What is your building Square Footage?",
+            "es_US": "¿Cuál es el número de metros cuadrados de su edificio?",
+            "zh_TW": "您的建筑面积是多少平方英尺?"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "text",
+          "minLength": null,
+          "maxLength": null
+        },
+        "id": 482,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "address",
+      "config": {
+        "name": "project_adress",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Quelle est l’adresse du projet ? ",
+            "ru": "По какому адресу проект?\r\n\r\n",
+            "vi": "Địa chỉ dự án là gì?\r\n\r\n",
+            "en_US": "What is the project address?",
+            "es_US": "¿Cuál es la dirección del proyecto?",
+            "zh_TW": "项目地址是什么？"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "fr": "Si l’adresse est celle de votre entreprise, indiquez son adresse de nouveau.",
+            "ru": "Если это то же самое, что и адрес компании, просто укажите адрес своей компании еще раз.\r\n\r\n",
+            "vi": "Nếu địa chỉ này giống với địa chỉ doanh nghiệp, chỉ cần liệt kê lại địa chỉ doanh nghiệp của bạn.\r\n\r\n",
+            "en_US": "If this is the same as the business address, just list your business address again.",
+            "es_US": "Si es la misma que la dirección de la empresa, simplemente vuelva a incluir la dirección de su empresa.",
+            "zh_TW": "如果此地址与公司地址相同，只需再次列出公司地址即可。"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "address",
+          "disallowPoBox": false
+        },
+        "id": 483,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "Business_yes_no",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Êtes-vous une entreprise ? ",
+            "ru": "Вы занимаетесь бизнесом?\r\n\r\n",
+            "vi": "Bạn là một doanh nghiệp?",
+            "en_US": "Are you a business?",
+            "es_US": "¿Eres una empresa?",
+            "zh_TW": "您是一家企业吗？"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": 1,
+          "maxChoicesAllowed": 1
+        },
+        "id": 484,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 0,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "es_US": "Sí",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": "Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ],
+      "multiOptionQuestionType": "RADIO_BUTTON",
+      "optionAdminNames": ["yes", "no"],
+      "options": [
+        {
+          "id": 0,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "es_US": "Sí",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": "Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ]
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "businesstype",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Indiquez votre type d’entreprise :",
+            "ru": "Укажите тип своего бизнеса:",
+            "vi": "Cho biết loại hình doanh nghiệp của bạn:\r\n\r\n",
+            "en_US": "Indicate your business type:",
+            "es_US": "Indica tu tipo de negocio:\r\n\r\n",
+            "zh_TW": "请说明您的企业类型:"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": null,
+          "maxChoicesAllowed": null
+        },
+        "id": 485,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 4,
+          "adminName": "corp",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Société",
+              "ru": "Корпорация",
+              "vi": "Công ty",
+              "en_US": "Corporation",
+              "es_US": "Corporación",
+              "zh_TW": "股份有限公司"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 5,
+          "adminName": "llc",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Société en nom collectif LLC",
+              "ru": "ООО «Партнерство»",
+              "vi": "Đối tác LLC",
+              "en_US": "Partnership LLC",
+              "es_US": "Sociedad LLC",
+              "zh_TW": "合伙企业"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        },
+        {
+          "id": 6,
+          "adminName": "sole",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Individuelle",
+              "ru": "Индивидуальное предпринимательство",
+              "vi": "Quyền sở hữu duy nhất",
+              "en_US": "Sole Proprietorship",
+              "es_US": "Empresa individual",
+              "zh_TW": "独资企业"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 2
+        },
+        {
+          "id": 7,
+          "adminName": "other",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Autre",
+              "ru": "Другой",
+              "vi": "Khác",
+              "en_US": "Other",
+              "es_US": "Otro",
+              "zh_TW": "其他"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 3
+        }
+      ],
+      "multiOptionQuestionType": "CHECKBOX",
+      "optionAdminNames": ["corp", "llc", "sole", "other"],
+      "options": [
+        {
+          "id": 4,
+          "adminName": "corp",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Société",
+              "ru": "Корпорация",
+              "vi": "Công ty",
+              "en_US": "Corporation",
+              "es_US": "Corporación",
+              "zh_TW": "股份有限公司"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 5,
+          "adminName": "llc",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Société en nom collectif LLC",
+              "ru": "ООО «Партнерство»",
+              "vi": "Đối tác LLC",
+              "en_US": "Partnership LLC",
+              "es_US": "Sociedad LLC",
+              "zh_TW": "合伙企业"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        },
+        {
+          "id": 6,
+          "adminName": "sole",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Individuelle",
+              "ru": "Индивидуальное предпринимательство",
+              "vi": "Quyền sở hữu duy nhất",
+              "en_US": "Sole Proprietorship",
+              "es_US": "Empresa individual",
+              "zh_TW": "独资企业"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 2
+        },
+        {
+          "id": 7,
+          "adminName": "other",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Autre",
+              "ru": "Другой",
+              "vi": "Khác",
+              "en_US": "Other",
+              "es_US": "Otro",
+              "zh_TW": "其他"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 3
+        }
+      ]
+    },
+    {
+      "type": "fileupload",
+      "config": {
+        "name": "business type",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Veuillez mettre en ligne les documents justifiant de l’existence de votre entreprise (statuts, etc.) ",
+            "ru": "Пожалуйста, загрузите подтверждающую документацию для вашего бизнеса (учредительный договор и т.д.):\r\n\r\n",
+            "vi": "Vui lòng tải lên tài liệu hỗ trợ cho doanh nghiệp của bạn (điều khoản thành lập, v.v.):\r\n\r\n",
+            "en_US": "Please upload supporting documentation for your business (articles of incorporation, etc.):",
+            "es_US": "Cargue la documentación de respaldo de su negocio (artículos de incorporación, etc.):\r\n\r\n",
+            "zh_TW": "请上传贵企业的证明文件（公司章程等）： "
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "fileupload",
+          "maxFiles": null
+        },
+        "id": 486,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "multiple_businessowners",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "L’entreprise a-t-elle plusieurs propriétaires ? ",
+            "ru": "Есть ли несколько владельцев бизнеса?\r\n\r\n\r\n\r\n",
+            "vi": "Có nhiều chủ sở hữu của doanh nghiệp không?\r\n",
+            "en_US": "Are there multiple owners of the business?",
+            "es_US": "¿Hay varios propietarios del negocio?\r\n\r\n\r\n\r\n",
+            "zh_TW": "贵企业是否有多名所有人？"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "fr": "Cliquez sur « Oui » si l’entreprise a d’autres propriétaires détenant plus de 10 % de ses parts.",
+            "ru": "Нажмите «да», если помимо вас есть другие владельцы, владеющие более чем 10% бенефициарного владения бизнесом.\r\n",
+            "vi": "\r\nNhấp vào \"có\" nếu có chủ sở hữu khác ngoài bạn sở hữu hơn 10% quyền sở hữu có lợi đối với doanh nghiệp.",
+            "en_US": "Click \"yes\" if there are other owners besides yourself owning more than 10% beneficial ownership of the business. ",
+            "es_US": "Haga clic en \"sí\" si hay otros propietarios además de usted que posean más del 10% de la propiedad efectiva de la empresa.",
+            "zh_TW": "如果除您之外，还有其他所有人拥有企业 10% 以上的实益所有权，请点击“是\""
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": 1,
+          "maxChoicesAllowed": 1
+        },
+        "id": 487,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 4,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "es_US": "Sí",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 5,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": "Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ],
+      "multiOptionQuestionType": "RADIO_BUTTON",
+      "optionAdminNames": ["yes", "no"],
+      "options": [
+        {
+          "id": 4,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "es_US": "Sí",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 5,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": "Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ]
+    },
+    {
+      "type": "enumerator",
+      "config": {
+        "name": "business_owner_enum",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "en_US": "Please provide the full name (first and last) for each applicant and/or company principal owning more than 10% beneficial ownership.",
+            "zh_TW": "请提供拥有 10% 以上实益所有权的每位申请人和/或公司负责人的全名（姓氏和名名字）。 "
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "enumerator",
+          "minEntities": null,
+          "maxEntities": null
+        },
+        "id": 420,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "entityType": {
+        "translations": {
+          "en_US": "Business Owner",
+          "zh_TW": "（+ 添加企业所有人）"
+        },
+        "isRequired": true
+      }
+    },
+    {
+      "type": "date",
+      "config": {
+        "name": "business_owner_dob",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Quelle est la date de naissance de $this ? *",
+            "ru": "Какая дата рождения у $this?",
+            "vi": "Ngày sinh của $this là gì?",
+            "en_US": "What is $this's date of birth?",
+            "es_US": "¿Cuál es la fecha de nacimiento de $this?",
+            "zh_TW": "$this 的出生日期是怎样的？"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "date"
+        },
+        "id": 488,
+        "enumeratorId": 420,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "enumerator",
+      "config": {
+        "name": "nested-enum-properties",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Veuillez énumérer toutes les propriétés appartenant à $this*\r\n",
+            "ru": "Пожалуйста, перечислите все объекты недвижимости, принадлежащие $this",
+            "vi": "Vui lòng liệt kê tất cả các chỗ nghỉ thuộc sở hữu của $this\r\n\r\n",
+            "en_US": "Please list all the properties owned by $this",
+            "es_US": "Enumere todas las propiedades que posee $this",
+            "zh_TW": "请列出 ____$this拥有的所有房产"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "fr": "Exemple : si vous êtes propriétaire de votre résidence principale et d’une maison de vacances, indiquez « Résidence » et « Maison de vacances » comme nom de propriété ci-dessous.\r\n",
+            "ru": "Пример: если вы являетесь владельцем своего дома и дома для отдыха, укажите «Дом» и «Дом для отдыха» в качестве названий объектов недвижимости ниже.\r\n\r\n",
+            "vi": "Ví dụ: nếu bạn sở hữu nhà và nhà nghỉ, hãy liệt kê \"Home\" và \"Vacation Home\" làm tên của các thuộc tính bên dưới.",
+            "en_US": "Example: if you own your home and a vacation home, list \"Home\" and \"Vacation Home\" as the names of the properties below. ",
+            "es_US": "Ejemplo: si usted es dueño de su casa y una casa de vacaciones, anote \"Casa\" y \"Casa de Vacaciones\" como los nombres de las propiedades a continuación.",
+            "zh_TW": "例如：如果您拥有自住房和度假屋，请将\"自住房\"和\"度假屋\"列为以下房产的名称"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "enumerator",
+          "minEntities": null,
+          "maxEntities": null
+        },
+        "id": 489,
+        "enumeratorId": 420,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "entityType": {
+        "translations": {
+          "fr": "( + Ajouter un nom de propriété )",
+          "ru": "Имя объекта",
+          "vi": "\r\nTên tài sản",
+          "en_US": "Property Name",
+          "es_US": "Nombre de la propiedad",
+          "zh_TW": "（+ 添加房产名称)"
+        },
+        "isRequired": true
+      }
+    },
+    {
+      "type": "address",
+      "config": {
+        "name": "address_enumerator_two",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "en_US": "What is the address of $this.parent's $this?"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "address",
+          "disallowPoBox": false
+        },
+        "id": 492,
+        "enumeratorId": 489,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "number",
+      "config": {
+        "name": "business_owner_years",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Depuis combien d’années $this habite-t-il/elle à son adresse actuelle ? ",
+            "ru": "Сколько лет $this прожили по своему нынешнему домашнему адресу?\r\n",
+            "vi": "$this đã sống ở địa chỉ nhà hiện tại của họ bao nhiêu năm?\r\n\r\n",
+            "en_US": "How many years has $this lived at their current home address?",
+            "es_US": "¿Cuántos años ha vivido $this en su domicilio actual?",
+            "zh_TW": "$this 在当前家庭住址居住了多少年？"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "number",
+          "min": null,
+          "max": null
+        },
+        "id": 493,
+        "enumeratorId": 420,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "business_owner_taxes",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "$this a-t-il/elle acquitté tous ses impôts locaux, étatiques et fédéraux ? ",
+            "ru": "Актуальны ли личные местные, государственные и федеральные налоги $this?\r\n",
+            "vi": "Thuế cá nhân địa phương, tiểu bang và liên bang $this có liên quan không?\r\n\r\n",
+            "en_US": "Are $this's personal local, state and federal taxes current?",
+            "zh_TW": "$this 的个人地方税、州税和联邦税是否都已缴纳？*"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": 1,
+          "maxChoicesAllowed": 1
+        },
+        "id": 494,
+        "enumeratorId": 420,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 0,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": " Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ],
+      "multiOptionQuestionType": "RADIO_BUTTON",
+      "optionAdminNames": ["yes", "no"],
+      "options": [
+        {
+          "id": 0,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": " Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ]
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "legal_interest",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Quel est votre intérêt juridique à l’égard du site du projet ? ",
+            "ru": "\r\nВ чем заключается Ваш законный интерес в отношении сайта проекта?",
+            "vi": "Lợi ích pháp lý của bạn đối với trang web dự án là gì?",
+            "en_US": "What is your legal interest in the project site?",
+            "es_US": "¿Cuál es su estado legal en el lugar del proyecto? ",
+            "zh_TW": "您在项目地点中的合法权益是什么?"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "fr": "Si vous êtes un locataire, le propriétaire doit remplir un formulaire de consentement de propriétaire pour le compte du locataire à la fin de cette demande.\r\n\t\r\n",
+            "ru": "Если вы являетесь арендатором, владелец недвижимости должен заполнить форму согласия владельца от имени арендатора в конце этого заявления.",
+            "vi": "Nếu bạn là người thuê nhà, chủ sở hữu tài sản phải thay mặt người thuê hoàn thành Mẫu chấp thuận của chủ sở hữu ở cuối đơn đăng ký này.",
+            "en_US": "If you are a tenant, the property owner must complete an Owner Consent Form on behalf of the tenant at the end of this application. ",
+            "es_US": "Si es inquilino, el propietario del inmueble debe completar un formulario de consentimiento del propietario en nombre del inquilino al final de esta solicitud",
+            "zh_TW": "如果您是租客，房主必须代表租客填写本申请表末尾的房主同意书"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": 1,
+          "maxChoicesAllowed": 1
+        },
+        "id": 495,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 0,
+          "adminName": "prop_owner",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Propriétaire",
+              "ru": "Владелец недвижимости",
+              "vi": "Chủ sở hữu tài sản",
+              "en_US": "Property Owner",
+              "es_US": "Propietario del inmueble",
+              "zh_TW": "房主"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "tenant",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Locataire",
+              "ru": "Aренда́тор",
+              "vi": "Thuê",
+              "en_US": "Tenant",
+              "es_US": "Inquilino",
+              "zh_TW": "租客"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ],
+      "multiOptionQuestionType": "RADIO_BUTTON",
+      "optionAdminNames": ["prop_owner", "tenant"],
+      "options": [
+        {
+          "id": 0,
+          "adminName": "prop_owner",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Propriétaire",
+              "ru": "Владелец недвижимости",
+              "vi": "Chủ sở hữu tài sản",
+              "en_US": "Property Owner",
+              "es_US": "Propietario del inmueble",
+              "zh_TW": "房主"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "tenant",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Locataire",
+              "ru": "Aренда́тор",
+              "vi": "Thuê",
+              "en_US": "Tenant",
+              "es_US": "Inquilino",
+              "zh_TW": "租客"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ]
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "building_permits",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "am": "是否已申请建筑许可证?",
+            "fr": "Avez-vous fait des demandes de permis de construction ? \r\n",
+            "ru": "Подавались ли заявки на получение разрешений на строительство?\r\n\r\n\r\n",
+            "vi": "Giấy phép xây dựng đã được cấp chưa?",
+            "en_US": "Have building permits been applied for?",
+            "es_US": "¿Se han solicitado los permisos de construcción? ",
+            "zh_TW": "是否已申请建筑许可证?"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "am": "如果回答为\"是\"，请准备在下一屏幕附上许可证副本和支持性场地平面图。",
+            "fr": "Si oui, vous serez invité(e) à joindre une copie du permis et des plans de site correspondants sur l’écran suivant.",
+            "ru": "Если да, пожалуйста, будьте готовы приложить копию разрешения и сопроводительные планы участка на следующем экране.\r\n",
+            "vi": "Nếu có, vui lòng chuẩn bị đính kèm bản sao giấy phép và sơ đồ địa điểm hỗ trợ trên màn hình tiếp theo.\r\n",
+            "en_US": "If yes, please be prepared to attach a copy of permit and supporting site plans on the next screen. ",
+            "es_US": "Si responde de manera afirmativa, adjunte una copia del permiso y los planos de respaldo del lugar",
+            "zh_TW": "如果回答为\"是\"，请准备在下一屏幕附上许可证副本和支持性场地平面图。"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": 1,
+          "maxChoicesAllowed": 1
+        },
+        "id": 496,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 0,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "am": "房主",
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "es_US": "Sí",
+              "zh_TW": "房主"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "am": "租客",
+              "fr": "Non",
+              "ru": "Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "租客"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ],
+      "multiOptionQuestionType": "RADIO_BUTTON",
+      "optionAdminNames": ["yes", "no"],
+      "options": [
+        {
+          "id": 0,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "am": "房主",
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "es_US": "Sí",
+              "zh_TW": "房主"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "am": "租客",
+              "fr": "Non",
+              "ru": "Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "租客"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ]
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "site_plans",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Disposez-vous de plans de site pour le projet ?\r\n\r\n",
+            "ru": "Есть ли у вас планы участка для проекта?\r\n",
+            "vi": "Bạn có kế hoạch trang web cho dự án?",
+            "en_US": "Do you have site plans for the project?",
+            "es_US": "¿Tiene planos del lugar para el proyecto? *",
+            "zh_TW": "您是否有该项目的场地平面图？ "
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "fr": "Si oui, vous serez invité(e) à en joindre une copie sur l’écran suivant.",
+            "ru": "\r\nЕсли да, будьте готовы загрузить копию на следующем экране.",
+            "vi": "Nếu có, hãy chuẩn bị để tải lên một bản sao trên màn hình tiếp theo.",
+            "en_US": "If yes, be prepared to upload a copy on the next screen. ",
+            "es_US": "Si responde de manera afirmativa, cargue una copia en la siguiente pantalla.",
+            "zh_TW": "\t如果回答为\"是\"，请准备在下一屏幕上传副本。"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": 1,
+          "maxChoicesAllowed": 1
+        },
+        "id": 497,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 0,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "es_US": "Sí",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": "Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ],
+      "multiOptionQuestionType": "RADIO_BUTTON",
+      "optionAdminNames": ["yes", "no"],
+      "options": [
+        {
+          "id": 0,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "es_US": "Sí",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": "Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ]
+    },
+    {
+      "type": "fileupload",
+      "config": {
+        "name": "Site file",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Veuillez joindre une copie des plans de site pour le projet. \r\n",
+            "ru": "Пожалуйста, приложите копию планов участка по проекту\r\n",
+            "vi": "Vui lòng đính kèm bản sao sơ đồ mặt bằng cho dự án",
+            "en_US": "Please attach a copy of site plans for the project",
+            "es_US": "Adjunte una copia de los planos del lugar del proyecto ",
+            "zh_TW": "请附上项目的场地平面图副本"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "fileupload",
+          "maxFiles": null
+        },
+        "id": 498,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "fileupload",
+      "config": {
+        "name": "documents_permit_siteplan",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "en_US": "Please upload a copy of your building permit and supporting site plans, if applicable. "
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "fileupload",
+          "maxFiles": null
+        },
+        "id": 144,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "minority_women",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Ferez-vous appel à une entreprise certifiée par la ville comme appartenant à un membre de groupe minoritaire, comme appartenant à une femme ou comme étant une petite entreprise pour réaliser votre projet ?\r\n",
+            "ru": "Будете ли вы использовать городское сертифицированное предприятие для представителей меньшинств, женщин и малого бизнеса для завершения своего проекта?",
+            "vi": "Bạn sẽ sử dụng Doanh nghiệp thiểu số, phụ nữ và doanh nghiệp nhỏ được chứng nhận của thành phố để hoàn thành dự án của mình chứ?",
+            "en_US": "Will you be using a City Certified Minority, Women, and Small Business Enterprise to complete your project?",
+            "es_US": "¿Utilizará los servicios de una empresa certificada por la ciudad que represente a una minoría, a una mujer o a una pequeña empresa para completar su proyecto? *",
+            "zh_TW": "您是否将使用本市认证的少数族裔、妇女和小型企业来完成项目？"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": 1,
+          "maxChoicesAllowed": 1
+        },
+        "id": 499,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 0,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "ДА",
+              "vi": "Có ",
+              "en_US": "Yes",
+              "es_US": "Si",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": "НЕТ",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        },
+        {
+          "id": 2,
+          "adminName": "not_sure",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Ne sais pas",
+              "ru": "  НЕ УВЕРЕН",
+              "vi": "Không chắc chắn",
+              "en_US": "Not sure",
+              "es_US": "No estoy seguro",
+              "zh_TW": "不确定"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 2
+        }
+      ],
+      "multiOptionQuestionType": "RADIO_BUTTON",
+      "optionAdminNames": ["yes", "no", "not_sure"],
+      "options": [
+        {
+          "id": 0,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "ДА",
+              "vi": "Có ",
+              "en_US": "Yes",
+              "es_US": "Si",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": "НЕТ",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        },
+        {
+          "id": 2,
+          "adminName": "not_sure",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Ne sais pas",
+              "ru": "  НЕ УВЕРЕН",
+              "vi": "Không chắc chắn",
+              "en_US": "Not sure",
+              "es_US": "No estoy seguro",
+              "zh_TW": "不确定"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 2
+        }
+      ]
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "code_violations",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Y a-t-il des violations de code dont vous avez connaissance sur le site ? ",
+            "ru": "Известны ли на сайте нарушения кодекса?",
+            "vi": "Có bất kỳ vi phạm mã nào đã biết tại trang web không?\r\n",
+            "en_US": "Are there any known code violations at the site?",
+            "es_US": "¿Se conoce alguna infracción al código en el lugar? *",
+            "zh_TW": "项目现场是否有已知的违规行为?"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": 1,
+          "maxChoicesAllowed": 1
+        },
+        "id": 500,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 0,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "es_US": "Sí",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": "Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ],
+      "multiOptionQuestionType": "RADIO_BUTTON",
+      "optionAdminNames": ["yes", "no"],
+      "options": [
+        {
+          "id": 0,
+          "adminName": "yes",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Oui",
+              "ru": "Да",
+              "vi": "Có",
+              "en_US": "Yes",
+              "es_US": "Sí",
+              "zh_TW": "是"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 1,
+          "adminName": "no",
+          "localizedOptionText": {
+            "translations": {
+              "fr": "Non",
+              "ru": "Нет",
+              "vi": "Không",
+              "en_US": "No",
+              "es_US": "No",
+              "zh_TW": "否"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "config": {
+        "name": "explain_codeviolations",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Veuillez décrire la/les violation(s) de code : ",
+            "ru": "Пожалуйста, объясните нарушение кодекса:\r\n\r\n",
+            "vi": "Vui lòng giải thích (các) lỗi vi phạm mã:\r\n\r\n",
+            "en_US": "Please explain the code violation(s):",
+            "es_US": "Por favor, explique la(s) violación(es) del código:",
+            "zh_TW": "请解释违规的原因："
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "text",
+          "minLength": null,
+          "maxLength": null
+        },
+        "id": 501,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "fileupload",
+      "config": {
+        "name": "businesses doc",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Veuillez fournir une liste de TOUTES les entreprises exerçant une activité à l’adresse du projet. Joignez une feuille séparée. \r\n",
+            "ru": "Предоставьте список ВСЕХ бизнесов, работающих по адресу проекта. Прикрепите отдельный лист.",
+            "vi": "Cung cấp danh sách TẤT CẢ các doanh nghiệp hoạt động từ địa chỉ dự án. Đính kèm một trang tính riêng.\r\n",
+            "en_US": "Provide a list of ALL businesses operating from the project address. Attach a separate sheet.",
+            "es_US": "Proporcione una lista de TODAS las empresas que operan en la dirección del proyecto. Adjunte una hoja aparte. *",
+            "zh_TW": "提供一份在项目地址开展业务经营的所有企业名单. 另附一张表格"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "fr": "Indiquez le nom de l’entreprise, le type d’entreprise et la superficie occupée.",
+            "ru": "Включайте: название компании, тип бизнеса, площадь",
+            "vi": "Bao gồm: tên doanh nghiệp, loại hình kinh doanh, diện tích vuông",
+            "en_US": "Include: business name, type of business, square footage",
+            "es_US": "Incluya: nombre de la empresa, tipo de empresa, superficie en metros cuadrados.",
+            "zh_TW": "包括：企业名称、企业类型、占地面积"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "fileupload",
+          "maxFiles": null
+        },
+        "id": 502,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "text",
+      "config": {
+        "name": "security",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "en_US": "What security enhancements or installations would you like to install at your site?"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "en_US": "*For Security Improvement Grant Only"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "text",
+          "minLength": null,
+          "maxLength": null
+        },
+        "id": 149,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "fileupload",
+      "config": {
+        "name": "Consent ",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "Veuillez télécharger le formulaire de consentement de propriétaire, le signer et le faire signer par un notaire à partir de ce document https://charlotteopenforbusiness.com/wp-content/uploads/2023/05/Business-Matching-Grant-Program-Application.pdf, puis mettez-le en ligne ci-dessous. *",
+            "ru": "Пожалуйста, скачайте, подпишите и нотариально заверьте форму согласия владельца из этого документа https://charlotteopenforbusiness.com/wp-content/uploads/2023/05/Business-Matching-Grant-Program-Application.pdf и загрузите ее ниже.",
+            "vi": "Vui lòng tải xuống, ký tên và công chứng Biểu mẫu chấp thuận của chủ sở hữu từ tài liệu này https://charlotteopenforbusiness.com/wp-content/uploads/2023/05/Business-Matching-Grant-Program-Application.pdf và tải lên bên dưới.",
+            "en_US": "Please download, sign and notarize Owner Consent Form from  this document https://charlotteopenforbusiness.com/wp-content/uploads/2023/05/Business-Matching-Grant-Program-Application.pdf and upload it below.",
+            "es_US": "Descargue, firme y certifique ante notario el formulario de consentimiento del propietario de este documento https://charlotteopenforbusiness.com/wp-content/uploads/2023/05/Business-Matching-Grant-Program-Application.pdf y cárguelo a continuación. *",
+            "zh_TW": "请从本文件中下载、签署并公证房主同意书：https://charlotteopenforbusiness.com/wp-content/uploads/2023/05/Business-Matching-Grant-Program-Application.pdf并在下方上传该文件。"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {},
+          "isRequired": false
+        },
+        "validationPredicates": {
+          "type": "fileupload",
+          "maxFiles": null
+        },
+        "id": 503,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    },
+    {
+      "type": "multioption",
+      "config": {
+        "name": "documents",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "am": "申请Façade Improvement Grant（外立面改造补助金）、Interior Uplift Improvement Grant（室内装修改造补助金）和Security Improvement Grant（安保改造补助金）时必须提供",
+            "fr": "Obligatoire pour les Façade, Interior Upfit et Security Improvement Grants (subventions pour l’amélioration des façades, des espaces intérieurs et de la sécurité) ",
+            "ru": "Требуется для получения грантов на модернизацию фасада, интерьера и улучшение безопасности",
+            "vi": "Cần thiết cho mặt tiền, trang bị nội thất và tài trợ cải thiện an ninh",
+            "en_US": "Required for Façade, Interior Upfit and Security Improvement Grants",
+            "es_US": "Obligatorio para los subsidios destinados a mejoras de la fachada, de la seguridad y el acondicionamiento de interiores ",
+            "zh_TW": "申请Façade Improvement Grant（外立面改造补助金）、Interior Uplift Improvement Grant（室内装修改造补助金）和Security Improvement Grant（安保改造补助金）时必须提供"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "am": "请选择您已包含以下申请要求的所有信息或已提交相关文件：",
+            "fr": "Veuillez indiquer que vous avez joint ou envoyé tous les documents requis pour la demande :\r\n\r\n\r\n",
+            "ru": "Пожалуйста, выберите, что вы указали всю информацию или предоставленные документы для следующих требований к заявке:",
+            "vi": "Vui lòng chọn rằng bạn đã bao gồm tất cả thông tin hoặc tài liệu đã gửi cho các yêu cầu ứng dụng sau:",
+            "en_US": "Please select that you have included all information or submitted documents for the following application requirements:",
+            "es_US": "Seleccione que ha incluido toda la información o enviado los documentos para los siguientes requisitos de solicitud:",
+            "zh_TW": "请选择您已包含以下申请要求的所有信息或已提交相关文件："
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "multioption",
+          "minChoicesRequired": null,
+          "maxChoicesAllowed": null
+        },
+        "id": 504,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      },
+      "questionOptions": [
+        {
+          "id": 4,
+          "adminName": "orgdocs",
+          "localizedOptionText": {
+            "translations": {
+              "am": "组织文件（公司章程、有限责任公司运营协议等",
+              "fr": "Documents organisationnels (statuts, contrat d’exploitation de LLC, etc.)",
+              "ru": "Организационная документация (учредительный договор, договор об учреждении ООО и т.д.)",
+              "vi": "Tài liệu tổ chức (các điều khoản thành lập, thỏa thuận hoạt động LLC, v.v.)",
+              "en_US": "Organizational Documentation (articles of incorporation, LLC operating agreement, etc.)",
+              "es_US": "Documentación de la organización (documentos de la constitución de la empresa, reglamento interno de la asociación de responsabilidad limitada, etc.)",
+              "zh_TW": "组织文件（公司章程、有限责任公司运营协议等）"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 5,
+          "adminName": "exhibits",
+          "localizedOptionText": {
+            "translations": {
+              "am": "个人背景证明",
+              "fr": "d’antécédents personnels",
+              "ru": "Экспонаты с персональными данными",
+              "vi": "Triển lãm lý lịch cá nhân",
+              "en_US": "Personal Background Exhibits",
+              "es_US": "Documentos sobre sus antecedentes personales",
+              "zh_TW": "个人背景证明"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        },
+        {
+          "id": 6,
+          "adminName": "consent",
+          "localizedOptionText": {
+            "translations": {
+              "am": "房主同意书——如果申请人不是房产所有人，则必须提供",
+              "fr": "Formulaire de consentement de propriétaire – Obligatoire si le demandeur n’est pas le propriétaire du bien immobilier",
+              "ru": "Форма согласия владельца – требуется, если заявитель не является владельцем недвижимости",
+              "vi": "Mẫu chấp thuận của chủ sở hữu - Bắt buộc nếu Người nộp đơn không phải là chủ sở hữu bất động sản",
+              "en_US": "Owner Consent Form – Required if Applicant is not the owner of the real estate",
+              "es_US": "Formulario de consentimiento del propietario (obligatorio si el solicitante no es el propietario del inmueble)",
+              "zh_TW": "房主同意书——如果申请人不是房产所有人，则必须提供"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 2
+        },
+        {
+          "id": 7,
+          "adminName": "tenants",
+          "localizedOptionText": {
+            "translations": {
+              "am": "所有租客名单",
+              "fr": "Liste de tous les locataires",
+              "ru": "Список всех арендаторов",
+              "vi": "Danh sách tất cả người thuê nhà",
+              "en_US": "List of all tenants",
+              "es_US": "Lista de todos los inquilinos",
+              "zh_TW": "所有租客名单"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 3
+        },
+        {
+          "id": 8,
+          "adminName": "cost_estimates",
+          "localizedOptionText": {
+            "translations": {
+              "am": "拟议改造工程的详细成本估算/投标",
+              "fr": "Devis détaillés/appels d’offres pour les améliorations proposées",
+              "ru": "Подробная смета расходов/предложения по предлагаемым улучшениям",
+              "vi": "Dự toán chi phí chi tiết / giá thầu cho các cải tiến được đề xuất",
+              "en_US": "Detailed Cost Estimates/Bids for Proposed Improvements",
+              "es_US": "Presupuesto de costos detallados/Propuestas para las mejoras que quiere realizar.",
+              "zh_TW": "拟议改造工程的详细成本估算/投标"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 4
+        },
+        {
+          "id": 9,
+          "adminName": "site_plans",
+          "localizedOptionText": {
+            "translations": {
+              "am": "场地平面图副本",
+              "fr": "Copie du plan de site",
+              "ru": "Копия плана участка",
+              "vi": "Bản sao sơ đồ trang web",
+              "en_US": "Copy of Site Plan",
+              "es_US": "Copia del plano del lugar",
+              "zh_TW": "场地平面图副本"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 5
+        }
+      ],
+      "multiOptionQuestionType": "CHECKBOX",
+      "optionAdminNames": [
+        "orgdocs",
+        "exhibits",
+        "consent",
+        "tenants",
+        "cost_estimates",
+        "site_plans"
+      ],
+      "options": [
+        {
+          "id": 4,
+          "adminName": "orgdocs",
+          "localizedOptionText": {
+            "translations": {
+              "am": "组织文件（公司章程、有限责任公司运营协议等",
+              "fr": "Documents organisationnels (statuts, contrat d’exploitation de LLC, etc.)",
+              "ru": "Организационная документация (учредительный договор, договор об учреждении ООО и т.д.)",
+              "vi": "Tài liệu tổ chức (các điều khoản thành lập, thỏa thuận hoạt động LLC, v.v.)",
+              "en_US": "Organizational Documentation (articles of incorporation, LLC operating agreement, etc.)",
+              "es_US": "Documentación de la organización (documentos de la constitución de la empresa, reglamento interno de la asociación de responsabilidad limitada, etc.)",
+              "zh_TW": "组织文件（公司章程、有限责任公司运营协议等）"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 0
+        },
+        {
+          "id": 5,
+          "adminName": "exhibits",
+          "localizedOptionText": {
+            "translations": {
+              "am": "个人背景证明",
+              "fr": "d’antécédents personnels",
+              "ru": "Экспонаты с персональными данными",
+              "vi": "Triển lãm lý lịch cá nhân",
+              "en_US": "Personal Background Exhibits",
+              "es_US": "Documentos sobre sus antecedentes personales",
+              "zh_TW": "个人背景证明"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 1
+        },
+        {
+          "id": 6,
+          "adminName": "consent",
+          "localizedOptionText": {
+            "translations": {
+              "am": "房主同意书——如果申请人不是房产所有人，则必须提供",
+              "fr": "Formulaire de consentement de propriétaire – Obligatoire si le demandeur n’est pas le propriétaire du bien immobilier",
+              "ru": "Форма согласия владельца – требуется, если заявитель не является владельцем недвижимости",
+              "vi": "Mẫu chấp thuận của chủ sở hữu - Bắt buộc nếu Người nộp đơn không phải là chủ sở hữu bất động sản",
+              "en_US": "Owner Consent Form – Required if Applicant is not the owner of the real estate",
+              "es_US": "Formulario de consentimiento del propietario (obligatorio si el solicitante no es el propietario del inmueble)",
+              "zh_TW": "房主同意书——如果申请人不是房产所有人，则必须提供"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 2
+        },
+        {
+          "id": 7,
+          "adminName": "tenants",
+          "localizedOptionText": {
+            "translations": {
+              "am": "所有租客名单",
+              "fr": "Liste de tous les locataires",
+              "ru": "Список всех арендаторов",
+              "vi": "Danh sách tất cả người thuê nhà",
+              "en_US": "List of all tenants",
+              "es_US": "Lista de todos los inquilinos",
+              "zh_TW": "所有租客名单"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 3
+        },
+        {
+          "id": 8,
+          "adminName": "cost_estimates",
+          "localizedOptionText": {
+            "translations": {
+              "am": "拟议改造工程的详细成本估算/投标",
+              "fr": "Devis détaillés/appels d’offres pour les améliorations proposées",
+              "ru": "Подробная смета расходов/предложения по предлагаемым улучшениям",
+              "vi": "Dự toán chi phí chi tiết / giá thầu cho các cải tiến được đề xuất",
+              "en_US": "Detailed Cost Estimates/Bids for Proposed Improvements",
+              "es_US": "Presupuesto de costos detallados/Propuestas para las mejoras que quiere realizar.",
+              "zh_TW": "拟议改造工程的详细成本估算/投标"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 4
+        },
+        {
+          "id": 9,
+          "adminName": "site_plans",
+          "localizedOptionText": {
+            "translations": {
+              "am": "场地平面图副本",
+              "fr": "Copie du plan de site",
+              "ru": "Копия плана участка",
+              "vi": "Bản sao sơ đồ trang web",
+              "en_US": "Copy of Site Plan",
+              "es_US": "Copia del plano del lugar",
+              "zh_TW": "场地平面图副本"
+            },
+            "isRequired": true
+          },
+          "displayOrder": 5
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "config": {
+        "name": "signature",
+        "description": "",
+        "questionText": {
+          "translations": {
+            "fr": "En signant ci-dessous, le demandeur reconnaît avoir lu et comprendre les lignes directrices du Façade Improvement Grant Program (programme de subvention pour l’amélioration des façades) sur www.charlottenc.gov/ED. Le demandeur comprend que les demandes sont examinées trimestriellement et que les dates butoirs pour envoyer les demandes sont le 15 février, le 15 mai, le 15 août et le 15 novembre. \r\n\r\nLes frais encourus avant l’approbation de la demande et la signature du contrat de subvention ne sont pas remboursables. \r\n\r\nLes demandes incomplètes sont rejetées. \r\n\r\nLe demandeur atteste que les informations figurant dans la demande sont exactes et correctes, et accepte de respecter toutes les lignes directrices de la ville de Charlotte applicables à ce programme. \r\n\r\nLe demandeur autorise la ville à utiliser son nom, son image, ses photos ou les données relatives au projet faisant l’objet du programme à des fins promotionnelles. \r\n\r\nEn signant ci-dessous, le signataire reconnaît qu’il/elle est dûment autorisé(e) à intervenir pour le compte du demandeur et que le demandeur est une entreprise dûment immatriculée et disposant des permis nécessaires pour exercer ses activités dans l’État de la Caroline du Nord. ",
+            "ru": "Подписывая ниже, Заявитель подтверждает, что он/она прочитал и понимает руководящие принципы Программы грантов на улучшение фасада, доступные по адресу www.charlottenc.gov/ED Заявитель понимает, что заявки рассматриваются ежеквартально и что крайние сроки подачи заявок наступают 15 февраля, 15 мая, 15 августа и 15 ноября. Расходы, понесенные до утверждения заявки и подписания договора о гранте, возмещению не подлежат.\r\nНеполные заявки не рассматриваются. Заявитель гарантирует, что информация, содержащаяся в заявке, является правдивой и точной, и соглашается соблюдать все рекомендации города Шарлотт, применимые к данной программе. Заявитель уполномочивает Город использовать его имя, изображение, фотографии и/или информацию о проекте, участвующем в Программе, в рекламных целях.Подписывая ниже, Подписант подтверждает, что он/она должным образом уполномочен действовать от имени Заявителя и что Заявитель надлежащим образом организован и лицензирован для ведения бизнеса в штате Северная Каролина.\r\n",
+            "vi": "Bằng cách ký tên bên dưới, Người nộp đơn thừa nhận rằng họ đã đọc và hiểu các hướng dẫn của chương trình cho Chương trình Tài trợ Cải thiện Mặt tiền có sẵn tại www.charlottenc.gov/ED Người nộp đơn hiểu rằng các đơn đăng ký được xem xét hàng quý và thời hạn nộp đơn xảy ra vào ngày 15 tháng Hai, ngày 15 tháng Năm, ngày 15 tháng Tám và ngày 15 tháng Mười Một. Chi phí phát sinh trước khi phê duyệt đơn đăng ký và ký hợp đồng tài trợ không đủ điều kiện để được hoàn trả.\r\nCác ứng dụng không đầy đủ không thể được xem xét. Người nộp đơn đảm bảo rằng thông tin trong đơn đăng ký là đúng sự thật và chính xác và đồng ý tuân thủ tất cả các hướng dẫn của Thành phố Charlotte áp dụng cho chương trình này. Người nộp đơn ủy quyền cho Thành phố sử dụng tên, chân dung, hình ảnh và / hoặc thông tin của mình về dự án tham gia Chương trình cho mục đích quảng cáo.Bằng cách ký tên dưới đây, Người ký thừa nhận rằng họ được ủy quyền hợp lệ để hành động thay mặt cho Người nộp đơn và Người nộp đơn được tổ chức và cấp phép hợp lý để tiến hành kinh doanh tại bang Bắc Carolina.",
+            "en_US": "By signing below the Applicant acknowledges that he/she has read and understands the program guidelines for the Façade Improvement Grant Program available at www.charlottenc.gov/ED Applicant understands that applications are reviewed quarterly and that application deadlines occur on February 15th, May 15th, August 15th and November 15th. Costs incurred prior to application approval and grant contract signing are not eligible for reimbursement.\r\nIncomplete applications cannot be considered. The Applicant assures that the information contained in the application is true and correct and agrees to comply with all City of Charlotte guidelines applicable to this program. The Applicant authorizes the City to use his/her/its name, likeness, photos and/or information about the project participating in the Program for promotional purposes.\r\nBy signing below, the Signatory acknowledges he/she is duly authorized to act on behalf of the Applicant and that the Applicant is properly organized and licensed to conduct business in the state of North Carolina.",
+            "es_US": "Al firmar abajo, el solicitante reconoce que ha leído y entendido las directrices del Façade Improvement Grant Program (Programa de Subsidios para Mejoras de la Fachada), disponibles en www.charlottenc.gov/ED. El solicitante entiende que las solicitudes se revisan trimestralmente y que las fechas límites de las solicitudes son el 15 de febrero, el 15 de mayo, el 15 de agosto y el 15 de noviembre. Los costos incurridos antes de la aprobación de la solicitud y la firma del contrato de subsidio no son elegibles para un reembolso.\r\nNo se tendrán en cuenta las solicitudes incompletas. El solicitante asegura que la información que aparece en la solicitud es verdadera y correcta, y se compromete a cumplir con las directrices de la ciudad de Charlotte que se aplican a este programa. El solicitante autoriza a la ciudad a usar su nombre, imagen, fotos o información sobre el proyecto que participa en el programa con fines promocionales.\r\nAl firmar abajo, el firmante reconoce que está debidamente autorizado para actuar en nombre del solicitante y que el solicitante está constituido y autorizado para ejercer actividades comerciales en el estado de Carolina del Norte. \r\n",
+            "zh_TW": "申请人一旦在下方签字，即表示其已阅读并理解Façade Improvement Grant（外立面改造补助金）项目的项目指导准则，详情可登录 www.charlottenc.gov/ED 查阅。申请人了解，申请每季度审核一次，申请截止日期分别为 2 月 15 日、5 月 15 日、8 月 15 日和 11 月 15 日\r\n\t申请获得批准和补助金合同签订之前发生的费用不能报销。\r\n不完整的申请将不予考虑。\r\nT申请人保证申请中所包含的信息真实无误，并同意遵守适用于本项目的所有夏洛特市指导准则。\r\n申请人授权市政府将其姓名、肖像、照片和/或有关参与本项目的工程相关信息用于宣传目的。\r\n一旦在下方签字，即表示签字人确认他/她已被正式授权代表申请人行事，并且申请人在北卡罗来纳州有正规注册的组织机构和开展业务的经营许可。\r\n"
+          },
+          "isRequired": true
+        },
+        "questionHelpText": {
+          "translations": {
+            "fr": "Veuillez indiquer votre nom et votre poste, puis signer et entrer la date",
+            "ru": "Пожалуйста, укажите свое имя, должность, подпись и дату\r\n\r\n",
+            "vi": "Vui lòng liệt kê tên, chức danh, chữ ký và ngày tháng của bạn\r\n\r\n",
+            "en_US": "Please list your name, title, signature and date",
+            "es_US": "Indique su nombre, cargo, firma y fecha.",
+            "zh_TW": "请列出您的姓名、职称、签名和日期"
+          },
+          "isRequired": true
+        },
+        "validationPredicates": {
+          "type": "text",
+          "minLength": null,
+          "maxLength": null
+        },
+        "id": 505,
+        "universal": false,
+        "primaryApplicantInfoTags": []
+      }
+    }
+  ]
+}

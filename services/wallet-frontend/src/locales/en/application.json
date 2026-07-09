@@ -1,0 +1,490 @@
+{
+	"levels": {
+		"pills": {
+			"incomplete": "Incomplete",
+			"advanced": "Advanced",
+			"ready": "Ready"
+		}
+	},
+	"overview": {
+		"main_title": "Basic Income Application",
+		"progress_card_title": "Your application step-by-step to the goal",
+		"document_auto_verified_banner": "Your application was updated based on your document \"{{documentName}}\".",
+		"generate_notice_title": "Your application is almost ready! You can download it at any time.",
+		"generate_notice_scroll_label": "Scroll to generate application",
+		"step_by_step_illustration_alt": "Illustration of a step-by-step checklist",
+		"intro_text": "Here you can upload documents and fill out the basic income application faster.",
+		"filters": {
+			"open": "Open",
+			"done": "Done"
+		},
+		"generate_button": "Generate application",
+		"preview_title": "Application draft preview",
+		"open_button": "Open in tab",
+		"preview_ephemeral_notice": "For security reasons, this link is valid for 60 seconds.",
+		"preview_expired_title": "Security link expired",
+		"preview_expired_description": "For data protection reasons (GDPR), the temporary link was deactivated. Please refresh the preview.",
+		"refresh_preview_button": "Refresh preview",
+		"link_expired_label": "Link expired",
+		"preview_timer_notice": "Link valid for {{count}}s for security reasons",
+		"download_button": "Download",
+		"download_filename": "basic_income_application.pdf",
+		"download_success_title": "Success",
+		"download_success_message": "Your application has been downloaded.",
+		"download_success_message_active": "Your application is being downloaded.",
+		"modal": {
+			"title": "Generate application early?",
+			"cancel": "Cancel",
+			"confirm": "Generate anyway"
+		},
+		"warning_dialog": "Warning: Incomplete applications take significantly longer to process. Do you still want to generate the application now?",
+		"generating": "Generating...",
+		"preview_ready_title": "Application ready for download",
+		"preview_ready_description": "Your completed application has been successfully generated as a PDF. Download it to review.",
+		"success_modal": {
+			"title": "PDF downloaded!",
+			"subtitle": "Your application is ready on your device for printing.",
+			"card_title": "What you can do next:",
+			"step1_title": "1. Print and sign application:",
+			"step1_desc": "Print the downloaded PDF file and sign it by hand on the last page.",
+			"step2_title": "2. Submit documents:",
+			"step2_desc": "You can hand in the documents in person at your local office or send them by mail to:",
+			"hours_label": "Opening hours:",
+			"default_office_name": "Responsible welfare office",
+			"default_office_desc": "Please submit the application to the welfare office of your district.",
+			"default_office_link": "Search for responsible welfare office online",
+			"cta_button": "Back to Basic Income Application"
+		},
+		"close_modal_button": "Close",
+		"warning_modal_title": "Application incomplete",
+		"warning_modal_description": "You have not filled out all recommended fields. An incomplete application may delay processing by the office. Do you still want to generate the application now?",
+		"warning_modal_cancel": "Back to application",
+		"warning_modal_confirm": "Generate anyway"
+	},
+	"questionnaire": {
+		"overview_header_title": "Questions",
+		"empty": "No information available",
+		"badges": {
+			"personal": "Personal Details"
+		},
+		"intro": {
+			"path_upload_title": "Upload documents",
+			"path_upload_desc": "Upload proofs to autofill your details automatically.",
+			"path_manual_title": "Enter data manually",
+			"path_manual_desc": "Enter your details step-by-step yourself.",
+			"upload_options_title": "How would you like to submit documents?",
+			"upload_options_desc": "Choose an option to upload your documents.",
+			"back_to_intro": "Back to introduction",
+			"back_to_overview": "Back to overview"
+		},
+		"sections": {
+			"about_me": {
+				"title": "About You",
+				"subtitle": "Here you will find your personal details.",
+				"intro_desc": "Upload documents.\nThe assistant will auto-populate many details. You can review them later.",
+				"recommended_docs": "Recommended Documents",
+				"docs_list": {
+					"id_card": "ID card",
+					"passport": "Passport",
+					"residence_permit": "Residence permit",
+					"tolerated_stay": "Tolerated stay permit / temporary suspension of deportation"
+				}
+			},
+			"household": {
+				"title": "Family and Household",
+				"subtitle": "We record your living and household situation and what needs arise.",
+				"intro_desc": "Upload proof to provide details about your family and household. The assistant will auto-populate many details.",
+				"recommended_docs": "Recommended Documents",
+				"docs_list": {
+					"declaration": "Household members / declaration of benefit community"
+				}
+			},
+			"housing": {
+				"title": "Your Housing",
+				"subtitle": "We clarify what information and documents you need for your living situation.",
+				"docs_list": {
+					"rental_contract": "Rental agreement / Sublease agreement",
+					"heating_proof": "Heating cost statement / Gas bill",
+					"utility_statement": "Utility bill"
+				}
+			},
+			"income_assets": {
+				"title": "Your Income, Savings and Valuables",
+				"subtitle": "We record what money you receive regularly and what you need to prove and check what you have to declare and what evidence is important."
+			},
+			"assets": {
+				"title": "Your savings and valuables",
+				"subtitle": "We check what you have to declare and what evidence is important."
+			},
+			"health": {
+				"title": "Health and additional needs",
+				"subtitle": "We clarify whether you can receive more support due to illness or disability."
+			}
+		}
+	},
+	"docs": {
+		"overview_header_title": "Documents",
+		"groups": {
+			"identity": "Identity and personal documents",
+			"income": "Income and finances",
+			"housing": "Housing and housing costs",
+			"declarations": "Applications and declarations"
+		},
+		"group_descriptions": {
+			"identity": "ID Card, Passport, Certificate of registration, Health insurance",
+			"income": "Initial pension notice, Bank statements of the last 3 months, Income declaration...",
+			"housing": "Rental agreement, Utility bill, Heating cost proof...",
+			"declarations": "Obligation to cooperate, Privacy policy, Household members..."
+		},
+		"selected_documents": "Selected documents: {{count}}",
+		"add_document": "Add document",
+		"close_aria": "Close",
+		"back_to_overview_aria": "Back to my documents",
+		"actions": {
+			"upload_title": "Upload document",
+			"upload_desc": "Upload a photo or PDF of your document.",
+			"camera_title": "Scan with camera",
+			"camera_desc": "Upload a photo of your document."
+		},
+		"tabs": {
+			"offen": "Open",
+			"erledigt": "Completed"
+		},
+		"review": "Review",
+		"upload_more": "+ Upload another document",
+		"slot_empty": "No document is available for this section yet.",
+		"upload_initial": "+ Upload document",
+		"unsorted_title": "Recently uploaded documents",
+		"untitled": "Untitled document",
+		"slots": {
+			"id_card": "ID Card or Passport",
+			"registration": "Certificate of registration",
+			"health_insurance": "Proof of health insurance membership",
+			"pension_notice": "Initial pension notice",
+			"stmt3": "Bank statements of the last 3 months",
+			"income": "Income declaration (Annex Income)",
+			"assets": "Annex Assets",
+			"bank": "Bank details",
+			"rent": "Rental agreement",
+			"utility_bill": "Utility bill of your apartment",
+			"heating": "Heating cost bill (gas/heating bill)",
+			"housing": "Annex Housing / Cost of accommodation",
+			"cooperation_agreement": "Obligation to cooperate + privacy policy",
+			"household": "Household members / benefit community declaration"
+		},
+		"badges": {
+			"doc": "Document",
+			"form": "Form",
+			"proof": "Proof"
+		},
+		"processing": "Processing...",
+		"delete_aria": "Delete document",
+		"delete_title": "Delete document?",
+		"delete_confirm": "Do you really want to delete this document?",
+		"failed": "Error"
+	},
+	"common": {
+		"delete": "Delete",
+		"cancel": "Cancel"
+	},
+	"wizard": {
+		"sections": {
+			"eligibility_check": "Eligibility Check",
+			"applicant_information": "About Me",
+			"applicant_financial_situation": "Income & Assets"
+		},
+		"steps": {
+			"step_eligibility_nationality": {
+				"title": "Nationality & Residence Status",
+				"description": "Which of the following applies to you?"
+			},
+			"step_eligibility_residence": {
+				"title": "Place of Residence",
+				"description": "Do you currently live in Germany?"
+			},
+			"step_eligibility_dob": {
+				"title": "Date of Birth",
+				"description": "When were you born?"
+			},
+			"step_eligibility_pension": {
+				"title": "Pension Status",
+				"description": "Do you receive a pension?"
+			},
+			"step_eligibility_income": {
+				"title": "Income Assessment",
+				"description": "Which of the following applies to your current income?"
+			},
+			"step_eligibility_assets": {
+				"title": "Asset Assessment",
+				"description": "Do you have assets worth more than €10,000?"
+			}
+		},
+		"options": {
+			"nationality_german": "I am German.",
+			"nationality_eu_5_plus": "I am an EU citizen and have lived in Germany for at least 5 years.",
+			"nationality_residence_permit": "I have a residence permit.",
+			"nationality_none": "None of the above applies.",
+			"residence_germany": "I live in Germany.",
+			"residence_abroad": "I live abroad.",
+			"pension_yes": "Yes",
+			"pension_no": "No",
+			"pension_unknown": "I don't know.",
+			"income_not_sufficient": "My income is currently not sufficient.",
+			"income_concerned_insufficient": "I am worried. My income may not be sufficient soon.",
+			"income_sufficient": "My income is sufficient. I can pay for everything.",
+			"assets_under_10000": "I have less than €10,000 in assets.",
+			"assets_over_10000": "I have more than €10,000 in assets."
+		},
+		"actions": {
+			"next": "Next",
+			"finish": "Show result"
+		},
+		"end_screen": {
+			"title": "Done!",
+			"description": "Your answers have been saved. In the next step you can prepare your application.",
+			"back": "Back to overview"
+		}
+	},
+	"personal": {
+		"steps": {
+			"step_x_of_y": "Step {{current}} of {{total}}"
+		},
+		"questions": {
+			"name_title": "What is your full name?",
+			"birth_title": "When and where were you born?",
+			"gender_title": "Which gender do you want to specify?",
+			"address_title": "What is your current residential address?",
+			"no_fixed_address_label": "I currently do not have a fixed address",
+			"last_fixed_address_title": "Where did you last live permanently?",
+			"last_fixed_address_placeholder": "City/Town",
+			"citizenship_title": "Which applies to you?",
+			"support_title": "Do you have a guardian or custodian?",
+			"displaced_title": "Are you displaced from your country?",
+			"insurance_title": "Do you have any of these insurances?",
+			"social_benefits_title": "Are you currently waiting for approval for social assistance benefits?",
+			"insurance_subtitle": "Please select which insurances you have, so we can verify how they are taken into account for your application."
+		},
+		"placeholders": {
+			"first_name": "Enter first name",
+			"last_name": "Enter last name",
+			"birth_place": "Enter place of birth",
+			"address": "Street, house number, zip code, city",
+			"authority": "Enter authority"
+		},
+		"labels": {
+			"address": "Address",
+			"displaced_status": "Displaced status",
+			"displaced_since": "Since when is this status valid?",
+			"displaced_authority": "Competent authority / Immigration office",
+			"insurance_provider": "Insurance provider / Name",
+			"insurance_status": "Insurance status"
+		},
+		"dropdowns": {
+			"select_eu_country": "-- Select EU country --",
+			"select_origin_country": "-- Select country of origin --",
+			"select_status": "-- Select status --",
+			"select_insurance": "-- Select insurance --"
+		},
+		"options": {
+			"female": "Female",
+			"male": "Male",
+			"diverse": "Diverse",
+			"custodian": "Yes, I have a custodian",
+			"guardian": "Yes, I have a guardian",
+			"none": "No, neither of these",
+			"yes": "Yes",
+			"no": "No",
+			"social": "Social Security Insurance",
+			"health": "Health Insurance",
+			"not_insured": "I am not insured",
+			"displaced_expellee": "Expellee (Resettler) (ID A)",
+			"displaced_person": "Displaced Person (ID B)",
+			"displaced_late_resettler": "Late Resettler",
+			"displaced_refugee": "Soviet Zone Refugee",
+			"insurance_statutory": "Statutory (e.g. AOK, TK)",
+			"insurance_private": "Private",
+			"insurance_other": "Other / Voluntary",
+			"status_family": "Family-insured",
+			"status_student": "Student-insured",
+			"status_pensioner": "Pensioner (KVdR)",
+			"status_employee": "Compulsorily insured (Employee)",
+			"status_voluntary": "Voluntarily insured",
+			"status_other": "Other",
+			"german": "I am a German citizen.",
+			"eu_5": "I am a citizen of an EU country and have lived in Germany for at least 5 years.",
+			"permit": "My residence permit for Germany is valid."
+		}
+	},
+	"household": {
+		"steps": {
+			"step_x_of_y": "Step {{current}} of {{total}}"
+		},
+		"questions": {
+			"members_title": "How many people live in your household?",
+			"marital_status_title": "What is your marital status?",
+			"married_since_label": "Married since",
+			"error_select_marital_status": "Please select your marital status."
+		},
+		"options": {
+			"single": "Single",
+			"married": "Married",
+			"divorced": "Divorced",
+			"widowed": "Widowed",
+			"partnership": "Registered civil partnership"
+		},
+		"actions": {
+			"next": "Next",
+			"finish": "Finish"
+		}
+	},
+	"financial": {
+		"steps": {
+			"step_x_of_y": "Step {{current}} of {{total}}"
+		},
+		"intro": {
+			"back_aria": "Back to overview",
+			"intro_desc": "Upload your documents.\nThe assistant automatically fills in many fields. You can verify them later.",
+			"recommended_docs": "Recommended Documents",
+			"doc_list": {
+				"statements": "Bank statements (last 3 months)",
+				"pension": "Pension statement (retirement, reduced capacity)",
+				"other_income": "Proof of other regular income"
+			},
+			"important_title": "Good to know",
+			"important_desc": "You do not have to upload documents now. You can also enter the details manually. The social welfare office will still need copies of the documents later.",
+			"upload_doc": "Upload document",
+			"upload_desc": "Select a document.",
+			"take_photo": "Take photo with camera",
+			"take_photo_desc": "Take a photo of your document.",
+			"continue": "Continue"
+		},
+		"questions": {
+			"awaiting_benefits_title": "Are you currently waiting for approval for social assistance benefits?",
+			"awaiting_benefits_type_label": "What type of benefit is it?",
+			"awaiting_benefits_type_placeholder": "-- Choose a benefit --",
+			"awaiting_benefits_date_label": "Application date (if known)",
+			"awaiting_benefits_office_label": "Which office will decide on it?",
+			"awaiting_benefits_office_placeholder": "e.g. Sozialamt Tempelhof",
+			"awaiting_benefits_ref_label": "Reference number (if known)",
+			"awaiting_benefits_ref_placeholder": "e.g. 12/345/67",
+			"previous_benefits_title": "Have you received social security benefits in the two years before today?",
+			"previous_benefits_type_label": "Which benefit did you receive?",
+			"previous_benefits_type_placeholder": "e.g. Wohngeld",
+			"previous_benefits_start_label": "Received from",
+			"previous_benefits_end_label": "Received until",
+			"previous_benefits_office_label": "Which agency paid the benefit?",
+			"previous_benefits_office_placeholder": "e.g. Wohnungsamt Berlin",
+			"previous_benefits_ref_label": "Reference number (if known)",
+			"previous_benefits_ref_placeholder": "e.g. Az. 9876-A",
+			"pension_title": "Do you receive a pension?",
+			"pension_amount_label": "Monthly pension amount (net in EUR)",
+			"pension_amount_placeholder": "e.g. 650.00",
+			"employment_title": "What is your employment status?",
+			"employment_amount_label": "Monthly earnings (net in EUR)",
+			"employment_amount_placeholder": "e.g. 450.00",
+			"other_income_title": "Do you have any other regular income?",
+			"other_income_amount_label": "Monthly amount (net in EUR)",
+			"other_income_amount_placeholder": "e.g. 100.00",
+			"one_time_payment_title": "Do you expect any significant one-time payment in the near future?",
+			"one_time_payment_type_label": "Type of payment (e.g. tax refund, inheritance)",
+			"one_time_payment_type_placeholder": "e.g. tax refund",
+			"one_time_payment_amount_label": "Expected amount (in EUR)",
+			"one_time_payment_amount_placeholder": "e.g. 1200.00",
+			"one_time_payment_date_label": "When is the payment expected?",
+			"bank_title": "What are your bank details?",
+			"bank_holder_label": "Account holder",
+			"bank_holder_placeholder": "Helmut Klar",
+			"bank_name_label": "Bank name",
+			"bank_name_placeholder": "e.g. Sparkasse",
+			"bank_iban_label": "IBAN",
+			"bank_iban_placeholder": "e.g. DE89 3704 0044 ...",
+			"bank_bic_label": "BIC",
+			"bank_bic_placeholder": "e.g. WELADED1BER",
+			"amount_net_hint": "Please enter the monthly net amount (payout amount).",
+			"employer_label": "Employer Name",
+			"employer_placeholder": "Enter name of employer",
+			"job_title_label": "Job / Occupation",
+			"job_title_placeholder": "Enter job title",
+			"account_holder_label": "Account Holder",
+			"account_holder_placeholder": "e.g. Helmut Klar",
+			"iban_label": "IBAN",
+			"iban_placeholder": "e.g. DE89 3704 0044 ...",
+			"bic_label": "BIC",
+			"bic_placeholder": "e.g. WELADED1BER",
+			"submit_cta": "Back to Application"
+		},
+		"options": {
+			"yes": "Yes",
+			"no": "No",
+			"pension_retirement": "Retirement pension (statutory)",
+			"pension_reduced": "Reduced earning capacity pension",
+			"pension_survivor": "Survivor / widow pension",
+			"pension_other": "Other pension / company pension",
+			"pension_none": "No, I do not receive a pension",
+			"emp_employed": "Employed (full-time / part-time / minijob / working student)",
+			"emp_self": "Self-employed / business owner",
+			"emp_student": "Apprentice / student",
+			"emp_unemployed": "Unemployed",
+			"emp_none": "None of the above",
+			"other_sick": "Sickness benefit",
+			"other_alimony": "Alimony / maintenance",
+			"other_rent": "Other income (e.g. interest, subletting)",
+			"other_none": "No, no other income",
+			"benefit_options": {
+				"grundsicherung": "Basic income support",
+				"hilfe_lebensunterhalt": "Social support (Hilfe zum Lebensunterhalt)",
+				"wohngeld": "Housing allowance (Wohngeld)",
+				"krankengeld": "Sickness benefit (Krankengeld)",
+				"sonstiges": "Other"
+			},
+			"none_of_these": "No, none of these"
+		},
+		"errors": {
+			"save_failed": "Saving failed. Please check your inputs.",
+			"pension_selection": "Please select an option.",
+			"pension_amount": "Please enter your pension amount.",
+			"employment_selection": "Please select an option.",
+			"employment_amount": "Please enter your monthly earnings.",
+			"other_selection": "Please select an option.",
+			"other_amount": "Please enter the amount.",
+			"one_time_selection": "Please select an option.",
+			"one_time_fields": "Please fill in all one-time payment fields.",
+			"one_time_amount_invalid": "Please enter a valid expected amount.",
+			"bank_fields": "Please fill in all bank details.",
+			"bank_holder_req": "Account holder is required.",
+			"bank_name_req": "Bank name is required.",
+			"bank_iban_req": "IBAN is required.",
+			"bank_iban_invalid": "Invalid IBAN"
+		}
+	},
+	"health": {
+		"intro": {
+			"title": "Health and Care",
+			"desc": "Upload proofs to receive assistance with care or additional needs for disability. The assistant will fill in many details automatically.",
+			"recommended_docs": "Recommended Documents",
+			"doc_list": {
+				"care_pills": "Care level assessment",
+				"disability_card": "Disability ID card",
+				"nursing_home_contract": "Nursing home contract or cost breakdown",
+				"care_service_invoice": "Invoices of the care service"
+			}
+		}
+	},
+	"eligibility_questions": {
+		"q1_title": "Where is your primary residence?",
+		"q1_desc": "For the initial assessment, it is important to know if you are permanently unable to work at least 3 hours a day due to health reasons. In that case, welfare benefits from the social welfare office are more likely to apply.",
+		"q1_option_de": "I live in Germany.",
+		"q1_option_abroad": "I live abroad.",
+		"q2_title": "How old are you?",
+		"q2_option_older": "I am 67 years or older (reached standard retirement age).",
+		"q2_option_younger": "I am younger than 67 years.",
+		"q3_title": "Has a doctor or the pension office confirmed that you are unable to work due to health reasons?",
+		"q3_option_yes": "Yes",
+		"q3_option_no": "No",
+		"q3_option_unknown": "I don't know.",
+		"q4_title": "Do you receive a pension?",
+		"q4_option_yes": "Yes",
+		"q4_option_no": "No",
+		"q4_option_unknown": "I don't know."
+	}
+}

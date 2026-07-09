@@ -1,0 +1,103 @@
+name: CI/CD Orchestrator
+
+on:
+  push:
+    branches:
+      - main
+      - prod
+  workflow_dispatch:
+
+jobs:
+  setup-env:
+    name: Setup Environment Variables
+    runs-on: ubuntu-latest
+    outputs:
+      env_name: ${{ steps.set-env.outputs.env_name }}
+      prefix: ${{ steps.set-env.outputs.prefix }}
+    steps:
+      - id: set-env
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [ "$GITHUB_REF_NAME" = "prod" ]; then
+            echo "env_name=production" >> $GITHUB_OUTPUT
+            echo "prefix=bf-prd" >> $GITHUB_OUTPUT
+          else
+            echo "env_name=staging" >> $GITHUB_OUTPUT
+            echo "prefix=bf-stg" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Verify Staging Build Status
+        if: github.ref_name == 'prod'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          echo "Verifying latest Staging (main branch) workflow run..."
+          LATEST_STG_STATUS=$(gh run list --repo "$GITHUB_REPOSITORY" --branch main --workflow "CI/CD Orchestrator" --limit 1 --json conclusion --jq '.[0].conclusion')
+          echo "Latest Staging Run Conclusion: $LATEST_STG_STATUS"
+          if [ "$LATEST_STG_STATUS" != "success" ]; then
+            echo "::error::Staging build was not successful (status: $LATEST_STG_STATUS). Aborting Production deployment to protect stability."
+            exit 1
+          fi
+          echo "Staging is green! Safe to promote to Production."
+
+  auth-service:
+    needs: setup-env
+    uses: ./.github/workflows/reusable-service-pipeline.yaml
+    with:
+      service_name: auth-service
+      service_path: services/auth-service
+      environment_name: ${{ needs.setup-env.outputs.env_name }}
+      environment_prefix: ${{ needs.setup-env.outputs.prefix }}
+    secrets: inherit
+
+  orchestration-middleware-service:
+    needs: setup-env
+    uses: ./.github/workflows/reusable-service-pipeline.yaml
+    with:
+      service_name: orchestration-middleware-service
+      service_path: services/orchestration-middleware-service
+      environment_name: ${{ needs.setup-env.outputs.env_name }}
+      environment_prefix: ${{ needs.setup-env.outputs.prefix }}
+    secrets: inherit
+
+  rules-engine:
+    needs: setup-env
+    uses: ./.github/workflows/reusable-service-pipeline.yaml
+    with:
+      service_name: rules-engine
+      service_path: services/rules-engine
+      environment_name: ${{ needs.setup-env.outputs.env_name }}
+      environment_prefix: ${{ needs.setup-env.outputs.prefix }}
+    secrets: inherit
+
+  wallet-frontend:
+    needs: setup-env
+    uses: ./.github/workflows/reusable-service-pipeline.yaml
+    with:
+      service_name: wallet-frontend
+      service_path: services/wallet-frontend
+      environment_name: ${{ needs.setup-env.outputs.env_name }}
+      environment_prefix: ${{ needs.setup-env.outputs.prefix }}
+    secrets: inherit
+
+  document-intelligence-service:
+    needs: setup-env
+    uses: ./.github/workflows/reusable-service-pipeline.yaml
+    with:
+      service_name: document-intelligence-service
+      service_path: services/document-intelligence-service
+      environment_name: ${{ needs.setup-env.outputs.env_name }}
+      environment_prefix: ${{ needs.setup-env.outputs.prefix }}
+    secrets: inherit
+
+  forms-filling-service:
+    needs: setup-env
+    uses: ./.github/workflows/reusable-service-pipeline.yaml
+    with:
+      service_name: forms-filling-service
+      service_path: services/forms-filling-service
+      environment_name: ${{ needs.setup-env.outputs.env_name }}
+      environment_prefix: ${{ needs.setup-env.outputs.prefix }}
+    secrets: inherit

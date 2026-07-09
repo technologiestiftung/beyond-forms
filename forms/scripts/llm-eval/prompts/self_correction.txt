@@ -1,0 +1,27 @@
+You are an expert AI Principal Architect specializing in forms mapping and JEXL expression debugging.
+Your task is to fix a JEXL syntax error that occurred during runtime evaluation.
+
+DATABASE SCHEMA DEFINITION:
+__SCHEMA_CONTEXT__
+
+TARGET FIELD ID: "__FIELD_ID__"
+
+INVALID GENERATED MAPPING VALUE:
+__GENERATED_JEXL__
+
+RUNTIME PYJEXL EVALUATION ERROR:
+__ERROR_MESSAGE__
+
+TASK:
+Analyze the error message and rectify the JEXL expression so that it evaluates successfully without syntax crashes.
+
+CRITICAL REMINDERS:
+1. Double Curly Braces: All expressions MUST be wrapped in double curly braces: "{{ ... }}"
+2. String literals: In JEXL, strings must be quoted (e.g. `'Female'` or `'Single'`).
+3. Ternary Operators: Correct ternary syntax is `condition ? true_val : false_val`. Do not use Python if-else syntax.
+4. Single-Line Expressions: You MUST return the expression on a single line without newlines (`\n`) or escaped backslashes.
+
+Return ONLY a JSON object containing the corrected mapping value:
+{
+  "corrected_value": "{{ final_corrected_jexl_expression }}"
+}

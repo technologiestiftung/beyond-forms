@@ -1,0 +1,111 @@
+{
+  "name": "Minimal Basic Welfare for Elderly and Disabled Form Test Schema",
+  "version": "1.0.0",
+  "description": "This is the schema for the minimal set of information for the Basic Welfare for Elderly and Disabled form for testing purposes",
+  "schema": {
+    "eligibility_information": {
+      "type": "object",
+      "properties": {
+        "applicant_primary_residence_country": {
+          "type": "string",
+          "enum": ["Germany", "Other"],
+          "description": "The country of the applicant's primary residence"
+        },
+        "applicant_age": {
+          "type": "integer",
+          "description": "The age of the applicant"
+        },
+        "applicant_work_capacity_at_least_3h_daily": {
+          "type": "boolean",
+          "description": "Whether the applicant can work at least 3 hours daily"
+        }
+      }
+    },
+    "family_and_household_information": {
+      "type": "object",
+      "properties": {
+        "applicant_marital_status": {
+          "type": "string",
+          "enum": [
+            "single_or_divorced",
+            "married_or_in_registered_civil_partnership",
+            "widowed"
+          ]
+        },
+        "does_applicant_live_with_other_people": {
+          "type": "boolean",
+          "description": "Whether the applicant lives with other people"
+        },
+        "people_living_in_household_with_applicant": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "partner",
+              "children_or_parents",
+              "roommates_or_other_people"
+            ]
+          },
+          "description": "The people living in the household with the applicant"
+        },
+        "applicant_accommodation_type": {
+          "type": "string",
+          "enum": [
+            "rental_appartment",
+            "home_owner_or_flat_owner",
+            "care_home_or_assisted_living_facility"
+          ],
+          "description": "The type of accommodation of the applicant"
+        }
+      }
+    },
+    "monetary_information": {
+      "type": "object",
+      "properties": {
+        "applicant_monthly_income_type": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "government_pension",
+              "survivors_pension",
+              "employed",
+              "housing_benefit",
+              "alimony",
+              "nothing"
+            ]
+          },
+          "description": "The type or types of income of the applicant"
+        },
+        "does_applicany_have_any_savings_properties_or_items_of_high_value": {
+          "type": "boolean",
+          "description": "Whether the applicant has any savings, properties or items of high value"
+        },
+        "applicant_assets_type": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["savings", "car", "life_insurance"]
+          },
+          "description": "The type or types of assets of the applicant"
+        }
+      }
+    },
+    "health_extra_needs": {
+      "type": "object",
+      "properties": {
+        "does_applicant_have_pass_for_severely_disabled": {
+          "type": "boolean",
+          "description": "Whether the applicant has a pass for severely disabled people"
+        },
+        "does_applicant_have_costly_nutrition_for_medical_reasons": {
+          "type": "boolean",
+          "description": "Whether the applicant has costly nutrition for medical reasons"
+        }
+      }
+    }
+  }
+}

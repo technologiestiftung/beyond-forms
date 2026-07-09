@@ -1,0 +1,42 @@
+{
+	"error": {
+		"connection_title": "Verbindungsproblem",
+		"connection_desc": "Die Anwendungskomponente konnte nicht geladen werden. Bitte prüfe Deine Internetverbindung und lade die Seite neu.",
+		"reload_button": "Seite neu laden",
+		"generic_title": "Etwas ist schief gelaufen",
+		"generic_desc": "Ein unerwarteter Fehler ist aufgetreten.",
+		"back_to_home": "Zurück zur Startseite"
+	},
+	"toast": {
+		"error_title": "Fehler",
+		"sync_title": "Synchronisationsproblem",
+		"save_error_title": "Fehler beim Speichern"
+	},
+	"nav": {
+		"dashboard": "Anträge",
+		"chat": "Chat",
+		"my_account": "Profil"
+	},
+	"save_next": "Speichern und weiter",
+	"save_close": "Speichern und schließen",
+	"step_page": "{{current}} von {{total}} Fragen",
+	"done": "Geschafft!",
+	"next": "Weiter",
+	"back": "Zurück",
+	"yes": "Ja",
+	"no": "Nein",
+	"continue": "Weiter",
+	"cancel": "Abbrechen",
+	"save": "Speichern",
+	"saving": "Speichern...",
+	"please_select": "Bitte auswählen",
+	"close": "Schließen",
+	"loading": "Laden...",
+	"error_title": "Fehler",
+	"error_desc": "Fehler beim Laden.",
+	"retry": "Erneut versuchen",
+	"back_to_overview": "Zurück zur Übersicht",
+	"delete": "Löschen",
+	"remove_file": "Entfernen",
+	"save_and_continue": "Speichern und weiter"
+}

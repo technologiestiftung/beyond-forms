@@ -1,0 +1,19 @@
+steps:
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "gcloud"
+    args:
+      - "run"
+      - "deploy"
+      - "${_SERVICE_NAME}"
+      - "--image=${_IMAGE_URI}"
+      - "--region=${_GCP_REGION}"
+      - "--platform=managed"
+      - "--no-invoker-iam-check"
+
+substitutions:
+  _SERVICE_NAME: "forms-filling-service"
+  _IMAGE_URI: ""
+  _GCP_REGION: "europe-west10"
+
+options:
+  logging: CLOUD_LOGGING_ONLY

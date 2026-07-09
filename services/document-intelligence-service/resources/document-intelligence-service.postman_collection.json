@@ -1,0 +1,92 @@
+{
+  "info": {
+    "_postman_id": "7f8e2ad2-261b-4122-9474-87f5029631fe",
+    "name": "DocumentIntelligence",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "44316691",
+    "_collection_link": "https://jr-6020766.postman.co/workspace/JR's-Workspace~7402d588-ff14-42be-8575-71ee6d598549/collection/44316691-7f8e2ad2-261b-4122-9474-87f5029631fe?action=share&source=collection_link&creator=44316691"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8001/health",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8001",
+          "path": ["health"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Available Document Types",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8001/get-available-document-types",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8001",
+          "path": ["get-available-document-types"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Document Type Definition",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8001/get-document-type-definition/:document_type_name",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8001",
+          "path": ["get-document-type-definition", ":document_type_name"],
+          "variable": [
+            {
+              "key": "document_type_name",
+              "value": "income_declaration"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Classify",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "/home/jrenk/code/citylab/test-documents/id-and-rental-contract.png"
+            },
+            {
+              "key": "entity-extraction",
+              "value": "True",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8001/classify",
+          "protocol": "http",
+          "host": ["127", "0", "0", "1"],
+          "port": "8001",
+          "path": ["classify"]
+        }
+      },
+      "response": []
+    }
+  ]
+}

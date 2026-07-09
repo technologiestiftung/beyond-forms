@@ -1,0 +1,44 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-json
+        exclude: ^(services/wallet-frontend/tsconfig.*\.json|\.vscode/.*\.json)$
+      - id: check-toml
+      - id: check-yaml
+        args: [--unsafe]
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: detect-private-key
+        exclude: ^auth/infrastructure/certs-secret\.yaml$
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.8
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.9.1
+    hooks:
+      - id: prettier
+        types_or:
+          [javascript, jsx, ts, tsx, css, scss, html, json, yaml, markdown]
+        exclude: ^services/wallet-frontend/package-lock\.json$
+
+  - repo: local
+    hooks:
+      - id: eslint-wallet-frontend
+        name: ESLint (wallet-frontend)
+        entry: bash -c 'cd services/wallet-frontend && npx eslint --fix "${@#services/wallet-frontend/}"' --
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        files: ^services/wallet-frontend/
+      - id: tsc-wallet-frontend
+        name: TypeScript Check (wallet-frontend)
+        entry: bash -c 'cd services/wallet-frontend && npx tsc -b'
+        language: system
+        types_or: [ts, tsx]
+        files: ^services/wallet-frontend/
+        pass_filenames: false

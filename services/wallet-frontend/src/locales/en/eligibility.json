@@ -1,0 +1,144 @@
+{
+	"progress": "Your Progress",
+	"progress_aria": "{{current}} of {{total}}",
+	"yes": "Yes",
+	"no": "No",
+	"next": "Next",
+	"back": "Back",
+	"back_aria": "Go back to previous question",
+	"switch_to_language": "Switch language to {{language}}",
+	"language_switcher_toggle_open": "Open language menu",
+	"language_switcher_toggle_close": "Close language menu",
+	"language_selection_region": "Language selection",
+	"application_title": "Eligibility Check",
+	"aria": {
+		"welcome": "Welcome to the start page",
+		"questionnaire": "Assessment questionnaire"
+	},
+	"start_screen": {
+		"title": "Check Grundsicherung easily and quickly",
+		"description": "With Klaro you can check in just 5 minutes whether you can apply for Grundsicherung.",
+		"description_list": "Quick check in just 5 minutes\nSimply and clearly explained\nFree for everyone",
+		"feature_cards": {
+			"quick_check": {
+				"title": "Check quickly",
+				"description": "Answer 6 short questions."
+			},
+			"simply_guided": {
+				"title": "Simply guided",
+				"description": "Klaro explains every step clearly."
+			},
+			"safe_one_place": {
+				"title": "Safe in one place",
+				"description": "Data, documents and applications stay together clearly."
+			}
+		},
+		"currently_available": {
+			"label": "CURRENTLY AVAILABLE",
+			"title": "Check and prepare Grundsicherung",
+			"description": "With Klaro you can currently check whether Grundsicherung is suitable for you and prepare for the application step by step. More services will follow later."
+		},
+		"promo_card": {
+			"title": "Straight to Grundsicherung",
+			"description": "Sign in and start right away with your application for Grundsicherung. Klaro guides you step by step.",
+			"cta": "Start application now"
+		},
+		"intro_cards": {
+			"section_title": "How Klaro works",
+			"slide_aria": "{{current}} of {{total}}",
+			"dot_aria": "Go to slide {{index}}: {{title}}",
+			"tap_advance": "Tap to show the next card",
+			"1": {
+				"title": "Welcome to Klaro",
+				"description": "Klaro is a free service. Klaro helps you understand social support better."
+			},
+			"2": {
+				"title": "This is about Grundsicherung",
+				"description": "Klaro first helps you with Grundsicherung. You can check whether this support might suit your situation."
+			},
+			"3": {
+				"title": "Answer a few short questions",
+				"description": "With a few questions, Klaro checks your situation. That gives you an initial orientation."
+			},
+			"4": {
+				"title": "Start the check now",
+				"description": "The check only takes a few minutes. You can start right away and don't need an account yet."
+			}
+		},
+		"cta": "Start quick check now"
+	},
+	"questions": {
+		"nationality": {
+			"category": "Nationality and Residence Status",
+			"title": "Which of the following applies to you?",
+			"tip": "This is important because different laws apply depending on your residency status. If you are new in Germany or in asylum proceedings, there is a special support system.",
+			"options": {
+				"GERMAN": "I have German citizenship.",
+				"EU_5_PLUS": "I am an EU citizen and have lived in Germany for at least 5 years.",
+				"RESIDENCE_PERMIT": "I have a valid residence permit for Germany.",
+				"NONE": "None of the above."
+			}
+		},
+		"livesInGermany": {
+			"category": "Place of Residence",
+			"title": "Do you live in Germany?",
+			"tip": "You can only receive Basic Income Support if you live in Germany permanently.",
+			"options": {
+				"YES": "Yes, I live in Germany.",
+				"NO": "No, I do not live in Germany."
+			}
+		},
+		"dateOfBirth": {
+			"category": "Date of Birth",
+			"title": "When were you born?",
+			"tip": "Basic Income Support may be an option for you if you:\n• have reached the standard retirement age or\n• are at least 18 years old and permanently fully unable to work."
+		},
+		"pension": {
+			"category": "Pension Status",
+			"title": "Do you receive a pension?",
+			"tip": "From the standard retirement age, Basic Income Support in old age may be an option for you. When you reach this age limit depends on your year of birth.",
+			"options": {
+				"OLD_AGE": "I receive an old-age pension.",
+				"REDUCED_EARNING_CAPACITY": "I receive a pension because I am no longer able to work full-time (Reduced Earning Capacity).",
+				"NONE": "I do not receive a pension."
+			}
+		},
+		"income": {
+			"category": "Income Assessment",
+			"title": "Which of the following applies to you?",
+			"tip": "Sometimes money is enough for food, but not for the rent. Then you might get housing benefit.",
+			"options": {
+				"NOT_SUFFICIENT": "My current income is not sufficient to cover my needs.",
+				"SOON_INSUFFICIENT": "I am concerned that my income may soon be insufficient.",
+				"SUFFICIENT": "My income is sufficient. I can afford my expenses."
+			}
+		},
+		"hasAssetsAboveThreshold": {
+			"category": "Assets check",
+			"title": "Approximately how much do you have in assets?",
+			"tip": "Don't worry, many people receive help despite savings. The limit in the first year is €10,000 for one person. This includes cash, valuable items, or your car, for example.",
+			"options": {
+				"YES": "Yes, I have more than €10,000 in assets.",
+				"NO": "No, I have less than €10,000 in assets."
+			}
+		}
+	},
+	"outcome": {
+		"eligible": {
+			"title": "You could be entitled to basic income support.",
+			"description": "This is an initial assessment. Klaro helps you fill out your application step-by-step. It is easy, digital, and free.",
+			"cta": "Fill out application now"
+		},
+		"not_eligible": {
+			"title": "Basic Income Support is not a good fit at the moment...",
+			"description": "You can still create an account and save your answers securely. So you can use Klaro later when your situation changes or you need support with further steps. Later we will offer more applications!",
+			"cta": "Create account"
+		},
+		"sozialamt": {
+			"title": "Please contact your local Social Services Office",
+			"description": "Based on your answers, none of the qualifying residence statuses apply. Please contact your local Social Services Office (Sozialamt) for guidance on which support may be available to you.",
+			"cta": "Find your Social Services Office"
+		},
+		"start_over": "Start over"
+	}
+}

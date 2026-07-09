@@ -1,0 +1,123 @@
+{
+  "projectName": "beyondforms",
+  "projectOwner": "technologiestiftung",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 64,
+  "commit": true,
+  "commitConvention": "eslint",
+  "contributors": [
+    {
+      "login": "malte-b",
+      "name": "Malte Barth",
+      "avatar_url": "https://avatars.githubusercontent.com/u/27922183?v=4",
+      "profile": "https://github.com/malte-b",
+      "contributions": [
+        "code",
+        "data",
+        "doc",
+        "ideas",
+        "infra",
+        "maintenance",
+        "review",
+        "userTesting",
+        "test"
+      ]
+    },
+    {
+      "login": "aeschi",
+      "name": "aeschi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/56318362?v=4",
+      "profile": "https://github.com/aeschi",
+      "contributions": [
+        "code",
+        "a11y",
+        "maintenance",
+        "review",
+        "design",
+        "test"
+      ]
+    },
+    {
+      "login": "nlspnsgen",
+      "name": "nlspnsgen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12913491?v=4",
+      "profile": "https://github.com/nlspnsgen",
+      "contributions": [
+        "code",
+        "maintenance",
+        "review",
+        "infra",
+        "security",
+        "test"
+      ]
+    },
+    {
+      "login": "mms789",
+      "name": "Magda",
+      "avatar_url": "https://avatars.githubusercontent.com/u/254668140?v=4",
+      "profile": "https://github.com/mms789",
+      "contributions": [
+        "code",
+        "review",
+        "test",
+        "ideas"
+      ]
+    },
+    {
+      "login": "janinarenk",
+      "name": "Janina Renk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12065659?v=4",
+      "profile": "https://github.com/janinarenk",
+      "contributions": [
+        "code",
+        "review",
+        "test"
+      ]
+    },
+    {
+      "login": "oreflow",
+      "name": "Tim Malmström",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1454151?v=4",
+      "profile": "http://oreflow.com/",
+      "contributions": [
+        "code",
+        "review",
+        "test"
+      ]
+    },
+    {
+      "login": "kennycoder",
+      "name": "Nikolai Danylchyk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/234851?v=4",
+      "profile": "https://nikolai.one/",
+      "contributions": [
+        "mentoring",
+        "infra",
+        "security",
+        "tutorial",
+        "code",
+        "review",
+        "test",
+        "ideas"
+      ]
+    },
+    {
+      "login": "Esshahn",
+      "name": "Ingo Hinterding",
+      "avatar_url": "https://avatars.githubusercontent.com/u/434355?v=4",
+      "profile": "http://www.awsm.de/",
+      "contributions": [
+        "projectManagement",
+        "business",
+        "ideas"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "linkToUsage": false,
+  "skipCi": true
+}

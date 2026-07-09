@@ -1,0 +1,26 @@
+{
+	"title": "Klaro Chat",
+	"typing_indicator": "Klaro is typing...",
+	"new_chat": "New chat",
+	"close": "Close chat",
+	"history": {
+		"show": "Chat history",
+		"hide": "Back to chat",
+		"title": "Chat history",
+		"placeholder": "Your past conversations will appear here."
+	},
+	"input_placeholder": "Type a message",
+	"send": "Send message",
+	"upload": "Upload document",
+	"error": {
+		"general": "We could not send your message. Please try again later.",
+		"dismiss": "Dismiss"
+	},
+	"welcome": {
+		"heading": "Hello, I'm Klaro",
+		"description": "I can help with questions about basic security benefits, applications, documents, and next steps.",
+		"quick_action1": "Can I receive basic security benefits?",
+		"quick_action2": "What documents do I need?",
+		"quick_action3": "How do I submit an application?"
+	}
+}

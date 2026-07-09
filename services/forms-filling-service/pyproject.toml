@@ -1,0 +1,28 @@
+[project]
+name = "forms-filling-service"
+version = "0.1.0"
+description = "Service for parsing and filling PDF forms."
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]",
+    "pydantic",
+    "pydantic-settings",
+    "pdfrw",
+    "reportlab",
+    "python-multipart",
+]
+
+[tool.uv]
+managed = true
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+default = true
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "httpx",
+    "pytest-asyncio",
+]

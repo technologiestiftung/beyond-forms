@@ -1,0 +1,490 @@
+{
+	"levels": {
+		"pills": {
+			"incomplete": "Unvollständig",
+			"advanced": "Fortgeschritten",
+			"ready": "Startklar"
+		}
+	},
+	"overview": {
+		"main_title": "Antrag auf Grundsicherung",
+		"progress_card_title": "Dein Antrag Schritt für Schritt zum Ziel",
+		"document_auto_verified_banner": "Dein Antrag wurde basierend auf deinem Dokument \"{{documentName}}\" aktualisiert.",
+		"generate_notice_title": "Dein Antrag ist fast fertig! Du kannst ihn jederzeit runterladen.",
+		"generate_notice_scroll_label": "Zum Antrag generieren scrollen",
+		"step_by_step_illustration_alt": "Illustration einer Schritt-für-Schritt-Checkliste",
+		"intro_text": "Hier kannst Du Dokumente hochladen und den Antrag zur Grundsicherung schneller ausfüllen.",
+		"filters": {
+			"open": "Offen",
+			"done": "Erledigt"
+		},
+		"generate_button": "Antrag generieren",
+		"preview_title": "Antragsentwurf Vorschau",
+		"open_button": "Öffnen",
+		"preview_ephemeral_notice": "Link ist aus Sicherheitsgründen für 60 Sekunden gültig.",
+		"preview_expired_title": "Sicherheitslink abgelaufen",
+		"preview_expired_description": "Aus Datenschutzgründen (DSGVO) wurde der temporäre Link deaktiviert. Bitte aktualisiere die Vorschau.",
+		"refresh_preview_button": "Vorschau aktualisieren",
+		"link_expired_label": "Link abgelaufen",
+		"preview_timer_notice": "Link aus Sicherheitsgründen für {{count}}s gültig",
+		"download_button": "Herunterladen",
+		"download_filename": "antrag_grundsicherung.pdf",
+		"download_success_title": "Erfolgreich",
+		"download_success_message": "Dein Antrag wurde heruntergeladen.",
+		"download_success_message_active": "Dein Antrag wird heruntergeladen.",
+		"modal": {
+			"title": "Antrag vorzeitig generieren?",
+			"cancel": "Abbrechen",
+			"confirm": "Trotzdem generieren"
+		},
+		"warning_dialog": "Achtung: Unvollständige Anträge dauern in der Bearbeitung deutlich länger. Möchtest Du den Antrag trotzdem jetzt generieren?",
+		"generating": "Wird generiert...",
+		"preview_ready_title": "Antrag bereit zum Herunterladen",
+		"preview_ready_description": "Dein ausgefüllter Antrag wurde erfolgreich als PDF erstellt. Lade ihn herunter, um ihn zu überprüfen.",
+		"success_modal": {
+			"title": "PDF heruntergeladen!",
+			"subtitle": "Dein Antrag liegt auf Deinem Gerät bereit zum Ausdrucken.",
+			"card_title": "Was du vor Ort erledigen kannst:",
+			"step1_title": "1. Antrag ausdrucken und unterschreiben:",
+			"step1_desc": "Drucke die heruntergeladene PDF-Datei aus und unterzeichne sie handschriftlich auf der letzten Seite.",
+			"step2_title": "2. Unterlagen abgeben:",
+			"step2_desc": "Du kannst die Unterlagen persönlich bei der Behörde in deiner Nähe abgeben oder per Post senden an:",
+			"hours_label": "Öffnungszeiten:",
+			"default_office_name": "Zuständiges Sozialamt",
+			"default_office_desc": "Bitte reiche den Antrag bei dem Sozialamt deines Bezirks ein.",
+			"default_office_link": "Zuständiges Sozialamt online suchen",
+			"cta_button": "Zurück zu Antrag auf Grundsicherung"
+		},
+		"close_modal_button": "Schließen",
+		"warning_modal_title": "Antrag unvollständig",
+		"warning_modal_description": "Du hast noch nicht alle empfohlenen Felder ausgefüllt. Ein unvollständiger Antrag kann die Bearbeitung durch das Amt verzögern. Möchtest du den Antrag trotzdem jetzt schon generieren?",
+		"warning_modal_cancel": "Zurück zum Antrag",
+		"warning_modal_confirm": "Trotzdem generieren"
+	},
+	"questionnaire": {
+		"overview_header_title": "Fragen",
+		"empty": "Keine Informationen vorhanden",
+		"badges": {
+			"personal": "Persönliche Angaben"
+		},
+		"intro": {
+			"path_upload_title": "Dokumente hochladen",
+			"path_upload_desc": "Lade Nachweise hoch, um Angaben automatisch auszufüllen.",
+			"path_manual_title": "Angaben manuell ausfüllen",
+			"path_manual_desc": "Trage Deine Daten Schritt für Schritt selbst ein.",
+			"upload_options_title": "Wie möchtest Du Dokumente einreichen?",
+			"upload_options_desc": "Wähle eine Option, um Deine Dokumente hochzuladen.",
+			"back_to_intro": "Zurück zur Einführung",
+			"back_to_overview": "Zurück zur Übersicht"
+		},
+		"sections": {
+			"about_me": {
+				"title": "Über Dich",
+				"subtitle": "Hier findest Du Deine personenbezogenen Daten.",
+				"intro_desc": "Lade Dokumente hoch.\nDer Assistent übernimmt viele Angaben automatisch. Du kannst sie später prüfen.",
+				"recommended_docs": "Empfohlene Dokumente",
+				"docs_list": {
+					"id_card": "Personalausweis",
+					"passport": "Reisepass",
+					"residence_permit": "Aufenthaltstitel",
+					"tolerated_stay": "Aufenthaltsgestattung/Duldung"
+				}
+			},
+			"household": {
+				"title": "Familie und Haushalt",
+				"subtitle": "Wir erfassen Deine Wohn- und Lebenssituation und welche Bedarfe sich ergeben.",
+				"intro_desc": "Lade Nachweise hoch, um Angaben zu Deiner Familie und Deinem Haushalt zu machen. Der Assistent übernimmt viele Angaben automatisch.",
+				"recommended_docs": "Empfohlene Dokumente",
+				"docs_list": {
+					"declaration": "Haushaltsangehörige / Bedarfsgemeinschaftserklärung"
+				}
+			},
+			"housing": {
+				"title": "Dein Wohnen",
+				"subtitle": "Wir klären, welche Angaben und Unterlagen Du zu Deiner Wohnsituation brauchst.",
+				"docs_list": {
+					"rental_contract": "Mietvertrag / Untermietvertrag",
+					"heating_proof": "Heizkostennachweis / Gasrechnung",
+					"utility_statement": "Nebenkostenabrechnung"
+				}
+			},
+			"income_assets": {
+				"title": "Dein Einkommen, Ersparnisse und Wertsachen",
+				"subtitle": "Wir erfassen, welches Geld Du regelmäßig bekommst und was Du nachweisen musst und wir prüfen, was Du angeben musst und welche Nachweise dazu wichtig sind."
+			},
+			"assets": {
+				"title": "Deine Ersparnisse und Wertsachen",
+				"subtitle": "Wir prüfen, was Du angeben musst und welche Nachweise dazu wichtig sind."
+			},
+			"health": {
+				"title": "Gesundheit und zusätzlicher Bedarf",
+				"subtitle": "Wir klären, ob Du wegen Krankheit oder Behinderung mehr Unterstützung bekommen kannst."
+			}
+		}
+	},
+	"docs": {
+		"overview_header_title": "Dokumente",
+		"groups": {
+			"identity": "Identität und persönliche Dokumente",
+			"income": "Einkommen und Finanzen",
+			"housing": "Wohnen und Wohnkosten",
+			"declarations": "Anträge und Erklärungen"
+		},
+		"group_descriptions": {
+			"identity": "Personalausweis, Reisepass, Meldebescheinigung, Krankenversicherung",
+			"income": "Erstrentenbescheid, Kontoauszüge der letzten 3 Monate, Einkommenserklärung...",
+			"housing": "Mietvertrag, Nebenkostenrechnung, Heizkostennachweis...",
+			"declarations": "Mitwirkungsverpflichtung, Datenschutzerklärung, Haushaltsangehörige..."
+		},
+		"selected_documents": "Ausgewählte Dokumente: {{count}}",
+		"add_document": "Dokument hinzufügen",
+		"close_aria": "Schließen",
+		"back_to_overview_aria": "Zurück zu meine Dokumente",
+		"actions": {
+			"upload_title": "Dokument hochladen",
+			"upload_desc": "Lade ein Foto oder PDF Deines Dokuments hoch.",
+			"camera_title": "Mit Kamera scannen",
+			"camera_desc": "Lade ein Foto Deines Dokuments hoch."
+		},
+		"tabs": {
+			"offen": "Offen",
+			"erledigt": "Erledigt"
+		},
+		"review": "Prüfen",
+		"upload_more": "+ Weiteres Dokument hochladen",
+		"slot_empty": "Für diesen Bereich liegt noch kein Dokument vor.",
+		"upload_initial": "+ Dokument hochladen",
+		"unsorted_title": "Kürzlich hochgeladene Dokumente",
+		"untitled": "Unbenanntes Dokument",
+		"slots": {
+			"id_card": "Personalausweis oder Reisepass",
+			"registration": "Meldebescheinigung",
+			"health_insurance": "Nachweis der Krankenversicherungsmitgliedschaft",
+			"pension_notice": "Erstrentenbescheid",
+			"stmt3": "Kontoauszüge der letzten 3 Monate",
+			"income": "Einkommenserklärung (Anlage Einkommen)",
+			"assets": "Anlage Vermögen",
+			"bank": "Bankdaten",
+			"rent": "Mietvertrag",
+			"utility_bill": "Nebenkostenrechnung Deiner Wohnung",
+			"heating": "Heizkostennachweis (Gas-/Wärmerechnung)",
+			"housing": "Anlage Unterkunft / Kosten der Unterkunft",
+			"cooperation_agreement": "Mitwirkungsverpflichtung + Datenschutzerklärung",
+			"household": "Haushaltsangehörige/Bedarfsgemeinschaftserklärung"
+		},
+		"badges": {
+			"doc": "Dokument",
+			"form": "Formular",
+			"proof": "Nachweis"
+		},
+		"processing": "Verarbeitung...",
+		"delete_aria": "Dokument löschen",
+		"delete_title": "Dokument löschen?",
+		"delete_confirm": "Möchtest Du dieses Dokument wirklich löschen?",
+		"failed": "Fehler"
+	},
+	"common": {
+		"delete": "Löschen",
+		"cancel": "Abbrechen"
+	},
+	"wizard": {
+		"sections": {
+			"eligibility_check": "Hast du Anspruch?",
+			"applicant_information": "Über Dich",
+			"applicant_financial_situation": "Einkommen & Vermögen"
+		},
+		"steps": {
+			"step_eligibility_nationality": {
+				"title": "Staatsangehörigkeit & Aufenthaltsstatus",
+				"description": "Was trifft auf Dich zu?"
+			},
+			"step_eligibility_residence": {
+				"title": "Wohnort",
+				"description": "Wohnst Du in Deutschland?"
+			},
+			"step_eligibility_dob": {
+				"title": "Geburtsdatum",
+				"description": "Wann bist Du geboren?"
+			},
+			"step_eligibility_pension": {
+				"title": "Rentenstatus",
+				"description": "Beziehst Du eine Rente?"
+			},
+			"step_eligibility_income": {
+				"title": "Einkommenseinschätzung",
+				"description": "Was trifft auf Dein aktuelles Einkommen zu?"
+			},
+			"step_eligibility_assets": {
+				"title": "Vermögenseinschätzung",
+				"description": "Hast Du Vermögen (Ersparnisse/Immobilien) im Wert von mehr als 10.000 €?"
+			}
+		},
+		"options": {
+			"nationality_german": "Ich bin Deutsche/Deutscher.",
+			"nationality_eu_5_plus": "Ich bin EU-Bürger/EU-Bürgerin und lebe seit mindestens 5 Jahren in Deutschland.",
+			"nationality_residence_permit": "Ich habe eine Aufenthaltserlaubnis.",
+			"nationality_none": "Nichts davon trifft zu.",
+			"residence_germany": "Ich wohne in Deutschland.",
+			"residence_abroad": "Ich wohne im Ausland.",
+			"pension_yes": "Ja",
+			"pension_no": "Nein",
+			"pension_unknown": "Ich weiß es nicht.",
+			"income_not_sufficient": "Mein Einkommen reicht im Moment nicht aus.",
+			"income_concerned_insufficient": "Ich mache mir Sorgen. Mein Einkommen reicht bald vielleicht nicht mehr aus.",
+			"income_sufficient": "Mein Einkommen reicht aus. Ich kann alles bezahlen.",
+			"assets_under_10000": "Ich habe weniger als 10.000 Euro Vermögen.",
+			"assets_over_10000": "Ich habe mehr als 10.000 Euro Vermögen."
+		},
+		"actions": {
+			"next": "Weiter",
+			"finish": "Ergebnis anzeigen"
+		},
+		"end_screen": {
+			"title": "Geschafft!",
+			"description": "Deine Angaben wurden gespeichert. Im nächsten Schritt kannst Du Deinen Antrag vorbereiten.",
+			"back": "Zurück zur Übersicht"
+		}
+	},
+	"personal": {
+		"steps": {
+			"step_x_of_y": "Schritt {{current}} von {{total}}"
+		},
+		"questions": {
+			"name_title": "Wie ist Dein voller Name?",
+			"birth_title": "Wann und wo bist Du geboren?",
+			"gender_title": "Welches Geschlecht möchtest Du angeben?",
+			"address_title": "Wie lautet Deine aktuelle Wohnadresse?",
+			"no_fixed_address_label": "Ich habe aktuell keine feste Adresse",
+			"last_fixed_address_title": "Wo hast Du zuletzt fest gewohnt?",
+			"last_fixed_address_placeholder": "Ort/Gemeinde",
+			"citizenship_title": "Was trifft auf Dich zu?",
+			"support_title": "Wirst Du betreut oder hast Du einen Beistand?",
+			"displaced_title": "Bist Du aus deinem Land vertrieben?",
+			"insurance_title": "Hast du eine von diesen Versicherungen?",
+			"social_benefits_title": "Wartest Du im Moment auf eine Bewilligung für eine Sozialhilfeleistung?",
+			"insurance_subtitle": "Bitte wähle aus, welche Versicherungen Du hast, damit wir prüfen können, wie diese für Deinen Antrag berücksichtigt werden."
+		},
+		"placeholders": {
+			"first_name": "Vorname eingeben",
+			"last_name": "Nachname eingeben",
+			"birth_place": "Geburtsort eingeben",
+			"address": "Straße, Hausnummer, PLZ, Stadt",
+			"authority": "Behörde eingeben"
+		},
+		"labels": {
+			"address": "Adresse",
+			"displaced_status": "Vertriebenenstatus",
+			"displaced_since": "Seit wann ist dieser Status gültig?",
+			"displaced_authority": "Zuständige Behörde / Einwanderungsbehörde",
+			"insurance_provider": "Versicherungsträger / Name",
+			"insurance_status": "Versicherungsstatus"
+		},
+		"dropdowns": {
+			"select_eu_country": "-- EU-Land auswählen --",
+			"select_origin_country": "-- Herkunftsland auswählen --",
+			"select_status": "-- Status auswählen --",
+			"select_insurance": "-- Versicherung auswählen --"
+		},
+		"options": {
+			"female": "Weiblich",
+			"male": "Männlich",
+			"diverse": "Divers",
+			"custodian": "Ja, ich werde betreut",
+			"guardian": "Ja, ich habe Beistand",
+			"none": "Nein, keins davon",
+			"yes": "Ja",
+			"no": "Nein",
+			"social": "Sozialversicherung",
+			"health": "Krankenversicherung",
+			"not_insured": "Ich bin nicht versichert",
+			"displaced_expellee": "Heimatvertriebene/r (Ausweis A)",
+			"displaced_person": "Vertriebene/r (Ausweis B)",
+			"displaced_late_resettler": "Spätaussiedler/in",
+			"displaced_refugee": "Sowjetzonenflüchtling",
+			"insurance_statutory": "Gesetzlich (z.B. AOK, TK)",
+			"insurance_private": "Privat",
+			"insurance_other": "Andere / Freiwillig",
+			"status_family": "Familienversichert",
+			"status_student": "Studentisch versichert",
+			"status_pensioner": "Rentner (KVdR)",
+			"status_employee": "Pflichtversichert (Angestellt)",
+			"status_voluntary": "Freiwillig versichert",
+			"status_other": "Andere",
+			"german": "Ich habe die deutsche Staatsangehörigkeit.",
+			"eu_5": "Ich habe eine Staatsangehörigkeit von einem EU-Land. Seit mindestens 5 Jahren lebe ich in Deutschland.",
+			"permit": "Mein Aufenthaltstitel für Deutschland ist gültig."
+		}
+	},
+	"household": {
+		"steps": {
+			"step_x_of_y": "Schritt {{current}} von {{total}}"
+		},
+		"questions": {
+			"members_title": "Wie viele Personen leben in Deinem Haushalt?",
+			"marital_status_title": "Wie ist Dein Familienstand?",
+			"married_since_label": "Verheiratet seit",
+			"error_select_marital_status": "Bitte wähle Deinen Familienstand aus."
+		},
+		"options": {
+			"single": "Ledig (Single)",
+			"married": "Verheiratet",
+			"divorced": "Geschieden",
+			"widowed": "Verwitwet",
+			"partnership": "Eingetragene Lebenspartnerschaft"
+		},
+		"actions": {
+			"next": "Weiter",
+			"finish": "Fertigstellen"
+		}
+	},
+	"financial": {
+		"steps": {
+			"step_x_of_y": "Schritt {{current}} von {{total}}"
+		},
+		"intro": {
+			"back_aria": "Zurück zur Übersicht",
+			"intro_desc": "Lade Dokumente hoch.\nDer Assistent übernimmt viele Angaben automatisch. Du kannst sie später prüfen.",
+			"recommended_docs": "Empfohlene Dokumente",
+			"doc_list": {
+				"statements": "Kontoauszüge (letzte 3 Monate)",
+				"pension": "Rentenbescheid (Altersrente, Erwerbsminderung)",
+				"other_income": "Nachweise über weitere regelmäßige Einnahmen"
+			},
+			"important_title": "Wichtig zu wissen",
+			"important_desc": "Du musst jetzt keine Dokumente hochladen. Du kannst deine Angaben auch selbst eintragen. Das Sozialamt braucht die Dokumente später trotzdem als Kopie.",
+			"upload_doc": "Dokument hochladen",
+			"upload_desc": "Wähle ein Dokument aus.",
+			"take_photo": "Mit Kamera aufnehmen",
+			"take_photo_desc": "Nehme ein Foto deines Dokuments auf.",
+			"continue": "Weiter"
+		},
+		"questions": {
+			"awaiting_benefits_title": "Wartest Du im Moment auf eine Bewilligung für eine Sozialhilfeleistung?",
+			"awaiting_benefits_type_label": "Um welche Leistung handelt es sich?",
+			"awaiting_benefits_type_placeholder": "-- Wähle eine Leistung --",
+			"awaiting_benefits_date_label": "Antragsdatum (falls bekannt)",
+			"awaiting_benefits_office_label": "Welches Amt entscheidet darüber?",
+			"awaiting_benefits_office_placeholder": "z.B. Sozialamt Tempelhof",
+			"awaiting_benefits_ref_label": "Aktenzeichen (falls bekannt)",
+			"awaiting_benefits_ref_placeholder": "z.B. 12/345/67",
+			"previous_benefits_title": "Hast Du in den letzten zwei Jahren vor dem heutigen Tag Sozialleistungen erhalten?",
+			"previous_benefits_type_label": "Welche Leistung hast Du erhalten?",
+			"previous_benefits_type_placeholder": "z.B. Wohngeld",
+			"previous_benefits_start_label": "Erhalten von",
+			"previous_benefits_end_label": "Erhalten bis",
+			"previous_benefits_office_label": "Welche Stelle hat die Leistung gezahlt?",
+			"previous_benefits_office_placeholder": "z.B. Wohnungsamt Berlin",
+			"previous_benefits_ref_label": "Aktenzeichen (falls bekannt)",
+			"previous_benefits_ref_placeholder": "z.B. Az. 9876-A",
+			"pension_title": "Beziehst Du eine Rente?",
+			"pension_amount_label": "Monatlicher Rentenbetrag (netto in Euro)",
+			"pension_amount_placeholder": "z.B. 650.00",
+			"employment_title": "Wie ist Deine Erwerbssituation?",
+			"employment_amount_label": "Monatlicher Verdienst (netto in Euro)",
+			"employment_amount_placeholder": "z.B. 450.00",
+			"other_income_title": "Hast Du weitere regelmäßige Einnahmen?",
+			"other_income_amount_label": "Monatlicher Betrag (netto in Euro)",
+			"other_income_amount_placeholder": "z.B. 100.00",
+			"one_time_payment_title": "Erwartest Du in nächster Zeit eine größere einmalige Zahlung?",
+			"one_time_payment_type_label": "Art der Zahlung (z.B. Steuerrückzahlung, Erbschaft)",
+			"one_time_payment_type_placeholder": "z.B. Steuerrückerstattung",
+			"one_time_payment_amount_label": "Erwarteter Betrag (in Euro)",
+			"one_time_payment_amount_placeholder": "z.B. 1200.00",
+			"one_time_payment_date_label": "Wann wird die Zahlung erwartet?",
+			"bank_title": "Wie lautet Deine Bankverbindung?",
+			"bank_holder_label": "Kontoinhaber:in",
+			"bank_holder_placeholder": "Helmut Klar",
+			"bank_name_label": "Geldinstitut / Name der Bank",
+			"bank_name_placeholder": "z.B. Sparkasse",
+			"bank_iban_label": "IBAN",
+			"bank_iban_placeholder": "z.B. DE89 3704 0044 ...",
+			"bank_bic_label": "BIC",
+			"bank_bic_placeholder": "z.B. WELADED1BER",
+			"amount_net_hint": "Bitte gib den monatlichen Netto-Betrag (Auszahlungsbetrag) an.",
+			"employer_label": "Name des Arbeitgebers",
+			"employer_placeholder": "Name des Arbeitgebers eingeben",
+			"job_title_label": "Beruf / Tätigkeit",
+			"job_title_placeholder": "Berufsbezeichnung eingeben",
+			"account_holder_label": "Kontoinhaber:in",
+			"account_holder_placeholder": "z. B. Helmut Klar",
+			"iban_label": "IBAN",
+			"iban_placeholder": "z. B. DE89 3704 0044 ...",
+			"bic_label": "BIC",
+			"bic_placeholder": "z. B. WELADED1BER",
+			"submit_cta": "Zurück zum Antrag"
+		},
+		"options": {
+			"yes": "Ja",
+			"no": "Nein",
+			"pension_retirement": "Altersrente (gesetzlich)",
+			"pension_reduced": "Erwerbsminderungsrente",
+			"pension_survivor": "Hinterbliebenen- / Witwenrente",
+			"pension_other": "Sonstige Rente / Werkspension",
+			"pension_none": "Nein, ich erhalte keine Rente",
+			"emp_employed": "Angestellt (Vollzeit / Teilzeit / Minijob / Werkstudierende)",
+			"emp_self": "Selbstständig / Gewerbe",
+			"emp_student": "Ausbildung / Studium",
+			"emp_unemployed": "Arbeitslos",
+			"emp_none": "Nichts davon",
+			"other_sick": "Krankengeld",
+			"other_alimony": "Unterhalt",
+			"other_rent": "Sonstige Einnahmen (z.B. Zinsen, Untermiete)",
+			"other_none": "Nein, keine weiteren Einkünfte",
+			"benefit_options": {
+				"grundsicherung": "Grundsicherung",
+				"hilfe_lebensunterhalt": "Hilfe zum Lebensunterhalt",
+				"wohngeld": "Wohngeld",
+				"krankengeld": "Krankengeld",
+				"sonstiges": "Sonstiges"
+			},
+			"none_of_these": "Nein, nichts davon"
+		},
+		"errors": {
+			"save_failed": "Speichern fehlgeschlagen. Bitte überprüfe Deine Eingaben.",
+			"pension_selection": "Bitte wähle eine Option aus.",
+			"pension_amount": "Bitte gib Deinen Rentenbetrag an.",
+			"employment_selection": "Bitte wähle eine Option aus.",
+			"employment_amount": "Bitte gib Deinen monatlichen Verdienst an.",
+			"other_selection": "Bitte wähle eine Option aus.",
+			"other_amount": "Bitte gib Deinen Betrag an.",
+			"one_time_selection": "Bitte wähle eine Option aus.",
+			"one_time_fields": "Bitte fülle alle Felder der Einmalzahlung aus.",
+			"one_time_amount_invalid": "Bitte gib einen gültigen erwarteten Betrag an.",
+			"bank_fields": "Bitte fülle alle Bankverbindungsfelder aus.",
+			"bank_holder_req": "Kontoinhaber ist erforderlich.",
+			"bank_name_req": "Name der Bank ist erforderlich.",
+			"bank_iban_req": "IBAN ist erforderlich.",
+			"bank_iban_invalid": "Ungültige IBAN"
+		}
+	},
+	"health": {
+		"intro": {
+			"title": "Gesundheit und Pflege",
+			"desc": "Lade Nachweise hoch, um Unterstützung bei Pflege oder Mehrbedarf bei Behinderung zu erhalten. Der Assistent übernimmt viele Angaben automatisch.",
+			"recommended_docs": "Empfohlene Dokumente",
+			"doc_list": {
+				"care_pills": "Pflegegradbescheid",
+				"disability_card": "Schwerbehindertenausweis",
+				"nursing_home_contract": "Heimvertrag oder Heimkostenaufstellung",
+				"care_service_invoice": "Rechnungen des Pflegedienstes"
+			}
+		}
+	},
+	"eligibility_questions": {
+		"q1_title": "Wo ist Dein Hauptwohnsitz?",
+		"q1_desc": "Für die erste Einschätzung ist wichtig, ob Du aus gesundheitlichen Gründen auf Dauer weniger als 3 Stunden am Tag arbeiten kannst. Dann kann eher Grundsicherung über das Sozialamt infrage kommen.",
+		"q1_option_de": "Ich wohne in Deutschland.",
+		"q1_option_abroad": "Ich wohne im Ausland.",
+		"q2_title": "Wie alt bist Du?",
+		"q2_option_older": "Ich bin 67 Jahre oder älter (Regelaltersgrenze erreicht).",
+		"q2_option_younger": "Ich bin jünger als 67 Jahre.",
+		"q3_title": "Hat ein Arzt/eine Ärztin oder das Rentenamt bestätigt, dass Du aus gesundheitlichen Gründen erwerbsunfähig bist?",
+		"q3_option_yes": "Ja",
+		"q3_option_no": "Nein",
+		"q3_option_unknown": "Ich weiß es nicht.",
+		"q4_title": "Beziehst Du Rente?",
+		"q4_option_yes": "Ja",
+		"q4_option_no": "Nein",
+		"q4_option_unknown": "Ich weiß es nicht."
+	}
+}

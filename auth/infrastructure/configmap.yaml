@@ -1,0 +1,367 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-config
+  namespace: default
+data:
+  AUTHENTIK_POSTGRESQL__HOST: "authentik-postgresql"
+  AUTHENTIK_POSTGRESQL__PORT: "5432"
+  AUTHENTIK_POSTGRESQL__NAME: "authentik"
+  AUTHENTIK_BOOTSTRAP_EMAIL: "beyondforms-admin@tsberlin.de"
+
+  oidc-provider.yaml: |
+    # Authentik Blueprint: OIDC Provider and Application for BeyondForms
+    version: 1
+
+    entries:
+      # Signing Key for OIDC
+      - model: authentik_crypto.certificatekeypair
+        identifiers:
+          name: beyondforms-signing-key
+        id: signing-key
+        attrs:
+          name: BeyondForms Signing Key
+          certificate_data: !File /certs/pub/oidc_public.pem
+          key_data: !File /certs/priv/oidc_private.pem
+
+      # OIDC Provider
+      - model: authentik_providers_oauth2.oauth2provider
+        identifiers:
+          name: beyondforms-provider
+        id: provider
+        attrs:
+          name: BeyondForms Provider
+          client_id: beyondforms
+          client_secret: !Env BEYONDFORMS_OIDC_CLIENT_SECRET
+          signing_key: !KeyOf signing-key
+          authentication_flow: !Find [authentik_flows.flow, [slug, passwordless-sms-login]]
+          redirect_uris:
+            - matching_mode: strict
+              url: "https://authentik.staging.bf.citylab-berlin.org/api/auth/callback/beyondforms"
+            - matching_mode: strict
+              url: "https://authentik.staging.bf.citylab-berlin.org/auth/callback"
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
+          property_mappings:
+            - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-openid]]
+            - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile]]
+            - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-email]]
+
+      # Application
+      - model: authentik_core.application
+        identifiers:
+          slug: beyondforms
+        id: application
+        attrs:
+          name: BeyondForms
+          slug: beyondforms
+          provider: !KeyOf provider
+
+  passwordless-sms-enrollment.yaml: |
+    # Authentik Blueprint: Passwordless SMS Enrollment
+    # This blueprint creates an enrollment flow where a new user provides their phone number,
+    # verifies it via SMS, and is registered and logged in.
+    version: 1
+
+    entries:
+      - model: authentik_flows.flow
+        identifiers:
+          slug: passwordless-sms-enrollment
+        id: flow
+        attrs:
+          name: Passwordless SMS Enrollment
+          title: "Enroll with Phone"
+          designation: enrollment
+          compatibility_mode: false
+
+      # Prompt for Phone Number (as username and phone_number)
+      - model: authentik_stages_prompt.prompt
+        identifiers:
+          name: passwordless-sms-enrollment-prompt-username
+        id: prompt-username
+        attrs:
+          field_key: username
+          label: "Username"
+          type: text
+          placeholder: "+1234567890"
+          order: 10
+
+      - model: authentik_stages_prompt.prompt
+        identifiers:
+          name: passwordless-sms-enrollment-prompt-phone-number
+        id: prompt-phone-number
+        attrs:
+          field_key: phone_number
+          label: "Phone Number"
+          type: text
+          placeholder: "+1234567890"
+          order: 20
+
+      - model: authentik_stages_prompt.promptstage
+        identifiers:
+          name: passwordless-sms-enrollment-prompt-stage
+        id: prompt-stage
+        attrs:
+          fields:
+            - !KeyOf prompt-username
+            - !KeyOf prompt-phone-number
+
+      # User Write Stage: Creates the user in the database
+      - model: authentik_stages_user_write.userwritestage
+        identifiers:
+          name: passwordless-sms-enrollment-user-write
+        id: user-write
+        attrs:
+          user_creation_mode: always_create
+
+      # SMS Authenticator Stage: Sends and verifies the code
+      - model: authentik_stages_authenticator_sms.authenticatorsmsstage
+        identifiers:
+          name: passwordless-sms-enrollment-sms-stage
+        id: sms-stage
+        attrs:
+          verify_only_and_not_create: false
+          provider: twilio
+          from_number: !Env AUTHENTIK_SMS__PROVIDERS__TWILIO__FROM
+          account_sid: !Env AUTHENTIK_SMS__PROVIDERS__TWILIO__ACCOUNT_SID
+          auth: !Env AUTHENTIK_SMS__PROVIDERS__TWILIO__AUTH_TOKEN
+
+      # Login Stage: Creates the session after enrollment
+      - model: authentik_stages_user_login.userloginstage
+        identifiers:
+          name: passwordless-sms-enrollment-login-stage
+        id: login-stage
+        attrs:
+          session_duration: "hours=24"
+
+      # Bindings
+      - model: authentik_flows.flowstagebinding
+        identifiers:
+          target: !KeyOf flow
+          stage: !KeyOf prompt-stage
+          order: 10
+        attrs:
+          evaluate_on_plan: true
+          re_evaluate_policies: true
+
+      - model: authentik_flows.flowstagebinding
+        identifiers:
+          target: !KeyOf flow
+          stage: !KeyOf user-write
+          order: 20
+        attrs:
+          evaluate_on_plan: true
+          re_evaluate_policies: true
+
+      - model: authentik_flows.flowstagebinding
+        identifiers:
+          target: !KeyOf flow
+          stage: !KeyOf sms-stage
+          order: 30
+        attrs:
+          evaluate_on_plan: true
+          re_evaluate_policies: true
+
+      - model: authentik_flows.flowstagebinding
+        identifiers:
+          target: !KeyOf flow
+          stage: !KeyOf login-stage
+          order: 40
+        attrs:
+          evaluate_on_plan: true
+          re_evaluate_policies: true
+
+  passwordless-sms-login.yaml: |
+    # Authentik Blueprint: Passwordless SMS-only Authentication
+    # This blueprint creates a flow where the user enters their phone number,
+    # receives an SMS code, and is logged in.
+    version: 1
+
+    entries:
+      - model: authentik_flows.flow
+        identifiers:
+          slug: passwordless-sms-login
+        id: flow
+        attrs:
+          name: Passwordless SMS Login
+          title: "Login with Phone"
+          designation: authentication
+          compatibility_mode: false
+
+      # Identification Stage: Asks for the phone number
+      - model: authentik_stages_identification.identificationstage
+        identifiers:
+          name: passwordless-sms-login-identification-stage
+        id: identification-stage
+        attrs:
+          user_fields:
+            - username
+          label_text: "Phone Number"
+          placeholder_text: "+1234567890"
+          case_insensitive_matching: true
+          show_matched_user: true
+          pretend_user_exists: false
+          # No password_stage defined here makes it passwordless
+
+      # SMS Authenticator Stage: Sends the code
+      - model: authentik_stages_authenticator_sms.authenticatorsmsstage
+        identifiers:
+          name: passwordless-sms-login-sms-stage
+        id: sms-stage
+        attrs:
+          configure_flow: null # Users don't "configure" this during login
+          verify_only_and_not_create: true # Essential for login-only flows
+          provider: twilio
+          from_number: !Env AUTHENTIK_SMS__PROVIDERS__TWILIO__FROM
+          account_sid: !Env AUTHENTIK_SMS__PROVIDERS__TWILIO__ACCOUNT_SID
+          auth: !Env AUTHENTIK_SMS__PROVIDERS__TWILIO__AUTH_TOKEN
+
+      # Login Stage: Creates the session
+      - model: authentik_stages_user_login.userloginstage
+        identifiers:
+          name: passwordless-sms-login-login-stage
+        id: login-stage
+        attrs:
+          session_duration: "hours=24"
+
+      # Bindings
+      - model: authentik_flows.flowstagebinding
+        identifiers:
+          target: !KeyOf flow
+          stage: !KeyOf identification-stage
+          order: 10
+        attrs:
+          evaluate_on_plan: true
+          re_evaluate_policies: true
+
+      - model: authentik_flows.flowstagebinding
+        identifiers:
+          target: !KeyOf flow
+          stage: !KeyOf sms-stage
+          order: 20
+        attrs:
+          evaluate_on_plan: true
+          re_evaluate_policies: true
+
+      - model: authentik_flows.flowstagebinding
+        identifiers:
+          target: !KeyOf flow
+          stage: !KeyOf login-stage
+          order: 30
+        attrs:
+          evaluate_on_plan: true
+          re_evaluate_policies: true
+
+  username-password-enrollment.yaml: |
+    # Authentik Blueprint: Username-Password Enrollment Flow
+    #
+    # This blueprint defines a two-stage enrollment flow used for test accounts.
+    # It allows the 'start' endpoint to handle identification (Username stage)
+    # and the 'finish' endpoint to handle authentication (Password stage),
+    # effectively sidestepping the default SMS-based flow.
+    version: 1
+
+    entries:
+      - model: authentik_flows.flow
+        identifiers:
+          slug: username-password-enrollment
+        id: flow
+        attrs:
+          name: Username-Password Enrollment Flow
+          title: Welcome to authentik!
+          designation: enrollment
+          authentication: require_unauthenticated
+          compatibility_mode: false
+
+      # Username
+      - model: authentik_stages_prompt.prompt
+        identifiers:
+          name: username-password-enrollment-prompt-username
+        id: prompt-username
+        attrs:
+          field_key: username
+          label: Username
+          type: text
+          required: true
+          order: 10
+
+      - model: authentik_stages_prompt.promptstage
+        identifiers:
+          name: username-password-enrollment-prompt-stage-username
+        id: prompt-stage-username
+        attrs:
+          fields:
+            - !KeyOf prompt-username
+
+      # Password
+      - model: authentik_stages_prompt.prompt
+        identifiers:
+          name: username-password-enrollment-prompt-password
+        id: prompt-password
+        attrs:
+          field_key: password
+          label: Password
+          type: password
+          required: true
+          order: 20
+
+      - model: authentik_stages_prompt.promptstage
+        identifiers:
+          name: username-password-enrollment-prompt-stage-password
+        id: prompt-stage-password
+        attrs:
+          fields:
+            - !KeyOf prompt-password
+
+      # User Write Stage: Creates the user in the database
+      - identifiers:
+          name: username-password-enrollment-user-write
+        id: user-write
+        model: authentik_stages_user_write.userwritestage
+        attrs:
+          user_creation_mode: always_create
+
+      # Login Stage: Creates the session after enrollment
+      - identifiers:
+          name: username-password-enrollment-user-login
+        id: user-login
+        model: authentik_stages_user_login.userloginstage
+        attrs:
+          session_duration: "hours=24"
+
+      # Bindings
+      - identifiers:
+          target: !KeyOf flow
+          stage: !KeyOf prompt-stage-username
+          order: 10
+        model: authentik_flows.flowstagebinding
+        attrs:
+          evaluate_on_plan: true
+          re_evaluate_policies: true
+
+      - identifiers:
+          target: !KeyOf flow
+          stage: !KeyOf prompt-stage-password
+          order: 20
+        model: authentik_flows.flowstagebinding
+        attrs:
+          evaluate_on_plan: true
+          re_evaluate_policies: true
+
+      - identifiers:
+          target: !KeyOf flow
+          stage: !KeyOf user-write
+          order: 30
+        model: authentik_flows.flowstagebinding
+        attrs:
+          evaluate_on_plan: true
+          re_evaluate_policies: true
+
+      - identifiers:
+          target: !KeyOf flow
+          stage: !KeyOf user-login
+          order: 40
+        model: authentik_flows.flowstagebinding
+        attrs:
+          evaluate_on_plan: true
+          re_evaluate_policies: true

@@ -1,0 +1,303 @@
+include:
+  - auth/compose.yml
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: devdb
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  migration-service:
+    build:
+      context: .
+      dockerfile: ./services/migration-service/Dockerfile
+    image: migration-service:latest
+    container_name: migration-service
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=devuser
+      - DB_PASSWORD=devpassword
+      - DB_NAME=devdb
+      - DB_SSLMODE=disable
+    volumes:
+      - ./migrations:/app/migrations
+    networks:
+      - app-network
+    depends_on:
+      postgres:
+        condition: service_started
+
+  document-intelligence-service:
+    build:
+      context: .
+      dockerfile: services/document-intelligence-service/Dockerfile
+    image: document-intelligence-service:latest
+    container_name: document-intelligence-service
+    ports:
+      - "8001:8080"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.config/gcloud/application_default_credentials.json
+      - LLM_RETRIES=3
+      - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-3.5-flash}
+      - GCLOUD_PROJECT=beyond-forms-staging
+    volumes:
+      - ./auth/certs/pub:/app/auth/certs/pub:ro
+      - ./services/document-intelligence-service:/app/services/document-intelligence-service
+      - ./libs/document-schemas:/app/libs/document-schemas
+      - ./libs/auth:/app/libs/auth
+      - /app/services/document-intelligence-service/.venv
+      - ~/.config/gcloud:/tmp/.config/gcloud
+    entrypoint:
+      [
+        "fastapi",
+        "dev",
+        "src/app/main.py",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8080",
+      ]
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  rules-engine:
+    build:
+      context: .
+      dockerfile: ./services/rules-engine/Dockerfile
+    image: rules-engine:latest
+    container_name: rules-engine
+    ports:
+      - "8004:8080"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./services/rules-engine:/app/services/rules-engine
+      - ./libs/document-schemas:/app/libs/document-schemas
+      - /app/services/rules-engine/.venv
+    command:
+      [
+        "fastapi",
+        "dev",
+        "src/app/main.py",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8080",
+      ]
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  orchestration-middleware-service:
+    build:
+      context: .
+      dockerfile: services/orchestration-middleware-service/Dockerfile
+    image: orchestration-middleware-service:latest
+    container_name: orchestration-middleware-service
+    env_file:
+      - services/orchestration-middleware-service/.env
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.config/gcloud/application_default_credentials.json
+      - GCLOUD_PROJECT=beyond-forms-staging
+      - AUTHENTIK_SERVER_URL=${AUTHENTIK_SERVER_URL:-http://authentik-server:9000}
+      - AUTHENTIK_PUBLIC_KEY_PATH=${AUTHENTIK_PUBLIC_KEY_PATH:-/app/auth/certs/pub/oidc_public.pem}
+      - ENDPOINT_RULES_ENGINE=http://rules-engine:8080
+      - ENDPOINT_FORMS_FILLER=http://forms-filling-service:8080
+      - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-3.5-flash}
+      - CHAT_CONTEXT_WINDOW_SIZE=20
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=devpassword
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DATABASE=devdb
+      - CHAT_CONTEXT_WINDOW_SIZE=20
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator:8085
+      - PUBSUB_PROJECT_ID=beyondforms-dev
+      - GCS_BUCKET_NAME=${GCS_BUCKET_NAME:-beyondforms-dev-bucket}
+      - API_PUBLIC_URL=http://localhost:8080
+    depends_on:
+      postgres:
+        condition: service_started
+      forms-filling-service:
+        condition: service_started
+    volumes:
+      - ~/.config/gcloud:/tmp/.config/gcloud
+      - ./auth/certs/pub:/app/auth/certs/pub:ro
+      - ./services/orchestration-middleware-service:/app/services/orchestration-middleware-service
+      - ./libs/auth:/app/libs/auth
+      - ./forms:/app/forms:ro
+    command:
+      ["fastapi", "dev", "src/main.py", "--host", "0.0.0.0", "--port", "8080"]
+
+  orchestration-middleware-worker:
+    image: orchestration-middleware-service:latest
+    container_name: orchestration-middleware-worker
+    env_file:
+      - services/orchestration-middleware-service/.env
+    networks:
+      - app-network
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.config/gcloud/application_default_credentials.json
+      - GCLOUD_PROJECT=beyond-forms-staging
+      - AUTHENTIK_SERVER_URL=${AUTHENTIK_SERVER_URL:-http://authentik-server:9000}
+      - AUTHENTIK_PUBLIC_KEY_PATH=${AUTHENTIK_PUBLIC_KEY_PATH:-/app/auth/certs/pub/oidc_public.pem}
+      - ENDPOINT_RULES_ENGINE=http://rules-engine:8080
+      - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-3.5-flash}
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=devpassword
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DATABASE=devdb
+      - CHAT_CONTEXT_WINDOW_SIZE=20
+      - MIDDLEWARE_SERVICE_URL=http://orchestration-middleware-service:8080
+      - ENDPOINT_DOC_INTELLIGENCE=http://document-intelligence-service:8080
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator:8085
+      - PUBSUB_PROJECT_ID=beyondforms-dev
+      - OIDC_CLIENT_ID=beyondforms
+      - OIDC_CLIENT_SECRET=beyondforms-secret
+      - GCS_BUCKET_NAME=${GCS_BUCKET_NAME:-beyondforms-dev-bucket}
+
+    depends_on:
+      postgres:
+        condition: service_started
+      orchestration-middleware-service:
+        condition: service_started
+    volumes:
+      - ~/.config/gcloud:/tmp/.config/gcloud
+      - ./auth/certs/pub:/app/auth/certs/pub:ro
+      - ./services/orchestration-middleware-service:/app/services/orchestration-middleware-service
+      - ./libs/auth:/app/libs/auth
+    command: ["python", "src/worker.py"]
+
+  pubsub-emulator:
+    image: google/cloud-sdk:emulators
+    platform: linux/amd64
+    container_name: pubsub-emulator
+    ports:
+      - "8085:8085"
+    command: /bin/bash -c "gcloud beta emulators pubsub start --project=beyondforms-dev --host-port='0.0.0.0:8085'"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    image: auth-service:latest
+    container_name: auth-service
+    env_file:
+      - services/auth-service/.env
+    ports:
+      - "8003:8080"
+    environment:
+      - AUTHENTIK_SERVER_URL=${AUTHENTIK_SERVER_URL:-http://authentik-server:9000}
+      - AUTHENTIK_PUBLIC_KEY_PATH=${AUTHENTIK_PUBLIC_KEY_PATH:-/app/auth/certs/pub/oidc_public.pem}
+      - OIDC_REDIRECT_URI=http://localhost:3000/auth/callback
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=devuser
+      - DB_PASSWORD=devpassword
+      - DB_NAME=devdb
+      - PYTHONUNBUFFERED=1
+      - OIDC_CLIENT_ID=beyondforms
+      - OIDC_CLIENT_SECRET=beyondforms-secret
+      - TEST_ACCOUNT_PASSWORD=test-account-pw
+
+    volumes:
+      - ./auth/certs/pub:/app/auth/certs/pub:ro
+      - ./services/auth-service:/app/services/auth-service
+      - ./libs/auth:/app/libs/auth
+      - /app/services/auth-service/.venv
+    entrypoint:
+      [
+        "uvicorn",
+        "src.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8080",
+        "--reload",
+      ]
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_started
+      # authentik-server:
+      #   condition: service_started
+      # authentik-worker:
+      #   condition: service_started
+
+  wallet-frontend:
+    build:
+      context: .
+      dockerfile: services/wallet-frontend/Dockerfile
+      target: development
+      args:
+        - MODE=development
+    image: wallet-frontend:latest
+    container_name: wallet-frontend
+    ports:
+      - "3000:5173"
+    environment:
+      - AUTH_PROXY_URL=http://auth-service:8080
+      - API_PROXY_URL=http://orchestration-middleware-service:8080
+    volumes:
+      - ./services/wallet-frontend:/app/services/wallet-frontend
+      - /app/services/wallet-frontend/node_modules
+      - ./libs:/app/libs
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      auth-service:
+        condition: service_started
+      orchestration-middleware-service:
+        condition: service_started
+
+  forms-filling-service:
+    build:
+      context: .
+      dockerfile: services/forms-filling-service/Dockerfile
+    image: forms-filling-service:latest
+    container_name: forms-filling-service
+    ports:
+      - "8005:8080"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./services/forms-filling-service:/app/services/forms-filling-service
+      - /app/services/forms-filling-service/.venv
+    networks:
+      - app-network
+    restart: unless-stopped
+    entrypoint:
+      ["fastapi", "dev", "src/main.py", "--host", "0.0.0.0", "--port", "8080"]
+
+networks:
+  app-network:
+    external: true
+
+volumes:
+  postgres-data:

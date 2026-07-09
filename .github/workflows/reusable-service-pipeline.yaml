@@ -1,0 +1,208 @@
+name: Service Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      service_name:
+        required: true
+        type: string
+      service_path:
+        required: true
+        type: string
+      environment_name:
+        required: false
+        type: string
+        default: "staging"
+      environment_prefix:
+        required: false
+        type: string
+        default: "bf-stg"
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER:
+        required: true
+      GCP_SERVICE_ACCOUNT:
+        required: true
+      ALLOYDB_HOST:
+        required: false
+      RAG_ENGINE_CORPUS:
+        required: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.context.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for Dockerfile
+        id: context
+        env:
+          SERVICE_PATH: ${{ inputs.service_path }}
+          SERVICE_NAME: ${{ inputs.service_name }}
+        run: |
+          if [ -f "$SERVICE_PATH/Dockerfile" ]; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "component_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
+          else
+            echo "No Dockerfile found in $SERVICE_PATH, skipping tests"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Tests
+        if: steps.context.outputs.skip != 'true'
+        env:
+          COMPONENT_NAME: ${{ steps.context.outputs.component_name }}
+          SERVICE_PATH: ${{ inputs.service_path }}
+        run: |
+          docker build \
+            --target test \
+            -t "$COMPONENT_NAME:test" \
+            -f "$SERVICE_PATH/Dockerfile" \
+            .
+
+  build-push:
+    needs: test
+    if: needs.test.outputs.skip != 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment_name }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for Dockerfile
+        id: context
+        env:
+          SERVICE_PATH: ${{ inputs.service_path }}
+          SERVICE_NAME: ${{ inputs.service_name }}
+        run: |
+          if [ -f "$SERVICE_PATH/Dockerfile" ]; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "component_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
+          else
+            echo "No Dockerfile found in $SERVICE_PATH, skipping build"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          fi
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ inputs.service_path }}/Dockerfile
+          push: true
+          tags: |
+            ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_CIS_PROJECT_ID }}/beyondforms/${{ steps.context.outputs.component_name }}:${{ github.sha }}
+            ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_CIS_PROJECT_ID }}/beyondforms/${{ steps.context.outputs.component_name }}:latest
+          build-args: ${{ steps.build-args.outputs.args }}
+
+  deploy:
+    needs: build-push
+    if: needs.test.outputs.skip != 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment_name }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Deploy to Cloud Run
+        env:
+          INPUT_SERVICE_NAME: ${{ inputs.service_name }}
+          INPUT_SERVICE_PATH: ${{ inputs.service_path }}
+          INPUT_ENVIRONMENT_PREFIX: ${{ inputs.environment_prefix }}
+          INPUT_ENVIRONMENT_NAME: ${{ inputs.environment_name }}
+          VAR_GCP_REGION: ${{ vars.GCP_REGION }}
+          VAR_GCP_CIS_PROJECT_ID: ${{ vars.GCP_CIS_PROJECT_ID }}
+          VAR_GCP_DEPLOY_PROJECT_ID: ${{ vars.GCP_DEPLOY_PROJECT_ID }}
+          GITHUB_SHA: ${{ github.sha }}
+          # wallet-frontend:
+          VAR_API_PROXY_URL: ${{ vars.API_PROXY_URL }}
+          VAR_AUTH_PROXY_URL: ${{ vars.AUTH_PROXY_URL }}
+          # orchestration-middleware-service:
+          VAR_ENDPOINT_RULES_ENGINE: ${{ vars.ENDPOINT_RULES_ENGINE }}
+          VAR_ENDPOINT_FORMS_FILLER: ${{ vars.ENDPOINT_FORMS_FILLER }}
+          VAR_ENDPOINT_DOC_INTELLIGENCE: ${{ vars.ENDPOINT_DOC_INTELLIGENCE }}
+          VAR_MIDDLEWARE_SERVICE_URL: ${{ vars.MIDDLEWARE_SERVICE_URL }}
+          VAR_DB_NAME: ${{ vars.DB_NAME }}
+          VAR_GCS_BUCKET: ${{ vars.GCS_BUCKET }}
+          VAR_GCLOUD_PROJECT: ${{ vars.GCLOUD_PROJECT }}
+          VAR_PUBSUB_TOPIC_ID: ${{ vars.PUBSUB_TOPIC_ID }}
+          VAR_PUBSUB_SUBSCRIPTION_ID: ${{ vars.PUBSUB_SUBSCRIPTION_ID }}
+          VAR_PUBSUB_DLQ_TOPIC_ID: ${{ vars.PUBSUB_DLQ_TOPIC_ID }}
+          VAR_PUBSUB_PROJECT_ID: ${{ vars.PUBSUB_PROJECT_ID }}
+          VAR_DB_USER_SECRET: ${{ vars.DB_USER_SECRET }}
+          VAR_DB_PASSWORD_SECRET: ${{ vars.DB_PASSWORD_SECRET }}
+          VAR_AUTHENTIK_URL: ${{ vars.AUTHENTIK_URL }}
+          SECRET_ALLOYDB_HOST: ${{ secrets.ALLOYDB_HOST }}
+          VAR_NETWORK: ${{ vars.GCP_VPC_NETWORK }}
+          VAR_SUBNET: ${{ vars.GCP_VPC_SUBNET }}
+          SECRET_RAG_ENGINE_CORPUS: ${{ secrets.RAG_ENGINE_CORPUS }}
+        run: |
+          if [ "$INPUT_SERVICE_NAME" == "migration-service" ]; then
+            echo "Skipping deployment for migration-service as it is handled separately."
+            exit 0
+          fi
+
+          # Install yq
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+          # Determine Context Path
+          INFRA_DIR="$INPUT_SERVICE_PATH/infrastructure"
+          COMPONENT_NAME="$INPUT_SERVICE_NAME"
+          TMP_DIR="tmp_infra_$INPUT_SERVICE_NAME"
+
+          if [ ! -d "$INFRA_DIR" ]; then
+            echo "No infrastructure directory found at $INFRA_DIR. Skipping deployment."
+            exit 0
+          fi
+
+          echo "Processing infrastructure directory: $INFRA_DIR"
+
+          IMAGE_URI="$VAR_GCP_REGION-docker.pkg.dev/$VAR_GCP_CIS_PROJECT_ID/beyondforms/${COMPONENT_NAME}:$GITHUB_SHA"
+
+          COMPONENT_NAME="$INPUT_ENVIRONMENT_PREFIX-${COMPONENT_NAME}"
+
+          echo "Deploying component: $COMPONENT_NAME to Cloud Run from image $IMAGE_URI"
+
+          # Build substitutions string
+          SUBSTITUTIONS="_SERVICE_NAME=${COMPONENT_NAME},_IMAGE_URI=${IMAGE_URI},_GCP_REGION=$VAR_GCP_REGION"
+
+          if [ "$INPUT_SERVICE_NAME" = "wallet-frontend" ]; then
+            SUBSTITUTIONS="${SUBSTITUTIONS},_API_PROXY_URL=$VAR_API_PROXY_URL,_AUTH_PROXY_URL=$VAR_AUTH_PROXY_URL"
+          elif [ "$INPUT_SERVICE_NAME" = "orchestration-middleware-service" ]; then
+            SUBSTITUTIONS="${SUBSTITUTIONS},_ENDPOINT_RULES_ENGINE=$VAR_ENDPOINT_RULES_ENGINE,_ENDPOINT_FORMS_FILLER=$VAR_ENDPOINT_FORMS_FILLER,_ENDPOINT_DOC_INTELLIGENCE=$VAR_ENDPOINT_DOC_INTELLIGENCE,_MIDDLEWARE_SERVICE_URL=$VAR_MIDDLEWARE_SERVICE_URL,_DB_NAME=$VAR_DB_NAME,_GCS_BUCKET_NAME=$VAR_GCS_BUCKET,_PUBSUB_PROJECT_ID=$VAR_PUBSUB_PROJECT_ID,_PUBSUB_TOPIC_ID=$VAR_PUBSUB_TOPIC_ID,_PUBSUB_SUBSCRIPTION_ID=$VAR_PUBSUB_SUBSCRIPTION_ID,_PUBSUB_DLQ_TOPIC_ID=$VAR_PUBSUB_DLQ_TOPIC_ID,_GCLOUD_PROJECT=$VAR_GCLOUD_PROJECT,_DB_HOST=$SECRET_ALLOYDB_HOST,_NETWORK=$VAR_NETWORK,_SUBNET=$VAR_SUBNET,_RAG_ENGINE_CORPUS=$SECRET_RAG_ENGINE_CORPUS,_AUTHENTIK_SERVER_URL=$VAR_AUTHENTIK_URL,_AUTHENTIK_ISSUER_URL=$VAR_AUTHENTIK_URL/application/o/beyondforms/,_DB_USER_SECRET=$VAR_DB_USER_SECRET,_DB_PASSWORD_SECRET=$VAR_DB_PASSWORD_SECRET"
+          elif [ "$INPUT_SERVICE_NAME" = "auth-service" ]; then
+            SUBSTITUTIONS="${SUBSTITUTIONS},_AUTHENTIK_SERVER_URL=$VAR_AUTHENTIK_URL,_OIDC_REDIRECT_URI=$VAR_AUTHENTIK_URL/auth/callback,_DB_NAME=$VAR_DB_NAME,_DB_HOST=$SECRET_ALLOYDB_HOST,_NETWORK=$VAR_NETWORK,_SUBNET=$VAR_SUBNET,_ENV=$INPUT_ENVIRONMENT_NAME"
+          elif [ "$INPUT_SERVICE_NAME" = "document-intelligence-service" ]; then
+            SUBSTITUTIONS="${SUBSTITUTIONS},_GCLOUD_PROJECT=$VAR_GCLOUD_PROJECT,_NETWORK=$VAR_NETWORK,_SUBNET=$VAR_SUBNET"
+          fi
+
+          gcloud builds submit --no-source \
+            --config "${INFRA_DIR}/cloudbuild.yaml" \
+            --project "$VAR_GCP_DEPLOY_PROJECT_ID" \
+            --substitutions="$SUBSTITUTIONS"

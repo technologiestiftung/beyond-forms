@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentik-server
+  namespace: default
+  labels:
+    app: authentik-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentik-server
+  template:
+    metadata:
+      labels:
+        app: authentik-server
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      volumes:
+        - name: blueprints
+          configMap:
+            name: authentik-config
+            items:
+              - key: oidc-provider.yaml
+                path: oidc-provider.yaml
+              - key: passwordless-sms-enrollment.yaml
+                path: passwordless-sms-enrollment.yaml
+              - key: passwordless-sms-login.yaml
+                path: passwordless-sms-login.yaml
+              - key: username-password-enrollment.yaml
+                path: username-password-enrollment.yaml
+        - name: certs
+          secret:
+            secretName: authentik-certs
+            items:
+              - key: oidc_public.pem
+                path: pub/oidc_public.pem
+              - key: oidc_private.pem
+                path: priv/oidc_private.pem
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: "512Mi"
+      containers:
+        - name: authentik-server
+          securityContext:
+            allowPrivilegeEscalation: false
+          image: ghcr.io/goauthentik/server:2026.2.1
+          command: ["dumb-init", "--", "ak"]
+          args: ["server"]
+          ports:
+            - containerPort: 9000
+              name: http
+            - containerPort: 9443
+              name: https
+          env:
+            - name: AUTHENTIK_POSTGRESQL__HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: authentik-config
+                  key: AUTHENTIK_POSTGRESQL__HOST
+            - name: AUTHENTIK_POSTGRESQL__PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: authentik-config
+                  key: AUTHENTIK_POSTGRESQL__PORT
+            - name: AUTHENTIK_POSTGRESQL__NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: authentik-config
+                  key: AUTHENTIK_POSTGRESQL__NAME
+            - name: AUTHENTIK_POSTGRESQL__USER
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: AUTHENTIK_POSTGRESQL__USER
+            - name: AUTHENTIK_POSTGRESQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: AUTHENTIK_POSTGRESQL__PASSWORD
+            - name: AUTHENTIK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: AUTHENTIK_SECRET_KEY
+            - name: AUTHENTIK_BOOTSTRAP_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: authentik-config
+                  key: AUTHENTIK_BOOTSTRAP_EMAIL
+            - name: AUTHENTIK_BOOTSTRAP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: AUTHENTIK_BOOTSTRAP_PASSWORD
+            - name: BEYONDFORMS_OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: BEYONDFORMS_OIDC_CLIENT_SECRET
+            - name: AUTHENTIK_SMS__PROVIDERS__TWILIO__FROM
+              value: "+4900000000"
+            - name: AUTHENTIK_SMS__PROVIDERS__TWILIO__ACCOUNT_SID
+              value: "twilio-fake-sid"
+            - name: AUTHENTIK_SMS__PROVIDERS__TWILIO__AUTH_TOKEN
+              value: "twilio-fake-token"
+          volumeMounts:
+            - name: blueprints
+              mountPath: /blueprints/custom
+            - name: certs
+              mountPath: /certs
+            - name: shm
+              mountPath: /dev/shm
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /if/flow/default-authentication-flow/
+              port: 9000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /if/flow/default-authentication-flow/
+              port: 9000
+            initialDelaySeconds: 15
+            periodSeconds: 5

@@ -1,0 +1,34 @@
+{
+  "$defs": {
+    "personal_details": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the person"
+        },
+        "birth_name": {
+          "type": "string",
+          "description": "The birth name of the person"
+        },
+        "first_name": {
+          "type": "string",
+          "description": "The first name of the person"
+        },
+        "date_of_birth": {
+          "type": "string",
+          "format": "date",
+          "description": "The date of birth of the person"
+        },
+        "place_of_birth": {
+          "type": "string",
+          "description": "The place of birth of the person, including district and country"
+        },
+        "citizenship": {
+          "type": "string",
+          "description": "The citizenship of the person"
+        }
+      }
+    }
+  }
+}

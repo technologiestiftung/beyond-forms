@@ -1,0 +1,823 @@
+{
+  "name": "Basic Welfare for Elderly and Disabled",
+  "version": "1.0.0",
+  "description": "This is the schema for the Basic Welfare for Elderly and Disabled form",
+  "schema": {
+    "form_type": {
+      "type": "string",
+      "enum": [
+        "basic_welfare_for_elderly_and_disabled",
+        "social_support",
+        "asylum_benefits"
+      ]
+    },
+    "applicant_information": {
+      "type": "object",
+      "properties": {
+        "applicant_personal_details": {
+          "$ref": "../common/person.json#/$defs/personal_details"
+        },
+        "is_applicant_a_minor": {
+          "type": "boolean",
+          "description": "Whether the applicant is a minor"
+        },
+        "applicant_gender": {
+          "type": "string",
+          "enum": ["male", "female"],
+          "description": "The gender of the applicant"
+        },
+        "applicant_marital_status": {
+          "type": "string",
+          "enum": [
+            "single",
+            "marriage-like_union",
+            "registered_civil_partnership",
+            "married",
+            "permanently_separated",
+            "divorced",
+            "widowed"
+          ],
+          "description": "The marital status of the applicant"
+        },
+        "applicant_marital_status_since": {
+          "type": "string",
+          "format": "date",
+          "description": "The date when the applicant's marital status was last updated"
+        },
+        "applicant_id_issued_by": {
+          "type": "string",
+          "description": "The authority that issued the ID document of the applicant"
+        },
+        "applicant_id_valid_until": {
+          "type": "string",
+          "format": "date",
+          "description": "The date until which the ID document of the applicant is valid"
+        },
+        "has_applicant_received_benefits_before": {
+          "type": "boolean",
+          "description": "Whether the applicant has received benefits before"
+        },
+        "applicant_previous_benefits_end": {
+          "type": "string",
+          "format": "date",
+          "description": "The date when the applicant's benefits ended"
+        },
+        "applicant_previous_benefits_authority": {
+          "type": "string",
+          "description": "The authority that issued the benefits of the applicant"
+        },
+        "applicant_previous_benefits_reference_number": {
+          "type": "string",
+          "description": "The reference number of the applicant's benefits"
+        },
+        "has_applicant_succor": {
+          "type": "boolean",
+          "description": "Whether the applicant is under legal support"
+        },
+        "has_applicant_guardian": {
+          "type": "boolean",
+          "description": "Whether the applicant is under legal guardianship"
+        },
+        "applicant_displaced_status": {
+          "type": "string",
+          "enum": [
+            "expellee_resettler",
+            "displaced_person_resettler",
+            "late_resettler",
+            "spouse_or_descendant_of_late_resettler",
+            "soviet_zone_refugee"
+          ],
+          "description": "The displaced status of the applicant"
+        },
+        "applicant_displaced_issued_on": {
+          "type": "string",
+          "format": "date",
+          "description": "The date when the applicant's displaced status was last updated"
+        },
+        "applicant_displaced_issued_by": {
+          "type": "string",
+          "description": "The authority that issued the displaced status of the applicant"
+        },
+        "applicant_pass_for_severely_disabled_valid_until": {
+          "type": "string",
+          "format": "date",
+          "description": "The date until which the pass for severely disabled is valid"
+        },
+        "applicant_pass_for_severely_disabled_mark": {
+          "type": "string",
+          "description": "The mark of the pass for severely disabled (G, aG)"
+        },
+        "applicant_pass_for_severely_disabled_applied": {
+          "type": "boolean",
+          "description": "Whether the applicant has applied for the pass for severely disabled"
+        },
+        "applicant_insurance_details": {
+          "$ref": "../common/insurance.json#/$defs/insurance_details"
+        }
+      }
+    },
+    "partner_information": {
+      "type": "object",
+      "properties": {
+        "is_partner_living_in_same_household": {
+          "type": "boolean",
+          "description": "Whether the partner is living in the same household as the applicant"
+        },
+        "partner_personal_details": {
+          "$ref": "../common/person.json#/$defs/personal_details"
+        },
+        "partner_id_issued_by": {
+          "type": "string",
+          "description": "The authority that issued the ID document of the partner"
+        },
+        "partner_id_valid_until": {
+          "type": "string",
+          "format": "date",
+          "description": "The date until which the ID document of the partner is valid"
+        },
+        "has_partner_received_benefits_before": {
+          "type": "boolean",
+          "description": "Whether the partner has received benefits before"
+        },
+        "partner_previous_benefits_end": {
+          "type": "string",
+          "format": "date",
+          "description": "The date when the partner's benefits ended"
+        },
+        "partner_previous_benefits_authority": {
+          "type": "string",
+          "description": "The authority that issued the benefits of the partner"
+        },
+        "partner_previous_benefits_reference_number": {
+          "type": "string",
+          "description": "The reference number of the partner's benefits"
+        },
+        "has_partner_succor": {
+          "type": "boolean",
+          "description": "Whether the partner is under legal support"
+        },
+        "has_partner_guardian": {
+          "type": "boolean",
+          "description": "Whether the partner is under legal guardianship"
+        },
+        "partner_displaced_status": {
+          "type": "string",
+          "enum": [
+            "expellee_resettler",
+            "displaced_person_resettler",
+            "late_resettler",
+            "spouse_or_descendant_of_late_resettler",
+            "soviet_zone_refugee"
+          ],
+          "description": "The displaced status of the partner"
+        },
+        "partner_displaced_issued_on": {
+          "type": "string",
+          "format": "date",
+          "description": "The date when the partner's displaced status was last updated"
+        },
+        "partner_displaced_issued_by": {
+          "type": "string",
+          "description": "The authority that issued the displaced status of the partner"
+        },
+        "partner_pass_for_severely_disabled_valid_until": {
+          "type": "string",
+          "format": "date",
+          "description": "The date until which the pass for severely disabled is valid"
+        },
+        "partner_pass_for_severely_disabled_mark": {
+          "type": "string",
+          "description": "The mark of the pass for severely disabled (G, aG)"
+        },
+        "partner_pass_for_severely_disabled_applied": {
+          "type": "boolean",
+          "description": "Whether the partner has applied for the pass for severely disabled"
+        },
+        "partner_insurance_details": {
+          "$ref": "../common/insurance.json#/$defs/insurance_details"
+        }
+      }
+    },
+    "applicant_earning_capacity": {
+      "type": "object",
+      "properties": {
+        "is_applicant_employed": {
+          "type": "boolean",
+          "description": "Whether the applicant is employed"
+        },
+        "applicant_occupation": {
+          "type": "string",
+          "description": "The occupation of the applicant"
+        },
+        "applicant_employer": {
+          "type": "string",
+          "description": "The employer of the applicant"
+        },
+        "applicant_work_capacity_at_least_3h_daily": {
+          "type": "boolean",
+          "description": "Whether the applicant can work at least 3 hours daily"
+        },
+        "applicant_work_capacity_3h_daily_reason": {
+          "type": "string",
+          "description": "The reason why the applicant cannot work at least 3 hours daily"
+        },
+        "has_applicant_completely_reduced_earnings_capacity": {
+          "type": "boolean",
+          "description": "Whether the applicant has completely reduced earnings capacity"
+        },
+        "is_applicants_completely_reduced_earnings_capacity_permanent": {
+          "type": "boolean",
+          "description": "Whether the applicant's completely reduced earnings capacity is permanent"
+        },
+        "applicant_completely_reduced_earnings_capacity_period": {
+          "type": "string",
+          "description": "The period for which the applicant's completely reduced earnings capacity is permanent"
+        },
+        "is_applicant_care_dependent": {
+          "type": "boolean",
+          "description": "Whether the applicant is care dependent"
+        },
+        "applicant_care_dependency_level": {
+          "type": "integer",
+          "description": "The level of care dependency of the applicant"
+        },
+        "is_applicant_a_student_or_trainee": {
+          "type": "boolean",
+          "description": "Whether the applicant is a student or trainee"
+        },
+        "applicant_student_or_trainee_discipline": {
+          "type": "string",
+          "description": "The discipline of the applicant's studies or traineeship"
+        },
+        "applicant_name_of_employer_or_school": {
+          "type": "string",
+          "description": "The name of the employer or school of the applicant"
+        },
+        "applicant_address_of_employer_or_school": {
+          "type": "string",
+          "description": "The address of the employer or school of the applicant"
+        },
+        "is_applicant_living_in_a_stationary_facility": {
+          "type": "boolean",
+          "description": "Whether the applicant is living in a stationary facility"
+        },
+        "applicant_stationary_facility_start_date": {
+          "type": "string",
+          "format": "date",
+          "description": "The start date of the applicant's stay in a stationary facility"
+        },
+        "applicant_stationary_facility_end_date": {
+          "type": "string",
+          "format": "date",
+          "description": "The end date of the applicant's stay in a stationary facility"
+        },
+        "has_applicant_applied_for_sgb2_benefits": {
+          "type": "boolean",
+          "description": "Whether the applicant has applied for SGB II benefits"
+        },
+        "applicant_customer_number_employment_office": {
+          "type": "string",
+          "description": "The customer number of the employment office of the applicant"
+        }
+      }
+    },
+    "partner_earning_capacity": {
+      "type": "object",
+      "properties": {
+        "is_partner_employed": {
+          "type": "boolean",
+          "description": "Whether the partner is employed"
+        },
+        "partner_occupation": {
+          "type": "string",
+          "description": "The occupation of the partner"
+        },
+        "partner_employer": {
+          "type": "string",
+          "description": "The employer of the partner"
+        },
+        "partner_work_capacity_at_least_3h_daily": {
+          "type": "boolean",
+          "description": "Whether the partner can work at least 3 hours daily"
+        },
+        "partner_work_capacity_3h_daily_reason": {
+          "type": "string",
+          "description": "The reason why the partner cannot work at least 3 hours daily"
+        },
+        "has_partner_completely_reduced_earnings_capacity": {
+          "type": "boolean",
+          "description": "Whether the partner has completely reduced earnings capacity"
+        },
+        "is_partners_completely_reduced_earnings_capacity_permanent": {
+          "type": "boolean",
+          "description": "Whether the partner's completely reduced earnings capacity is permanent"
+        },
+        "partner_completely_reduced_earnings_capacity_period": {
+          "type": "string",
+          "description": "The period for which the partner's completely reduced earnings capacity is permanent"
+        },
+        "is_partner_care_dependent": {
+          "type": "boolean",
+          "description": "Whether the partner is care dependent"
+        },
+        "partner_care_dependency_level": {
+          "type": "integer",
+          "description": "The level of care dependency of the partner"
+        },
+        "is_partner_a_student_or_trainee": {
+          "type": "boolean",
+          "description": "Whether the partner is a student or trainee"
+        },
+        "partner_student_or_trainee_discipline": {
+          "type": "string",
+          "description": "The discipline of the partner's studies or traineeship"
+        },
+        "partner_name_of_employer_or_school": {
+          "type": "string",
+          "description": "The name of the employer or school of the partner"
+        },
+        "partner_address_of_employer_or_school": {
+          "type": "string",
+          "description": "The address of the employer or school of the partner"
+        },
+        "is_partner_living_in_a_stationary_facility": {
+          "type": "boolean",
+          "description": "Whether the partner is living in a stationary facility"
+        },
+        "partner_stationary_facility_start_date": {
+          "type": "string",
+          "format": "date",
+          "description": "The start date of the partner's stay in a stationary facility"
+        },
+        "partner_stationary_facility_end_date": {
+          "type": "string",
+          "format": "date",
+          "description": "The end date of the partner's stay in a stationary facility"
+        },
+        "has_partner_applied_for_sgb2_benefits": {
+          "type": "boolean",
+          "description": "Whether the partner has applied for SGB II benefits"
+        },
+        "partner_customer_number_employment_office": {
+          "type": "string",
+          "description": "The customer number of the employment office of the partner"
+        }
+      }
+    },
+    "applicant_bank_details": {
+      "type": "object",
+      "properties": {
+        "applicant_bank_name": {
+          "type": "string",
+          "description": "The name of the bank of the applicant"
+        },
+        "applicant_bank_blz": {
+          "type": "string",
+          "description": "The BLZ of the bank of the applicant"
+        },
+        "applicant_bank_account_number": {
+          "type": "string",
+          "description": "The account number of the bank of the applicant"
+        },
+        "applicant_bank_account_holder": {
+          "type": "string",
+          "description": "The account holder of the bank of the applicant"
+        }
+      }
+    },
+    "applicant_residence": {
+      "type": "object",
+      "properties": {
+        "applicant_residence_address": {
+          "type": "string",
+          "description": "The address of the residence of the applicant"
+        },
+        "applicant_residence_floor": {
+          "type": "string",
+          "description": "The floor of the residence of the applicant"
+        },
+        "applicant_phone_number": {
+          "type": "string",
+          "description": "The phone number of the applicant"
+        },
+        "applicant_living_in_berlin_since": {
+          "type": "string",
+          "format": "date",
+          "description": "The date when the applicant is living in Berlin"
+        },
+        "applicant_living_in_district_since": {
+          "type": "string",
+          "format": "date",
+          "description": "The date when the applicant is living in the district"
+        },
+        "applicant_last_resided_address": {
+          "type": "string",
+          "description": "The address of the last residence of the applicant"
+        }
+      }
+    },
+    "applicant_accommodation": {
+      "type": "object",
+      "properties": {
+        "applicant_accommodation_type": {
+          "type": "string",
+          "enum": [
+            "rental_appartment",
+            "home_owner",
+            "flat_owner",
+            "relative",
+            "economic_community"
+          ],
+          "description": "The type of accommodation of the applicant"
+        },
+        "is_applicant_main_tenant": {
+          "type": "boolean",
+          "description": "Whether the applicant is the main tenant"
+        },
+        "is_applicant_subtenant": {
+          "type": "boolean",
+          "description": "Whether the applicant is a subtenant"
+        },
+        "applicant_landlord_name": {
+          "type": "string",
+          "description": "The name of the landlord of the applicant"
+        },
+        "applicant_landlord_address": {
+          "type": "string",
+          "description": "The address of the landlord of the applicant"
+        },
+        "applicant_main_tenant_name": {
+          "type": "string",
+          "description": "The name of the main tenant of the applicant"
+        },
+        "applicant_rent_total": {
+          "type": "number",
+          "description": "The total monthly rent of the applicant in EUR"
+        },
+        "applicant_hot_water_costs": {
+          "type": "number",
+          "description": "The monthly hot water costs of the applicant in EUR"
+        },
+        "applicant_heating_cost_advance": {
+          "type": "number",
+          "description": "The monthly heating cost advance of the applicant in EUR"
+        },
+        "applicant_cable_tv_costs": {
+          "type": "number",
+          "description": "The monthly cable TV costs of the applicant in EUR"
+        },
+        "applicant_rent_paid_until": {
+          "type": "string",
+          "format": "date",
+          "description": "The date until which the rent of the applicant is paid"
+        },
+        "applicant_rent_arrears": {
+          "type": "string",
+          "description": "Range (from/to) of the rent arrears of the applicant in EUR"
+        },
+        "applicant_accommodation_terminated_date": {
+          "type": "string",
+          "format": "date",
+          "description": "The date when the accommodation of the applicant was terminated"
+        },
+        "applicant_accommodation_number_of_rooms": {
+          "type": "integer",
+          "description": "The number of rooms without kitchen or bathroom of the applicant"
+        },
+        "applicant_accommodation_living_area": {
+          "type": "number",
+          "description": "The living area of the applicant's accommodation in m²"
+        },
+        "applicant_accommodation_housing_benefit_payment_status": {
+          "type": "boolean",
+          "description": "Whether the applicant is receiving housing benefit"
+        },
+        "has_applicant_accommodation_central_heating": {
+          "type": "boolean",
+          "description": "Whether the applicant's accommodation has central heating"
+        },
+        "has_applicant_accommodation_central_hot_water_supply": {
+          "type": "boolean",
+          "description": "Whether the applicant's accommodation has central hot water supply"
+        },
+        "has_applicant_night_storage_heating": {
+          "type": "boolean",
+          "description": "Whether the applicant's accommodation has night storage heating"
+        },
+        "has_applicant_accommodation_stove_heating": {
+          "type": "boolean",
+          "description": "Whether the applicant's accommodation has stove heating"
+        },
+        "has_applicant_accommodation_gas_heating": {
+          "type": "boolean",
+          "description": "Whether the applicant's accommodation has gas heating"
+        },
+        "is_applicant_accommodation_sublet": {
+          "type": "boolean",
+          "description": "Whether the applicant's accommodation is sublet"
+        },
+        "is_applicant_accommodation_sublet_possible": {
+          "type": "boolean",
+          "description": "Whether the applicant's accommodation can be sublet"
+        },
+        "applicant_accommodation_sublet_number_of_rooms": {
+          "type": "integer",
+          "description": "The number of rented empty rooms of the applicant's accommodation"
+        },
+        "applicant_accommodation_sublet_empty_rooms_rent": {
+          "type": "number",
+          "description": "The monthly rent of the rented empty rooms of the applicant's accommodation in EUR"
+        },
+        "applicant_accommodation_sublet_number_of_furnished_rooms": {
+          "type": "integer",
+          "description": "The number of furnished rented rooms of the applicant's accommodation"
+        },
+        "applicant_accommodation_sublet_furnished_rooms_rent": {
+          "type": "number",
+          "description": "The monthly rent of the furnished rented rooms of the applicant's accommodation in EUR"
+        },
+        "applicant_accommodation_sublet_impossible_reason": {
+          "type": "string",
+          "description": "The reason why the applicant's accommodation cannot be sublet"
+        },
+        "applicant_free_right_of_residence_at": {
+          "type": "string",
+          "description": "The name and first name of the person that grants free right of residence to the applicant"
+        },
+        "applicant_prev_address_inpatient": {
+          "type": "string",
+          "description": "The address of the previous residence of the applicant in the inpatient facility"
+        },
+        "partner_prev_address_inpatient": {
+          "type": "string",
+          "description": "The address of the previous residence of the partner in the inpatient facility"
+        }
+      }
+    },
+    "other_people_living_in_same_household_as_applicant": {
+      "type": "object",
+      "properties": {
+        "are_other_people_living_in_same_household_as_applicant": {
+          "type": "boolean",
+          "description": "Whether other people are living in the same household as the applicant"
+        },
+        "household_members_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Number of ADDITIONAL household members beyond applicant and partner (Person 3+). Enter 0 if no other people live in the household."
+        },
+        "household_members": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "personal_details": {
+                "$ref": "../common/person.json#/$defs/personal_details"
+              },
+              "family_relationship_to_applicant_or_partner": {
+                "type": "string",
+                "description": "The family relationship of this person to the applicant or partner"
+              },
+              "marital_status": {
+                "type": "string",
+                "description": "The marital status of this person"
+              },
+              "customer_number_employment_office": {
+                "type": "string",
+                "description": "The customer number of the employment office of this person"
+              },
+              "work_capacity_at_least_3h_daily": {
+                "type": "boolean",
+                "description": "Whether this person can work at least 3 hours daily"
+              },
+              "work_capacity_3h_daily_reason": {
+                "type": "string",
+                "description": "The reason why this person cannot work at least 3 hours daily"
+              },
+              "has_applied_for_sgb2_benefits": {
+                "type": "boolean",
+                "description": "Whether this person has applied for SGB II benefits"
+              },
+              "sgb2_benefits_application_date": {
+                "type": "string",
+                "format": "date",
+                "description": "The date when this person applied for SGB II benefits"
+              },
+              "income_details": {
+                "$ref": "../common/income.json#/$defs/income_details"
+              },
+              "assets_details": {
+                "$ref": "../common/assets.json#/$defs/assets_details"
+              }
+            }
+          }
+        }
+      }
+    },
+    "other_people_liable_for_alimony_not_living_in_same_household_as_applicant": {
+      "type": "object",
+      "properties": {
+        "are_other_people_liable_for_alimony_not_living_in_same_household_as_applicant": {
+          "type": "boolean",
+          "description": "Whether other people are liable for alimony and not living in the same household as the applicant"
+        },
+        "significant_income_of_at_least_one_child_of_applicant": {
+          "type": "boolean",
+          "description": "Whether the income of at least one child of the applicant is at least 100,000 EUR annually"
+        },
+        "significant_joint_income_of_parents_of_applicant": {
+          "type": "boolean",
+          "description": "Whether the joint income of the applicant's parents is at least 100,000 EUR annually"
+        },
+        "information_on_children_or_parents_outside_the_household_of_applicant": {
+          "type": "object",
+          "description": "Information on children or parents outside the household of the applicant, including name, date of birth, marital status, family relationship to the applicant, occupation, address, type of alimony, amount of alimony payment"
+        }
+      }
+    },
+    "income_information": {
+      "type": "object",
+      "properties": {
+        "income_information_applicant": {
+          "type": "object",
+          "properties": {
+            "income_applicant_details": {
+              "$ref": "../common/income.json#/$defs/income_details"
+            }
+          }
+        },
+        "benefits_awaiting_decision_details_applicant": {
+          "$ref": "../common/income.json#/$defs/benefits_awaiting_decision_details"
+        },
+        "income_information_partner": {
+          "type": "object",
+          "properties": {
+            "income_partner_details": {
+              "$ref": "../common/income.json#/$defs/income_details"
+            }
+          }
+        },
+        "benefits_awaiting_decision_details_partner": {
+          "$ref": "../common/income.json#/$defs/benefits_awaiting_decision_details"
+        },
+        "one-time_payments_expected_details_applicant": {
+          "$ref": "../common/income.json#/$defs/one-time_payments_expected_details"
+        },
+        "one-time_payments_expected_details_partner": {
+          "$ref": "../common/income.json#/$defs/one-time_payments_expected_details"
+        }
+      }
+    },
+    "assets_information": {
+      "type": "object",
+      "properties": {
+        "applicant_assets": {
+          "type": "object",
+          "properties": {
+            "applicant_assets_details": {
+              "$ref": "../common/assets.json#/$defs/assets_details"
+            }
+          }
+        },
+        "partner_assets": {
+          "type": "object",
+          "properties": {
+            "partner_assets_details": {
+              "$ref": "../common/assets.json#/$defs/assets_details"
+            }
+          }
+        }
+      }
+    },
+    "other_information_applicant": {
+      "type": "object",
+      "properties": {
+        "other_information_applicant_text": {
+          "type": "string",
+          "description": "The text of the other information the applicant has"
+        }
+      }
+    },
+    "benefits_for_special_additional_needs": {
+      "type": "object",
+      "properties": {
+        "does_household_have_expecting_mother_after_12th_week_of_pregnancy": {
+          "type": "boolean",
+          "description": "Whether the household has an expecting mother after the 12th week of pregnancy"
+        },
+        "expecting_mother_after_12th_week_of_pregnancy_information": {
+          "type": "object",
+          "properties": {
+            "expecting_mother_after_12th_week_of_pregnancy_name": {
+              "type": "string",
+              "description": "The name of the expecting mother after the 12th week of pregnancy"
+            },
+            "expecting_mother_after_12th_week_of_pregnancy_first_name": {
+              "type": "string",
+              "description": "The first name of the expecting mother after the 12th week of pregnancy"
+            },
+            "expecting_mother_after_12th_week_of_pregnancy_estimated_date_of_birth": {
+              "type": "string",
+              "format": "date",
+              "description": "The estimated date of birth of the expecting mother after the 12th week of pregnancy"
+            }
+          }
+        },
+        "does_household_have_severely_disabled_person_older_than_15_receiving_benefits_for_pariticipating_in_work_life": {
+          "type": "boolean",
+          "description": "Whether the household has a severely disabled person older than 15 receiving benefits for participating in work life"
+        },
+        "severely_disabled_person_older_than_15_receving_benefits_for_pariticpiating_in_work_life_information": {
+          "type": "object",
+          "properties": {
+            "severely_disabled_person_older_than_15_receving_benefits_for_pariticpiating_in_work_life_name": {
+              "type": "string",
+              "description": "The name of the severely disabled person older than 15 receiving benefits for participating in work life"
+            },
+            "severely_disabled_person_older_than_15_receving_benefits_for_pariticpiating_in_work_life_first_name": {
+              "type": "string",
+              "description": "The first name of the severely disabled person older than 15 receiving benefits for participating in work life"
+            }
+          }
+        },
+        "does_household_have_costly_nutrition_for_medical_reasons": {
+          "type": "boolean",
+          "description": "Whether the household has costly nutrition for medical reasons"
+        },
+        "costly_nutrition_for_medical_reasons_information": {
+          "type": "object",
+          "properties": {
+            "costly_nutrition_for_medical_reasons_name": {
+              "type": "string",
+              "description": "The name of the person with costly nutrition for medical reasons"
+            },
+            "costly_nutrition_for_medical_reasons_first_name": {
+              "type": "string",
+              "description": "The first name of the person with costly nutrition for medical reasons"
+            }
+          }
+        }
+      }
+    },
+    "attachments_list": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "1 - Alimony",
+          "2 - Foreigners",
+          "3 - Land Ownership",
+          "4 - Integration Assistance",
+          "6 - Rent Debts"
+        ],
+        "description": "The list of attachment types"
+      }
+    },
+    "attached_documents_list": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "The list of attached documents"
+      }
+    },
+    "eligibility_check": {
+      "type": "object",
+      "properties": {
+        "lives_in_germany": {
+          "type": "boolean",
+          "description": "Whether the applicant currently lives in Germany"
+        },
+        "has_residence_permit": {
+          "type": "boolean",
+          "description": "Whether the applicant has a valid residence permit for Germany"
+        },
+        "is_eu_citizen_5y": {
+          "type": "boolean",
+          "description": "Whether the applicant is an EU citizen who has lived in Germany for at least 5 years"
+        },
+        "receives_old_age_pension": {
+          "type": "boolean",
+          "description": "Whether the applicant receives an old-age pension"
+        },
+        "receives_reduced_earnings_pension": {
+          "type": "boolean",
+          "description": "Whether the applicant receives a pension due to reduced earning capacity"
+        },
+        "income_not_sufficient": {
+          "type": "boolean",
+          "description": "Whether the applicant's current income is not sufficient to cover their needs"
+        },
+        "income_concerned_insufficient": {
+          "type": "boolean",
+          "description": "Whether the applicant is concerned that their income may soon be insufficient"
+        },
+        "assets_over_10000": {
+          "type": "boolean",
+          "description": "Whether the applicant has assets (savings/property) worth more than 10,000 EUR"
+        }
+      }
+    }
+  }
+}

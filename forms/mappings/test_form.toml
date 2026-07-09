@@ -1,0 +1,82 @@
+# Field Mapping for test_form.pdf
+# Run './forms/scripts/validate_mappings.sh' to verify substitutions.
+# Expressions wrapped in {{ }} are treated as JEXL.
+# See JEXL syntax: https://commons.apache.org/proper/commons-jexl/reference/syntax.html
+
+["p1_visible_text_1"]
+type = "string"
+description = "Visible Text 1"
+value = "{{ first_name }} {{ last_name }}"
+
+["p1_visible_multiline_1"]
+type = "string"
+description = "Visible Multiline 1"
+value = """
+Profile Summary:
+- Name: {{ first_name }} {{ last_name }}
+- Contact: {{ phone_number }}
+- Verification: {{ authentik_id ? 'Authenticated' : 'Local' }}
+"""
+
+["p1_visible_checkbox_1"]
+type = "checkbox"
+description = "Checkbox Option 1"
+value = "{{ first_name == 'Max' }}"
+
+["p1_visible_checkbox_2"]
+type = "checkbox"
+description = "Checkbox Option 2"
+value = "{{ last_name != 'Unknown' }}"
+
+["p1_visible_choice_1"]
+type = "choice"
+description = "Visible Choice 1"
+options = ["Dropdown Option 1", "Dropdown Option 2"]
+value = "Dropdown Option 1"
+
+["p1_visible_radio_1"]
+type = "radio"
+options = ["Radio Mode A", "Radio Mode B"]
+value = "{{ last_name == 'Mustermann' ? 'Radio Mode A' : 'Radio Mode B' }}"
+
+["p1_status_hidden_text_1"]
+type = "string"
+value = ""
+
+["p1_status_hidden_multiline_1"]
+type = "string"
+value = ""
+
+["p1_status_hidden_checkbox_1"]
+type = "string"
+value = ""
+
+["p1_status_hidden_choice_1"]
+type = "string"
+value = ""
+
+["p1_status_hidden_radio_1"]
+type = "string"
+value = ""
+
+["p1_hidden_text_1"]
+type = "string"
+value = ""
+
+["p1_hidden_multiline_1"]
+type = "string"
+value = ""
+
+["p1_hidden_checkbox_1"]
+type = "checkbox"
+value = false
+
+["p1_hidden_choice_1"]
+type = "choice"
+options = ["Dropdown H1", "Dropdown H2"]
+value = "Dropdown H1"
+
+["p1_hidden_radio_1"]
+type = "radio"
+options = ["Radio H1", "Radio H2"]
+value = "Radio H1"

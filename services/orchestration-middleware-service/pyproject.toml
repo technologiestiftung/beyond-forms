@@ -1,0 +1,55 @@
+[project]
+name = "orchestration-middleware-service"
+version = "0.1.0"
+description = "The Middleware Orchestration API serves as the central hub for our document processing ecosystem. This service will act as the glue between our distributed internal services and the LLM."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]",
+    "google-cloud-aiplatform",
+    "litellm",
+    "google-cloud-storage",
+    "google-cloud-pubsub",
+    "psycopg2-binary",
+    "python-dotenv",
+    "sqlalchemy",
+    "beyondforms-auth",
+    "sqlacodegen",
+    "pydantic",
+    "firebase-admin",
+    "httpx",
+    "pyjexl",
+    "aiofiles",
+    "pyjwt[crypto]",
+    "pyopenssl",
+    "Pillow",
+    "pillow-heif",
+]
+
+[tool.uv.sources]
+beyondforms-auth = { workspace = true }
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+default = true
+
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "locust",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v"

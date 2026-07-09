@@ -1,0 +1,257 @@
+@import "tailwindcss";
+
+@theme {
+	--font-sans: "IBM Plex Sans", sans-serif;
+	--breakpoint-xs: 390px;
+
+	/* Colors */
+	--color-primary-blue-20: #f2f3f9; /* Background color for the app */
+	--color-primary-blue-50: #e5e7f3;
+	--color-primary-blue-100: #cccfe7;
+	--color-primary-blue-300: #666eb8;
+	--color-primary-blue-400: #333ea0;
+	--color-primary-blue-500: #000e88;
+
+	--color-primary-green-20: #fcfff2;
+	--color-primary-green-200: #ebff99;
+	--color-primary-green-300: #e0ff66;
+	--color-primary-green-500: #ccff00;
+	--color-primary-green-800: #7a9900;
+
+	--color-secondary-orange-20: #fff7f2;
+	--color-secondary-orange-50: #fff0e5;
+	--color-secondary-orange-200: #ffc399;
+	--color-secondary-orange-500: #ff6800;
+	--color-secondary-orange-800: #8a3800;
+
+	--color-brand-black: #1e1e1e;
+	--color-brand-grey: #4a5565;
+	--color-status-error: #ff3b30;
+	--color-status-error-bg: #fff5f5;
+
+	/* Consolidated Theme Tokens */
+	--color-brand-primary: var(--color-brand-black);
+	--color-brand-border: var(--color-primary-blue-100);
+	--color-brand-border-subtle: var(--color-primary-blue-50);
+	--color-brand-bg: var(--color-primary-blue-20);
+	--color-brand-muted-bright: var(--color-primary-green-200);
+	--color-brand-muted: var(--color-primary-blue-20);
+
+	--color-badge-pending-muted: var(--color-secondary-orange-50);
+	--color-badge-pending: var(--color-secondary-orange-800);
+	--color-badge-done-muted: var(--color-primary-blue-20);
+	--color-badge-done: var(--color-primary-blue-500);
+
+	--color-status-incomplete: var(--color-primary-blue-100);
+	--color-status-in-progress: var(--color-primary-blue-300);
+	--color-status-done: var(--color-primary-blue-500);
+
+	/* Typography Scales */
+	--text-h1: 28px;
+	--text-h1--line-height: 38px;
+	--text-h2: 24px;
+	--text-h2--line-height: 32px;
+	--text-body-lg: 18px;
+	--text-body-lg--line-height: 28px;
+	--text-body: 14px;
+	--text-body--line-height: 21px;
+	--text-otp: 24px;
+	--text-otp--line-height: 32px;
+
+	/* Z-Index Scale */
+	--z-nav: 90;
+	--z-chat-backdrop: 9998;
+	--z-chat-content: 9999;
+	--z-menu-backdrop: 100;
+	--z-menu-content: 101;
+	--z-toast: 110;
+
+	/* Box Shadows */
+	--shadow-cards: 0 0 10px 0 rgba(0, 8, 82, 0.1);
+}
+
+@utility z-nav {
+	z-index: var(--z-nav);
+}
+
+@utility z-menu-backdrop {
+	z-index: var(--z-menu-backdrop);
+}
+
+@utility z-menu-content {
+	z-index: var(--z-menu-content);
+}
+
+@utility z-toast {
+	z-index: var(--z-toast);
+}
+
+@utility z-chat-backdrop {
+	z-index: var(--z-chat-backdrop);
+}
+
+@utility z-chat-content {
+	z-index: var(--z-chat-content);
+}
+
+:root {
+	--app-sidebar-width: 280px;
+	--app-nav-height-mobile: 72px;
+	--app-footer-height: 160px;
+}
+
+.markdown-container {
+	@apply min-w-0 overflow-x-auto text-body text-brand-black leading-relaxed;
+}
+
+.markdown-container h1 {
+	@apply text-[22px] font-bold leading-snug mt-3 pb-4 first:mt-0;
+}
+
+.markdown-container h2 {
+	@apply text-base font-semibold leading-snug mt-3 mb-1 first:mt-0;
+}
+
+.markdown-container h3 {
+	@apply text-sm font-semibold leading-snug mt-2 mb-1 first:mt-0;
+}
+
+.markdown-container p {
+	@apply text-body leading-relaxed mb-2 last:mb-0;
+}
+
+.markdown-container strong {
+	@apply font-semibold;
+}
+
+.markdown-container em {
+	@apply italic;
+}
+
+.markdown-container ul {
+	@apply my-2 list-disc pl-5 last:mb-0;
+}
+
+.markdown-container ol {
+	@apply my-2 list-decimal pl-5 last:mb-0;
+}
+
+.markdown-container li {
+	@apply my-0.5 pl-0.5;
+}
+
+.markdown-container blockquote {
+	@apply my-2 border-l-2 border-primary-blue-20 pl-3 text-body italic text-brand-black;
+}
+
+.markdown-container code {
+	@apply rounded px-1 py-0.5 font-mono text-[0.85em] bg-brand-muted;
+}
+
+.markdown-container pre {
+	@apply my-2 overflow-x-auto rounded-lg bg-brand-muted p-3 font-mono text-sm leading-relaxed;
+}
+
+.markdown-container pre code {
+	@apply m-0 block rounded-none bg-transparent p-0 text-sm leading-relaxed whitespace-pre-wrap;
+}
+
+.markdown-container table {
+	@apply my-2 w-full min-w-[240px] border-collapse border border-primary-blue-20 text-left text-sm;
+}
+
+.markdown-container thead {
+	@apply bg-brand-muted;
+}
+
+.markdown-container tr {
+	@apply border-b border-primary-blue-20;
+}
+
+.markdown-container th {
+	@apply border border-primary-blue-20 px-2 py-1.5 text-xs font-semibold uppercase tracking-wide;
+}
+
+.markdown-container td {
+	@apply border border-primary-blue-20 px-2 py-1.5 align-top text-body text-brand-black;
+}
+
+.markdown-container a {
+	@apply text-brand-primary underline underline-offset-2 hover:font-semibold;
+}
+
+.markdown-container hr {
+	@apply my-3 border-0 border-t border-primary-blue-20;
+}
+
+.markdown-container del {
+	@apply line-through opacity-80;
+}
+
+/* User bubble (dark): invert text and surfaces */
+.markdown-container--user {
+	@apply text-white;
+}
+
+.markdown-container--user h1,
+.markdown-container--user h2,
+.markdown-container--user h3,
+.markdown-container--user strong {
+	@apply text-white;
+}
+
+.markdown-container--user blockquote {
+	@apply border-white/25 text-white/85;
+}
+
+.markdown-container--user code {
+	@apply bg-white/15 text-white;
+}
+
+.markdown-container--user pre {
+	@apply bg-white/15 text-white;
+}
+
+.markdown-container--user pre code {
+	@apply text-white bg-transparent;
+}
+
+.markdown-container--user table {
+	@apply border-white/25 text-white;
+}
+
+.markdown-container--user th {
+	@apply border-white/25 bg-white/15 text-white;
+}
+
+.markdown-container--user td {
+	@apply border-white/25 text-white/85;
+}
+
+.markdown-container--user tr {
+	@apply border-white/25;
+}
+
+.markdown-container--user thead {
+	@apply bg-white/15;
+}
+
+.markdown-container--user a {
+	@apply text-sky-200 underline underline-offset-2 hover:text-white;
+}
+
+.markdown-container--user hr {
+	@apply border-white/25;
+}
+
+/* Globally remove browser-default up/down spin buttons from number input elements */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type="number"] {
+	-moz-appearance: textfield;
+	appearance: textfield;
+}

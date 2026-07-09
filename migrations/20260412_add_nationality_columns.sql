@@ -1,0 +1,3 @@
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS nationality VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS second_nationality VARCHAR(255);

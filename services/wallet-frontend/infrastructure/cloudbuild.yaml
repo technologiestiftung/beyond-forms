@@ -1,0 +1,23 @@
+steps:
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "gcloud"
+    args:
+      - "run"
+      - "deploy"
+      - "${_SERVICE_NAME}"
+      - "--image=${_IMAGE_URI}"
+      - "--region=${_GCP_REGION}"
+      - "--platform=managed"
+      - "--no-invoker-iam-check"
+      - "--set-env-vars"
+      - "API_PROXY_URL=${_API_PROXY_URL},AUTH_PROXY_URL=${_AUTH_PROXY_URL}"
+
+substitutions:
+  _SERVICE_NAME: "wallet-frontend"
+  _IMAGE_URI: ""
+  _API_PROXY_URL: "REQUIRED_INJECTED_AT_DEPLOY"
+  _AUTH_PROXY_URL: "REQUIRED_INJECTED_AT_DEPLOY"
+  _GCP_REGION: "europe-west10"
+
+options:
+  logging: CLOUD_LOGGING_ONLY

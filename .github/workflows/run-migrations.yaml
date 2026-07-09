@@ -1,0 +1,96 @@
+name: Apply Database Migrations
+
+on:
+  push:
+    branches:
+      - main
+      - prod
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    name: Run Migrations
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'prod' && 'production' || 'staging' }}
+    permissions:
+      contents: read
+      id-token: write # Required for GCP Workload Identity
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Determine Migrations Context
+        id: context
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [ "$GITHUB_REF_NAME" = "prod" ]; then
+            echo "bucket_name=beyond-forms-migrations-prd" >> $GITHUB_OUTPUT
+            echo "job_name=bf-prd-migration-service" >> $GITHUB_OUTPUT
+            echo "db_name=prod" >> $GITHUB_OUTPUT
+          else
+            echo "bucket_name=beyond-forms-migrations" >> $GITHUB_OUTPUT
+            echo "job_name=bf-stg-migration-service" >> $GITHUB_OUTPUT
+            echo "db_name=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Copy migrations to GCS
+        env:
+          BUCKET_NAME: ${{ steps.context.outputs.bucket_name }}
+        run: |
+          gcloud storage rsync -r migrations/ gs://"$BUCKET_NAME"/
+
+      - name: Create Env Vars File
+        env:
+          DB_HOST: ${{ secrets.ALLOYDB_HOST }}
+          DB_PORT: ${{ secrets.ALLOYDB_PORT }}
+          DB_USER: ${{ secrets.ALLOYDB_USER }}
+          DB_PASSWORD: ${{ secrets.ALLOYDB_PASSWORD }}
+          DB_NAME: ${{ steps.context.outputs.db_name }}
+          DB_SSLMODE: ${{ secrets.ALLOYDB_SSLMODE }}
+        run: |
+          jq -n 'env | {DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_SSLMODE}' > env.yaml
+
+      - name: Deploy Cloud Run Job
+        env:
+          JOB_NAME: ${{ steps.context.outputs.job_name }}
+          GCP_DEPLOY_PROJECT_ID: ${{ vars.GCP_DEPLOY_PROJECT_ID }}
+          GCP_REGION: ${{ vars.GCP_REGION }}
+          GCP_CIS_PROJECT_ID: ${{ vars.GCP_CIS_PROJECT_ID }}
+          GCP_VPC_NETWORK: ${{ vars.GCP_VPC_NETWORK }}
+          GCP_VPC_SUBNET: ${{ vars.GCP_VPC_SUBNET }}
+          BUCKET_NAME: ${{ steps.context.outputs.bucket_name }}
+        run: |
+          gcloud run jobs deploy "$JOB_NAME" \
+            --project "$GCP_DEPLOY_PROJECT_ID" \
+            --image "$GCP_REGION"-docker.pkg.dev/"$GCP_CIS_PROJECT_ID"/beyondforms/migration-service:latest \
+            --region "$GCP_REGION" \
+            --env-vars-file env.yaml \
+            --vpc-egress all-traffic \
+            --network "$GCP_VPC_NETWORK" \
+            --subnet "$GCP_VPC_SUBNET" \
+            --execution-environment gen2 \
+            --add-volume name=migrations_volume,type=cloud-storage,bucket="$BUCKET_NAME" \
+            --add-volume-mount volume=migrations_volume,mount-path=/app/migrations
+
+      - name: Execute Cloud Run Job
+        env:
+          JOB_NAME: ${{ steps.context.outputs.job_name }}
+          GCP_DEPLOY_PROJECT_ID: ${{ vars.GCP_DEPLOY_PROJECT_ID }}
+          GCP_REGION: ${{ vars.GCP_REGION }}
+        run: |
+          gcloud run jobs execute "$JOB_NAME" \
+            --project "$GCP_DEPLOY_PROJECT_ID" \
+            --region "$GCP_REGION" \
+            --wait

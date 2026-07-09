@@ -1,0 +1,85 @@
+{
+  "$defs": {
+    "assets_details": {
+      "type": "object",
+      "properties": {
+        "assets_savings_amount": {
+          "type": "number",
+          "description": "The amount of savings the person has in EUR"
+        },
+        "assets_securities_amount": {
+          "type": "number",
+          "description": "The amount of securities the person has in EUR"
+        },
+        "assets_valuables_amount": {
+          "type": "number",
+          "description": "The amount of valuables the person has in EUR"
+        },
+        "assets_valuables_type": {
+          "type": "string",
+          "description": "The type of valuables the person has"
+        },
+        "assets_other_like_accounts_receivable_amount": {
+          "type": "number",
+          "description": "The amount of other assets like accounts receivable the person has in EUR"
+        },
+        "assets_other_like_accounts_receivable_type": {
+          "type": "string",
+          "description": "The type of other assets like accounts receivable the person has"
+        },
+        "assets_gifted_amount_last_10_years": {
+          "type": "number",
+          "description": "The amount of assets the person gave away in EUR in the last 10 years"
+        },
+        "assets_gifted_type_last_10_years": {
+          "type": "string",
+          "description": "The type of assets the person gave away in the last 10 years"
+        },
+        "does_person_have_a_vehicle": {
+          "type": "boolean",
+          "description": "Whether the person has a vehicle"
+        },
+        "assets_vehicle_license_plate_number": {
+          "type": "string",
+          "description": "The license plate number of the vehicle the person has"
+        },
+        "assets_vehicle_build_year": {
+          "type": "number",
+          "description": "The build year of the vehicle the person has"
+        },
+        "assets_vehicle_brand": {
+          "type": "string",
+          "description": "The brand of the vehicle the person has"
+        },
+        "assets_vehicle_holder": {
+          "type": "string",
+          "description": "The holder of the vehicle the person has"
+        },
+        "does_person_own_a_home_or_property": {
+          "type": "boolean",
+          "description": "Whether the person owns a home or property"
+        },
+        "does_person_have_state_supported_private_retirement_provision": {
+          "type": "boolean",
+          "description": "Whether the person has state-supported private retirement provision"
+        },
+        "does_person_have_claims_from_transfer_contracts": {
+          "type": "boolean",
+          "description": "Whether the person has claims from transfer contracts"
+        },
+        "does_person_have_other_assets": {
+          "type": "boolean",
+          "description": "Whether the person has other assets"
+        },
+        "other_assets_amount": {
+          "type": "number",
+          "description": "The amount of other assets the person has in EUR"
+        },
+        "other_assets_type": {
+          "type": "string",
+          "description": "The type of other assets the person has"
+        }
+      }
+    }
+  }
+}

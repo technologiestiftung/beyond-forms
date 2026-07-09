@@ -1,0 +1,56 @@
+[project]
+name = "document-intelligence-service"
+version = "0.2.0"
+description = "Automated document classification and extraction for BeyondForms"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "beyondforms-document-schemas",
+    "fastapi[standard]",
+    "uvicorn",
+    "python-multipart",
+    "litellm",
+    "pydantic",
+    "pydantic-settings",
+    "python-dotenv",
+    "tenacity",
+    "litellm[google]",
+    "numpy",
+    "google-cloud-storage",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv.sources]
+beyondforms-document-schemas = { workspace = true }
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+default = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "src/app"]
+markers = [
+    "e2e: End-to-end tests"
+]
+
+[tool.mypy]
+mypy_path = "src"
+# Ensure mypy follows imports correctly
+explicit_package_bases = true
+namespace_packages = true
+# Ignore missing stubs for third-party libs like litellm
+ignore_missing_imports = true

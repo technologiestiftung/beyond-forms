@@ -1,0 +1,74 @@
+{
+	"load_error": {
+		"title": "Failed to load dashboard",
+		"description": "There was an error retrieving your profile information. Please try again later.",
+		"retry": "Retry"
+	},
+	"sections": {
+		"applications": {
+			"basic_security": {
+				"title": "Basic Security",
+				"status": {
+					"in_progress": "In Progress",
+					"not_started": "Not started yet"
+				},
+				"description": {
+					"returning": "You can continue where you left off.",
+					"new": "You have already completed the initial check. The application has not been started yet.",
+					"in_progress": "Start your application. Klaro shows you step by step what is important.",
+					"almost": "Almost done! Add the missing information and documents.",
+					"completed": "Your application is ready – you can submit the form now!"
+				},
+				"recommendation": {
+					"title": "Recommendation",
+					"text": "Based on your answers, basic security might be suitable for you. You can now start preparing your application."
+				},
+				"actions": {
+					"continue": "Continue",
+					"start": "Let's go",
+					"view_checklist": "View complete checklist",
+					"go": "Let's go"
+				},
+				"progress": {
+					"documents": "{{count}} of {{total}} documents",
+					"information": "{{count}} of {{total}} details",
+					"legend": {
+						"title": "What your progress means",
+						"red": "Red = only a little is available",
+						"orange": "Orange = partly prepared",
+						"green": "Green = the most important documents are available"
+					}
+				},
+				"requirements": {
+					"disability_proof": "If you apply due to reduced earning capacity: proof of this (e.g. from the pension insurance provider).",
+					"disability_hint": "Only needed if you apply for Grundsicherung due to reduced earning capacity."
+				}
+			}
+		}
+	},
+	"onboarding": {
+		"tutorial_viewer": {
+			"back": "Go back",
+			"close": "Close guide",
+			"loading": "Loading guide …",
+			"next": "Continue",
+			"finish": "Understood"
+		},
+		"checklist": {
+			"greeting_anonymous": "Hello there!",
+			"greeting_named": "Hello {{name}}!",
+			"intro": "Welcome to Klaro. Here you can see an overview of your applications.",
+			"status": {
+				"started": "Started",
+				"pending": "Not yet done",
+				"done": "Done"
+			},
+			"tutorial": {
+				"aria_label": "{{title}}. {{subtitle}}. {{status}}",
+				"subtitle_default": "Here you will find a simple guide.",
+				"fallback_title": "Guide"
+			},
+			"emergency_help": "If you need help urgently, you can also find pointers to quick support here."
+		}
+	}
+}

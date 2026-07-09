@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document Intelligence Self-Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        --card-bg: rgba(30, 41, 59, 0.7);
+        --card-border: rgba(255, 255, 255, 0.1);
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --accent: #10b981;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Outfit", sans-serif;
+        background: var(--bg-gradient);
+        background-attachment: fixed;
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 800px;
+        background: var(--card-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--card-border);
+        border-radius: 24px;
+        padding: 3rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.6s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        font-weight: 600;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(to right, #fff, #cbd5e1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+      }
+
+      p.subtitle {
+        color: var(--text-muted);
+        text-align: center;
+        margin-bottom: 3rem;
+        font-size: 1.1rem;
+      }
+
+      .upload-zone {
+        border: 2px dashed var(--card-border);
+        border-radius: 16px;
+        padding: 3rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.02);
+        margin-bottom: 2rem;
+      }
+
+      .upload-zone:hover,
+      .upload-zone.dragover {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.05);
+      }
+
+      .upload-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: inline-block;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .upload-zone p {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+      }
+
+      .btn:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .result-container {
+        margin-top: 3rem;
+        display: none; /* Hidden by default */
+        animation: fadeIn 0.4s ease-out;
+      }
+
+      .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .section-title::before {
+        content: "";
+        display: inline-block;
+        width: 4px;
+        height: 16px;
+        background: var(--primary);
+        border-radius: 2px;
+      }
+
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .meta-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        padding: 1.25rem;
+        transition: transform 0.2s ease;
+      }
+
+      .meta-card:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .meta-card .label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
+      }
+
+      .meta-card .value {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-main);
+      }
+
+      .meta-card .value.accent {
+        color: var(--accent);
+      }
+
+      .fields-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(255, 255, 255, 0.01);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--card-border);
+      }
+
+      .fields-table th,
+      .fields-table td {
+        padding: 1rem 1.25rem;
+        text-align: left;
+        border-bottom: 1px solid var(--card-border);
+      }
+
+      .fields-table th {
+        background: rgba(255, 255, 255, 0.03);
+        font-weight: 600;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .fields-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .fields-table tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .fields-table td.key {
+        font-weight: 600;
+        color: var(--text-main);
+        width: 30%;
+      }
+
+      .fields-table td.value {
+        color: #e2e8f0;
+        font-family: monospace;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        margin: 2rem 0;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--card-border);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-bottom: 1rem;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error-msg {
+        display: none;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      /* Micro-animations */
+      .upload-zone:active {
+        transform: scale(0.99);
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 1rem 1.25rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+      }
+
+      .controls label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .controls input[type="checkbox"] {
+        accent-color: var(--primary);
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+      }
+
+      .controls select {
+        flex: 1;
+        background: rgba(0, 0, 0, 0.2);
+        color: var(--text-main);
+        border: 1px solid var(--card-border);
+        border-radius: 8px;
+        padding: 0.5rem 0.75rem;
+        font-family: inherit;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: border-color 0.2s;
+        -webkit-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        padding-right: 2rem;
+      }
+
+      .controls select option {
+        background: #1e293b;
+        color: var(--text-main);
+      }
+
+      .controls select:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .controls select:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Document Intelligence</h1>
+      <p class="subtitle">Self-Test & Verification Interface</p>
+
+      <div class="error-msg" id="errorMsg">
+        An error occurred during processing.
+      </div>
+
+      <div class="upload-zone" id="dropZone">
+        <span class="upload-icon">📄</span>
+        <p>Drag & drop your document here or click to browse</p>
+        <button
+          class="btn"
+          onclick="document.getElementById('fileInput').click()"
+        >
+          Select File
+        </button>
+        <input
+          type="file"
+          id="fileInput"
+          class="file-input"
+          accept="application/pdf,image/png,image/jpeg"
+        />
+      </div>
+
+      <div class="controls" id="controls">
+        <label>
+          <input type="checkbox" id="skipClassification" />
+          Skip classification, use type:
+        </label>
+        <select id="docTypeSelect" disabled>
+          <option value="">-- loading document types --</option>
+        </select>
+      </div>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p style="color: var(--text-muted)">
+          Analyzing document with Gemini...
+        </p>
+      </div>
+
+      <div class="result-container" id="resultContainer">
+        <div class="section-title">Classification Results</div>
+        <div class="meta-grid">
+          <div class="meta-card">
+            <div class="label">Document Type</div>
+            <div class="value accent" id="docType">-</div>
+          </div>
+          <div class="meta-card">
+            <div class="label">Confidence Score</div>
+            <div class="value" id="confidence">-</div>
+          </div>
+          <div class="meta-card">
+            <div class="label">Filename</div>
+            <div
+              class="value"
+              id="resFilename"
+              style="
+                font-size: 0.9rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              "
+            >
+              -
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">Extracted Fields & Values</div>
+        <table class="fields-table">
+          <thead>
+            <tr>
+              <th>Field / Key</th>
+              <th>Extracted Value</th>
+            </tr>
+          </thead>
+          <tbody id="fieldsBody">
+            <!-- Rows will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const dropZone = document.getElementById("dropZone");
+      const fileInput = document.getElementById("fileInput");
+      const loading = document.getElementById("loading");
+      const resultContainer = document.getElementById("resultContainer");
+      const errorMsg = document.getElementById("errorMsg");
+      const skipCheckbox = document.getElementById("skipClassification");
+      const docTypeSelect = document.getElementById("docTypeSelect");
+
+      // Fetch available document types on load
+      fetch("/get-available-document-types")
+        .then((r) => r.json())
+        .then((res) => {
+          const types = res["available-forms"] || [];
+          types.sort();
+          docTypeSelect.innerHTML =
+            '<option value="">-- select document type --</option>';
+          types.forEach((t) => {
+            const opt = document.createElement("option");
+            opt.value = t;
+            opt.textContent = t;
+            docTypeSelect.appendChild(opt);
+          });
+        })
+        .catch(() => {
+          docTypeSelect.innerHTML =
+            '<option value="">-- failed to load types --</option>';
+        });
+
+      skipCheckbox.addEventListener("change", () => {
+        docTypeSelect.disabled = !skipCheckbox.checked;
+      });
+
+      // Drag and drop handlers
+      dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.classList.add("dragover");
+      });
+
+      dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragover");
+      });
+
+      dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFile(files[0]);
+        }
+      });
+
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files.length > 0) {
+          handleFile(e.target.files[0]);
+        }
+      });
+
+      // Make the whole drop zone clickable
+      dropZone.addEventListener("click", (e) => {
+        if (e.target !== document.querySelector(".btn")) {
+          fileInput.click();
+        }
+      });
+
+      function handleFile(file) {
+        errorMsg.style.display = "none";
+        resultContainer.style.display = "none";
+
+        const skipClassification = skipCheckbox.checked && docTypeSelect.value;
+
+        if (skipCheckbox.checked && !docTypeSelect.value) {
+          errorMsg.textContent =
+            'Please select a document type or uncheck "Skip classification".';
+          errorMsg.style.display = "block";
+          return;
+        }
+
+        loading.style.display = "block";
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        let url;
+        if (skipClassification) {
+          url = "/api/v1/stateless/extract";
+          formData.append("document_type", docTypeSelect.value);
+        } else {
+          url = "/classify";
+        }
+
+        fetch(url, {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                "Network response was not ok: " + response.statusText,
+              );
+            }
+            return response.json();
+          })
+          .then((res) => {
+            loading.style.display = "none";
+
+            if (res.status === "error") {
+              throw new Error(res.detail || "Unknown error occurred");
+            }
+
+            const data = res.data;
+            if (!data) {
+              throw new Error("No data returned from service");
+            }
+
+            if (skipClassification) {
+              document.getElementById("docType").textContent =
+                docTypeSelect.value;
+              document.getElementById("confidence").textContent = "Skipped";
+              document.getElementById("resFilename").textContent = file.name;
+              renderFields(data.extracted_data);
+            } else {
+              document.getElementById("docType").textContent =
+                data.classified_document?.document_type || "Unknown";
+              const conf = data.classified_document?.confidence;
+              document.getElementById("confidence").textContent = conf
+                ? (conf * 100).toFixed(1) + "%"
+                : "N/A";
+              document.getElementById("resFilename").textContent =
+                data.filename || file.name;
+              renderFields(data.extraction_result);
+            }
+
+            resultContainer.style.display = "block";
+            resultContainer.scrollIntoView({ behavior: "smooth" });
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            loading.style.display = "none";
+            errorMsg.textContent = "Error: " + error.message;
+            errorMsg.style.display = "block";
+          });
+      }
+
+      function renderFields(extraction) {
+        const fieldsBody = document.getElementById("fieldsBody");
+        fieldsBody.innerHTML = "";
+
+        if (extraction) {
+          for (const [key, value] of Object.entries(extraction)) {
+            if (key.startsWith("_")) continue;
+
+            const row = document.createElement("tr");
+
+            const keyTd = document.createElement("td");
+            keyTd.className = "key";
+            keyTd.textContent = formatKey(key);
+
+            const valTd = document.createElement("td");
+            valTd.className = "value";
+            valTd.textContent = formatValue(value);
+
+            row.appendChild(keyTd);
+            row.appendChild(valTd);
+            fieldsBody.appendChild(row);
+          }
+        } else {
+          const row = document.createElement("tr");
+          const td = document.createElement("td");
+          td.colSpan = 2;
+          td.textContent = "No entity extraction data available.";
+          td.style.textAlign = "center";
+          td.style.color = "var(--text-muted)";
+          row.appendChild(td);
+          fieldsBody.appendChild(row);
+        }
+      }
+
+      function formatKey(key) {
+        return key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+      }
+
+      function formatValue(val) {
+        if (val === null || val === undefined) return "-";
+        if (typeof val === "object") return JSON.stringify(val, null, 2);
+        return String(val);
+      }
+    </script>
+  </body>
+</html>

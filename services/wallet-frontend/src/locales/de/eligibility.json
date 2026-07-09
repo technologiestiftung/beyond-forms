@@ -1,0 +1,144 @@
+{
+	"progress": "Dein Fortschritt",
+	"progress_aria": "{{current}} von {{total}}",
+	"yes": "Ja",
+	"no": "Nein",
+	"next": "Weiter",
+	"back": "Zurück",
+	"back_aria": "Gehe zurück zur vorherigen Frage",
+	"switch_to_language": "Sprache zu {{language}} wechseln",
+	"language_switcher_toggle_open": "Sprachauswahl öffnen",
+	"language_switcher_toggle_close": "Sprachauswahl schließen",
+	"language_selection_region": "Sprachauswahl",
+	"application_title": "Anspruch prüfen",
+	"aria": {
+		"welcome": "Willkommen auf der Startseite",
+		"questionnaire": "Fragebogen zur Prüfung"
+	},
+	"start_screen": {
+		"title": "Schnell und einfach Deinen Anspruch auf Grundsicherung prüfen",
+		"description": "Mit Klaro findest Du in nur 5 Minuten heraus, ob Du Grundsicherung beantragen kannst.",
+		"description_list": "Schnelltest in nur 5 Minuten\nEinfach und verständlich erklärt\nKostenlos für alle",
+		"feature_cards": {
+			"quick_check": {
+				"title": "Schnell prüfen",
+				"description": "Beantworte 6 kurze Fragen."
+			},
+			"simply_guided": {
+				"title": "Einfach begleitet",
+				"description": "Klaro erklärt jeden Schritt verständlich."
+			},
+			"safe_one_place": {
+				"title": "Sicher an einem Ort",
+				"description": "Daten, Dokumente und Anträge bleiben übersichtlich zusammen."
+			}
+		},
+		"currently_available": {
+			"label": "ZURZEIT VERFÜGBAR",
+			"title": "Grundsicherung prüfen und vorbereiten",
+			"description": "Mit Klaro kannst Du aktuell prüfen, ob Grundsicherung für Dich infrage kommt, und Dich Schritt-für-Schritt auf den Antrag vorbereiten. Weitere Services folgen später."
+		},
+		"promo_card": {
+			"title": "Direkt zur Grundsicherung",
+			"description": "Melde Dich an und starte direkt mit Deinem Antrag zur Grundsicherung. Klaro begleitet Dich Schritt für Schritt.",
+			"cta": "Jetzt Antrag starten"
+		},
+		"intro_cards": {
+			"section_title": "So funktioniert Klaro",
+			"slide_aria": "{{current}} von {{total}}",
+			"dot_aria": "Zu Karte {{index}}: {{title}}",
+			"tap_advance": "Tippen, um die nächste Karte anzuzeigen",
+			"1": {
+				"title": "Willkommen bei Klaro",
+				"description": "Klaro ist ein kostenloses Angebot. Klaro hilft Dir dabei, soziale Unterstützung besser zu verstehen."
+			},
+			"2": {
+				"title": "Hier geht es um Grundsicherung",
+				"description": "Klaro hilft Dir zuerst beim Thema Grundsicherung. Du kannst prüfen, ob diese Unterstützung für Dich passen könnte."
+			},
+			"3": {
+				"title": "Beantworte ein paar kurze Fragen",
+				"description": "Mit einigen Fragen prüft Klaro Deine Situation. So bekommst Du eine erste Orientierung."
+			},
+			"4": {
+				"title": "Starte jetzt die Prüfung",
+				"description": "Die Prüfung dauert nur wenige Minuten. Du kannst direkt starten und brauchst noch kein Konto."
+			}
+		},
+		"cta": "Jetzt Schnelltest starten"
+	},
+	"questions": {
+		"nationality": {
+			"category": "Staatsangehörigkeit und Aufenthaltsstatus",
+			"title": "Was trifft auf Dich zu?",
+			"tip": "Das ist wichtig, weil je nach Aufenthaltsstatus unterschiedliche Gesetze gelten. Wenn Du neu in Deutschland bist oder Dich im Asylverfahren befindest, gibt es ein spezielles Unterstützungssystem.",
+			"options": {
+				"GERMAN": "Ich habe die deutsche Staatsangehörigkeit.",
+				"EU_5_PLUS": "Ich bin EU-Bürger:in und lebe seit mindestens 5 Jahren in Deutschland.",
+				"RESIDENCE_PERMIT": "Ich habe einen gültigen Aufenthaltstitel für Deutschland.",
+				"NONE": "Nichts trifft zu."
+			}
+		},
+		"livesInGermany": {
+			"category": "Wohnsitz und Aufenthalt",
+			"title": "Wohnst Du in Deutschland?",
+			"tip": "Grundsicherung kannst Du nur bekommen, wenn Du dauerhaft in Deutschland lebst.",
+			"options": {
+				"YES": "Ja, ich wohne in Deutschland.",
+				"NO": "Nein, ich wohne nicht in Deutschland."
+			}
+		},
+		"dateOfBirth": {
+			"category": "Geburtsdatum",
+			"title": "Wann bist Du geboren?",
+			"tip": "Grundsicherung kann für Dich infrage kommen, wenn Du:\n• die Regelaltersgrenze erreicht hast oder\n• mindestens 18 Jahre alt und dauerhaft voll erwerbsgemindert bist."
+		},
+		"pension": {
+			"category": "Rente",
+			"title": "Bekommst Du eine Rente?",
+			"tip": "Ab der Regelaltersgrenze kann Grundsicherung im Alter für Dich infrage kommen. Wann Du diese Altersgrenze erreichst, hängt von Deinem Geburtsjahr ab.",
+			"options": {
+				"OLD_AGE": "Ich bekomme eine Altersrente.",
+				"REDUCED_EARNING_CAPACITY": "Ich bekomme eine Erwerbsminderungsrente. Der Grund ist, dass ich  nicht mehr voll arbeiten kann.",
+				"NONE": "Ich bekomme keine Rente."
+			}
+		},
+		"income": {
+			"category": "Einkommensprüfung",
+			"title": "Was trifft auf Dich zu?",
+			"tip": "Manchmal reicht das Geld für Essen, aber nicht für die Wohnung. Dann kannst Du vielleicht Wohngeld bekommen.",
+			"options": {
+				"NOT_SUFFICIENT": "Mein Einkommen reicht im Moment nicht aus.",
+				"SOON_INSUFFICIENT": "Ich mache mir Sorgen. Mein Einkommen reicht bald vielleicht nicht mehr aus.",
+				"SUFFICIENT": "Mein Einkommen reicht aus. Ich kann alles bezahlen."
+			}
+		},
+		"hasAssetsAboveThreshold": {
+			"category": "Vermögensprüfung",
+			"title": "Wie viel Vermögen hast Du ungefähr?",
+			"tip": "Keine Sorge, viele Menschen erhalten Hilfe trotz Ersparnissen. Im ersten Jahr liegt die Grenze jedoch bei 10.000 € für eine Person. Damit sind Bargeld, Wertgegenstände oder zum Beispiel Dein Auto gemeint.",
+			"options": {
+				"YES": "Ich habe mehr als 10.000 € Vermögen.",
+				"NO": "Ich habe weniger als 10.000 € Vermögen."
+			}
+		}
+	},
+	"outcome": {
+		"eligible": {
+			"title": "Du könntest Anspruch auf Grundsicherung haben.",
+			"description": "Das ist eine erste Einschätzung. Klaro hilft Dir dabei Deinen Antrag Schritt-für-Schritt auszufüllen. Das geht einfach, digital und ist kostenlos.",
+			"cta": "Jetzt Antrag ausfüllen"
+		},
+		"not_eligible": {
+			"title": "Grundsicherung passt im Moment eher nicht...",
+			"description": "Du kannst trotzdem ein Konto erstellen und Deine Angaben sicher speichern. So kannst Du Klaro später weiter nutzen, wenn sich Deine Situation ändert oder Du Unterstützung bei weiteren Schritten brauchst. Später werden wir weitere Anträge anbieten!",
+			"cta": "Konto erstellen"
+		},
+		"sozialamt": {
+			"title": "Bitte wende Dich an das zuständige Sozialamt",
+			"description": "Nach Deinen Antworten trifft keiner der qualifizierenden Aufenthaltsstatus zu. Bitte wende Dich an das zuständige Sozialamt, um zu erfahren, welche Unterstützung für Dich infrage kommt.",
+			"cta": "Sozialamt finden"
+		},
+		"start_over": "Von vorne anfangen"
+	}
+}

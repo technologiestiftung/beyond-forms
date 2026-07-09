@@ -1,0 +1,74 @@
+{
+	"load_error": {
+		"title": "Dashboard konnte nicht geladen werden",
+		"description": "Beim Abrufen Deiner Profildaten ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
+		"retry": "Erneut versuchen"
+	},
+	"sections": {
+		"applications": {
+			"basic_security": {
+				"title": "Grundsicherung",
+				"status": {
+					"in_progress": "In Bearbeitung",
+					"not_started": "Noch nicht begonnen"
+				},
+				"description": {
+					"returning": "Du kannst dort weitermachen, wo Du zuletzt aufgehört hast.",
+					"new": "Starte mit Deinem Antrag. Klaro zeigt Dir Schritt-für-Schritt, was wichtig ist.",
+					"in_progress": "Starte mit Deinem Antrag. Klaro zeigt Dir Schritt-für-Schritt, was wichtig ist.",
+					"almost": "Fast fertig! Füge noch die fehlenden Angaben und Dokumente hinzu.",
+					"completed": "Dein Antrag ist fertig – Du kannst das Formular jetzt einreichen!"
+				},
+				"recommendation": {
+					"title": "Empfehlung",
+					"text": "Nach Deinen Antworten könnte Grundsicherung für Dich infrage kommen. Du kannst jetzt mit der Vorbereitung Deines Antrags beginnen."
+				},
+				"actions": {
+					"continue": "Fortfahren",
+					"start": "Los geht's",
+					"view_checklist": "Vollständige Checkliste ansehen",
+					"go": "Los geht's"
+				},
+				"progress": {
+					"documents": "{{count}} von {{total}} Dokumenten",
+					"information": "{{count}} von {{total}} Angaben",
+					"legend": {
+						"title": "Bedeutung Deines Fortschritts",
+						"red": "Rot = erst wenig vorhanden",
+						"orange": "Orange = teilweise vorbereitet",
+						"green": "Grün = wichtigste Dokumente vorhanden"
+					}
+				},
+				"requirements": {
+					"disability_proof": "Wenn Du den Antrag wegen Erwerbsminderung stellst: Nachweis darüber (z. B. vom Rentenversicherungsträger).",
+					"disability_hint": "Nur nötig, wenn Du Grundsicherung wegen Erwerbsminderung beantragst."
+				}
+			}
+		}
+	},
+	"onboarding": {
+		"tutorial_viewer": {
+			"back": "Zurück",
+			"close": "Anleitung schließen",
+			"loading": "Anleitung wird geladen …",
+			"next": "Weiter",
+			"finish": "Verstanden"
+		},
+		"checklist": {
+			"greeting_anonymous": "Hallo!",
+			"greeting_named": "Hallo {{name}}!",
+			"intro": "Willkommen bei Klaro. Hier siehst Du eine Übersicht über Deine Anträge.",
+			"status": {
+				"started": "Gestartet",
+				"pending": "Fehlt noch",
+				"done": "Erledigt"
+			},
+			"tutorial": {
+				"aria_label": "{{title}}. {{subtitle}}. {{status}}",
+				"subtitle_default": "Hier findest Du eine einfache Anleitung.",
+				"fallback_title": "Anleitung"
+			},
+			"emergency_help": "Bei dringendem Bedarf findest Du hier auch Hinweise auf schnelle Hilfe."
+		}
+	}
+}

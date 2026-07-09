@@ -1,0 +1,42 @@
+{
+	"error": {
+		"connection_title": "Connection Issue",
+		"connection_desc": "The application component could not be loaded. Please check your internet connection and reload the page.",
+		"reload_button": "Reload Page",
+		"generic_title": "Something went wrong",
+		"generic_desc": "An unexpected error occurred.",
+		"back_to_home": "Back to Home"
+	},
+	"toast": {
+		"error_title": "Error",
+		"sync_title": "Synchronization Issue",
+		"save_error_title": "Error Saving Profile"
+	},
+	"nav": {
+		"dashboard": "Applications",
+		"chat": "Chat",
+		"my_account": "Profile"
+	},
+	"save_next": "Save and continue",
+	"save_close": "Save and close",
+	"step_page": "Question {{current}} of {{total}}",
+	"done": "Done!",
+	"next": "Next",
+	"back": "Back",
+	"yes": "Yes",
+	"no": "No",
+	"continue": "Continue",
+	"cancel": "Cancel",
+	"save": "Save",
+	"saving": "Saving...",
+	"please_select": "Please select",
+	"close": "Close",
+	"loading": "Loading...",
+	"error_title": "Error",
+	"error_desc": "Error loading.",
+	"retry": "Retry",
+	"back_to_overview": "Back to overview",
+	"delete": "Delete",
+	"remove_file": "Remove",
+	"save_and_continue": "Save and continue"
+}

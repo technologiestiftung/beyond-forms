@@ -1,0 +1,157 @@
+{
+  "$defs": {
+    "income_details": {
+      "type": "object",
+      "properties": {
+        "income_non_self_employed": {
+          "type": "number",
+          "description": "The monthly income of the person from non-self-employed work in EUR"
+        },
+        "income_health_insurance_benefits": {
+          "type": "number",
+          "description": "The monthly income of the person from health insurance benefits in EUR"
+        },
+        "income_commercial_operation": {
+          "type": "number",
+          "description": "The monthly income of the person from commercial operation in EUR"
+        },
+        "income_agriculture_and_forestry": {
+          "type": "number",
+          "description": "The monthly income of the person from agriculture and forestry in EUR"
+        },
+        "income_other_self_employed": {
+          "type": "number",
+          "description": "The monthly income of the person from other self-employed work in EUR"
+        },
+        "income_rental_income": {
+          "type": "number",
+          "description": "The monthly income of the person from rental income in EUR"
+        },
+        "income_housing_allowance": {
+          "type": "number",
+          "description": "The monthly income of the person from housing allowance in EUR"
+        },
+        "income_pension": {
+          "type": "number",
+          "description": "The monthly income of the person from pension in EUR"
+        },
+        "income_social_benefits": {
+          "type": "number",
+          "description": "The monthly income of the person from social benefits in EUR"
+        },
+        "income_basic_welfare": {
+          "type": "number",
+          "description": "The monthly income of the person from basic welfare in EUR"
+        },
+        "income_asylum_benefits": {
+          "type": "number",
+          "description": "The monthly income of the person from asylum benefits in EUR"
+        },
+        "income_federal_law_on_war_pensions": {
+          "type": "number",
+          "description": "The monthly income of the person from federal law on war pensions in EUR"
+        },
+        "income_from_office_of_burden_sharing": {
+          "type": "number",
+          "description": "The monthly income of the person from the office of burden sharing in EUR"
+        },
+        "income_from_employment_office": {
+          "type": "number",
+          "description": "The monthly income of the person from the employment office in EUR"
+        },
+        "income_child_benefit": {
+          "type": "number",
+          "description": "The monthly income of the person from child benefit in EUR"
+        },
+        "income_addition_to_child_benefit": {
+          "type": "number",
+          "description": "The monthly income of the person from addition to child benefit in EUR"
+        },
+        "income_child_raising_benefit": {
+          "type": "number",
+          "description": "The monthly income of the person from child raising benefit in EUR"
+        },
+        "income_educational_grant": {
+          "type": "number",
+          "description": "The monthly income of the person from educational grant in EUR"
+        },
+        "income_other_grants": {
+          "type": "number",
+          "description": "The monthly income of the person from other grants in EUR"
+        },
+        "income_alimony": {
+          "type": "number",
+          "description": "The monthly income of the person from alimony in EUR"
+        },
+        "income_alimony_advance": {
+          "type": "number",
+          "description": "The monthly income of the person from alimony advance in EUR"
+        },
+        "income_non_cash_claims_private_law": {
+          "type": "number",
+          "description": "The monthly income of the person from non-cash claims under private law in EUR"
+        },
+        "income_tax_return": {
+          "type": "number",
+          "description": "The monthly income of the person from tax return in EUR"
+        },
+        "income_capital_gains": {
+          "type": "number",
+          "description": "The monthly income of the person from capital gains in EUR, e.g. interest"
+        },
+        "income_other_income": {
+          "type": "number",
+          "description": "The monthly income of the person from other income in EUR"
+        }
+      }
+    },
+    "benefits_awaiting_decision_details": {
+      "type": "object",
+      "properties": {
+        "has_applied_for_benefits_awaiting_decision": {
+          "type": "boolean",
+          "description": "Whether the person has applied for benefits and is awaiting decision"
+        },
+        "benefits_awaiting_decision_type": {
+          "type": "string",
+          "description": "The type of benefits the person is awaiting decision for"
+        },
+        "benefits_awaiting_decision_application_date": {
+          "type": "string",
+          "format": "date",
+          "description": "The date when the person applied for benefits and is awaiting decision"
+        },
+        "benefits_awaiting_decision_office": {
+          "type": "string",
+          "description": "The office that will make the decision on the person's benefits"
+        },
+        "benefits_awaiting_decision_reference": {
+          "type": "string",
+          "description": "The reference number of the application for the person's benefits"
+        }
+      }
+    },
+    "one-time_payments_expected_details": {
+      "type": "object",
+      "properties": {
+        "are_one-time_payments_expected": {
+          "type": "boolean",
+          "description": "Whether one-time payments are expected for the person"
+        },
+        "one-time_payments_expected_type": {
+          "type": "string",
+          "description": "The type of one-time payment expected for the person"
+        },
+        "one-time_payments_expected_amount": {
+          "type": "number",
+          "description": "The amount of the one-time payment expected for the person in EUR"
+        },
+        "one-time_payments_expected_date": {
+          "type": "string",
+          "format": "date",
+          "description": "The date when the one-time payment is expected for the person"
+        }
+      }
+    }
+  }
+}

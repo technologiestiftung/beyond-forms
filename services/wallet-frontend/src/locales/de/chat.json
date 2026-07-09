@@ -1,0 +1,26 @@
+{
+	"title": "Klaro-Chat",
+	"typing_indicator": "Klaro schreibt...",
+	"new_chat": "Neuer Chat",
+	"close": "Chat schließen",
+	"history": {
+		"show": "Chatverlauf",
+		"hide": "Zurück zum Chat",
+		"title": "Chatverlauf",
+		"placeholder": "Deine früheren Unterhaltungen erscheinen hier."
+	},
+	"input_placeholder": "Nachricht eingeben",
+	"send": "Nachricht senden",
+	"upload": "Dokument hochladen",
+	"error": {
+		"general": "Die Nachricht konnte nicht gesendet werden. Bitte versuche es später erneut.",
+		"dismiss": "Schließen"
+	},
+	"welcome": {
+		"heading": "Hallo, ich bin Klaro",
+		"description": "Ich helfe Dir bei Fragen zu Grundsicherung, Anträgen, Dokumenten und den nächsten Schritten.",
+		"quick_action1": "Kann ich Grundsicherung bekommen?",
+		"quick_action2": "Welche Unterlagen brauche ich?",
+		"quick_action3": "Wie stelle ich einen Antrag?"
+	}
+}

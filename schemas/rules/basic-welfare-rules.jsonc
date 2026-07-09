@@ -1,0 +1,800 @@
+{
+  "form_id": "basic_welfare_for_elderly_and_disabled",
+  "initial_step": "step_eligibility_nationality",
+  "sections": [
+    {
+      "id": "eligibility_check",
+      "title": "Eligibility Check",
+      "steps": [
+        "step_eligibility_nationality",
+        "step_eligibility_residence",
+        "step_eligibility_dob",
+        "step_eligibility_pension",
+        "step_eligibility_income",
+        "step_eligibility_assets"
+      ]
+    },
+    {
+      "id": "applicant_information",
+      "title": "About Me",
+      "steps": [
+        "step_applicant_name",
+        "step_applicant_dob",
+        "step_applicant_place_of_birth",
+        "step_applicant_gender",
+        "step_applicant_address",
+        "step_applicant_nationality",
+        "step_applicant_legal_support",
+        "step_applicant_displaced_status",
+        "step_applicant_displaced_details",
+        "step_applicant_legal_support",
+        "step_applicant_insurance"
+      ]
+    },
+    {
+      "id": "applicant_financial_situation",
+      "title": "Income & Assets",
+      "steps": [
+        "step_previous_benefits",
+        "step_previous_benefits_details",
+        "step_applicant_benefits_awaiting_decision",
+        "step_applicant_benefits_awaiting_decision_details",
+        "step_applicant_pension",
+        "step_applicant_employment",
+        "step_applicant_employment_details",
+        "step_applicant_work_capacity",
+        "step_applicant_work_capacity_reason",
+        "step_applicant_income_work",
+        "step_applicant_income_benefits",
+        "step_applicant_income_other",
+        "step_applicant_expected_payments",
+        "step_applicant_expected_payments_details",
+        "step_applicant_bank_details"
+        /*"step_applicant_assets_savings",
+        "step_applicant_assets_vehicles",
+        "step_applicant_assets_vehicles_details",
+        "step_applicant_assets_property_and_other"*/
+      ]
+    }
+    /*,
+    {
+      "id": "partner_information",
+      "title": "Partner Information",
+      "steps": [
+        "step_partner_check",
+        "step_partner_basics",
+        "step_partner_citizenship",
+        "step_partner_documents",
+        "step_partner_previous_benefits",
+        "step_partner_previous_benefits_details",
+        "step_partner_legal_support",
+        "step_partner_displaced_status",
+        "step_partner_displaced_details",
+        "step_partner_severely_disabled",
+        "step_partner_severely_disabled_details",
+        "step_partner_insurance",
+        "step_partner_work_capacity",
+        "step_partner_work_capacity_reason"
+      ]
+    }*/,
+    {
+      "id": "applicant_earning_capacity",
+      "title": "Earning Capacity",
+      "steps": [
+        "step_applicant_care_dependency",
+        "step_applicant_stationary_facility",
+        "step_applicant_stationary_facility_dates",
+        "step_applicant_reduced_earnings",
+        "step_applicant_reduced_earnings_permanent",
+        "step_applicant_reduced_earnings_period"
+      ]
+    }
+    /*,
+    {
+      "id": "partner_earning_capacity",
+      "title": "Partner Earning Capacity",
+      "steps": [
+        "step_marital_status",
+        "step_marital_status_since",
+        "step_partner_employment",
+        "step_partner_employment_details",
+        "step_partner_work_capacity",
+        "step_partner_work_capacity_reason",
+        "step_partner_reduced_earnings",
+        "step_partner_reduced_earnings_permanent",
+        "step_partner_reduced_earnings_period",
+        "step_partner_care_dependency",
+        "step_partner_care_dependency_level",
+        "step_partner_education",
+        "step_partner_education_details",
+        "step_partner_stationary_facility",
+        "step_partner_stationary_facility_dates",
+        "step_partner_sgb2"
+      ]
+    },
+    {
+      "id": "residence_and_accommodation",
+      "title": "Residence & Accommodation",
+      "steps": [
+        "step_applicant_residence",
+        "step_applicant_accommodation_type",
+        "step_applicant_rental_details",
+        "step_applicant_accommodation_costs",
+        "step_applicant_accommodation_details",
+        "step_applicant_heating",
+        "step_applicant_sublet",
+        "step_applicant_sublet_details",
+        "step_applicant_sublet_impossible_reason",
+        "step_applicant_accommodation_issues"
+      ]
+    },
+    {
+      "id": "household_and_alimony",
+      "title": "Household & Alimony",
+      "steps": [
+        "step_other_people_in_household",
+        "step_household_members_count",
+        "step_household_member_1",
+        "step_household_member_2",
+        "step_household_member_3",
+        "step_household_member_4",
+        "step_household_member_5",
+        "step_household_member_6",
+        "step_household_member_7",
+        "step_household_member_8",
+        "step_household_member_9",
+        "step_household_member_10",
+        "step_alimony_liable_people",
+        "step_alimony_liable_details"
+      ]
+    },
+    {
+      "id": "partner_financial_situation",
+      "title": "Partner Income & Assets",
+      "steps": [
+        "step_partner_income_work",
+        "step_partner_income_benefits",
+        "step_partner_income_other",
+        "step_partner_benefits_awaiting_decision",
+        "step_partner_benefits_awaiting_decision_details",
+        "step_partner_expected_payments",
+        "step_partner_expected_payments_details",
+        "step_partner_assets_savings",
+        "step_partner_assets_vehicles",
+        "step_partner_assets_vehicles_details",
+        "step_partner_assets_property_and_other"
+      ]
+    },
+    {
+      "id": "special_needs",
+      "title": "Special Additional Needs",
+      "steps": [
+        "step_special_needs_pregnancy",
+        "step_special_needs_pregnancy_details",
+        "step_special_needs_disability",
+        "step_special_needs_disability_details",
+        "step_special_needs_nutrition",
+        "step_special_needs_nutrition_details"
+      ]
+    },
+    {
+      "id": "other_information",
+      "title": "Other Information",
+      "steps": [
+        "step_other_information"
+      ]
+    }*/
+  ],
+  "steps": {
+    "step_eligibility_nationality": {
+      "id": "step_eligibility_nationality",
+      "title": "Nationality & Residence Status",
+      "description": "Which of the following applies to you?",
+      "fields": [
+        "applicant_information.applicant_personal_details.citizenship",
+        "eligibility_check.is_eu_citizen_5y",
+        "eligibility_check.has_residence_permit"
+      ],
+      "effects": [
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "Anlage 2",
+          "condition": "applicant_information.applicant_personal_details.citizenship != 'deutsch'"
+        },
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "ID card or passport",
+          "condition": "applicant_information.applicant_personal_details.citizenship = 'deutsch'"
+        }
+      ],
+      "transitions": [
+        { "next_step": "step_eligibility_residence" }
+      ]
+    },
+    "step_eligibility_residence": {
+      "id": "step_eligibility_residence",
+      "title": "Place of Residence",
+      "description": "Do you currently live in Germany?",
+      "fields": [
+        "eligibility_check.lives_in_germany"
+      ],
+      "transitions": [
+        { "next_step": "step_eligibility_dob" }
+      ]
+    },
+    "step_eligibility_dob": {
+      "id": "step_eligibility_dob",
+      "title": "Date of Birth",
+      "description": "When were you born?",
+      "fields": [
+        "applicant_information.applicant_personal_details.date_of_birth"
+      ],
+      "transitions": [
+        { "next_step": "step_eligibility_pension" }
+      ]
+    },
+    "step_eligibility_pension": {
+      "id": "step_eligibility_pension",
+      "title": "Pension Status",
+      "description": "Do you receive a pension?",
+      "fields": [
+        "eligibility_check.receives_old_age_pension",
+        "eligibility_check.receives_reduced_earnings_pension"
+      ],
+      "transitions": [
+        { "next_step": "step_eligibility_income" }
+      ]
+    },
+    "step_eligibility_income": {
+      "id": "step_eligibility_income",
+      "title": "Income Assessment",
+      "description": "Which of the following applies to your current income?",
+      "fields": [
+        "eligibility_check.income_not_sufficient",
+        "eligibility_check.income_concerned_insufficient"
+      ],
+      "transitions": [
+        { "next_step": "step_eligibility_assets" }
+      ]
+    },
+    "step_eligibility_assets": {
+      "id": "step_eligibility_assets",
+      "title": "Asset Assessment",
+      "description": "Do you have assets (savings/property) worth more than 10,000 EUR?",
+      "fields": [
+        "eligibility_check.assets_over_10000"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_name" }
+      ]
+    },
+    "step_applicant_name": {
+      "id": "step_applicant_name",
+      "title": "Name",
+      "description": "Please enter your full name.",
+      "fields": [
+        "applicant_information.applicant_personal_details.name",
+        "applicant_information.applicant_personal_details.birth_name",
+        "applicant_information.applicant_personal_details.first_name"
+      ],
+      "effects": [
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "ID card or passport"
+        }
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_dob" }
+      ]
+    },
+    "step_applicant_dob": {
+      "id": "step_applicant_dob",
+      "title": "Date of Birth",
+      "description": "When were you born?",
+      "fields": [
+        "applicant_information.applicant_personal_details.date_of_birth"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_place_of_birth" }
+      ]
+    },
+    "step_applicant_place_of_birth": {
+      "id": "step_applicant_place_of_birth",
+      "title": "Place of Birth",
+      "description": "Where were you born?",
+      "fields": [
+        "applicant_information.applicant_personal_details.place_of_birth"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_gender" }
+      ]
+    },
+    "step_applicant_gender": {
+      "id": "step_applicant_gender",
+      "title": "Gender",
+      "description": "Which gender do you identify with?",
+      "fields": [
+        "applicant_information.applicant_gender"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_address" }
+      ]
+    },
+    "step_applicant_address": {
+      "id": "step_applicant_address",
+      "title": "Address",
+      "description": "What's your current address?",
+      "fields": [
+        "applicant_information.applicant_residence_address",
+        "applicant_infromation.applicant_last_resided_address"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_nationality" }
+      ]
+    },
+    "step_applicant_nationality": {
+      "id": "step_applicant_nationality",
+      "title": "Nationality & Residence Status",
+      "description": "Which of the following applies to you?",
+      "fields": [
+        "applicant_information.applicant_personal_details.citizenship",
+        "eligibility_check.is_eu_citizen_5y",
+        "eligibility_check.has_residence_permit"
+      ],
+      "effects": [
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "Anlage 2",
+          "condition": "applicant_information.applicant_personal_details.citizenship != 'deutsch'"
+        },
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "ID card or passport",
+          "condition": "applicant_information.applicant_personal_details.citizenship = 'deutsch'"
+        }
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_legal_support" }
+      ]
+    },
+    "step_applicant_legal_support": {
+      "id": "step_applicant_legal_support",
+      "title": "Legal Support & Guardianship",
+      "fields": [
+        "applicant_information.has_applicant_succor",
+        "applicant_information.has_applicant_guardian"
+      ],
+      "effects": [
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "Power of attorney (Vollmacht)",
+          "condition": "applicant_information.has_applicant_succor = true"
+        },
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "Guardianship / legal representative papers (Betreuung)",
+          "condition": "applicant_information.has_applicant_guardian = true"
+        }
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_displaced_status" }
+      ]
+    },
+    "step_applicant_displaced_status": {
+      "id": "step_applicant_displaced_status",
+      "title": "Displaced Status",
+      "description": "Do you have a displaced status (e.g. expellee, late resettler)?",
+      "fields": [
+        "applicant_information.applicant_displaced_status"
+      ],
+      "transitions": [
+        {
+          "condition": "applicant_information.applicant_displaced_status != 'none'",
+          "next_step": "step_applicant_displaced_details"
+        },
+        { "next_step": "step_applicant_insurance" }
+      ]
+    },
+    "step_applicant_displaced_details": {
+      "id": "step_applicant_displaced_details",
+      "title": "Displaced Status Details",
+      "fields": [
+        "applicant_information.applicant_displaced_issued_on",
+        "applicant_information.applicant_displaced_issued_by"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_insurance" }
+      ]
+    },
+    "step_applicant_insurance": {
+      "id": "step_applicant_insurance",
+      "title": "Insurance Details",
+      "fields": [
+        "applicant_information.applicant_insurance_details.social_security_status",
+        "applicant_information.applicant_insurance_details.health_insurance_status",
+        "applicant_information.applicant_insurance_details.health_insurance_provider",
+        "applicant_information.applicant_insurance_details.pension_insurance_provider",
+        "applicant_information.applicant_insurance_details.pension_insurance_number"
+      ],
+      "effects": [
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "Proof of health insurance membership"
+        }
+      ],
+      "transitions": [
+        { "next_step": "step_household_members_count" }
+      ]
+    },
+    "step_household_members_count": {
+      "id": "step_household_members_count",
+      "title": "Household Members Count",
+      "description": "How many people live in your household?",
+      "fields": [
+        "applicant_information.persons_in_household_count"
+      ],
+      "transitions": [
+        { "next_step": "step_marital_status" }
+      ]
+    },
+    "step_marital_status": {
+      "id": "step_marital_status",
+      "title": "Marital Status",
+      "description": "What is your current marital status?",
+      "fields": [
+        "applicant_information.marital_status"
+      ],
+      "transitions": [
+        {
+          "condition": "applicant_information.marital_status = 'married'",
+          "next_step": "step_marital_status_since"
+        },
+        { "next_step": "step_applicant_benefits_awaiting_decision" }
+      ]
+    },
+    "step_marital_status_since": {
+      "id": "step_marital_status_since",
+      "title": "Married Since",
+      "description": "Since when has this marital status been in effect?",
+      "fields": [
+        "applicant_information.married_since"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_benefits_awaiting_decision" }
+      ]
+    },
+    "step_applicant_benefits_awaiting_decision": {
+      "id": "step_applicant_benefits_awaiting_decision",
+      "title": "Pending Benefits",
+      "description": "Have you applied for any benefits for which a decision is still pending?",
+      "fields": [
+        "income_information.benefits_awaiting_decision_details_applicant.has_applied_for_benefits_awaiting_decision"
+      ],
+      "transitions": [
+        {
+          "condition": "income_information.benefits_awaiting_decision_details_applicant.has_applied_for_benefits_awaiting_decision = true",
+          "next_step": "step_applicant_benefits_awaiting_decision_details"
+        },
+        { "next_step": "step_previous_benefits" }
+      ]
+    },
+    "step_applicant_benefits_awaiting_decision_details": {
+      "id": "step_applicant_benefits_awaiting_decision_details",
+      "title": "Pending Benefits Details",
+      "fields": [
+        "income_information.benefits_awaiting_decision_details_applicant.benefits_awaiting_decision_type",
+        "income_information.benefits_awaiting_decision_details_applicant.benefits_awaiting_decision_application_date",
+        "income_information.benefits_awaiting_decision_details_applicant.benefits_awaiting_decision_office",
+        "income_information.benefits_awaiting_decision_details_applicant.benefits_awaiting_decision_reference"
+      ],
+      "transitions": [
+        { "next_step": "step_previous_benefits" }
+      ]
+    },
+    "step_previous_benefits": {
+      "id": "step_previous_benefits",
+      "title": "Have you received benefits before?",
+      "fields": [
+        "applicant_information.has_applicant_received_benefits_before"
+      ],
+      "transitions": [
+        {
+          "condition": "applicant_information.has_applicant_received_benefits_before = true",
+          "next_step": "step_previous_benefits_details"
+        },
+        { "next_step": "step_applicant_pension" }
+      ]
+    },
+    "step_previous_benefits_details": {
+      "id": "step_previous_benefits_details",
+      "title": "Previous Benefits Details",
+      "fields": [
+        "applicant_information.applicant_previous_benefits_end",
+        "applicant_information.applicant_previous_benefits_authority",
+        "applicant_information.applicant_previous_benefits_reference_number"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_pension" }
+      ]
+    },
+    "step_applicant_pension": {
+      "id": "step_applicant_pension",
+      "title": "Pension Status",
+      "description": "Do you receive a pension?",
+      "fields": [
+        "applicant_information.applicant_receives_old_age_pension",
+        "applicant_information.applicant_receives_reduced_earnings_pension"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_employment" }
+      ]
+    },
+    "step_applicant_employment": {
+      "id": "step_applicant_employment",
+      "title": "Are you currently employed?",
+      "fields": [
+        "applicant_earning_capacity.is_applicant_employed"
+      ],
+      "effects": [
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "Employment contract / proof of wages",
+          "condition": "applicant_earning_capacity.is_applicant_employed = true"
+        }
+      ],
+      "transitions": [
+        {
+          "condition": "applicant_earning_capacity.is_applicant_employed = true",
+          "next_step": "step_applicant_employment_details"
+        },
+        {
+          "condition": "applicant_earning_capacity.is_applicant_employed = false",
+          "next_step": "step_applicant_care_dependency"
+        }
+      ]
+    },
+    "step_applicant_employment_details": {
+      "id": "step_applicant_employment_details",
+      "title": "Employment Details",
+      "fields": [
+        "applicant_earning_capacity.applicant_occupation",
+        "applicant_earning_capacity.applicant_employer"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_income_work" }
+      ]
+    },
+    "step_applicant_care_dependency": {
+      "id": "step_applicant_care_dependency",
+      "title": "Care Dependency Status",
+      "fields": [
+        "applicant_earning_capacity.is_care_dependent"
+      ],
+      "effects": [
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "care_level_notice",
+          "condition": "applicant_earning_capacity.is_care_dependent = true"
+        }
+      ],
+      "transitions": [
+        {
+          "condition": "applicant_earning_capacity.is_care_dependent = true",
+          "next_step": "step_applicant_stationary_facility"
+        },
+        {
+          "condition": "applicant_earning_capacity.is_care_dependent = false",
+          "next_step": "step_applicant_reduced_earnings"
+        }
+      ]
+    },
+    "step_applicant_stationary_facility": {
+      "id": "step_applicant_stationary_facility",
+      "title": "Stationary Care Facility",
+      "fields": [
+        "applicant_earning_capacity.has_inpatient_facility_accommodation"
+      ],
+      "effects": [
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "care_home_contract",
+          "condition": "applicant_earning_capacity.has_inpatient_facility_accommodation = true"
+        },
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "care_facility_costs",
+          "condition": "applicant_earning_capacity.has_inpatient_facility_accommodation = true"
+        },
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "care_service_invoice",
+          "condition": "applicant_earning_capacity.has_inpatient_facility_accommodation = false"
+        }
+      ],
+      "transitions": [
+        {
+          "condition": "applicant_earning_capacity.has_inpatient_facility_accommodation = true",
+          "next_step": "step_applicant_stationary_facility_dates"
+        },
+        {
+          "condition": "applicant_earning_capacity.has_inpatient_facility_accommodation = false",
+          "next_step": "step_applicant_reduced_earnings"
+        }
+      ]
+    },
+    "step_applicant_stationary_facility_dates": {
+      "id": "step_applicant_stationary_facility_dates",
+      "title": "Stationary Care Facility Move In Date",
+      "fields": [
+        "applicant_earning_capacity.inpatient_facility_move_in_date",
+        "applicant_earning_capacity.inpatient_facility_last_residence"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_reduced_earnings" }
+      ]
+    },
+    "step_applicant_reduced_earnings": {
+      "id": "step_applicant_reduced_earnings",
+      "title": "Reduced Earning Capacity",
+      "fields": [
+        "applicant_earning_capacity.ability_to_work"
+      ],
+      "transitions": [
+        {
+          "condition": "applicant_earning_capacity.ability_to_work = 'Permanently disabled'",
+          "next_step": "step_applicant_reduced_earnings_permanent"
+        },
+        {
+          "condition": "applicant_earning_capacity.ability_to_work = 'Temporarily disabled'",
+          "next_step": "step_applicant_reduced_earnings_period"
+        },
+        {
+          "next_step": "step_applicant_income_benefits"
+        }
+      ]
+    },
+    "step_applicant_reduced_earnings_permanent": {
+      "id": "step_applicant_reduced_earnings_permanent",
+      "title": "Permanent Reduced Earning Capacity Details",
+      "fields": [
+        "applicant_earning_capacity.reduced_work_capacity_start_date",
+        "applicant_earning_capacity.reduced_work_capacity_reason",
+        "applicant_earning_capacity.merkzeichen",
+        "applicant_earning_capacity.disability_valid_until"
+      ],
+      "effects": [
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "pension_notice"
+        },
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "disability_id"
+        }
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_income_benefits" }
+      ]
+    },
+    "step_applicant_reduced_earnings_period": {
+      "id": "step_applicant_reduced_earnings_period",
+      "title": "Temporary Reduced Earning Capacity Details",
+      "fields": [
+        "applicant_earning_capacity.reduced_work_capacity_start_date",
+        "applicant_earning_capacity.reduced_work_capacity_end_date",
+        "applicant_earning_capacity.reduced_work_capacity_reason"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_income_benefits" }
+      ]
+    },
+    "step_applicant_income_work": {
+      "id": "step_applicant_income_work",
+      "title": "Income from Work",
+      "description": "Please enter your income from employment, self-employment, or business operations.",
+      "fields": [
+        "income_information.income_information_applicant.income_applicant_details.income_non_self_employed",
+        "income_information.income_information_applicant.income_applicant_details.income_commercial_operation",
+        "income_information.income_information_applicant.income_applicant_details.income_agriculture_and_forestry",
+        "income_information.income_information_applicant.income_applicant_details.income_other_self_employed"
+      ],
+      "effects": [
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "Income declaration form (Anlage Einkommen)"
+        },
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "Bank statements (last 3 months)"
+        }
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_income_benefits" }
+      ]
+    },
+    "step_applicant_income_benefits": {
+      "id": "step_applicant_income_benefits",
+      "title": "Income from Benefits & Pensions",
+      "fields": [
+        "income_information.income_information_applicant.income_applicant_details.income_health_insurance_benefits",
+        "income_information.income_information_applicant.income_applicant_details.income_pension",
+        "income_information.income_information_applicant.income_applicant_details.income_social_benefits",
+        "income_information.income_information_applicant.income_applicant_details.income_basic_welfare",
+        "income_information.income_information_applicant.income_applicant_details.income_asylum_benefits",
+        "income_information.income_information_applicant.income_applicant_details.income_from_employment_office",
+        "income_information.income_information_applicant.income_applicant_details.income_child_benefit",
+        "income_information.income_information_applicant.income_applicant_details.income_addition_to_child_benefit",
+        "income_information.income_information_applicant.income_applicant_details.income_child_raising_benefit",
+        "income_information.income_information_applicant.income_applicant_details.income_alimony",
+        "income_information.income_information_applicant.income_applicant_details.income_alimony_advance",
+        "income_information.income_information_applicant.income_applicant_details.income_federal_law_on_war_pensions",
+        "income_information.income_information_applicant.income_applicant_details.income_from_office_of_burden_sharing",
+        "income_information.income_information_applicant.income_applicant_details.income_non_cash_claims_private_law"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_income_other" }
+      ]
+    },
+    "step_applicant_income_other": {
+      "id": "step_applicant_income_other",
+      "title": "Other Income",
+      "fields": [
+        "income_information.income_information_applicant.income_applicant_details.income_rental_income",
+        "income_information.income_information_applicant.income_applicant_details.income_housing_allowance",
+        "income_information.income_information_applicant.income_applicant_details.income_educational_grant",
+        "income_information.income_information_applicant.income_applicant_details.income_other_grants",
+        "income_information.income_information_applicant.income_applicant_details.income_tax_return",
+        "income_information.income_information_applicant.income_applicant_details.income_capital_gains",
+        "income_information.income_information_applicant.income_applicant_details.income_other_income"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_expected_payments" }
+      ]
+    },
+    "step_applicant_expected_payments": {
+      "id": "step_applicant_expected_payments",
+      "title": "Expected One-Time Payments",
+      "description": "Are you expecting any significant one-time payments?",
+      "fields": [
+        "income_information['one-time_payments_expected_details_applicant']['are_one-time_payments_expected']"
+      ],
+      "transitions": [
+        {
+          "condition": "income_information['one-time_payments_expected_details_applicant']['are_one-time_payments_expected'] = true",
+          "next_step": "step_applicant_expected_payments_details"
+        },
+        { "next_step": "step_applicant_bank_details" }
+      ]
+    },
+    "step_applicant_expected_payments_details": {
+      "id": "step_applicant_expected_payments_details",
+      "title": "Expected Payment Details",
+      "fields": [
+        "income_information['one-time_payments_expected_details_applicant']['one-time_payments_expected_type']",
+        "income_information['one-time_payments_expected_details_applicant']['one-time_payments_expected_amount']",
+        "income_information['one-time_payments_expected_details_applicant']['one-time_payments_expected_date']"
+      ],
+      "transitions": [
+        { "next_step": "step_applicant_bank_details" }
+      ]
+    },
+    "step_applicant_bank_details": {
+      "id": "step_applicant_bank_details",
+      "title": "Bank Details",
+      "fields": [
+        "applicant_information.applicant_bank_details.bank_name",
+        "applicant_information.applicant_bank_details.bank_account_number",
+        "applicant_information.applicant_bank_details.bank_account_holder"
+      ],
+      "effects": [
+        {
+          "type": "REQUIRE_DOCUMENT",
+          "target": "Bank statements (last 3 months)"
+        }
+      ],
+      "transitions": [
+        { "next_step": "END" }
+      ]
+    }
+  }
+}

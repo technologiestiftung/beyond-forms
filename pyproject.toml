@@ -1,0 +1,63 @@
+[tool.uv.workspace]
+members = [
+    "forms/scripts/llm-eval",
+    "libs/auth",
+    "libs/document-schemas",
+    "services/auth-service",
+    "services/document-intelligence-service",
+    "services/forms-filling-service",
+    "services/orchestration-middleware-service",
+    "services/rules-engine",
+    "tools/schema_utils",
+]
+
+[workspace.dependencies]
+# Core dependencies
+fastapi = "==0.136.3"
+pydantic = "==2.12.5"
+uvicorn = ">=0.44.0"
+python-dotenv = ">=1.0.1"
+python-multipart = ">=0.0.30"
+pyjwt = ">=2.13.0"
+pyopenssl = ">=26.3.0"
+requests = ">=2.34.2"
+httpx = ">=0.28.1"
+asyncpg = ">=0.31.0"
+numpy = "==2.3.2"
+json5 = ">=0.15.0"
+jsonschema = ">=4.26.0"
+jinja2 = ">=3.1.5"
+
+# LLM & AI
+litellm = ">=1.90.0"
+instructor = ">=1.0.0"
+google-genai = ">=0.1.0"
+google-auth = ">=2.55.1"
+google-cloud-aiplatform = ">=1.158.0"
+google-cloud-storage = ">=3.12.0"
+google-cloud-pubsub = ">=2.39.0"
+
+# Service specific
+pydantic-settings = "==2.12.0"
+authentik-client = ">=2026.5.3"
+tenacity = "==9.1.4"
+pdfrw = ">=0.4"
+reportlab = ">=5.0.0"
+psycopg2-binary = ">=2.9.11"
+sqlalchemy = ">=2.0.51"
+sqlacodegen = ">=4.0.4"
+firebase-admin = ">=6.6.0"
+pyjexl = ">=0.3.0"
+aiofiles = ">=25.1.0"
+loguru = ">=0.7.3"
+Pillow = ">=10.3.0"
+pillow-heif = ">=0.16.0"
+
+# Dev dependencies
+pytest = ">=9.1.1"
+pytest-asyncio = ">=1.4.0"
+ruff = ">=0.15.20"
+mypy = ">=1.19.1"
+mock = ">=5.2.0"
+pre-commit = ">=3.6.0"
+locust = ">=2.44.4"

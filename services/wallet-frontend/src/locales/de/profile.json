@@ -1,0 +1,705 @@
+{
+	"header": {
+		"new": {
+			"title": "Profil ergänzen",
+			"desc": "Mit einem vollständigen Profil können wir Dich besser durch den Prozess führen.",
+			"item1": "Persönliche Angaben ergänzen",
+			"item2": "Passendere Unterstützung erhalten",
+			"item3": "Später schneller weitermachen",
+			"cta": "Jetzt ergänzen"
+		},
+		"returning": {
+			"progress": "Profil zu {{count}} % vollständig",
+			"hint": "Mit einem vollständigen Profil kann Klaro Dir passendere Dienste zeigen."
+		}
+	},
+	"income": {
+		"question": "Welche Art von Geld erhältst Du monatlich?",
+		"multiple_choice": "(Mehrfachauswahl möglich)",
+		"why": {
+			"desc": "Wir klären, welche Einnahmen Du hast und welche Belege das Sozialamt dafür benötigt. Das hilft uns zu prüfen, wie viel Unterstützung Dir zusteht."
+		},
+		"options": {
+			"pension_title": "Gesetzliche Rente",
+			"pension_hinweis": "Suche Deinen Rentenbescheid.",
+			"survivor_pension_title": "Hinterbliebenenrente",
+			"survivor_pension_hinweis": "Dies ist ein separates Schreiben von Deiner eigenen Rente. Oft steht oben „Hinterbliebenenrente“ oder „Witwen- oder Witwerrente“.",
+			"minor_employment_title": "Einkommen aus einer kleinen Beschäftigung",
+			"minor_employment_hinweis": "Bitte halte Deine letzten drei Lohnabrechnungen bereit.",
+			"other_benefits_title": "Sonstige Leistungen wie Wohngeld oder Unterhalt",
+			"other_benefits_hinweis": "Suche den Bewilligungsbescheid.",
+			"none_title": "Ich habe kein monatliches Einkommen.",
+			"none_hinweis": "Bitte bestätige, falls Du keinerlei laufende Einnahmen hast."
+		}
+	},
+	"savings": {
+		"why": {
+			"desc": "Wir prüfen, ob Deine Ersparnisse unter dem Freibetrag liegen. Für das Sozialamt ist wichtig, dass Du Dein Erspartes behalten darfst, solange es bestimmte Grenzen nicht überschreitet."
+		},
+		"saving_01": {
+			"title": "Besitzt Du Ersparnisse, Immobilien oder Wertgegenstände?",
+			"option_yes_title": "Ja",
+			"option_yes_hinweis": "Wir erfassen im nächsten Schritt, welche Vermögenswerte vorliegen.",
+			"option_no_title": "Nein",
+			"option_no_hinweis": "Vielen Dank. Wenn Du keinerlei nennenswerte Ersparnisse hast, hilft dies, Deinen Anspruch schneller zu bestätigen."
+		},
+		"saving_02": {
+			"title": "Welche Art von Vermögen besitzt Du?",
+			"option_savings_title": "Guthaben/Sparbuch",
+			"option_savings_hinweis": "Wir benötigen Deine Kontoauszüge der letzten 3 Monate.",
+			"option_car_title": "Kraftfahrzeug",
+			"option_car_hinweis": "Bitte gib Marke und Baujahr an.",
+			"option_life_insurance_title": "Lebensversicherung",
+			"option_life_insurance_hinweis": "Wir benötigen den Nachweis über den aktuellen Rückkaufswert."
+		}
+	},
+	"health": {
+		"why": {
+			"desc": "Für die erste Einschätzung ist wichtig, ob Du aus gesundheitlichen Gründen auf Dauer weniger als 3 Stunden am Tag arbeiten kannst. Dann kann eher Grundsicherung über das Sozialamt infrage kommen."
+		},
+		"health_01": {
+			"title": "Besitzt Du einen offiziellen Behindertenausweis?",
+			"option_yes_title": "Ja",
+			"option_yes_hinweis": "Bitte prüfe, ob die Buchstaben „G“ oder „aG“ (Merkzeichen) enthalten sind. Dies kann auf zusätzliche Kosten hinweisen.",
+			"option_no_title": "Nein"
+		},
+		"health_02": {
+			"title": "Benötigst Du aufgrund einer Erkrankung eine spezielle, teure Diät?",
+			"option_yes_title": "Ja",
+			"option_yes_hinweis": "Du benötigst ein spezielles Formular (Kostenaufschlag).",
+			"option_no_title": "Nein"
+		},
+		"actions": {
+			"go_to_page_2": "Gehe zu Frage 2 von 2"
+		},
+		"care_dependency": {
+			"title": "Bist Du pflegebedürftig?"
+		},
+		"inpatient_details": {
+			"move_in_date": "Einzugsdatum"
+		},
+		"earning_temp": {
+			"start_date": "Beginn",
+			"end_date": "Voraussichtliches Ende"
+		},
+		"earning_perm": {
+			"start_date": "Beginn"
+		},
+		"disability": {
+			"title": "Angaben zum Behindertenausweis",
+			"valid_until": "Gültig bis"
+		},
+		"marks": {
+			"G": "G (Erhebliche Gehbehinderung)",
+			"aG": "aG (Außergewöhnliche Gehbehinderung)",
+			"H": "H (Hilflosigkeit)",
+			"B": "B (Begleitung)",
+			"Bl": "Bl (Blindheit)",
+			"Gl": "Gl (Gehörlosigkeit)",
+			"TBl": "TBl (Taubblindheit)",
+			"RF": "RF (Rundfunkbeitragsbefreiung)",
+			"1 Kl": "1. Klasse Bahn",
+			"EB": "EB (Entschädigungsberechtigt)",
+			"VB": "VB (Versorgungsberechtigt)",
+			"T": "T (Teilnahmeberechtigt)"
+		}
+	},
+	"welcome": "Hallo {{name}}!",
+	"actions": {
+		"logout": "Bei Klaro ausloggen",
+		"delete_account": "Mein Klaro Konto löschen"
+	},
+	"sections": {
+		"personal": {
+			"title": "Persönliche Daten",
+			"desc": "Name, Geburtsdatum und weitere persönliche Angaben"
+		},
+		"address": {
+			"title": "Adresse",
+			"desc": "Straße, Hausnummer, Postleitzahl und Wohnort"
+		},
+		"bank": {
+			"title": "Bankverbindung",
+			"desc": "Kontodaten für Auszahlungen und Leistungen"
+		},
+		"documents": {
+			"title": "Meine Dokumente",
+			"desc": "Dokumente für Anträge und andere Services"
+		},
+		"settings": {
+			"title": "Einstellungen",
+			"desc": "Sprache, Benachrichtigungen und persönliche Ansprache"
+		}
+	},
+	"status": {
+		"complete": "Vollständig",
+		"partial": "Teilweise vollständig",
+		"missing": "Fehlt noch"
+	},
+	"personal": {
+		"title": "Persönliche Daten",
+		"edit_title": "Persönliche Angaben bearbeiten",
+		"view_desc": "Hier kannst Du Deine persönlichen Daten einsehen und bearbeiten.",
+		"groups": {
+			"identity": "Rechtliche Identität",
+			"status": "Staatsangehörigkeit und Status",
+			"address": "Meldeadresse"
+		},
+		"choice": {
+			"title": "Wie möchtest Du Deine Angaben hinzufügen?",
+			"description": "Du kannst Deine Angaben selbst eingeben oder ein Dokument hochladen.",
+			"manual": {
+				"title": "Selbst eingeben",
+				"desc": "Fülle die Angaben in einem einfachen Formular aus."
+			},
+			"upload": {
+				"title": "Dokument hochladen",
+				"desc": "Lade ein Foto oder PDF Deines Dokuments hoch.",
+				"button": "Tippen oder Datei hierher ziehen"
+			},
+			"camera": {
+				"title": "Mit Kamera scannen",
+				"desc": "Lade ein Foto Deines Dokuments hoch.",
+				"button": "Kamera öffnen"
+			}
+		},
+		"fields": {
+			"firstName": "Vorname",
+			"firstName_placeholder": "z. B. Max",
+			"lastName": "Nachname",
+			"lastName_placeholder": "z. B. Mustermann",
+			"birthName": "ggf. Geburtsname / frühere Namen",
+			"dateOfBirth": "Geburtsdatum",
+			"placeOfBirth": "Geburtsort",
+			"placeOfBirth_placeholder": "z. B. Berlin",
+			"legalGender": "Geschlecht (laut Personalausweis)",
+			"nationality": "Staatsangehörigkeit",
+			"secondNationality": "Zweite Staatsangehörigkeit",
+			"residenceStatus": "ggf. Aufenthaltsstatus / Aufenthaltstitel",
+			"maritalStatus": "Familienstand",
+			"identificationNumbers": "Identifikationsnummern",
+			"taxId": "Steuer-ID",
+			"street": "Straße",
+			"houseNumber": "Hausnummer",
+			"city": "Stadt",
+			"state": "Bundesland",
+			"zipCode": "Postleitzahl"
+		},
+		"step_title": {
+			"1": "Persönliche Angaben",
+			"2": "Weitere Angaben",
+			"3": "Adresse"
+		},
+		"step_page": "{{current}} von {{total}} Fragen",
+		"gender": {
+			"Male": "männlich",
+			"Female": "weiblich",
+			"Diverse": "divers / weitere",
+			"hint": "Dieses Feld entspricht dem Eintrag in Deinem Personalausweis oder Deiner Geburtsurkunde, da dieser für den offiziellen Antrag benötigt wird."
+		},
+		"maritalStatus": {
+			"Single": "ledig",
+			"Married": "verheiratet",
+			"Divorced": "geschieden",
+			"Widowed": "verwitwet",
+			"Registered Civil Partnership": "eingetragene Lebenspartnerschaft"
+		},
+		"actions": {
+			"save": "Änderungen speichern",
+			"saving": "Wird gespeichert...",
+			"saved": "Gespeichert",
+			"cancel": "Abbrechen",
+			"edit": "Persönliche Daten bearbeiten",
+			"back_to_profile": "Zurück zum Profil"
+		},
+		"upload": {
+			"drag_drop": "Klicken oder Datei hierher ziehen",
+			"formats": "PDF, JPG oder PNG (max. 10MB)",
+			"start_upload": "Dokument hochladen",
+			"start_camera": "Kamera öffnen",
+			"uploading": "Wird hochgeladen...",
+			"processing": "Wird verarbeitet...",
+			"processing_desc": "Dies dauert normalerweise nur wenige Sekunden.",
+			"success_title": "Dokument hochgeladen!",
+			"success_desc": "Wir verarbeiten Dein Dokument jetzt. Du wirst gleich weitergeleitet.",
+			"background_processing_title": "Hintergrundverarbeitung",
+			"background_processing_desc": "Dein Dokument wird im Hintergrund analysiert. Du kannst mit anderen Kategorien fortfahren.",
+			"page": "Seite",
+			"add_page": "Weitere Seite",
+			"confirm": "Dokument verarbeiten",
+			"confirm_camera": "Foto verwenden & verarbeiten"
+		},
+		"countries": {
+			"DE": "Deutschland",
+			"FR": "Frankreich",
+			"AT": "Österreich",
+			"CH": "Schweiz",
+			"PL": "Polen",
+			"CZ": "Tschechien",
+			"NL": "Niederlande",
+			"GB": "Vereinigtes Königreich",
+			"UA": "Ukraine",
+			"TR": "Türkei",
+			"US": "Vereinigte Staaten",
+			"CA": "Kanada"
+		},
+		"errors": {
+			"update_failed": "Aktualisierung fehlgeschlagen",
+			"system_error": "Ein Systemfehler ist aufgetreten"
+		}
+	},
+	"address_placeholder": {
+		"title": "Adressdaten",
+		"desc": "Wir bereiten diesen Bereich vor, um Deine Wohnsitzinformationen sicher zu speichern. Dies hilft uns später, Deinen Grundsicherungsantrag automatisch auszufüllen.",
+		"return": "Zurück zum Profil"
+	},
+	"bank_placeholder": {
+		"title": "Bankverbindung",
+		"desc": "In diesem Bereich werden Deine Kontodaten für künftige Sozialleistungszahlungen sicher hinterlegt. Wir arbeiten daran, dass diese Informationen nach höchsten Sicherheitsstandards geschützt sind.",
+		"return": "Zurück zum Profil"
+	},
+	"common": {
+		"back": "Zurück",
+		"back_to_overview": "Zurück zur Übersicht",
+		"close": "Schließen",
+		"cancel": "Abbrechen",
+		"edit": "Bearbeiten",
+		"save": "Speichern",
+		"saving": "Speichere...",
+		"delete": "Löschen",
+		"yes": "Ja",
+		"no": "Nein",
+		"error_title": "Fehler",
+		"error_desc": "Fehler beim Laden der Dokumente.",
+		"retry": "Erneut versuchen",
+		"loading": "Lade...",
+		"please_select": "Bitte auswählen",
+		"save_close": "Speichern und schließen",
+		"continue": "Weiter",
+		"done": "Geschafft!",
+		"save_and_continue": "Speichern und weiter",
+		"remove_file": "Entfernen",
+		"download": "Herunterladen",
+		"edit_field": "{{field}} bearbeiten"
+	},
+	"success": {
+		"headline": "Daten übernommen",
+		"summary_title": "Was wurde gespeichert?",
+		"milestone": {
+			"imported": "Daten übernommen",
+			"saved": "Dokument gespeichert",
+			"updated": "Antrag aktualisiert"
+		},
+		"back_action": "Weiter"
+	},
+	"review": {
+		"title": "Daten prüfen",
+		"subtitle": "Prüfe die ausgelesenen Daten und bestätige sie.",
+		"detected_type": "Es wurde ein Dokument erkannt",
+		"detected_data": "Es wurden folgende Daten erkannt",
+		"delete_document": "Dokument löschen",
+		"confirm_all": "Bestätigen",
+		"delete_title": "Dokument löschen?",
+		"delete_confirm": "Möchtest Du dieses Dokument wirklich löschen?",
+		"doc_type_other": "Sonstiges",
+		"no_data": "Aus diesem Dokument wurden keine Daten ausgelesen.",
+		"errors": {
+			"empty_field": "Das bestätigte Feld „{{field}}“ darf nicht leer sein.",
+			"verification_failed": "Fehler beim Bestätigen der Daten.",
+			"system_error": "Ein unerwarteter Systemfehler ist aufgetreten."
+		},
+		"warning_title": "Überprüfung empfohlen",
+		"warnings": {
+			"PAGINATION_MISSING_PAGES": "Es sieht so aus, als ob einige Seiten dieses Dokuments fehlen könnten. Bitte überprüfe, ob alles vollständig ist.",
+			"LEGIBILITY_ISSUES": "Das Dokument ist an einigen Stellen schwer lesbar (z. B. durch Unschärfe oder Spiegelung). Bitte kontrolliere die Daten genau.",
+			"DATA_CONFLICTS": "Einige ausgelesene Daten stimmen nicht mit Deinen bisherigen Angaben überein. Bitte bestätige die korrekten Details.",
+			"OLD_STATEMENT_WARNING": "Dieser Nachweis scheint älter als 3 Monate zu sein. Du kannst fortfahren, aber die Sachbearbeiter bitten eventuell um eine Aktualisierung.",
+			"default": "Bitte überprüfe die ausgelesenen Daten sorgfältig."
+		},
+		"fields": {
+			"description": "Beschreibung",
+			"given_names": "Vorname(n)",
+			"first_name": "Vorname",
+			"family_name": "Nachname",
+			"last_name": "Nachname",
+			"birth_date": "Geburtsdatum",
+			"birth_place": "Geburtsort",
+			"city_of_birth": "Geburtsort",
+			"sex": "Geschlecht",
+			"gender": "Geschlecht",
+			"legal_gender": "Geschlecht",
+			"street": "Straße",
+			"house_number": "Hausnummer",
+			"city": "Stadt",
+			"state": "Bundesland",
+			"street_name": "Straße",
+			"zip_code": "Postleitzahl",
+			"postal_code": "Postleitzahl",
+			"monthly_total_rent": "Monatliche Warmmietkosten (gesamt)",
+			"monthly_rent": "Monatliche Warmmietkosten",
+			"rent_total": "Monatliche Warmmietkosten (gesamt)",
+			"monthly_heating_costs": "Monatliche Heizkosten",
+			"heating_costs": "Monatliche Heizkosten",
+			"square_meters": "Wohnfläche (m²)",
+			"living_area": "Wohnfläche (m²)",
+			"rooms": "Anzahl Zimmer",
+			"number_of_rooms": "Anzahl Zimmer",
+			"income": "Einkommen",
+			"earnings": "Einkommen",
+			"monthly_income": "Monatliches Nettoeinkommen",
+			"document_id": "Dokumenten-ID",
+			"card_number": "Ausweisnummer",
+			"identification_numbers": "Identifikationsnummern",
+			"social_security_number": "Sozialversicherungs-Nr.",
+			"social_security_no": "Sozialversicherungs-Nr.",
+			"pension_insurance_number": "Rentenversicherungs-Nr.",
+			"has_self_employment_income": "Einkünfte aus Selbstständigkeit",
+			"total_monthly_net": "Monatliches Nettoeinkommen",
+			"total_liquid_assets": "Verfügbares Vermögen",
+			"owns_real_estate": "Besitzt Immobilien",
+			"base_rent": "Monatliche Kaltmietkosten",
+			"heating_type": "Heizungsart",
+			"iban": "IBAN",
+			"account_holder": "Kontoinhaber:in",
+			"account_holder_name": "Kontoinhaber:in",
+			"member_count": "Anzahl Haushaltsmitglieder:innen",
+			"has_partner_in_household": "Partner:in im Haushalt",
+			"valid_until": "Gültig bis",
+			"date_of_issue": "Ausstellungsdatum",
+			"place_of_issue": "Ausstellungsort",
+			"nationality": "Staatsangehörigkeit",
+			"second_nationality": "Zweite Staatsangehörigkeit",
+			"place_of_birth": "Geburtsort",
+			"country_of_birth": "Geburtsland",
+			"residence_status": "Aufenthaltsstatus",
+			"hot_water_costs": "Warmwasserkosten",
+			"date_of_birth": "Geburtsdatum",
+			"address": "Adresse",
+			"issuing_authority": "Ausstellende Behörde",
+			"marital_status": "Familienstand",
+			"is_living_with_spouse": "Lebt mit Ehepartner",
+			"is_living_with_children": "Lebt mit Kindern",
+			"is_living_with_parent": "Lebt mit Eltern",
+			"owner_name": "Name Vermieter:in",
+			"owner_address": "Adresse Vermieter:in",
+			"is_moving_in": "Zieht ein",
+			"date_of_moving": "Einzugsdatum",
+			"tenant_name": "Name Mieter:in",
+			"tenant_address": "Adresse Mieter:in",
+			"confirmation_date": "Bestätigungsdatum",
+			"remarks": "Anmerkungen",
+			"employment_permitted": "Erwerbstätigkeit gestattet",
+			"permit_type": "Aufenthaltstitel",
+			"file_number": "Aktenzeichen",
+			"status_granted": "Verliehener Status",
+			"limited_to_state": "Beschränkt auf Bundesland",
+			"statement_period_start": "Zeitraum Von",
+			"statement_period_end": "Zeitraum Bis",
+			"statement_date": "Auszugsdatum",
+			"account_balance": "Kontostand (Betrag in Euro)",
+			"amount_health_insurance": "Krankenversicherung (Betrag in Euro)",
+			"amount_liability_insurance": "Haftpflichtversicherung (Betrag in Euro)",
+			"amount_rent": "Miete (Betrag in Euro)",
+			"amount_pension": "Rente (Betrag in Euro)",
+			"employee_name": "Name Arbeitnehmer:in",
+			"employee_address": "Adresse Arbeitnehmer:in",
+			"tax_id": "Steuer-ID",
+			"health_insurance_provider": "Krankenkasse",
+			"employer_name": "Name Arbeitgeber:in",
+			"employer_address": "Adresse Arbeitgeber",
+			"gross_amount": "Bruttobetrag (Betrag in Euro)",
+			"net_amount": "Nettobetrag (Betrag in Euro)",
+			"pay_period": "Abrechnungszeitraum",
+			"date_issued": "Ausstellungsdatum",
+			"accumulated_yearly_gross_income": "Bruttojahreseinkommen",
+			"accumulated_yearly_net_income": "Nettojahreseinkommen",
+			"benefit_type": "Leistungsart",
+			"reference_number": "Aktenzeichen",
+			"bg_number": "Bedarfsgemeinschafts-Nummer",
+			"date_of_application": "Antragsdatum",
+			"is_granted": "Bewilligt",
+			"recipient_name": "Empfänger",
+			"monthly_payment": "Monatliche Zahlung",
+			"payment_reason": "Grund der Zahlung",
+			"amount": "Betrag",
+			"pension_reason": "Rentenart",
+			"case_number": "Aktenzeichen",
+			"start_date_of_pension": "Rentenbeginn",
+			"end_date_of_pension": "Rentenende",
+			"monthly_amount": "Monatlicher Betrag",
+			"back_pay_amount": "Nachzahlung",
+			"name_of_pensioner": "Name Rentner",
+			"provider_name": "Name Versicherung",
+			"insurance_policy_number": "Versicherungsnummer",
+			"monthly_payout_amount": "Monatliche Auszahlung",
+			"current_monthly_pension_amount": "Aktueller monatlicher Rentenbetrag",
+			"current_one_time_payout_amount": "Aktueller Einmalzahlungsbetrag",
+			"estimated_start_of_pension": "Voraussichtlicher Rentenbeginn",
+			"start_of_pension_monthly_pension_amount": "Monatlicher Rentenbetrag bei Rentenbeginn",
+			"year": "Jahr",
+			"is_permanent": "Dauerhaft",
+			"decision_date": "Entscheidungsdatum",
+			"current_balance": "Aktueller Kontostand",
+			"bank_name": "Bankname",
+			"portfolio_value": "Depotwert",
+			"surrender_value": "Rückkaufswert",
+			"contract_end_date": "Vertragsende",
+			"property_address": "Immobilienadresse",
+			"property_type": "Immobilienart",
+			"outstanding_mortgage": "Restschuld",
+			"net_cold_rent": "Netto-Kaltmiete",
+			"operating_costs": "Nebenkosten",
+			"start_date_of_rent": "Mietbeginn",
+			"end_date_of_rent": "Mietende",
+			"new_total_rent": "Neue Warmmiete",
+			"effective_date": "Gültig ab",
+			"billing_period": "Abrechnungszeitraum",
+			"balance_due": "Saldo / Nachzahlung",
+			"fuel_type": "Energieträger",
+			"annual_total_heating_costs": "Jährliche Heizkosten",
+			"annual_consumption_amount_kwh_per_square_meter": "Jährlicher Verbrauch (kWh/m²)",
+			"heating_costs_regardless_of_usage": "Grundkosten Heizung",
+			"heating_costs_usage_based": "Verbrauchskosten Heizung",
+			"warm_water_costs_regardless_of_usage": "Grundkosten Warmwasser",
+			"warm_water_costs_usage_based": "Verbrauchskosten Warmwasser",
+			"insurance_name": "Name der Versicherung",
+			"health_insurance_status": "Versicherungsart",
+			"compulsory_insurance": "Pflichtversicherung",
+			"voluntary_insurance": "Freiwillige Versicherung",
+			"family_insurance": "Familienversicherung",
+			"private_insurance": "Private Versicherung",
+			"care_by_health_insurance_under_264_sgb_v": "Betreuung der Krankenkassen nach § 264 SGB V",
+			"is_private": "Privat versichert",
+			"full_name": "Vollständiger Name",
+			"care_level": "Pflegegrad",
+			"effective_from": "Gültig ab",
+			"invoice_amount": "Rechnungsbetrag",
+			"service_period": "Leistungszeitraum",
+			"monthly_base_cost": "Monatliche Grundkosten",
+			"facility_name": "Name der Pflegeeinrichtung",
+			"agreement_date": "Datum der Unterzeichnung",
+			"alimony_obligations_exist": "Unterhaltspflicht besteht",
+			"application_date": "Antragsdatum",
+			"assignment_date": "Zuweisungsdatum",
+			"authority_areas": "Betreuungsbereiche",
+			"catering_costs": "Verpflegungskosten",
+			"diagnosis_summary": "Diagnosezusammenfassung",
+			"disability_degree": "Grad der Behinderung (GdB)",
+			"district_authority": "Zuständiges Amt",
+			"divorce_date": "Scheidungsdatum",
+			"expected_due_date": "Voraussichtlicher Entbindungstermin",
+			"facility_address": "Adresse der Unterkunft",
+			"guardian_name": "Name des/der Betreuers/Betreuerin",
+			"has_sub_tenants": "Untermieter:in vorhanden",
+			"investment_costs": "Investitionskosten",
+			"is_life_long": "Lebenslang erforderlich",
+			"is_main_tenant": "Hauptmieter:in",
+			"is_signed": "Unterschrieben",
+			"landlord_address": "Adresse Wohnungsgeber:in",
+			"landlord_name": "Name Wohnungsgeber:in",
+			"marks": "Merkzeichen",
+			"marriage_date": "Heiratsdatum",
+			"maternity_pass_number": "Mutterpass-Nr.",
+			"monthly_interest": "Monatliche Zinsen",
+			"monthly_operating_costs": "Monatliche Betriebskosten",
+			"partner_name": "Name Partner:in",
+			"payment_periods": "Zahlungszeiträume",
+			"period_from": "Zeitraum von",
+			"period_to": "Zeitraum bis",
+			"reason_for_diet": "Grund Kostform",
+			"report_date": "Berichtsdatum",
+			"representative_name": "Name Bevollmächtigte:r",
+			"scope_of_authority": "Umfang der Vollmacht"
+		}
+	},
+	"errors": {
+		"save_title": "Fehler beim Speichern",
+		"save_failed": "Speichern fehlgeschlagen",
+		"firstName_required": "Vorname ist erforderlich",
+		"lastName_required": "Nachname ist erforderlich",
+		"placeOfBirth_required": "Geburtsort ist erforderlich",
+		"upload_failed": "Upload fehlgeschlagen",
+		"system_error": "Ein Systemfehler ist aufgetreten"
+	},
+	"logout": "Abmelden",
+	"settings": {
+		"title": "Einstellungen",
+		"modals": {
+			"delete": {
+				"title": "Konto unwiderruflich löschen?",
+				"desc": "Bist Du sicher, dass Du Dein Konto löschen möchtest? Alle Deine persönlichen Daten und Dokumente werden sofort und unwiderruflich vom Gerät entfernt.",
+				"confirm": "Konto löschen",
+				"cancel": "Abbrechen"
+			}
+		}
+	},
+	"housing": {
+		"question": "Wie ist Deine Wohnsituation?",
+		"why": {
+			"desc": "Das Sozialamt benötigt diese Angaben, um zu prüfen, welche Kosten für Unterkunft und Heizung (die Warmmiete) in angemessener Höhe übernommen werden können. Dies beeinflusst direkt die Höhe Deines gesamten Anspruchs auf Grundsicherung."
+		},
+		"questions": {
+			"address_title": "Wie lautet Deine aktuelle Wohnadresse?",
+			"last_fixed_address_title": "Wo hast Du zuletzt fest gewohnt?",
+			"accomodation_type_title": "Wie wohnst Du zurzeit?",
+			"tenancy_status_title": "Bist Du Haupt- oder Untermieter?",
+			"sublet_title": "Vermietest Du Zimmer unter?",
+			"arrears_title": "Hast Du Mietschulden?",
+			"arrears_details_legal": "Hat der Vermieter bereits rechtliche Schritte eingeleitet (z.B. Räumungsklage)?",
+			"costs_title": "Wie hoch sind Deine monatlichen Wohnkosten?",
+			"size_title": "Wie groß ist Deine Wohnung/Haus?",
+			"heating_type_title": "Wie wird Deine Wohnung beheizt?"
+		},
+		"labels": {
+			"street": "Straße",
+			"houseNumber": "Hausnummer",
+			"zipCode": "Postleitzahl",
+			"city": "Stadt",
+			"no_fixed_address": "Ich habe aktuell keine feste Adresse",
+			"last_fixed_address": "Letzter fester Wohnort",
+			"free_housing_right_holder": "Freies Wohnrecht bei (Name der Person)",
+			"landlord_name": "Name des Vermieters",
+			"arrears_amount": "Wie hoch sind Deine Mietschulden? (in Euro)",
+			"rent_paid_until": "Miete gezahlt bis (Datum)",
+			"rent_total": "Gesamtmiete (Warmmiete in Euro)",
+			"heating_costs": "Heizkosten (monatlich in Euro)",
+			"hot_water_costs": "Warmwasserkosten (€)",
+			"cable_tv_costs": "Kabelfernsehen (€)",
+			"living_area": "Wohnfläche (in qm)",
+			"number_of_rooms": "Anzahl der Zimmer",
+			"sublet_room_count": "Wie viele Zimmer vermietest Du unter?",
+			"sublet_rent_income": "Miete (Warm) in EUR"
+		},
+		"options": {
+			"rental_title": "Ich miete meine Wohnung.",
+			"rental_hinweis": "Bitte halte Deinen Mietvertrag und Deine letzte Heizkostenabrechnung bereit.",
+			"own_title": "Ich besitze mein Haus oder meine Wohnung.",
+			"own_hinweis": "Bitte halte Deinen Grundsteuerbescheid und Deine Hypothekendaten bereit.",
+			"care_title": "Ich wohne in einer Pflegeeinrichtung oder betreuten Wohnanlage.",
+			"care_hinweis": "Bitte halte Deinen Wohnvertrag und Deine Kostenaufstellung bereit.",
+			"commercial_title": "Ich wohne in einer gewerblichen Unterkunft (Hostel, Unterkunft für Flüchtlinge oder Menschen ohne Obdach).",
+			"commercial_hinweis": "Wenn Du keine feste Wohnung hast oder in einer Unterkunft lebst, ist oft die Fachstelle Soziale Wohnhilfe zuständig. Dort findest Du Hilfe bei drohender oder bereits eingetretener Wohnungslosigkeit.",
+			"accomodation_rental": "Ich lebe in einer Mietwohnung",
+			"accomodation_own": "Ich lebe in meinem Eigenheim / Eigentumswohnung",
+			"accomodation_care": "Ich wohne in einer Pflegeeinrichtung",
+			"accomodation_relative": "Ich lebe bei Verwandten / Bekannten (ohne eigenen Mietvertrag)",
+			"accomodation_other": "Ich lebe in einer sonstigen Unterkunft (z.B. Obdachlosenunterkunft)",
+			"tenancy_main": "Hauptmieter",
+			"tenancy_sub": "Untermieter",
+			"tenancy_free": "Ich habe freies Wohnrecht",
+			"sublet_none": "Nein, keine Untervermietung",
+			"sublet_one": "Ja, ich vermiete 1 Zimmer unter",
+			"sublet_multiple": "Ja, ich vermiete 2 oder mehr Zimmer unter",
+			"arrears_none": "Nein, keine Mietschulden",
+			"arrears_yes": "Ja, ich habe Mietschulden",
+			"heating_sammelheizung": "Sammelheizung",
+			"heating_warmwasser": "Zentrale Warmwasserversorgung",
+			"heating_gasheizung": "Gasheizung",
+			"heating_nachtstrom": "Nachtstromspeicher",
+			"heating_ofenheizung": "Ofenheizung"
+		},
+		"details_title": "Wohnungsdetails",
+		"fields": {
+			"tenancyStatus": "Mietverhältnis",
+			"rentTotal": "Warmmiete gesamt (€)",
+			"heatingCosts": "Heizkosten (€)",
+			"livingArea": "Wohnfläche (m²)",
+			"numberOfRooms": "Zimmeranzahl"
+		},
+		"tenancyStatus": {
+			"Main Tenant": "Hauptmieter:in",
+			"Subtenant": "Untermieter:in"
+		}
+	},
+	"validation": {
+		"empty_string": "Dieses Feld darf nicht leer sein.",
+		"invalid_phone": "Bitte gib eine gültige Telefonnummer ein (z. B. +49 176 12345678 oder 0176 12345678).",
+		"invalid_zip": "Die Postleitzahl muss aus genau fünf Ziffern bestehen.",
+		"future_date_not_allowed": "Das Datum darf nicht in der Zukunft liegen.",
+		"past_date_required": "Das Datum muss in der Vergangenheit liegen.",
+		"future_date_required": "Das Datum muss in der Zukunft liegen.",
+		"invalid_decimal": "Bitte gib einen gültigen Geldbetrag ein (z. B. 450,00).",
+		"invalid_number": "Bitte gib eine positive Zahl ein.",
+		"invalid_date": "Bitte gib ein gültiges Datum ein (z. B. 01.01.1950).",
+		"invalid_country": "Ungültiger Ländercode.",
+		"invalid_gender": "Ungültiges Geschlecht.",
+		"value_error": "Ungültiger Wert."
+	},
+	"household": {
+		"why": {
+			"desc": "Deine Familiäre- und Wohnsituation beschreibt welche Menschen finanzielle Unterstützung benötigen und wie sie miteinander verbunden sind. Das hat Einfluss auf den Gesamtbedarf an Grundsicherung."
+		},
+		"family_01": {
+			"title": "Wie ist Dein aktueller Familienstand?",
+			"option_married_title": "Ich bin verheiratet oder lebe in einer eingetragenen Lebenspartnerschaft.",
+			"option_married_hinweis": "Wir müssen Deinen Partner/Deine Partnerin in diesen Antrag einbeziehen. Bitte halte dessen/deren Ausweis und Einkommensnachweis bereit.",
+			"option_widowed_title": "Ich bin verwitwet.",
+			"option_widowed_hinweis": "Es tut mir sehr leid für Deinen Verlust. Du hast möglicherweise Anspruch auf eine Witwen- oder Witwerrente. Bitte halte das Schreiben des Rentenamts bereit, in dem diese Zahlung erläutert wird.",
+			"option_single_title": "Ich bin ledig oder geschieden.",
+			"option_single_hinweis": "Vielen Dank. Dies hilft uns, Deine persönliche Situation zu verstehen."
+		},
+		"family_02": {
+			"title": "Lebst Du allein in Deiner Wohnung?",
+			"option_alone_title": "Ja, ich lebe allein.",
+			"option_alone_hinweis": "Vielen Dank. Dies hilft uns, Deine Haushaltssituation zu verstehen.",
+			"option_not_alone_title": "Nein, ich lebe mit anderen Personen zusammen.",
+			"option_not_alone_hinweis": "Wir erfassen im nächsten Schritt, wer bei Dir wohnt."
+		},
+		"family_03": {
+			"title": "Wer lebt mit Dir in der Wohnung?",
+			"option_partner_title": "Mein:e Ehepartner:in/Lebenspartner:in.",
+			"option_partner_hinweis": "Da Ihr zusammenlebt, prüft das Amt Euer gemeinsames Einkommen. Wir stellen weitere Fragen zu Deinem Haushalt.",
+			"option_children_title": "Meine Kinder oder Eltern.",
+			"option_children_hinweis": "Das Amt muss wissen, ob Eure Kinder oder Eltern ein hohes Einkommen (mehr als 100.000 € pro Jahr) erzielen. Falls ja, werden sie möglicherweise um finanzielle Unterstützung gebeten. Wir stellen weitere Fragen zu Deinem Haushalt.",
+			"option_others_title": "Mitbewohner oder andere Personen.",
+			"option_others_hinweis": "Das Amt muss wissen, ob Du Lebensmittel und Kosten mit der Wirtschaftsgemeinschaft teilst oder ob Du nur die Unterkunft teilst."
+		},
+		"q6_guardian": {
+			"title": "Wirst Du betreut oder hast Du einen Beistand?",
+			"option_guardian": "Ja, ich werde betreut",
+			"option_succor": "Ja, ich habe Beistand",
+			"option_none": "Nein, keins davon"
+		},
+		"q7_displaced": {
+			"title": "Bist Du aus deinem Land vertrieben?",
+			"option_yes": "Ja",
+			"option_no": "Nein",
+			"dropdown_title": "Bitte wähle Deinen Vertriebenenstatus aus",
+			"status_expellee": "Vertriebene(r) / Spätaussiedler",
+			"status_displaced": "Heimatloser Ausländer",
+			"status_late_resettler": "Spätaussiedler",
+			"status_descendant": "Ehegatte/Abkömmling eines Spätaussiedlers",
+			"status_refugee": "Sowjetzonenflüchtling"
+		},
+		"q8_insurance": {
+			"title": "Hast du eine von diesen Versicherungen?",
+			"option_social": "Sozialversicherung",
+			"option_health": "Krankenversicherung",
+			"option_none": "Ich bin nicht versichert",
+			"dropdown_social_title": "Welche Sozialversicherung?",
+			"dropdown_health_title": "Welche Krankenversicherung?",
+			"social_pension": "Rentenversicherung",
+			"social_care": "Pflegeversicherung",
+			"social_other": "Sonstige",
+			"health_compulsory": "Pflichtversicherung",
+			"health_voluntary": "Freiwillige Versicherung",
+			"health_family": "Familienversicherung",
+			"health_private": "Private Versicherung",
+			"health_funds": "Betreuung der Krankenkassen nach § 264 SGB V",
+			"health_other": "Sonstige"
+		},
+		"actions": {
+			"go_to_page_2": "Gehe zu Frage 2 von 3",
+			"go_to_page_3": "Gehe zu Frage 3 von 3"
+		}
+	},
+	"documents": {
+		"preview_title": "Dokumenten-Vorschau",
+		"pdf_preview_title": "PDF-Vorschau",
+		"errors": {
+			"previewUnavailableDueToTTL": "Dieses Dokument ist aus Datenschutzgründen oder durch automatische Speicherfristen nicht mehr als Live-Vorschau verfügbar. Deine verifizierten Daten sind jedoch weiterhin sicher in Deinem Profil gespeichert.",
+			"loadFailed": "Fehler beim Laden der Dokumenten-Vorschau.",
+			"loading_document": "Dokument wird geladen..."
+		}
+	}
+}

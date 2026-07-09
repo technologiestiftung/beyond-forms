@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Wizard Rules Schema",
+  "description": "Schema for defining the step-by-step logic, conditions, and effects of a form wizard.",
+  "type": "object",
+  "required": ["form_id", "initial_step", "sections", "steps"],
+  "properties": {
+    "form_id": {
+      "type": "string",
+      "description": "The unique identifier of the form this ruleset applies to."
+    },
+    "initial_step": {
+      "type": "string",
+      "description": "The ID of the first step to display to the user."
+    },
+    "sections": {
+      "type": "array",
+      "description": "Logical groupings of steps.",
+      "items": {
+        "$ref": "#/definitions/section"
+      }
+    },
+    "steps": {
+      "type": "object",
+      "description": "A dictionary of all steps in the wizard, keyed by their unique step ID.",
+      "patternProperties": {
+        "^[a-zA-Z0-9_]+$": {
+          "$ref": "#/definitions/step"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "step": {
+      "type": "object",
+      "required": ["id", "fields", "transitions"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for this step. Must match the key in the 'steps' object."
+        },
+        "title": {
+          "type": "string",
+          "description": "The display title for this step in the UI."
+        },
+        "description": {
+          "type": "string",
+          "description": "An optional description or help text for this step."
+        },
+        "fields": {
+          "type": "array",
+          "description": "The list of JSON schema field paths (e.g., 'applicant_information.applicant_personal_details.name' or 'household_members[0].personal_details.first_name') that should be collected on this step. Supports array indexing with [n] syntax.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "description": "Side effects to apply when this step is reached or completed (e.g., requiring a document).",
+          "items": {
+            "$ref": "#/definitions/effect"
+          }
+        },
+        "transitions": {
+          "type": "array",
+          "description": "The logic to determine which step comes next. Evaluated in order; the first transition with a 'condition' that evaluates to truthy (or the first transition without a 'condition') is chosen.",
+          "items": {
+            "$ref": "#/definitions/transition"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "section": {
+      "type": "object",
+      "required": ["id", "title", "steps"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this section."
+        },
+        "title": {
+          "type": "string",
+          "description": "Display title for this section."
+        },
+        "steps": {
+          "type": "array",
+          "description": "Ordered list of step IDs that belong to this section.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "transition": {
+      "type": "object",
+      "required": ["next_step"],
+      "properties": {
+        "condition": {
+          "type": "string",
+          "description": "A JSONata expression evaluated against the form data. Supports comparisons (=, !=, <, >, <=, >=), logical operators (and, or, not), membership (in), existence ($exists), and array indexing with [n] syntax. If it evaluates to truthy, this transition is taken. If omitted, this transition is taken unconditionally."
+        },
+        "next_step": {
+          "type": "string",
+          "description": "The ID of the next step to navigate to. Use 'END' to denote the end of the wizard."
+        }
+      }
+    },
+    "effect": {
+      "type": "object",
+      "required": ["type", "target"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["REQUIRE_DOCUMENT", "SET_VALUE", "SHOW_WARNING"],
+          "description": "The type of side effect to trigger."
+        },
+        "target": {
+          "type": "string",
+          "description": "The target of the effect (e.g., the name of the document to require, or the field path to set)."
+        },
+        "condition": {
+          "type": "string",
+          "description": "An optional JSONata expression. The effect is only applied if this evaluates to truthy against the form data."
+        }
+      }
+    }
+  }
+}

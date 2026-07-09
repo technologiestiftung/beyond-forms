@@ -1,0 +1,37 @@
+{
+  "$defs": {
+    "insurance_details": {
+      "type": "object",
+      "properties": {
+        "social_security_status": {
+          "type": "string",
+          "enum": ["none", "pension_insurance", "long_term_care_insurance"],
+          "description": "The type of social security of the person"
+        },
+        "health_insurance_status": {
+          "type": "string",
+          "enum": [
+            "compulsory_insurance",
+            "voluntary_insurance",
+            "family_insurance",
+            "private_insurance",
+            "care_by_health_insurance_under_264_sgb_v"
+          ],
+          "description": "The type of health insurance of the person"
+        },
+        "health_insurance_provider": {
+          "type": "string",
+          "description": "The provider of the health insurance of the person"
+        },
+        "pension_insurance_provider": {
+          "type": "string",
+          "description": "The provider of the pension insurance of the person"
+        },
+        "pension_insurance_number": {
+          "type": "string",
+          "description": "The number of the pension insurance of the person"
+        }
+      }
+    }
+  }
+}
