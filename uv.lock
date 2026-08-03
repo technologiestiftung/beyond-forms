@@ -307,7 +307,7 @@ wheels = [
 
 [[package]]
 name = "beyondforms-auth"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "libs/auth" }
 dependencies = [
     { name = "fastapi" },
@@ -2325,6 +2325,7 @@ source = { editable = "services/orchestration-middleware-service" }
 dependencies = [
     { name = "aiofiles" },
     { name = "beyondforms-auth" },
+    { name = "beyondforms-document-schemas" },
     { name = "fastapi", extra = ["standard"] },
     { name = "firebase-admin" },
     { name = "google-cloud-aiplatform" },
@@ -2340,6 +2341,7 @@ dependencies = [
     { name = "pyjwt", extra = ["crypto"] },
     { name = "pyopenssl" },
     { name = "python-dotenv" },
+    { name = "reportlab" },
     { name = "sqlacodegen" },
     { name = "sqlalchemy" },
 ]
@@ -2355,6 +2357,7 @@ dev = [
 requires-dist = [
     { name = "aiofiles" },
     { name = "beyondforms-auth", editable = "libs/auth" },
+    { name = "beyondforms-document-schemas", editable = "libs/document-schemas" },
     { name = "fastapi", extras = ["standard"] },
     { name = "firebase-admin" },
     { name = "google-cloud-aiplatform" },
@@ -2370,6 +2373,7 @@ requires-dist = [
     { name = "pyjwt", extras = ["crypto"] },
     { name = "pyopenssl" },
     { name = "python-dotenv" },
+    { name = "reportlab" },
     { name = "sqlacodegen" },
     { name = "sqlalchemy" },
 ]
