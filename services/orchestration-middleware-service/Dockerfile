@@ -5,8 +5,8 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 ENV GEMINI_MODEL_NAME=gemini-3.5-flash
 ENV CHAT_CONTEXT_WINDOW_SIZE=20
 WORKDIR /app
-# Force the venv to be created in the service-specific path (instead of workspace root)
-# to maintain backward compatibility with the final stage PATH and external configs.
+# Outside the compose bind-mount, so the image's venv is not shadowed and no masking
+# anonymous volume is needed (Docker never refreshes those on rebuild).
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv
 ADD . /app
 WORKDIR /app/services/orchestration-middleware-service
@@ -28,7 +28,11 @@ RUN useradd -u 10001 -m app
 COPY --from=test /app/services/orchestration-middleware-service/pyproject.toml /dev/null
 COPY --from=builder --chown=app:app /app/services/orchestration-middleware-service /app/services/orchestration-middleware-service
 COPY --from=builder --chown=app:app /app/libs/auth /app/libs/auth
+COPY --from=builder --chown=app:app /app/libs/document-schemas /app/libs/document-schemas
 COPY --from=builder --chown=app:app /app/forms /app/forms
+# Demo persona fixtures. Read by src/services/demo_seed_service.py; harmless when
+# DEMO_SEED_ENABLED is unset, since the router is not mounted then.
+COPY --from=builder --chown=app:app /app/demo /app/demo
 COPY --from=builder --chown=app:app /opt/venv /opt/venv
 WORKDIR /app/services/orchestration-middleware-service
 ENV PATH="/opt/venv/bin:$PATH"

@@ -1,0 +1,249 @@
+{
+  "$schema": "../persona.schema.json",
+  "slug": "sandor",
+  "phone_number": "+493023125103",
+  "title": "Sandor — Ausländischer Mann, Langzeitempfänger",
+  "source": "demo/research/03_sandor.md",
+  "portrait": "portraits/Sandor.png",
+  "scenario": "Mid-flow with visible document-quality problems. His Nebenkostenabrechnung failed as illegible, his Kontoauszug is missing pages, and the Heizkostenabrechnung was never uploaded — the KdU documentation trap his User Stories 5, 8 and 9 describe. Use this one for upload feedback, error copy, multilingual surfaces and the housing-cost flow.",
+
+  "profile": {
+    "first_name": "Sandor",
+    "last_name": "Haddad",
+    "date_of_birth": "1965-09-30",
+    "place_of_birth": "Aleppo",
+    "legal_gender": "Male",
+    "marital_status": "Single",
+    "married_since": null,
+    "is_german_citizen": false,
+    "is_resident_in_germany": true,
+    "nationality": "SY",
+    "second_nationality": null,
+    "has_guardian": false,
+    "has_custodian": false,
+    "displaced_status": null,
+    "residence_status": "Asylberechtigt, Aufenthaltserlaubnis nach § 25 Abs. 1 AufenthG",
+
+    "street": "Sonnenallee",
+    "house_number": "112",
+    "zip_code": "12045",
+    "city": "Berlin",
+    "state": "Berlin",
+    "district": "Neukölln",
+
+    "persons_in_household_count": 1,
+
+    "social_security_type": "None",
+    "health_insurance_provider": "AOK Nordost",
+    "health_insurance_status": "Compulsory Insurance",
+    "pension_insurance_provider": null,
+    "pension_insurance_no": null,
+
+    "is_currently_employed": false,
+    "ability_to_work": "Fully able",
+    "has_permanent_reduction_in_earning_capacity": false,
+    "has_inpatient_facility_accommodation": false,
+
+    "accomodation_type": "Rental Apartment",
+    "tenancy_status": "Main Tenant",
+    "rent_total": 620.00,
+    "heating_costs": 95.00,
+    "hot_water_costs": 18.00,
+    "cable_tv_costs": 0.00,
+    "number_of_rooms": 1,
+    "living_area": 41.00,
+    "sublet_room_count": null,
+    "sublet_rent_income": null,
+    "rent_paid_until": "2026-07-31",
+    "landlord_name": "Sonnenallee Immobilien KG",
+    "heating_type": "Gasetagenheizung",
+    "free_housing_right_holder": null,
+
+    "monthly_income": 290.00,
+    "income_sources": ["other"],
+    "has_assets": false,
+    "assets_types": [],
+    "assets_description": null,
+
+    "bank_name": "N26 Bank",
+    "account_holder": "Sandor Haddad",
+    "iban": "DE71100110012629748220",
+    "bic": "NTSBDEB1",
+
+    "has_received_previous_benefits": true,
+    "previous_benefits_authority": "Bezirksamt Neukölln von Berlin, Wohngeldstelle",
+    "previous_benefits_period": "01.02.2022 - 30.06.2026",
+    "previous_benefits_ref_no": "WG-NK-2022-11734",
+    "has_applied_for_asylum_benefits": true,
+    "has_applied_for_benefits_awaiting_decision": false,
+    "are_one_time_payments_expected": false,
+    "gave_away_assets_last_10_years": false,
+    "gross_negligence_last_10_years": false,
+
+    "has_disability_id": false,
+    "disability_valid_until": null,
+    "merkzeichen": null,
+    "disability_application_pending": false,
+    "is_care_dependent": false,
+    "has_costly_medical_nutrition": false,
+
+    "identification_numbers": "AR8402715",
+    "tax_id": "51 297 806 344"
+  },
+
+  "application": {
+    "form_type": "antrag_grundsicherung",
+    "status": "in_progress",
+    "form_data": {}
+  },
+
+  "documents": [
+    {
+      "document_type": "id_card",
+      "status": "verified",
+      "confidence_score": 0.82,
+      "display_name": "Aufenthaltstitel_Sandor_Haddad.pdf",
+      "asset": { "generate": true, "title": "Aufenthaltstitel", "subtitle": "§ 25 Abs. 1 AufenthG" },
+      "raw_data": {
+        "document_id": "AR8402715",
+        "gender": "M",
+        "given_names": "Sandor",
+        "last_name": "Haddad",
+        "nationality": "SYR",
+        "date_of_birth": "1965-09-30",
+        "place_of_birth": "Aleppo",
+        "valid_until": "2028-11-05",
+        "date_of_issue": "2025-11-05",
+        "place_of_issue": "Berlin",
+        "address": "Sonnenallee 112, 12045 Berlin",
+        "issuing_authority": "Landesamt für Einwanderung Berlin"
+      }
+    },
+    {
+      "document_type": "rent",
+      "status": "verified",
+      "confidence_score": 0.88,
+      "display_name": "Mietvertrag_Sandor_Haddad.pdf",
+      "asset": { "generate": true, "title": "Mietvertrag", "subtitle": "Sonnenallee Immobilien KG" },
+      "raw_data": {
+        "tenant_name": "Sandor Haddad",
+        "tenant_address": "Sonnenallee 112, 12045 Berlin",
+        "net_cold_rent": 507.00,
+        "monthly_total_rent": 620.00,
+        "operating_costs": 113.00,
+        "heating_costs": 95.00,
+        "square_meters": 41.0,
+        "is_main_tenant": true,
+        "has_sub_tenants": false,
+        "start_date_of_rent": "2021-11-01",
+        "end_date_of_rent": null
+      }
+    },
+    {
+      "document_type": "stmt3",
+      "status": "ready_for_review",
+      "confidence_score": 0.55,
+      "display_name": "Kontoauszug_Sandor_Haddad.pdf",
+      "asset": { "generate": true, "title": "Kontoauszug", "subtitle": "N26 Bank" },
+      "user_error_code": "PAGINATION_MISSING_PAGES",
+      "internal_error_log": "Demo fixture: page 2 of 3 absent, so the closing balance could not be confirmed.",
+      "raw_data": {
+        "iban": "DE71100110012629748220",
+        "account_holder_name": "Sandor Haddad",
+        "statement_period_start": "2026-05-01",
+        "statement_period_end": "2026-07-31",
+        "statement_date": "2026-07-31",
+        "amount_rent": 620.00
+      }
+    },
+    {
+      "document_type": "utility_bill",
+      "status": "failed",
+      "confidence_score": 0.14,
+      "display_name": "Nebenkostenabrechnung_Sandor_Haddad.jpg",
+      "asset": { "generate": true, "title": "Nebenkostenabrechnung", "subtitle": "Abrechnungszeitraum 2025" },
+      "user_error_code": "LEGIBILITY_ISSUES",
+      "internal_error_log": "Demo fixture: photographed at an angle with glare across the totals column; extraction abandoned.",
+      "raw_data": {}
+    }
+  ],
+
+  "missing_documents": [
+    {
+      "document_type": "heating",
+      "reason": "deliberate",
+      "note": "Never uploaded. Heating is the largest part of his KdU and the thing his User Story 5 walks through step by step — leaving it absent is what makes the housing-cost flow worth testing on him."
+    },
+    {
+      "document_type": "pension_notice",
+      "reason": "not_applicable",
+      "note": "He has never contributed to the German pension system, which is exactly why /validate-form rejects him for a missing Rentenversicherungsnummer. See research.finding."
+    },
+    { "document_type": "health_insurance", "reason": "not_yet_supplied", "note": "Mitgliedsbescheinigung AOK Nordost." },
+    { "document_type": "registration", "reason": "not_yet_supplied", "note": "Meldebescheinigung, Bürgeramt Neukölln — or the Aufenthaltstitel could double as address proof." },
+    { "document_type": "bank", "reason": "not_yet_supplied", "note": "Kontobestätigung, N26 — IBAN DE71100110012629748220." },
+    { "document_type": "income", "reason": "not_yet_supplied", "note": "Einkommenserklärung — €290/month, source deliberately vague in the research." },
+    { "document_type": "assets", "reason": "not_yet_supplied", "note": "Vermögenserklärung — no assets, so a nil declaration. His research notes he must still evidence 'no assets'." },
+    { "document_type": "housing", "reason": "not_yet_supplied", "note": "Anlage KdU — cold rent €507, warm €620. Good candidate for a foreign-document or legibility variant." },
+    { "document_type": "household", "reason": "not_yet_supplied", "note": "Haushaltsbescheinigung — single-person household." },
+    { "document_type": "cooperation_agreement", "reason": "not_applicable", "note": "SGB II instrument; not part of an SGB XII application." }
+  ],
+
+  "derived": [
+    "last_name",
+    "date_of_birth",
+    "place_of_birth",
+    "nationality",
+    "street",
+    "house_number",
+    "zip_code",
+    "monthly_income",
+    "rent_total",
+    "heating_costs",
+    "hot_water_costs",
+    "living_area",
+    "health_insurance_provider",
+    "iban",
+    "bic",
+    "bank_name",
+    "landlord_name",
+    "rent_paid_until",
+    "previous_benefits_authority",
+    "previous_benefits_period",
+    "previous_benefits_ref_no",
+    "identification_numbers",
+    "tax_id"
+  ],
+
+  "research": {
+    "core_barrier": "A false start. The system landscape (AsylbLG / SGB II / SGB XII) is opaque, so the biggest risk is applying down the wrong path and losing time. On top of that sit language barriers, bureaucratic vocabulary, shame and fear of mistakes — which together produce the incomplete submissions that trigger follow-up requests and delay.",
+    "usage_context": "Rarely alone. Supported self-service at a terminal or PC in an office or counselling centre (Caritas, ASB), where an advisor can look at the case with his consent and missing documents can be added on the spot. Phone and chat groups are supplementary, informal channels.",
+    "key_wishes": [
+      "Understand at the start which benefit actually applies to him, and why",
+      "Language selection and simple language available at any point, including mid-application",
+      "Only relevant questions — no empty fields to puzzle over",
+      "A guided housing-cost path: rent → operating costs → heating → hot water, with the proof required at each step",
+      "Example documents and format hints so he knows what will be accepted",
+      "Immediate upload feedback on legibility and completeness, with concrete fixes",
+      "The ability to submit on time even when incomplete, then follow up in a structured way",
+      "Status transparency at every stage so long processing times become comprehensible"
+    ],
+    "key_fears": [
+      "Choosing the wrong application path and losing time",
+      "Shame at not understanding, and at not being able to supply documents correctly",
+      "Being caught in a loop of follow-up requests after an incomplete submission",
+      "Not knowing what proof is still required 'with no assets', or why"
+    ],
+    "not_representable": {
+      "duration_of_benefit_receipt_years": 4,
+      "hot_water_supply_decentralised": null,
+      "note": "Duration of receipt is only expressible as free text in `previous_benefits_period`. Decentralised hot water supply — which triggers an additional need under SGB XII and is one of the things his research says applicants most often forget — has no column at all, only the `hot_water_costs` amount. Filed as a gap."
+    },
+    "unreconciled": {
+      "age": "Stated as either 50–65 or 65+; born 1965 here, so 60.",
+      "need_and_entitlement": "Stated household need above €1,000 with net entitlement €790–900. Reconciled here as a €620 Warmmiete plus one Regelsatz, less €290 of income — but the source leaves the income unstated, so the €290 is derived."
+    },
+    "finding": "He is the only persona the rules engine rejects, and the reason is worth keeping: `/validate-form` requires `pension_insurance_provider` and `pension_insurance_number` unconditionally, but a 60-year-old asylberechtigter man who has never contributed to the German pension system has neither. The form therefore demands a Rentenversicherungsnummer that cannot exist. This is a real constraint on the target group, surfaced by the fixture rather than invented for it — leave him non-submittable.",
+    "notes": "The source document says only 'non-German, entitled to asylum'. The specific nationality is therefore this fixture's choice, not a characterisation drawn from the research: Syria is the largest group with asylum status in Germany, and SY was added to rules-engine CountryCode for it. Swapping it is a one-line edit here plus one enum member. Note also that `displaced_status` is deliberately null — DisplacedStatusType only holds BVFG Aussiedler/Vertriebene categories, none of which mean asylberechtigt, so the status lives in the free-text `residence_status` column. The surname differs from the Hungarian 'Kovacs' in forms/scripts/llm-eval/profiles/sandor.json; that file is left untouched for the eval harness."
+  }
+}

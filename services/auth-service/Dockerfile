@@ -8,9 +8,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
-# Force the venv to be created in the service-specific path (instead of workspace root)
-# to maintain backward compatibility with the final stage PATH and external configs.
-ENV UV_PROJECT_ENVIRONMENT=/app/services/auth-service/.venv
+# Outside the compose bind-mount, so the image's venv is not shadowed and no masking
+# anonymous volume is needed (Docker never refreshes those on rebuild).
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
 
 # Copy the entire repository to satisfy workspace members
 COPY . /app
@@ -38,13 +38,14 @@ LABEL maintainer="BeyondForms Team"
 # Environment Variables
 ENV PYTHONUNBUFFERED=1
 # Add the workspace venv's bin directory to the PATH
-ENV PATH="/app/services/auth-service/.venv/bin:$PATH"
+ENV PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /app
 
 # Copy the service and its local library dependencies to resolve path mappings
 COPY --from=builder /app/services/auth-service /app/services/auth-service
 COPY --from=builder /app/libs/auth /app/libs/auth
+COPY --from=builder /opt/venv /opt/venv
 
 WORKDIR /app/services/auth-service
 

@@ -1,9 +1,64 @@
-from typing import Any
+from typing import Any, Optional
+import datetime
 import logging
+import re
 from src.models import Users as DbUser
 from unittest.mock import Mock
 
 logger = logging.getLogger(__name__)
+
+# `users.previous_benefits_period` is free text, but the rules engine's
+# `ElderlyDisabledWelfareForm` requires a `PastDate` in `previous_benefits_end_date`
+# whenever `has_received_benefits_before` is true. Without a value there, every
+# applicant who has received benefits before is rejected as un-submittable.
+# TODO: replace the free-text column with a real date column so this parse can go away.
+_ISO_DATE_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
+_DE_DATE_RE = re.compile(r"(\d{1,2})\.(\d{1,2})\.(\d{4})")
+_YEAR_MONTH_RE = re.compile(r"(\d{4})-(\d{2})(?!\d)")
+
+
+def parse_previous_benefits_end(period: Optional[str]) -> Optional[str]:
+    """
+    Best-effort extraction of an end date from the free-text benefits period.
+
+    Handles ISO dates, German dotted dates and `YYYY-MM`, in ranges or on their own,
+    always taking the *last* date mentioned (a range's end). Returns an ISO date
+    string in the past, or None when nothing parseable and past is found.
+    """
+    if not period or isinstance(period, Mock):
+        return None
+
+    today = datetime.date.today()
+    candidates: list[datetime.date] = []
+
+    for match in _ISO_DATE_RE.finditer(period):
+        year, month, day = (int(g) for g in match.groups())
+        try:
+            candidates.append(datetime.date(year, month, day))
+        except ValueError:
+            continue
+
+    for match in _DE_DATE_RE.finditer(period):
+        day, month, year = (int(g) for g in match.groups())
+        try:
+            candidates.append(datetime.date(year, month, day))
+        except ValueError:
+            continue
+
+    if not candidates:
+        for match in _YEAR_MONTH_RE.finditer(period):
+            year, month = (int(g) for g in match.groups())
+            try:
+                candidates.append(datetime.date(year, month, 1))
+            except ValueError:
+                continue
+
+    past = [d for d in candidates if d < today]
+    if not past:
+        logger.warning("Could not parse a past end date from previous_benefits_period %r", period)
+        return None
+
+    return max(past).isoformat()
 
 
 def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
@@ -496,6 +551,7 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
             "applicant_finances": applicant_finances,
             "accommodation": accommodation,
             "has_received_benefits_before": has_rec_prev or False,
+            "previous_benefits_end_date": parse_previous_benefits_end(prev_period),
             "previous_benefits_authority": prev_auth or "N/A",
             "has_costly_medical_nutrition": has_medical or False,
             "eligibility_check": eligibility_check,

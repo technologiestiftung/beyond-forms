@@ -1,0 +1,256 @@
+{
+  "$schema": "../persona.schema.json",
+  "slug": "sabine",
+  "phone_number": "+493023125101",
+  "title": "Sabine — Alleinstehende deutsche Frau, volle Erwerbsminderungsrente",
+  "source": "demo/research/01_sabine.md",
+  "portrait": "portraits/Sabine.png",
+  "scenario": "Mid-flow, deliberately incomplete. Her Rentenbescheid is missing entirely and her Kontoauszug is flagged as an old statement — the exact 'unclear or hard-to-obtain proof' situation her User Story 6 describes. Use this one for to-do handling, encouragement copy, and the cognitive-load questions.",
+
+  "profile": {
+    "first_name": "Sabine",
+    "last_name": "Reinhardt",
+    "date_of_birth": "1968-04-22",
+    "place_of_birth": "Potsdam",
+    "legal_gender": "Female",
+    "marital_status": "Single",
+    "married_since": null,
+    "is_german_citizen": true,
+    "is_resident_in_germany": true,
+    "nationality": "DE",
+    "second_nationality": null,
+    "has_guardian": false,
+    "has_custodian": false,
+    "displaced_status": null,
+    "residence_status": "Deutsche Staatsangehörigkeit",
+
+    "street": "Invalidenstraße",
+    "house_number": "84",
+    "zip_code": "10115",
+    "city": "Berlin",
+    "state": "Berlin",
+    "district": "Mitte",
+
+    "persons_in_household_count": 1,
+
+    "social_security_type": "Pension Insurance",
+    "health_insurance_provider": "BARMER",
+    "health_insurance_status": "Compulsory Insurance",
+    "pension_insurance_provider": "Deutsche Rentenversicherung Bund",
+    "pension_insurance_no": "22220468R071",
+
+    "is_currently_employed": false,
+    "ability_to_work": "Permanently disabled",
+    "has_permanent_reduction_in_earning_capacity": true,
+    "reduced_work_capacity_start_date": "2019-10-01",
+    "reduced_work_capacity_end_date": null,
+    "reduced_work_capacity_reason": "Unbefristete volle Erwerbsminderung, festgestellt durch den Rentenversicherungsträger",
+    "has_inpatient_facility_accommodation": false,
+    "inpatient_facility_move_in_date": null,
+    "inpatient_facility_last_residence": null,
+
+    "accomodation_type": "Rental Apartment",
+    "tenancy_status": "Main Tenant",
+    "rent_total": 780.00,
+    "heating_costs": 105.00,
+    "hot_water_costs": 20.00,
+    "cable_tv_costs": 0.00,
+    "number_of_rooms": 2,
+    "living_area": 52.00,
+    "sublet_room_count": null,
+    "sublet_rent_income": null,
+    "rent_paid_until": "2026-07-31",
+    "landlord_name": "Wohnungsbaugesellschaft Mitte mbH",
+    "heating_type": "Gaszentralheizung",
+    "free_housing_right_holder": null,
+
+    "monthly_income": 245.00,
+    "income_sources": ["pension_reduced_earning_capacity"],
+    "has_assets": false,
+    "assets_types": [],
+    "assets_description": null,
+
+    "bank_name": "Berliner Volksbank",
+    "account_holder": "Sabine Reinhardt",
+    "iban": "DE29100900004512873600",
+    "bic": "BEVODEBB",
+
+    "has_received_previous_benefits": true,
+    "previous_benefits_authority": "Bezirksamt Mitte von Berlin, Wohngeldstelle",
+    "previous_benefits_period": "01.05.2024 - 31.07.2026",
+    "previous_benefits_ref_no": "WG-MI-2024-30918",
+    "has_applied_for_asylum_benefits": false,
+    "has_applied_for_benefits_awaiting_decision": false,
+    "are_one_time_payments_expected": false,
+    "gave_away_assets_last_10_years": false,
+    "gross_negligence_last_10_years": false,
+
+    "has_disability_id": false,
+    "disability_valid_until": null,
+    "merkzeichen": null,
+    "disability_application_pending": false,
+    "is_care_dependent": false,
+    "has_costly_medical_nutrition": false,
+
+    "identification_numbers": "T4RQ81ZKC",
+    "tax_id": "27 604 913 558"
+  },
+
+  "application": {
+    "form_type": "antrag_grundsicherung",
+    "status": "in_progress",
+    "form_data": {}
+  },
+
+  "documents": [
+    {
+      "document_type": "id_card",
+      "status": "verified",
+      "confidence_score": 0.96,
+      "display_name": "Personalausweis_Sabine_Reinhardt.pdf",
+      "asset": { "generate": true, "title": "Personalausweis", "subtitle": "Bundesrepublik Deutschland" },
+      "raw_data": {
+        "document_id": "T4RQ81ZKC",
+        "gender": "F",
+        "given_names": "Sabine",
+        "last_name": "Reinhardt",
+        "nationality": "DEU",
+        "date_of_birth": "1968-04-22",
+        "place_of_birth": "Potsdam",
+        "valid_until": "2031-08-07",
+        "date_of_issue": "2021-08-07",
+        "place_of_issue": "Berlin",
+        "address": "Invalidenstraße 84, 10115 Berlin",
+        "issuing_authority": "Bezirksamt Mitte von Berlin"
+      }
+    },
+    {
+      "document_type": "rent",
+      "status": "verified",
+      "confidence_score": 0.9,
+      "display_name": "Mietvertrag_Sabine_Reinhardt.pdf",
+      "asset": { "generate": true, "title": "Mietvertrag", "subtitle": "Wohnungsbaugesellschaft Mitte mbH" },
+      "raw_data": {
+        "tenant_name": "Sabine Reinhardt",
+        "tenant_address": "Invalidenstraße 84, 10115 Berlin",
+        "net_cold_rent": 655.00,
+        "monthly_total_rent": 780.00,
+        "operating_costs": 125.00,
+        "heating_costs": 105.00,
+        "square_meters": 52.0,
+        "is_main_tenant": true,
+        "has_sub_tenants": false,
+        "start_date_of_rent": "2016-09-01",
+        "end_date_of_rent": null
+      }
+    },
+    {
+      "document_type": "health_insurance",
+      "status": "verified",
+      "confidence_score": 0.93,
+      "display_name": "Mitgliedsbescheinigung_BARMER_Sabine_Reinhardt.pdf",
+      "asset": { "generate": true, "title": "Mitgliedsbescheinigung", "subtitle": "BARMER" },
+      "raw_data": {
+        "full_name": "Sabine Reinhardt",
+        "insurance_name": "BARMER",
+        "pension_insurance_number": "22220468R071",
+        "health_insurance_status": "compulsory_insurance"
+      }
+    },
+    {
+      "document_type": "stmt3",
+      "status": "ready_for_review",
+      "confidence_score": 0.68,
+      "display_name": "Kontoauszug_Sabine_Reinhardt.pdf",
+      "asset": { "generate": true, "title": "Kontoauszug", "subtitle": "Berliner Volksbank" },
+      "user_error_code": "OLD_STATEMENT_WARNING",
+      "internal_error_log": "Demo fixture: statement period ends more than three months before the application date.",
+      "raw_data": {
+        "iban": "DE29100900004512873600",
+        "account_holder_name": "Sabine Reinhardt",
+        "statement_period_start": "2026-01-01",
+        "statement_period_end": "2026-03-31",
+        "statement_date": "2026-03-31",
+        "account_balance": 31.47,
+        "amount_rent": 780.00,
+        "amount_pension": 245.00,
+        "amount_liability_insurance": 120.00
+      }
+    }
+  ],
+
+  "missing_documents": [
+    {
+      "document_type": "pension_notice",
+      "reason": "deliberate",
+      "note": "THE point of this persona. Her Rentenbescheid is old, she is unsure whether it is even needed, and she cannot find it — her User Story 6. Do not add it; add the to-do UX around it instead."
+    },
+    { "document_type": "heating", "reason": "not_yet_supplied", "note": "Gaszentralheizung — a Heizkostenabrechnung from the Wohnungsbaugesellschaft would fit." },
+    { "document_type": "utility_bill", "reason": "not_yet_supplied", "note": "Betriebskostenabrechnung for the 2-room flat." },
+    { "document_type": "registration", "reason": "not_yet_supplied", "note": "Meldebescheinigung, Bürgeramt Mitte." },
+    { "document_type": "bank", "reason": "not_yet_supplied", "note": "Kontobestätigung, Berliner Volksbank — IBAN DE29100900004512873600." },
+    { "document_type": "income", "reason": "not_yet_supplied", "note": "Einkommenserklärung — Erwerbsminderungsrente €245/month." },
+    { "document_type": "assets", "reason": "not_yet_supplied", "note": "Vermögenserklärung — she has none, so a nil declaration." },
+    { "document_type": "housing", "reason": "not_yet_supplied", "note": "Anlage KdU — cold rent €655, warm €780." },
+    { "document_type": "household", "reason": "not_yet_supplied", "note": "Haushaltsbescheinigung — single-person household." },
+    { "document_type": "cooperation_agreement", "reason": "not_applicable", "note": "SGB II instrument; not part of an SGB XII application." }
+  ],
+
+  "derived": [
+    "last_name",
+    "date_of_birth",
+    "place_of_birth",
+    "street",
+    "house_number",
+    "zip_code",
+    "monthly_income",
+    "pension_insurance_no",
+    "pension_insurance_provider",
+    "health_insurance_provider",
+    "reduced_work_capacity_start_date",
+    "iban",
+    "bic",
+    "bank_name",
+    "landlord_name",
+    "heating_costs",
+    "hot_water_costs",
+    "living_area",
+    "rent_paid_until",
+    "previous_benefits_authority",
+    "previous_benefits_period",
+    "previous_benefits_ref_no",
+    "identification_numbers",
+    "tax_id"
+  ],
+
+  "research": {
+    "core_barrier": "Fear and overwhelm from long, complex applications. Cognitive limitations mean she needs support with difficult questions, and stress further reduces her concentration. A calming entry point is what reduces her drop-off risk.",
+    "usage_context": "Supported self-service: normally at a PC or terminal in a counselling setting (Caritas, hospital, Sozialamt) together with a professional — not alone at home on a phone. Co-use is the core case, and she must stay in control while it happens.",
+    "key_wishes": [
+      "Small steps with a clear structure and no overwhelm",
+      "Reassurance and expectation-setting at the start (duration, steps, what is needed)",
+      "Encouragement and confirmation — 'everything done correctly', 'almost done'",
+      "Specific document instructions per section (what exactly, which period)",
+      "Help with unclear or old proofs, including how to request them",
+      "A 'filling out together' mode that does not take control away from her",
+      "Understanding the monthly deadline logic and being able to submit on time even when incomplete"
+    ],
+    "key_fears": [
+      "Entering something incorrectly and being disadvantaged or delayed for it",
+      "The sheer scope — 'no less than 80 pages if everything is included'",
+      "Not knowing which documents are really necessary, e.g. a pension notice from years ago",
+      "Hesitation to ask what she fears are 'silly questions'"
+    ],
+    "not_representable": {
+      "insurance_liability_household_total_eur": 120,
+      "in_a_relationship_but_living_alone": true,
+      "needs_cognitive_support": true,
+      "note": "There are no insurance-cost columns, so the €120 is recorded only in the stmt3 document's `amount_liability_insurance`. 'Living alone but in a relationship' has no representation — `marital_status: Single` with a 1-person household is the closest fit. Cognitive support needs are deliberately NOT stored: they are research context, and Art. 9 GDPR data has no business in this table. Both gaps are filed."
+    },
+    "unreconciled": {
+      "need_and_entitlement": "Stated gross need approx. €1,120 excluding housing costs, with net entitlement €860–890, alongside a €780 Warmmiete and a note that recognised housing costs typically run €400–500. The €1,120 is only consistent with a recognised (appropriateness-capped) housing cost well below her actual rent. Recorded as stated.",
+      "age": "Stated as a 50–65 range; born 1968 here, so 58."
+    },
+    "notes": "The missing pension_notice is intentional and is the point of this persona — it is the concrete instance of the 'I do not know whether I need the old Rentenbescheid, and I cannot find it' problem. Do not 'fix' it by adding the document."
+  }
+}

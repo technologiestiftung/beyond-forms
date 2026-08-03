@@ -503,7 +503,7 @@ value = ""
 ["p2_personenziffer_1_f\\374r_welchen_zeitraum?"]
 type = "string"
 description = "Personenziffer 1 f\\\\374r welchen Zeitraum?"
-value = "{{ reduced_work_capacity_start_date ? (reduced_work_capacity_start_date + ' bis ' + (reduced_work_capacity_end_date ? reduced_work_capacity_end_date : 'unbefristet')) : '' }}"
+value = "{{ reduced_work_capacity_start_date }}{{ reduced_work_capacity_start_date ? ' bis ' : '' }}{{ reduced_work_capacity_start_date ? (reduced_work_capacity_end_date ? reduced_work_capacity_end_date : 'unbefristet') : '' }}"
 
 ["p2_personenziffer_2_f\\374r_welchen_zeitraum?"]
 type = "string"
@@ -636,7 +636,7 @@ value = "{{ documents.bank_details ? documents.bank_details.iban : documents.ban
 ["p3_bic_-_swift_-_code"]
 type = "string"
 description = "BIC - Swift - Code"
-value = "{{ documents.bank_details ? documents.bank_details.bic : bic }}"
+value = "{{ documents.bank_details && documents.bank_details.bic ? documents.bank_details.bic : bic }}"
 
 ["p3_anschrift"]
 type = "string"
@@ -677,7 +677,7 @@ value = "{{ accomodation_type == 'Rental Apartment' ? '0' : tenancy_status == 'M
 ["p3_name_und_anschrift_des_vermieters"]
 type = "string"
 description = "Name und Anschrift des Vermieters"
-value = "{{ documents.address_proof ? (documents.address_proof.landlord_name + (documents.address_proof.landlord_address ? ', ' + documents.address_proof.landlord_address : '')) : '' }}"
+value = "{{ documents.address_proof && documents.address_proof.landlord_name ? (documents.address_proof.landlord_name + (documents.address_proof.landlord_address ? ', ' + documents.address_proof.landlord_address : '')) : (landlord_name ? landlord_name : '') }}"
 
 ["p3_haupt-_oder_untermiete"]
 type = "radio"
@@ -699,7 +699,8 @@ value = "{{ documents.rental_contract ? documents.rental_contract.tenant_name : 
 ["p3_miete_insgesamt_in_euro_pro_monat"]
 type = "string"
 description = "Miete insgesamt in Euro pro Monat"
-value = "{{ documents.housing_costs_form ? documents.housing_costs_form.base_rent : documents.bank_statements ? documents.bank_statements.amount_rent : documents.rental_contract ? documents.rental_contract.monthly_total_rent : rent_total }}"
+# housing_costs_form.base_rent is the Kaltmiete and must not feed a "Miete insgesamt" field.
+value = "{{ documents.rental_contract && documents.rental_contract.monthly_total_rent ? documents.rental_contract.monthly_total_rent : (documents.bank_statements && documents.bank_statements.amount_rent ? documents.bank_statements.amount_rent : rent_total) }}"
 
 ["p3_warmwasserkosten_in_euro_pro_monat"]
 type = "string"
@@ -724,7 +725,7 @@ value = ""
 ["p3_heizkostenvorschuss_in_euro_pro_monat"]
 type = "string"
 description = "Heizkostenvorschuss in Euro pro Monat"
-value = "{{ documents.heating_costs_proof ? documents.heating_costs_proof.annual_total_heating_costs : documents.rental_contract ? documents.rental_contract.heating_costs : heating_costs }}"
+value = "{{ documents.rental_contract && documents.rental_contract.heating_costs ? documents.rental_contract.heating_costs : (heating_costs ? heating_costs : (documents.heating_costs_proof ? documents.heating_costs_proof.annual_total_heating_costs / 12 : '')) }}"
 
 ["p3_kabelfernsehen_in_euro_pro_monat"]
 type = "string"

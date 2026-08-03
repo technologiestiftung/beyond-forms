@@ -14,6 +14,8 @@ dependencies = [
     "python-dotenv",
     "sqlalchemy",
     "beyondforms-auth",
+    "beyondforms-document-schemas",
+    "reportlab",
     "sqlacodegen",
     "pydantic",
     "firebase-admin",
@@ -28,6 +30,7 @@ dependencies = [
 
 [tool.uv.sources]
 beyondforms-auth = { workspace = true }
+beyondforms-document-schemas = { workspace = true }
 
 [[tool.uv.index]]
 url = "https://pypi.org/simple"

@@ -8,39 +8,19 @@ from src.utils.config import (
     TEST_ACCOUNT_PASSWORD,
 )
 from beyondforms.auth import get_current_user
+
+# The drama-number prefixes and `is_test_account` now live in `libs/auth` so the
+# orchestration middleware can apply the same check. Re-exported here so existing
+# call sites keep working.
+from beyondforms.auth import DRAMA_NUMBER_PREFIXES as _DRAMA_NUMBER_PREFIXES  # noqa: F401
+from beyondforms.auth import is_test_account  # noqa: F401
+
 from src.utils.auth_flows import AuthFlow, AUTH_FLOW_COOKIE_NAME
 from src.utils.db import get_db_pool
 from src.services.user_service import get_or_create_user
 from src.utils.token_exchange import exchange_session_for_oidc_token
 
 logger = logging.getLogger(__name__)
-
-# Bundesnetzagentur defines ranges of "Drama Numbers", which are phone numbers allowed
-# to be used in media productions, which will never be connected to real phones.
-# These numbers are used as test accounts.
-# https://www.bundesnetzagentur.de/DE/Fachthemen/Telekommunikation/Nummerierung/_DL/mittlg148_2021.pdf
-_DRAMA_NUMBER_PREFIXES = (
-    # Berlin
-    "03023125",
-    "+493023125",
-    # Frankfurt
-    "06990009",
-    "+496990009",
-    # Hamburg
-    "04066969",
-    "+494066969",
-    # Köln
-    "02214710",
-    "+492214710",
-    # München
-    "08999998",
-    "+498999998",
-)
-
-
-def is_test_account(phone_number: str) -> bool:
-    """Checks if a phone number belongs to a test account."""
-    return any(phone_number.startswith(prefix) for prefix in _DRAMA_NUMBER_PREFIXES)
 
 
 async def _start_test_enrollment(phone_number: str, response: Response):
