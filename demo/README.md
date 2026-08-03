@@ -37,6 +37,36 @@ Then log into the wallet frontend on <http://localhost:3000> with any of the pho
 They are Bundesnetzagentur "drama numbers", which bypass the SMS one-time password, so any
 code works.
 
+## Give this to your team
+
+Staging is publicly reachable and has `DEMO_SEED_ENABLED=true`, so any teammate — or their
+agent — can browse and seed the same three personas without running anything locally:
+
+```bash
+STAGING=https://staging.bf.citylab-berlin.org      # confirm the actual staging host/API path
+
+# 1. Browse what's available — no login needed, since these files hold no real data.
+curl -s $STAGING/api/v1/demo/personas | jq
+
+# 2. Log in as a persona's phone number. Drama numbers skip the SMS step — any code works.
+PHONE=+493023125102   # helmut; see step 1 for the others
+START=$(curl -s -X POST $STAGING/login/start -H 'Content-Type: application/json' \
+        -d "{\"phone_number\": \"$PHONE\"}")
+TOKEN0=$(echo "$START" | jq -r .token); FLOW=$(echo "$START" | jq -r .flow)
+TOKEN=$(curl -s -X POST $STAGING/login/finish -H 'Content-Type: application/json' \
+        -H "Authorization: Bearer $TOKEN0" -H "X-BeyondForms-Auth-Flow: $FLOW" \
+        -d '{"code":"123456"}' | jq -r .token)
+
+# 3. Seed, then drive it like any other account — GET /profile, GET /files, POST /chat, ...
+curl -s -X POST $STAGING/api/v1/demo/seed -H "Authorization: Bearer $TOKEN" \
+     -H 'Content-Type: application/json' -d '{"persona":"helmut"}' | jq
+curl -s $STAGING/profile -H "Authorization: Bearer $TOKEN" | jq
+```
+
+Whatever they build against this is the same REST surface production runs on — same JSON
+shapes, same auth, same computed fields — just pointed at a synthetic account instead of a
+real citizen's. Tokens are short-lived; re-run step 2 rather than caching one.
+
 ## Get a token
 
 ```bash
@@ -76,15 +106,20 @@ Full interactive reference: <http://localhost:8080/docs>.
 
 ### Demo endpoints
 
-| | |
-|---|---|
-| `GET /api/v1/demo/personas` | Every persona with its documents **and its research block** |
-| `POST /api/v1/demo/seed` | `{"persona": "helmut", "reset": true}` |
-| `DELETE /api/v1/demo/seed` | Cold start; add `?reset_tutorials=true` to replay onboarding |
+| | Auth | |
+|---|---|---|
+| `GET /api/v1/demo/personas` | none | Every persona with its documents **and its research block** |
+| `POST /api/v1/demo/seed` | drama number | `{"persona": "helmut", "reset": true}` |
+| `DELETE /api/v1/demo/seed` | drama number | Cold start; add `?reset_tutorials=true` to replay onboarding |
 
-They exist only where `DEMO_SEED_ENABLED=true` (staging and local; **never production**, where
-they 404), and each handler resolves the target user from the caller's own token and refuses
-anything that is not a drama number. You can only ever seed your own demo account.
+`GET /personas` is unauthenticated because it only reads files committed to the repo — there
+is nothing in them to protect. Seeding writes to a real `users` row, so it stays behind the
+same drama-number check as everything else.
+
+All three exist only where `DEMO_SEED_ENABLED=true` (staging and local; **never production**,
+where they 404). The two write endpoints resolve the target user from the caller's own
+token and refuse anything that is not a drama number — you can only ever seed your own
+demo account.
 
 ## Reading a persona file
 

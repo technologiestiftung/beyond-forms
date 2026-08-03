@@ -249,7 +249,8 @@ def test_seeding_never_publishes_to_pubsub():
 
 def test_demo_routes_are_not_mounted_by_default():
     """DEMO_SEED_ENABLED is unset in the test environment, so the routes must not exist
-    at all — a 404, with nothing to fingerprint."""
+    at all — a 404, with nothing to fingerprint. Applies even to the unauthenticated
+    /personas listing: the flag gates existence, not just the write paths."""
     from fastapi.testclient import TestClient
 
     from src.main import app
@@ -257,16 +258,16 @@ def test_demo_routes_are_not_mounted_by_default():
     paths = {getattr(route, "path", "") for route in app.routes}
     assert not any(path.startswith("/api/v1/demo") for path in paths)
 
-    # And prove it end to end, since the route table structure is a FastAPI detail.
-    response = TestClient(app).get("/api/v1/demo/personas")
-    assert response.status_code == 404
+    client = TestClient(app)
+    assert client.get("/api/v1/demo/personas").status_code == 404
+    assert client.post("/api/v1/demo/seed", json={"persona": "helmut"}).status_code == 404
 
 
 def test_seeding_is_refused_for_a_non_test_account():
     from beyondforms.auth import User as AuthUser
     from fastapi import HTTPException
 
-    from src.routes.demo import get_demo_service
+    from src.routes.demo import get_demo_service_for_caller
 
     real_user = AuthUser(
         user_id="real-auth-id",
@@ -275,14 +276,14 @@ def test_seeding_is_refused_for_a_non_test_account():
         is_authenticated=True,
     )
     with pytest.raises(HTTPException) as exc:
-        get_demo_service(current_user=real_user, db=MagicMock(spec=Session))
+        get_demo_service_for_caller(current_user=real_user, db=MagicMock(spec=Session))
     assert exc.value.status_code == 403
 
 
 def test_seeding_is_allowed_for_a_drama_number():
     from beyondforms.auth import User as AuthUser
 
-    from src.routes.demo import get_demo_service
+    from src.routes.demo import get_demo_service_for_caller
 
     demo_user = AuthUser(
         user_id="demo-auth-id",
@@ -290,6 +291,17 @@ def test_seeding_is_allowed_for_a_drama_number():
         session_id="s",
         is_authenticated=True,
     )
-    service, returned = get_demo_service(current_user=demo_user, db=MagicMock(spec=Session))
+    service, returned = get_demo_service_for_caller(current_user=demo_user, db=MagicMock(spec=Session))
     assert isinstance(service, DemoSeedService)
     assert returned is demo_user
+
+
+def test_personas_are_listable_without_authentication():
+    """The persona files are committed to the repo and contain no real data — nothing to
+    protect. Only seeding (a write) needs the drama-number check."""
+    from src.routes.demo import get_demo_service_readonly
+
+    service = get_demo_service_readonly(db=MagicMock(spec=Session))
+    service.personas_dir = PERSONAS_DIR  # get_demo_service_readonly defaults to the container path
+    slugs = {p["slug"] for p in service.list_personas()}
+    assert {"sabine", "helmut", "sandor"} <= slugs

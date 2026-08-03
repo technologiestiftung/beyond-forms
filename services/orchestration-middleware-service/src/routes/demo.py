@@ -1,12 +1,15 @@
 """
 Demo-persona seeding endpoints.
 
-Gated twice: the router is only mounted when `DEMO_SEED_ENABLED=true` (see `src/main.py`),
-so these paths 404 rather than 403 in production; and every handler resolves the target
-user from the caller's own token, refusing anything that is not a drama number.
+The router is only mounted when `DEMO_SEED_ENABLED=true` (see `src/main.py`), so these
+paths 404 rather than 403 in production.
 
-The target user is never read from the request body — unlike the `X-Internal-Token`
-pattern in `main.py`, where a leaked key would permit writes to arbitrary profiles.
+`GET /personas` is unauthenticated: it only reads the persona JSON files committed to the
+repo, which contain no real data, so there is nothing to protect. Every write path
+(`POST`/`DELETE /seed`) stays behind `require_authenticated_user` plus a drama-number
+check, and resolves the target user from the caller's own token — never from the request
+body, unlike the `X-Internal-Token` pattern in `main.py`, where a leaked key would permit
+writes to arbitrary profiles.
 """
 
 import logging
@@ -36,7 +39,11 @@ class SeedRequest(BaseModel):
     reset: bool = Field(True, description="Clear existing documents, application and profile first.")
 
 
-def get_demo_service(
+def get_demo_service_readonly(db: Session = Depends(get_db)) -> DemoSeedService:
+    return DemoSeedService(db)
+
+
+def get_demo_service_for_caller(
     current_user: AuthUser = Depends(require_authenticated_user),
     db: Session = Depends(get_db),
 ) -> tuple[DemoSeedService, AuthUser]:
@@ -62,16 +69,15 @@ def _internal_user_id(db: Session, current_user: AuthUser):
 
 
 @router.get("/personas")
-async def list_personas(service_and_user=Depends(get_demo_service)):
+async def list_personas(service: DemoSeedService = Depends(get_demo_service_readonly)):
     """Lists the available personas, including the research context behind each one."""
-    service, _ = service_and_user
     return {"personas": service.list_personas()}
 
 
 @router.post("/seed")
 async def seed_persona(
     payload: SeedRequest = Body(...),
-    service_and_user=Depends(get_demo_service),
+    service_and_user=Depends(get_demo_service_for_caller),
     db: Session = Depends(get_db),
 ):
     """
@@ -94,7 +100,7 @@ async def seed_persona(
 @router.delete("/seed")
 async def reset_account(
     reset_tutorials: bool = False,
-    service_and_user=Depends(get_demo_service),
+    service_and_user=Depends(get_demo_service_for_caller),
     db: Session = Depends(get_db),
 ):
     """
