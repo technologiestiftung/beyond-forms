@@ -2,10 +2,10 @@
   "$schema": "../persona.schema.json",
   "slug": "helmut",
   "phone_number": "+493023125102",
-  "title": "Helmut — Verheirateter deutscher Rentner mit hoher Miete",
+  "title": "Helmut — Verheirateter deutscher Rentner mit niedriger Altersrente",
   "source": "demo/research/02_helmut.md",
   "portrait": "portraits/Helmut.png",
-  "scenario": "Complete and fully verified. The only persona that exercises the final review, the completeness milestones and the PDF export end to end. Use this one when you need a case that works.",
+  "scenario": "The only persona built entirely from real committed scans — Personalausweis, Mietvertrag, Rentenbescheid, Kontoauszug, Heizkostenabrechnung, Versicherungsbescheinigung — with every profile figure read directly off them. Use this one when you want a document you can open and trust, not a synthetic stand-in.",
 
   "profile": {
     "first_name": "Helmut",
@@ -25,12 +25,12 @@
     "displaced_status": null,
     "residence_status": "Deutsche Staatsangehörigkeit",
 
-    "street": "Bundesallee",
-    "house_number": "187",
-    "zip_code": "10717",
+    "street": "Hauptstraße",
+    "house_number": "4",
+    "zip_code": "10820",
     "city": "Berlin",
     "state": "Berlin",
-    "district": "Charlottenburg-Wilmersdorf",
+    "district": "Tempelhof-Schöneberg",
 
     "persons_in_household_count": 2,
 
@@ -38,7 +38,7 @@
     "health_insurance_provider": "AOK Nordost",
     "health_insurance_status": "Compulsory Insurance",
     "pension_insurance_provider": "Deutsche Rentenversicherung Bund",
-    "pension_insurance_no": "14140247K503",
+    "pension_insurance_no": "52 171060 S 060",
 
     "is_currently_employed": false,
     "ability_to_work": "Fully able",
@@ -47,34 +47,34 @@
 
     "accomodation_type": "Rental Apartment",
     "tenancy_status": "Main Tenant",
-    "rent_total": 1200.00,
-    "heating_costs": 160.00,
-    "hot_water_costs": 30.00,
+    "rent_total": 430.87,
+    "heating_costs": 25.00,
+    "hot_water_costs": 0.00,
     "cable_tv_costs": 0.00,
     "number_of_rooms": 3,
-    "living_area": 78.00,
+    "living_area": 68.00,
     "sublet_room_count": null,
     "sublet_rent_income": null,
     "rent_paid_until": "2026-07-31",
-    "landlord_name": "Hausverwaltung Bundesallee GmbH",
-    "heating_type": "Fernwärme",
+    "landlord_name": "Wohngenossenschaft Berlin eG",
+    "heating_type": "Zentralheizung",
     "free_housing_right_holder": null,
 
-    "monthly_income": 450.00,
+    "monthly_income": 650.00,
     "income_sources": ["pension"],
-    "has_assets": false,
+    "has_assets": true,
     "assets_types": [],
     "assets_description": null,
 
-    "bank_name": "Berliner Sparkasse",
+    "bank_name": "Sparkasse Musterstadt",
     "account_holder": "Helmut Klar",
-    "iban": "DE41100500000123456789",
-    "bic": "BELADEBE",
+    "iban": "DE65940594210000123456",
+    "bic": null,
 
     "has_received_previous_benefits": true,
-    "previous_benefits_authority": "Bezirksamt Charlottenburg-Wilmersdorf, Amt für Soziales",
+    "previous_benefits_authority": "Bezirksamt Tempelhof-Schöneberg von Berlin, Amt für Soziales",
     "previous_benefits_period": "01.03.2021 - 30.06.2026",
-    "previous_benefits_ref_no": "GS-CW-2021-4471",
+    "previous_benefits_ref_no": "GS-TS-2021-4471",
     "has_applied_for_asylum_benefits": false,
     "has_applied_for_benefits_awaiting_decision": false,
     "are_one_time_payments_expected": false,
@@ -116,8 +116,8 @@
         "valid_until": "2030-05-19",
         "date_of_issue": "2020-05-19",
         "place_of_issue": "Berlin",
-        "address": "Bundesallee 187, 10717 Berlin",
-        "issuing_authority": "Bezirksamt Charlottenburg-Wilmersdorf von Berlin"
+        "address": "Hauptstr. 4, 10820 Berlin",
+        "issuing_authority": "Bezirksamt Tempelhof-Schöneberg von Berlin"
       }
     },
     {
@@ -128,12 +128,12 @@
       "asset": "Beispiel Mietvertrag.pdf",
       "raw_data": {
         "tenant_name": "Helmut Klar",
-        "tenant_address": "Bundesallee 187, 10717 Berlin",
-        "net_cold_rent": 1010.00,
-        "monthly_total_rent": 1200.00,
-        "operating_costs": 190.00,
-        "heating_costs": 160.00,
-        "square_meters": 78.0,
+        "tenant_address": "Hauptstr. 4, 10820 Berlin",
+        "net_cold_rent": 355.87,
+        "monthly_total_rent": 430.87,
+        "operating_costs": 75.00,
+        "heating_costs": 25.00,
+        "square_meters": 68.0,
         "is_main_tenant": true,
         "has_sub_tenants": false,
         "start_date_of_rent": "1998-04-01",
@@ -145,16 +145,16 @@
       "status": "verified",
       "confidence_score": 0.94,
       "display_name": "Rentenbescheid_Helmut_Klar.pdf",
-      "asset": { "generate": true, "title": "Rentenbescheid", "subtitle": "Deutsche Rentenversicherung Bund" },
+      "asset": "Grundsicherung_Rentenbescheid_Helmut Klar.pdf",
       "raw_data": {
-        "pension_reason": "Regelaltersrente nach § 35 SGB VI",
-        "pension_insurance_number": "14140247K503",
-        "case_number": "DRV-14140247K503-01",
-        "start_date_of_pension": "2013-03-01",
+        "pension_reason": "Altersrente",
+        "pension_insurance_number": "52 171060 S 060",
+        "case_number": "4617 (000-01)",
+        "start_date_of_pension": "2026-01-01",
         "end_date_of_pension": null,
-        "monthly_amount": 450.00,
+        "monthly_amount": 650.00,
         "back_pay_amount": null,
-        "date_of_issue": "2026-01-12",
+        "date_of_issue": "2026-04-23",
         "is_granted": true
       }
     },
@@ -163,18 +163,17 @@
       "status": "verified",
       "confidence_score": 0.89,
       "display_name": "Kontoauszug_Helmut_Klar.pdf",
-      "asset": { "generate": true, "title": "Kontoauszug", "subtitle": "Berliner Sparkasse" },
+      "asset": "Bank_Statement_Helmut_Klar.pdf",
       "raw_data": {
-        "iban": "DE41100500000123456789",
+        "iban": "DE65940594210000123456",
         "account_holder_name": "Helmut Klar",
-        "statement_period_start": "2026-05-01",
-        "statement_period_end": "2026-07-31",
-        "statement_date": "2026-07-31",
-        "account_balance": 84.13,
-        "amount_rent": 1200.00,
-        "amount_pension": 450.00,
-        "amount_health_insurance": 0.00,
-        "amount_liability_insurance": 290.00
+        "statement_period_start": "2026-01-01",
+        "statement_period_end": "2026-03-31",
+        "statement_date": "2026-04-04",
+        "account_balance": 5267.56,
+        "amount_rent": 430.87,
+        "amount_pension": 650.00,
+        "amount_liability_insurance": 52.67
       }
     },
     {
@@ -182,15 +181,10 @@
       "status": "verified",
       "confidence_score": 0.86,
       "display_name": "Heizkostenabrechnung_Helmut_Klar.pdf",
-      "asset": { "generate": true, "title": "Heizkostenabrechnung", "subtitle": "Abrechnungszeitraum 2025" },
+      "asset": "Heizkostenabrechnung Helmut Klar.pdf",
       "raw_data": {
-        "fuel_type": "Fernwärme",
-        "annual_total_heating_costs": 1920.00,
-        "annual_consumption_amount_kwh_per_square_meter": 118.0,
-        "heating_costs_regardless_of_usage": 576.00,
-        "heating_costs_usage_based": 1344.00,
-        "warm_water_costs_regardless_of_usage": 108.00,
-        "warm_water_costs_usage_based": 252.00
+        "annual_total_heating_costs": 321.85,
+        "annual_consumption_amount_kwh_per_square_meter": 166.0
       }
     },
     {
@@ -202,95 +196,8 @@
       "raw_data": {
         "full_name": "Helmut Klar",
         "insurance_name": "AOK Nordost",
-        "pension_insurance_number": "14140247K503",
+        "pension_insurance_number": "52 171060 S 060",
         "health_insurance_status": "compulsory_insurance"
-      }
-    },
-    {
-      "document_type": "registration",
-      "status": "verified",
-      "confidence_score": 0.92,
-      "display_name": "Meldebescheinigung_Helmut_Klar.pdf",
-      "asset": { "generate": true, "title": "Meldebescheinigung", "subtitle": "Bürgeramt Wilmersdorf" },
-      "raw_data": {
-        "given_names": "Helmut",
-        "last_name": "Klar",
-        "marital_status": "verheiratet",
-        "nationality": "DEU",
-        "place_of_birth": "Berlin",
-        "date_of_birth": "1947-02-14",
-        "date_of_issue": "2026-06-18",
-        "address": "Bundesallee 187, 10717 Berlin",
-        "is_living_with_spouse": true,
-        "is_living_with_children": false,
-        "is_living_with_parent": false,
-        "issuing_authority": "Bezirksamt Charlottenburg-Wilmersdorf von Berlin, Bürgeramt Wilmersdorf"
-      }
-    },
-    {
-      "document_type": "bank",
-      "status": "verified",
-      "confidence_score": 0.98,
-      "display_name": "Kontobestaetigung_Helmut_Klar.pdf",
-      "asset": { "generate": true, "title": "Kontobestätigung", "subtitle": "Berliner Sparkasse" },
-      "raw_data": {
-        "iban": "DE41100500000123456789",
-        "account_holder": "Helmut Klar"
-      }
-    },
-    {
-      "document_type": "utility_bill",
-      "status": "verified",
-      "confidence_score": 0.87,
-      "display_name": "Nebenkostenabrechnung_Helmut_Klar.pdf",
-      "asset": { "generate": true, "title": "Betriebskostenabrechnung", "subtitle": "Hausverwaltung Bundesallee GmbH" },
-      "raw_data": {
-        "billing_period": "01.01.2025 - 31.12.2025",
-        "balance_due": 142.6
-      }
-    },
-    {
-      "document_type": "housing",
-      "status": "verified",
-      "confidence_score": 0.9,
-      "display_name": "Anlage_KdU_Helmut_Klar.pdf",
-      "asset": { "generate": true, "title": "Anlage KdU – Kosten der Unterkunft", "subtitle": "Bundesallee 187, 10717 Berlin" },
-      "raw_data": {
-        "base_rent": 1010.0,
-        "heating_type": "Fernwärme"
-      }
-    },
-    {
-      "document_type": "household",
-      "status": "verified",
-      "confidence_score": 0.94,
-      "display_name": "Haushaltsbescheinigung_Helmut_Klar.pdf",
-      "asset": { "generate": true, "title": "Haushaltsbescheinigung", "subtitle": "Zwei-Personen-Haushalt" },
-      "raw_data": {
-        "member_count": 2,
-        "has_partner_in_household": true
-      }
-    },
-    {
-      "document_type": "income",
-      "status": "verified",
-      "confidence_score": 0.91,
-      "display_name": "Einkommenserklaerung_Helmut_Klar.pdf",
-      "asset": { "generate": true, "title": "Einkommenserklärung", "subtitle": "Anlage zum Antrag auf Grundsicherung" },
-      "raw_data": {
-        "has_self_employment_income": false,
-        "total_monthly_net": 450.0
-      }
-    },
-    {
-      "document_type": "assets",
-      "status": "verified",
-      "confidence_score": 0.93,
-      "display_name": "Vermoegenserklaerung_Helmut_Klar.pdf",
-      "asset": { "generate": true, "title": "Vermögenserklärung", "subtitle": "Anlage zum Antrag auf Grundsicherung" },
-      "raw_data": {
-        "total_liquid_assets": 84.13,
-        "owns_real_estate": false
       }
     }
   ],
@@ -300,28 +207,29 @@
       "document_type": "cooperation_agreement",
       "reason": "not_applicable",
       "note": "A Kooperationsvereinbarung belongs to SGB II (Bürgergeld), not to Grundsicherung im Alter under SGB XII. Helmut would never be asked for one."
-    }
+    },
+    { "document_type": "registration", "reason": "not_yet_supplied", "note": "Meldebescheinigung — no scan exists; the same values already come from his profile and identity_document, so this is nice-to-have, not blocking." },
+    { "document_type": "bank", "reason": "not_yet_supplied", "note": "Kontobestätigung — his IBAN is already established via the Kontoauszug." },
+    { "document_type": "utility_bill", "reason": "not_yet_supplied", "note": "Betriebskostenabrechnung — no scan exists." },
+    { "document_type": "housing", "reason": "not_yet_supplied", "note": "Anlage KdU — rent and heating are already covered by the Mietvertrag and Heizkostenabrechnung." },
+    { "document_type": "household", "reason": "not_yet_supplied", "note": "Haushaltsbescheinigung — persons_in_household_count already covers this from the profile." },
+    { "document_type": "income", "reason": "not_yet_supplied", "note": "Einkommenserklärung — his income is already established via the Rentenbescheid and Kontoauszug." },
+    { "document_type": "assets", "reason": "not_yet_supplied", "note": "Vermögenserklärung — his balance is already established via the Kontoauszug." }
   ],
 
   "derived": [
     "birth_name",
     "date_of_birth",
     "married_since",
-    "street",
-    "house_number",
-    "zip_code",
-    "district",
-    "pension_insurance_no",
-    "pension_insurance_provider",
-    "health_insurance_provider",
-    "iban",
-    "bic",
-    "bank_name",
-    "landlord_name",
+    "place_of_birth",
+    "number_of_rooms",
+    "living_area",
     "heating_costs",
     "hot_water_costs",
-    "living_area",
+    "landlord_name",
+    "heating_type",
     "rent_paid_until",
+    "health_insurance_provider",
     "previous_benefits_authority",
     "previous_benefits_period",
     "previous_benefits_ref_no",
@@ -351,13 +259,14 @@
       "partner_has_small_additional_income": true,
       "insurance_liability_household_life_total_eur": 290,
       "children_count": 2,
-      "note": "`users` has a single `monthly_income` scalar and no household-member entity, so his wife's pension and her additional income cannot be stored — only `persons_in_household_count: 2` hints at the couple. There are also no insurance-cost columns, even though his User Story 9 is specifically about insurance being coverable. The €290 is recorded in the stmt3 document's `amount_liability_insurance` as the closest available home. Both are filed schema gaps."
+      "note": "`users` has a single `monthly_income` scalar and no household-member entity, so his wife's pension cannot be stored — only `persons_in_household_count: 2` hints at the couple. There are also no insurance-cost columns, even though his User Story 9 is specifically about insurance being coverable; the Tierhaftpflicht debit of €52.67 visible on the Kontoauszug is recorded in the stmt3 document's `amount_liability_insurance` as the closest available home. Both are filed schema gaps."
     },
     "unreconciled": {
-      "age": "Short profile says 75–85+, User Story 1 says 68. The source document flags this itself. Resolved here in favour of the short profile (born 1947), which also places him past retirement age and therefore on a genuinely different eligibility branch from Sabine.",
+      "figures_follow_the_documents_not_the_research": "The research document describes a €1,200 Warmmiete in Charlottenburg-Wilmersdorf and a €450 pension. The committed scans say otherwise — €650 Altersrente, €430,87 rent-and-Nebenkosten debit, Hauptstr. 4 in 10820 — and the documents win, so that nothing contradicts itself when a reviewer opens them during a demo. The consequence is that Helmut is no longer the high-rent case the research captured; if that scenario is needed, it has to move to a persona of its own.",
+      "age": "Short profile says 75–85+, User Story 1 says 68. The source document flags this itself. Resolved in favour of the short profile (born 1947), which also places him past retirement age and therefore on a genuinely different eligibility branch from Sabine.",
       "pension_contribution_years": "Stated both as 'over 17 years' and as 'over 30 years of minimum contributions while self-employed'.",
-      "need_and_entitlement": "Stated gross need €800–1,250 and net entitlement €650–710/month do not reconcile with a €1,200 Warmmiete plus two Regelsätze minus €770 household income. Recorded as stated rather than silently adjusted."
+      "fixture_addresses_disagree": "The Rentenbescheid and Heizkostenabrechnung say Hauptstr. 4, 10820 Berlin; the Kontoauszug says Hauptstr. 3, 10829 Berlin; the Heizkostenabrechnung is also addressed to 'Herr Mustermann' in its salutation. The majority reading (Hauptstr. 4, 10820) is used, which is also the only unambiguous postcode of the two."
     },
-    "notes": "Surname 'Klar' is kept so the committed Personalausweis_ Helmut_Klar.png fixture remains usable. The Rentenbescheid, Kontoauszug and Heizkostenabrechnung fixtures are NOT reused: they carry the older €650 pension and €430.87 rent from forms/scripts/llm-eval/profiles/helmut_klar.json and would visibly contradict this persona when opened during a demo. Those three are generated from raw_data instead."
+    "notes": "All six documents are real committed scans — nothing generated. The seven supporting Anlagen (Meldebescheinigung, Kontobestätigung, Betriebskostenabrechnung, KdU, Haushaltsbescheinigung, Einkommens- and Vermögenserklärung) are deliberately left unseeded rather than fabricated; see missing_documents. He now has assets (€5.267,56 on the Kontoauszug) — still well inside the SGB XII Schonvermögen, so he stays eligible. No BIC is set: the Kontoauszug does not show one, and inventing one for a fictional 'Sparkasse Musterstadt' would reintroduce exactly the kind of contradiction this persona now avoids."
   }
 }

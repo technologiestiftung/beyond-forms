@@ -327,9 +327,9 @@ class DemoSeedService:
         display_name = spec.get("display_name") or f"{spec['document_type']}.pdf"
         content, content_type, source = resolve_asset(spec["asset"], display_name, raw_data)
 
-        # Same object naming as routes/files.py::upload_file_to_gcs — flat, UUID-prefixed.
-        # The frontend strips the UUID prefix and keyword-matches the remainder to a slot,
-        # so the German filename is load-bearing and must survive.
+        if isinstance(spec["asset"], dict) and not display_name.lower().endswith(".pdf"):
+            display_name = f"{Path(display_name).stem}.pdf"
+
         sanitized = re.sub(r"[^a-zA-Z0-9_\-\.]", "_", display_name)
         object_name = f"{uuid.uuid4()}_{sanitized}"
 
