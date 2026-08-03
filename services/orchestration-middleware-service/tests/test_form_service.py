@@ -407,3 +407,177 @@ def test_extract_document_refs_no_references():
     }
     refs = _extract_document_refs(mapping)
     assert refs == {}
+
+
+@pytest.mark.asyncio
+async def test_fill_form_resolves_dis_type_from_a_slot_id_document(form_service, mock_user):
+    """
+    Documents are stored under frontend slot ids (`id_card`), but the TOML mappings
+    reference document-intelligence registry names (`documents.identity_document.*`).
+    The two vocabularies overlap on `pension_notice` alone, so before the dual-key
+    registration every `documents.*` reference in antrag_grundsicherung.toml resolved
+    to nothing.
+    """
+    _set_application_query(form_service, _mock_application({}))
+    _set_documents_query(
+        form_service,
+        [_mock_document("id_card", {"valid_until": "2030-05-19"}, "verified")],
+    )
+
+    mock_mapping = {"p1_id_valid": "{{ documents.identity_document.valid_until }}"}
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch("httpx.AsyncClient.post") as mock_post,
+    ):
+        mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
+        await form_service.fill_form("antrag_grundsicherung", mock_user)
+
+        assert mock_post.call_args.kwargs["json"]["field_values"]["p1_id_valid"] == "2030-05-19"
+
+
+@pytest.mark.asyncio
+async def test_fill_form_still_resolves_the_stored_slot_id(form_service, mock_user):
+    """The alias must be additive: a mapping written against the slot id keeps working."""
+    _set_application_query(form_service, _mock_application({}))
+    _set_documents_query(
+        form_service,
+        [_mock_document("id_card", {"issuing_authority": "Bezirksamt Mitte"}, "verified")],
+    )
+
+    mock_mapping = {"p1_authority": "{{ documents.id_card.issuing_authority }}"}
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch("httpx.AsyncClient.post") as mock_post,
+    ):
+        mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
+        await form_service.fill_form("antrag_grundsicherung", mock_user)
+
+        assert mock_post.call_args.kwargs["json"]["field_values"]["p1_authority"] == "Bezirksamt Mitte"
+
+
+@pytest.mark.asyncio
+async def test_fill_form_falls_back_when_form_type_does_not_match(form_service, mock_user):
+    """
+    `get_or_create_user_application` writes form_type="grundsicherung" while exports are
+    requested as "antrag_grundsicherung", so the exact match never hit and both the
+    form_data and documents namespaces were empty for every user.
+    """
+    application = _mock_application({"cost_of_rent": decimal.Decimal("1200.00")})
+    query = form_service.db.query.return_value
+    # First call is the exact form_type match (misses), second is the fallback.
+    query.filter.return_value.order_by.return_value.first.side_effect = [None, application]
+    _set_documents_query(form_service, [])
+
+    mock_mapping = {"p1_cost_of_rent": "{{ cost_of_rent }}"}
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch("httpx.AsyncClient.post") as mock_post,
+    ):
+        mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
+        await form_service.fill_form("antrag_grundsicherung", mock_user)
+
+        assert mock_post.call_args.kwargs["json"]["field_values"]["p1_cost_of_rent"] == "1200.00"
+
+
+def test_document_refs_in_the_grundsicherung_mapping_resolve_in_the_registry():
+    """
+    Drift guard over the real mapping: every `documents.<type>.<field>` it references
+    should name a registered document type and an existing field, or no fixture can ever
+    fill it. Eight references currently do not resolve — see the xfail below. The list is
+    allowed to shrink, never to grow.
+    """
+    import tomllib
+    from pathlib import Path
+
+    from beyondforms.document_schemas.document_registry import document_registry
+
+    mapping_path = Path(__file__).resolve().parents[3] / "forms" / "mappings" / "antrag_grundsicherung.toml"
+    if not mapping_path.is_file():
+        pytest.skip(f"{mapping_path} not available")
+
+    with mapping_path.open("rb") as handle:
+        raw = tomllib.load(handle)
+
+    flat = {}
+    for key, value in raw.items():
+        if isinstance(value, dict) and "value" in value:
+            flat[key] = value["value"]
+        elif isinstance(value, str):
+            flat[key] = value
+
+    unresolvable = []
+    for doc_type, fields in _extract_document_refs(flat).items():
+        try:
+            model = document_registry.get_or_raise(doc_type)
+        except ValueError:
+            unresolvable.append(f"{doc_type} (unknown type)")
+            continue
+        for field in fields or set():
+            if field not in model.model_fields:
+                unresolvable.append(f"{doc_type}.{field}")
+
+    known_broken = {
+        "asylblg_application.bg_number",
+        "bank_details.bic",
+        "care_facility_costs.invoice_amount",
+        "disability_id.valid_until",
+        "private_pension_proof.monthly_amount",
+        "private_pension_yearly_information.accumulated_yearly_net_income",
+        "recognition_decision.date_of_issue",
+        "recognition_decision.issuing_authority",
+    }
+    regressions = sorted(set(unresolvable) - known_broken)
+    assert not regressions, f"new unresolvable document references in the mapping: {regressions}"
+
+
+@pytest.mark.asyncio
+async def test_fill_form_interpolates_dates_in_german_format(form_service, mock_user):
+    import datetime
+
+    mock_user.reduced_work_capacity_start_date = datetime.date(2019, 10, 1)
+    mock_user.reduced_work_capacity_end_date = None
+    col_a, col_b = MagicMock(), MagicMock()
+    col_a.name = "reduced_work_capacity_start_date"
+    col_b.name = "reduced_work_capacity_end_date"
+    mock_user.__table__.columns = list(mock_user.__table__.columns) + [col_a, col_b]
+    _set_application_query(form_service, None)
+
+    mock_mapping = {
+        "p1_period": "{{ reduced_work_capacity_start_date }}"
+        "{{ reduced_work_capacity_start_date ? ' bis ' : '' }}"
+        "{{ reduced_work_capacity_start_date ? (reduced_work_capacity_end_date ? "
+        "reduced_work_capacity_end_date : 'unbefristet') : '' }}"
+    }
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch("httpx.AsyncClient.post") as mock_post,
+    ):
+        mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
+        await form_service.fill_form("antrag_grundsicherung", mock_user)
+
+        assert mock_post.call_args.kwargs["json"]["field_values"]["p1_period"] == "01.10.2019 bis unbefristet"
+
+
+@pytest.mark.asyncio
+async def test_fill_form_survives_an_unevaluable_mapping_entry(form_service, mock_user):
+    """A single broken expression used to 500 the entire export."""
+    _set_application_query(form_service, None)
+    mock_mapping = {
+        "p1_broken": "{{ date_of_birth + ' oops' }}",
+        "p1_ok": "{{ first_name }}",
+    }
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch("httpx.AsyncClient.post") as mock_post,
+    ):
+        mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
+        await form_service.fill_form("antrag_grundsicherung", mock_user)
+
+        field_values = mock_post.call_args.kwargs["json"]["field_values"]
+        assert field_values["p1_broken"] == ""
+        assert field_values["p1_ok"] == "Max"

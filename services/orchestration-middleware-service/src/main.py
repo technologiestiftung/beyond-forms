@@ -89,9 +89,7 @@ async def notify_document_processed(
     if (
         not expected_token
         or not x_internal_token
-        or not secrets.compare_digest(
-            x_internal_token.encode("utf-8"), expected_token.encode("utf-8")
-        )
+        or not secrets.compare_digest(x_internal_token.encode("utf-8"), expected_token.encode("utf-8"))
     ):
         raise HTTPException(status_code=403, detail="Invalid internal authentication token")
 
@@ -171,3 +169,12 @@ app.include_router(llm.router)
 app.include_router(application.router)
 app.include_router(form_export.router)
 app.include_router(cms.router, prefix="/cms")
+
+# Demo-persona seeding is mounted only where it is explicitly enabled, so the routes do
+# not exist at all in production (404 rather than 403 — nothing to fingerprint). The
+# handlers apply a second gate: they only ever seed the caller's own test account.
+if os.environ.get("DEMO_SEED_ENABLED", "").strip().lower() == "true":
+    from src.routes import demo
+
+    app.include_router(demo.router)
+    logger.warning("DEMO_SEED_ENABLED=true: demo persona seeding routes are mounted at /api/v1/demo.")

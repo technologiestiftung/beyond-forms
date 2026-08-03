@@ -130,6 +130,17 @@ def normalize_nationality_string(val: Any) -> Optional[str]:
         "PORTUGIESISCH": "PT",
         "PORTUGAL": "PT",
         "PRT": "PT",
+        "SYRISCH": "SY",
+        "SYRIAN": "SY",
+        "SYRIA": "SY",
+        "SYRIEN": "SY",
+        "SY": "SY",
+        "SYR": "SY",
+        "UNGARISCH": "HU",
+        "HUNGARIAN": "HU",
+        "HUNGARY": "HU",
+        "UNGARN": "HU",
+        "HU": "HU",
     }
     return mapping.get(val_clean, val_clean)
 

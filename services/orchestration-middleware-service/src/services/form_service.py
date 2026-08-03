@@ -16,6 +16,7 @@ from pyjexl import JEXL
 from sqlalchemy.exc import DatabaseError, DisconnectionError
 from sqlalchemy.orm import Session
 
+from src.constants import SLOT_ID_TO_DIS_TYPE
 from src.db import get_db
 from src.models import DocumentStatusType, UserApplications, UserDocuments, Users
 from src.services.berlin_districts import resolve_berlin_district
@@ -25,6 +26,10 @@ logger = logging.getLogger(__name__)
 
 FORM_NAME_PATTERN = re.compile(r"^[a-zA-Z0-9_-]+$")
 _DOCUMENT_REF_RE = re.compile(r"documents\.([a-zA-Z_][a-zA-Z0-9_]*)(?:\.([a-zA-Z_][a-zA-Z0-9_]*))?")
+
+# Distinguishes "referenced as a whole object" (refs[type] is None) from
+# "not referenced by the mapping at all" (absent from refs).
+_UNREFERENCED = object()
 
 
 def _extract_document_refs(mapping: Dict[str, Any]) -> Dict[str, set[str] | None]:
@@ -224,6 +229,24 @@ class FormService:
                 .order_by(UserApplications.updated_at.desc())
                 .first()
             )
+            if application is None:
+                # `get_or_create_user_application` writes form_type="grundsicherung" while
+                # exports are requested as "antrag_grundsicherung", so the exact match above
+                # never hits and both namespaces below stay empty. Fall back to the user's
+                # most recent application rather than silently exporting a profile-only PDF.
+                application = (
+                    self.db.query(UserApplications)
+                    .filter(UserApplications.fk_user_id == user.id)
+                    .order_by(UserApplications.updated_at.desc())
+                    .first()
+                )
+                if application:
+                    logger.info(
+                        "No application with form_type=%r; falling back to most recent application %s (form_type=%r)",
+                        form_type,
+                        application.application_id,
+                        application.form_type,
+                    )
             if application:
                 if application.form_data:
                     form_data = application.form_data
@@ -240,14 +263,27 @@ class FormService:
                         .all()
                     )
                     for doc in verified_docs:
-                        if doc.raw_data and doc.document_type not in documents_ctx:
-                            needed = needed_refs.get(doc.document_type)
+                        if not doc.raw_data:
+                            continue
+                        # Documents are stored under frontend slot ids (`id_card`, `rent`, …)
+                        # while the TOML mappings reference document-intelligence registry
+                        # names (`documents.identity_document.*`). The two vocabularies
+                        # overlap on `pension_notice` alone, so register each document under
+                        # both names and let the mapping use whichever it was written against.
+                        aliases = {
+                            doc.document_type,
+                            SLOT_ID_TO_DIS_TYPE.get(doc.document_type, doc.document_type),
+                        }
+                        for alias in aliases:
+                            if alias in documents_ctx:
+                                continue
+                            needed = needed_refs.get(alias, _UNREFERENCED)
+                            if needed is _UNREFERENCED:
+                                continue
                             if needed is None:
-                                documents_ctx[doc.document_type] = dict(doc.raw_data)
+                                documents_ctx[alias] = dict(doc.raw_data)
                             else:
-                                documents_ctx[doc.document_type] = {
-                                    k: v for k, v in doc.raw_data.items() if k in needed
-                                }
+                                documents_ctx[alias] = {k: v for k, v in doc.raw_data.items() if k in needed}
 
         except DatabaseError:
             logger.warning("Internal database error")
@@ -270,22 +306,29 @@ class FormService:
             if isinstance(default_value, str):
                 stripped_val = default_value.strip()
                 # If the string is a pure JEXL expression, evaluate it first
-                if (
-                    stripped_val.startswith("{{")
-                    and stripped_val.endswith("}}")
-                    and stripped_val.count("{{") == 1
-                    and stripped_val.count("}}") == 1
-                ):
-                    res = self.jexl.evaluate(stripped_val[2:-2].strip(), context)
-                else:
+                try:
+                    if (
+                        stripped_val.startswith("{{")
+                        and stripped_val.endswith("}}")
+                        and stripped_val.count("{{") == 1
+                        and stripped_val.count("}}") == 1
+                    ):
+                        res = self.jexl.evaluate(stripped_val[2:-2].strip(), context)
+                    else:
 
-                    def _eval(m):
-                        val_res = self.jexl.evaluate(m.group(1), context)
-                        if isinstance(val_res, bool):
-                            return "Ja" if val_res else ""
-                        return str(val_res) if val_res is not None else ""
+                        def _eval(m):
+                            val_res = self.jexl.evaluate(m.group(1), context)
+                            if isinstance(val_res, bool):
+                                return "Ja" if val_res else ""
+                            if isinstance(val_res, (datetime.date, datetime.datetime)):
+                                return val_res.strftime("%d.%m.%Y")
+                            return str(val_res) if val_res is not None else ""
 
-                    res = re.sub(r"\{\{\s*(.*?)\s*\}\}", _eval, stripped_val, flags=re.DOTALL)
+                        res = re.sub(r"\{\{\s*(.*?)\s*\}\}", _eval, stripped_val, flags=re.DOTALL)
+                except Exception as e:
+                    # One unevaluable mapping entry must not fail the whole export.
+                    logger.warning(f"Mapping field {field_id!r} could not be evaluated: {e}")
+                    res = None
             else:
                 res = default_value
 

@@ -348,6 +348,13 @@ resource "google_cloud_run_v2_service" "middleware_service" {
         name  = "GCS_BUCKET_NAME"
         value = each.value.bucket_name
       }
+      # Demo persona seeding. Staging only: when this is not "true" the routes are never
+      # mounted, so /api/v1/demo/* returns 404 in production rather than 403. Handlers
+      # apply a second gate and only ever seed the caller's own drama-number test account.
+      env {
+        name  = "DEMO_SEED_ENABLED"
+        value = each.key == "stg" ? "true" : "false"
+      }
       env {
         name  = "POSTGRES_HOST"
         value = google_alloydb_instance.alloydb_primary.ip_address
