@@ -1,0 +1,184 @@
+# Demo personas
+
+Prefilled BeyondForms accounts — profile **and** verified documents — so an experiment can
+start from a realistic case instead of an empty form. Seeding skips the document-intelligence
+pipeline entirely: extractions are reviewed fixtures, so there is no Gemini call, no Pub/Sub
+publish, and no waiting.
+
+| | Sabine | Helmut | Sandor |
+|---|---|---|---|
+| | <img src="personas/portraits/Sabine.png" width="180"> | <img src="personas/portraits/Helmut.png" width="180"> | <img src="personas/portraits/Sandor.png" width="180"> |
+| **Phone** | `+493023125101` | `+493023125102` | `+493023125103` |
+| **Case** | Volle Erwerbsminderung, single, 1-person household, Mitte | Grundsicherung im Alter, married, 2-person household, Charlottenburg-Wilmersdorf | Asylberechtigt, non-German, single, long-term recipient, Neukölln |
+| **State** | Mid-flow — 4 documents, Rentenbescheid **missing**, Kontoauszug flagged as an old statement | **Complete** — 13 documents, all verified, 13 of 14 slots | Mid-flow — 4 documents, Nebenkostenabrechnung **failed as illegible**, Kontoauszug missing pages, Heizkosten never uploaded |
+| **Use it for** | To-do handling, encouragement copy, cognitive load, "I can't find this document" | Final review, completeness milestones, PDF export — the case that works | Upload quality feedback, error copy, the KdU/housing-cost flow, multilingual surfaces |
+| **Source** | [01_sabine.md](research/01_sabine.md) | [02_helmut.md](research/02_helmut.md) | [03_sandor.md](research/03_sandor.md) |
+
+The three deliberately land in **different** states. If they all looked complete they would
+stop exercising the review and to-do paths, which is most of what there is to study.
+
+## Seed them
+
+```bash
+docker compose up -d                         # DEMO_SEED_ENABLED defaults to true locally
+./scripts/seed_demo_personas.sh              # all three, prints a phone/token table
+./scripts/seed_demo_personas.sh helmut       # just one
+./scripts/seed_demo_personas.sh --no-reset   # keep what's already there
+```
+
+There is **no local GCS emulator**, so document blobs go to the real dev bucket — run
+`gcloud auth application-default login` first.
+
+Then log into the wallet frontend on <http://localhost:3000> with any of the phone numbers.
+They are Bundesnetzagentur "drama numbers", which bypass the SMS one-time password, so any
+code works.
+
+## Get a token
+
+```bash
+TOKEN=$(./scripts/demo_token.sh +493023125102)
+./scripts/demo_token.sh --all                 # phone/persona/token table
+```
+
+Tokens are short-lived Authentik ID tokens. There is deliberately no long-lived static
+credential — re-running the script is two curls and no SMS.
+
+## Drive an account over the API
+
+```bash
+API=http://localhost:8080
+TOKEN=$(./scripts/demo_token.sh +493023125102)
+AUTH="Authorization: Bearer $TOKEN"
+
+curl -s $API/verify_auth -H "$AUTH" | jq                    # who am I
+curl -s $API/profile -H "$AUTH" | jq                        # the whole users row
+curl -s $API/files -H "$AUTH" | jq                          # documents + status + confidence
+
+DOC=$(curl -s $API/files -H "$AUTH" | jq -r '.[0].document_id')
+curl -s $API/api/v1/documents/$DOC/extractions -H "$AUTH" | jq   # raw_data as the review UI sees it
+curl -s $API/api/v1/documents/$DOC/file -H "$AUTH" -o document.pdf
+
+APP=$(curl -s -X POST $API/api/v1/demo/seed -H "$AUTH" -H 'Content-Type: application/json' \
+        -d '{"persona":"helmut"}' | jq -r .application_id)
+curl -s $API/application/$APP/status -H "$AUTH" | jq        # completeness + milestone
+
+curl -s $API/export/antrag_grundsicherung -H "$AUTH" | jq   # filled PDF, signed URL
+
+curl -s -X POST $API/chat -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"content":"Wie hoch ist meine Miete laut meinem Profil?"}' | jq -r .content
+```
+
+Full interactive reference: <http://localhost:8080/docs>.
+
+### Demo endpoints
+
+| | |
+|---|---|
+| `GET /api/v1/demo/personas` | Every persona with its documents **and its research block** |
+| `POST /api/v1/demo/seed` | `{"persona": "helmut", "reset": true}` |
+| `DELETE /api/v1/demo/seed` | Cold start; add `?reset_tutorials=true` to replay onboarding |
+
+They exist only where `DEMO_SEED_ENABLED=true` (staging and local; **never production**, where
+they 404), and each handler resolves the target user from the caller's own token and refuses
+anything that is not a drama number. You can only ever seed your own demo account.
+
+## Reading a persona file
+
+`personas/<slug>.json`, validated by [persona.schema.json](persona.schema.json) and by
+`tests/test_demo_personas.py` in the middleware — which runs in the Docker `test` stage, so a
+drifted fixture fails the image build.
+
+- `profile` — keys are `users` column names, values are the exact DB enum strings.
+- `documents[].document_type` — a **frontend slot id** (`id_card`, `rent`, `stmt3`), as
+  `src/worker.py` writes. Not a document-intelligence registry name.
+- `documents[].raw_data` — validated against the registry schema for that slot with
+  `extra="forbid"`, i.e. the same check the rules engine applies when a real user
+  re-verifies a document. Computed fields such as `health_insurance_proof.is_private` must
+  not appear.
+- `documents[].confidence_score` — **must be ≤ 1.0.** The frontend schema is
+  `z.number().min(0).max(1)` and `FileService.getFiles()` returns `[]` on a parse failure,
+  so one out-of-range score makes the user see *no documents at all*.
+- `derived` — profile keys **invented** to satisfy the schema rather than taken from the
+  research document. Read this before quoting a number as a research finding.
+- `missing_documents` — every slot the persona does *not* have, with a reason:
+  `deliberate` (the absence is the point — do not "fix" it), `not_applicable` (this person
+  would never be asked), or `not_yet_supplied` (fair game to author). A test asserts every
+  absent slot is accounted for, so a forgotten document cannot hide among the intentional
+  ones.
+- `research` — narrative the seeder ignores and `GET /api/v1/demo/personas` returns:
+  barriers, wishes, usage context, and the facts the schema cannot hold.
+
+Adding a fourth persona is one JSON file plus a drama number; nothing needs registering.
+
+## Seeing what comes out
+
+```bash
+./scripts/export_demo_pdfs.sh
+```
+
+Writes each persona's filled application and all of its document blobs to
+[exports/](exports/) for review. See [exports/README.md](exports/README.md).
+
+## Conventions and known limitations
+
+**Warm rent.** The research gives Warmmieten. `rent_total` holds the **gross (warm) rent**,
+with `heating_costs` and `hot_water_costs` recording the components *contained within* it,
+because the KdU rules need them itemised. The column name is ambiguous about this — filed.
+
+**Document blobs.** Real committed fixtures are reused where their content does not
+contradict the persona (Personalausweis, Mietvertrag, Versicherungsbescheinigung). Where it
+would — Helmut's committed Rentenbescheid, Heizkostenabrechnung and Kontoauszug carry the
+older €650 pension and €430.87 rent from `forms/scripts/llm-eval/profiles/helmut_klar.json` —
+a watermarked one-page PDF is generated from the persona's own `raw_data` instead, so nothing
+visibly contradicts itself in a screenshare. Resolution order comes from `DEMO_ASSETS_PATH`;
+see [assets/README.md](assets/README.md).
+
+**`milestone_level` from `GET /application/{id}/status` caps at 2**, however many documents
+are verified. `/validate-form` never returns `required_documents`, so `application.py` falls
+back to a hardcoded uppercase `["ID_CARD"]` that never matches the lowercase slot ids
+actually stored. `can_submit` from that endpoint is likewise always `true`. The frontend
+computes its own milestone client-side and is unaffected. Filed, not papered over — the seed
+response reports both numbers.
+
+**Facts the schema cannot hold.** Each persona's `research.not_representable` lists them.
+Across the three: household-member income (Helmut is a couple — his €450 plus his wife's
+€320, but `users` has a single `monthly_income` scalar), insurance costs (€120 and €290, even
+though Helmut's User Story 9 is specifically about insurance being coverable), decentralised
+hot-water supply, and duration of benefit receipt beyond free text. All filed as gaps.
+
+**Prior benefit receipt.** All three personas are prior recipients, which used to make every
+one of them un-submittable: the rules engine requires `previous_benefits_end_date` whenever
+`has_received_benefits_before` is true, and `mappers.py` never emitted it. Now parsed from
+the free-text `previous_benefits_period` — a real date column is still the right fix.
+
+**Sandor is deliberately not submittable, and the reason is a finding.** `/validate-form`
+requires `pension_insurance_provider` and `pension_insurance_number` unconditionally, but a
+60-year-old asylberechtigter man who has never contributed to the German pension system has
+neither — the form demands a Rentenversicherungsnummer that cannot exist. Sabine and Helmut
+both come back submittable, so this is specific to his case, not a seeding failure.
+
+**The Social Worker persona is not here.** [04_social_worker.md](research/04_social_worker.md)
+is committed as research context, but there is no schema behind it: no roles, no consent, no
+audit log, no multi-tenancy anywhere in `migrations/`. Isolation is per-user row filtering
+applied ad hoc in each route. Consent-based assist access is the most-repeated requirement
+across all four research documents and the largest thing that is researched but unbuilt.
+The co-use scenario the documents describe is partly reachable today, since worker and client
+share one session — `./scripts/demo_token.sh --all` gives one operator all three at once.
+
+## Seeding without HTTP
+
+```bash
+docker compose exec orchestration-middleware-service python -m src.demo_cli --list +493023125102
+docker compose exec orchestration-middleware-service python -m src.demo_cli +493023125102 helmut --reset
+```
+
+For when Authentik isn't running locally. The account must already exist —
+`auth-service.get_or_create_user` is the only writer of a `users` row, so log in once first.
+On staging use the HTTP endpoint: AlloyDB has a private IP reachable only from inside the VPC.
+
+## Everything here is synthetic
+
+Names, addresses, IBANs, insurance numbers and tax IDs are invented. The portraits are
+generated likenesses, used in documentation only — never written to the database or served as
+a document. Generated PDFs are watermarked *DEMOBELEG – KEIN AMTLICHES DOKUMENT*. No real
+citizen data belongs in these files.
