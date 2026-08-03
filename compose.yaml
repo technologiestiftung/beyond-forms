@@ -55,7 +55,6 @@ services:
       - ./services/document-intelligence-service:/app/services/document-intelligence-service
       - ./libs/document-schemas:/app/libs/document-schemas
       - ./libs/auth:/app/libs/auth
-      - /app/services/document-intelligence-service/.venv
       - ~/.config/gcloud:/tmp/.config/gcloud
     entrypoint:
       [
@@ -84,7 +83,6 @@ services:
     volumes:
       - ./services/rules-engine:/app/services/rules-engine
       - ./libs/document-schemas:/app/libs/document-schemas
-      - /app/services/rules-engine/.venv
     command:
       [
         "fastapi",
@@ -132,6 +130,8 @@ services:
       - PUBSUB_PROJECT_ID=beyondforms-dev
       - GCS_BUCKET_NAME=${GCS_BUCKET_NAME:-beyondforms-dev-bucket}
       - API_PUBLIC_URL=http://localhost:8080
+      # Mounts /api/v1/demo/*. Terraform sets it for staging only. See demo/README.md.
+      - DEMO_SEED_ENABLED=${DEMO_SEED_ENABLED:-true}
     depends_on:
       postgres:
         condition: service_started
@@ -142,7 +142,11 @@ services:
       - ./auth/certs/pub:/app/auth/certs/pub:ro
       - ./services/orchestration-middleware-service:/app/services/orchestration-middleware-service
       - ./libs/auth:/app/libs/auth
+      - ./libs/document-schemas:/app/libs/document-schemas
       - ./forms:/app/forms:ro
+      - ./demo:/app/demo:ro
+      # Second entry on the default DEMO_ASSETS_PATH.
+      - ./services/wallet-frontend/tests/fixtures:/app/services/wallet-frontend/tests/fixtures:ro
     command:
       ["fastapi", "dev", "src/main.py", "--host", "0.0.0.0", "--port", "8080"]
 
@@ -186,6 +190,7 @@ services:
       - ./auth/certs/pub:/app/auth/certs/pub:ro
       - ./services/orchestration-middleware-service:/app/services/orchestration-middleware-service
       - ./libs/auth:/app/libs/auth
+      - ./libs/document-schemas:/app/libs/document-schemas
     command: ["python", "src/worker.py"]
 
   pubsub-emulator:
@@ -227,7 +232,6 @@ services:
       - ./auth/certs/pub:/app/auth/certs/pub:ro
       - ./services/auth-service:/app/services/auth-service
       - ./libs/auth:/app/libs/auth
-      - /app/services/auth-service/.venv
     entrypoint:
       [
         "uvicorn",
@@ -288,7 +292,6 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./services/forms-filling-service:/app/services/forms-filling-service
-      - /app/services/forms-filling-service/.venv
     networks:
       - app-network
     restart: unless-stopped
