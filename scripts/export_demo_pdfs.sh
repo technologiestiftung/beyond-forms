@@ -39,8 +39,13 @@ for file in "$PERSONAS_DIR"/*.json; do
   # 1. The filled application PDF, via the signed URL the export endpoint returns.
   export_json=$(curl -sS "$API_URL/export/$form_type" -H "$auth")
   url=$(printf '%s' "$export_json" | jq -r '.signed_open_url // .signed_download_url // empty')
+  # Against the GCS emulator, signing fails and the API returns an authenticated proxy
+  # URL instead of a signed one, so the token has to travel with the download.
+  dl_auth=()
+  case "$url" in "$API_URL"*) dl_auth=(-H "$auth") ;; esac
+
   if [ -n "$url" ]; then
-    if curl -sSL "$url" -o "$out/$form_type.pdf" 2>/dev/null && [ -s "$out/$form_type.pdf" ]; then
+    if curl -sSL --max-time 120 "${dl_auth[@]}" "$url" -o "$out/$form_type.pdf" 2>/dev/null && [ -s "$out/$form_type.pdf" ]; then
       size=$(wc -c < "$out/$form_type.pdf" | tr -d ' ')
       echo "  ✓ $form_type.pdf ($size bytes)"
     else

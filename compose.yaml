@@ -129,11 +129,15 @@ services:
       - PUBSUB_EMULATOR_HOST=pubsub-emulator:8085
       - PUBSUB_PROJECT_ID=beyondforms-dev
       - GCS_BUCKET_NAME=${GCS_BUCKET_NAME:-beyondforms-dev-bucket}
+      # Local blob storage. Unset this to use the real bucket (needs gcloud ADC).
+      - STORAGE_EMULATOR_HOST=${STORAGE_EMULATOR_HOST-http://gcs-emulator:4443}
       - API_PUBLIC_URL=http://localhost:8080
       # Mounts /api/v1/demo/*. Terraform sets it for staging only. See demo/README.md.
       - DEMO_SEED_ENABLED=${DEMO_SEED_ENABLED:-true}
     depends_on:
       postgres:
+        condition: service_started
+      gcs-emulator:
         condition: service_started
       forms-filling-service:
         condition: service_started
@@ -179,6 +183,8 @@ services:
       - OIDC_CLIENT_ID=beyondforms
       - OIDC_CLIENT_SECRET=beyondforms-secret
       - GCS_BUCKET_NAME=${GCS_BUCKET_NAME:-beyondforms-dev-bucket}
+      # Local blob storage. Unset this to use the real bucket (needs gcloud ADC).
+      - STORAGE_EMULATOR_HOST=${STORAGE_EMULATOR_HOST-http://gcs-emulator:4443}
 
     depends_on:
       postgres:
@@ -200,6 +206,24 @@ services:
     ports:
       - "8085:8085"
     command: /bin/bash -c "gcloud beta emulators pubsub start --project=beyondforms-dev --host-port='0.0.0.0:8085'"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  gcs-emulator:
+    image: fsouza/fake-gcs-server:latest
+    container_name: gcs-emulator
+    ports:
+      - "4443:4443"
+    # -external-url must match how other containers reach it, or the media links it
+    # returns point at 0.0.0.0 and every blob download hangs until the client gives up.
+    command:
+      - "-scheme=http"
+      - "-port=4443"
+      - "-host=0.0.0.0"
+      - "-backend=memory"
+      - "-public-host=gcs-emulator:4443"
+      - "-external-url=http://gcs-emulator:4443"
     networks:
       - app-network
     restart: unless-stopped

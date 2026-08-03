@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from src.routes import user, files, llm, application, cms, form_export
 from beyondforms.auth import User as AuthUser, get_current_user
 from src.db import get_db, SessionLocal
+from src.gcs import ensure_emulator_bucket
 from src.models import UserDocuments, Users
 
 from src.services.pubsub_service import initialize_pubsub
@@ -21,6 +22,7 @@ from src.services.pubsub_service import initialize_pubsub
 async def lifespan(app: FastAPI):
     # Initialize global httpx client
     app.state.http_client = httpx.AsyncClient()
+    ensure_emulator_bucket()
     yield
     # Clean up
     await app.state.http_client.aclose()

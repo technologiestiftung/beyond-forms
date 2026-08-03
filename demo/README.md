@@ -10,7 +10,7 @@ publish, and no waiting.
 | | <img src="personas/portraits/Sabine.png" width="180"> | <img src="personas/portraits/Helmut.png" width="180"> | <img src="personas/portraits/Sandor.png" width="180"> |
 | **Phone** | `+493023125101` | `+493023125102` | `+493023125103` |
 | **Case** | Volle Erwerbsminderung, single, 1-person household, Mitte | Grundsicherung im Alter, married, 2-person household, Charlottenburg-Wilmersdorf | Asylberechtigt, non-German, single, long-term recipient, Neukölln |
-| **State** | Mid-flow — 4 documents, Rentenbescheid **missing**, Kontoauszug flagged as an old statement | **Complete** — 13 documents, all verified, 13 of 14 slots | Mid-flow — 4 documents, Nebenkostenabrechnung **failed as illegible**, Kontoauszug missing pages, Heizkosten never uploaded |
+| **State** | Mid-flow — 4 documents, Rentenbescheid **missing**, Kontoauszug flagged as an old statement | 6 documents, **all real scans, all verified** | Mid-flow — 4 documents, Nebenkostenabrechnung **failed as illegible**, Kontoauszug missing pages, Heizkosten never uploaded |
 | **Use it for** | To-do handling, encouragement copy, cognitive load, "I can't find this document" | Final review, completeness milestones, PDF export — the case that works | Upload quality feedback, error copy, the KdU/housing-cost flow, multilingual surfaces |
 | **Source** | [01_sabine.md](research/01_sabine.md) | [02_helmut.md](research/02_helmut.md) | [03_sandor.md](research/03_sandor.md) |
 
@@ -26,8 +26,12 @@ docker compose up -d                         # DEMO_SEED_ENABLED defaults to tru
 ./scripts/seed_demo_personas.sh --no-reset   # keep what's already there
 ```
 
-There is **no local GCS emulator**, so document blobs go to the real dev bucket — run
-`gcloud auth application-default login` first.
+Document blobs go to a local [fake-gcs-server](https://github.com/fsouza/fake-gcs-server)
+emulator (`gcs-emulator` in `compose.yaml`), not the real bucket — no `gcloud auth
+application-default login` needed for seeding or export. Unset `STORAGE_EMULATOR_HOST` to
+point at the real `beyondforms-dev-bucket` instead (needs ADC). Chat, document-intelligence
+OCR and RAG still call Vertex AI directly and always need real credentials — the emulator
+only covers document storage.
 
 Then log into the wallet frontend on <http://localhost:3000> with any of the phone numbers.
 They are Bundesnetzagentur "drama numbers", which bypass the SMS one-time password, so any
@@ -125,13 +129,14 @@ Writes each persona's filled application and all of its document blobs to
 with `heating_costs` and `hot_water_costs` recording the components *contained within* it,
 because the KdU rules need them itemised. The column name is ambiguous about this — filed.
 
-**Document blobs.** Real committed fixtures are reused where their content does not
-contradict the persona (Personalausweis, Mietvertrag, Versicherungsbescheinigung). Where it
-would — Helmut's committed Rentenbescheid, Heizkostenabrechnung and Kontoauszug carry the
-older €650 pension and €430.87 rent from `forms/scripts/llm-eval/profiles/helmut_klar.json` —
-a watermarked one-page PDF is generated from the persona's own `raw_data` instead, so nothing
-visibly contradicts itself in a screenshare. Resolution order comes from `DEMO_ASSETS_PATH`;
-see [assets/README.md](assets/README.md).
+**Document blobs.** Helmut's profile is read directly off his six real committed scans
+(Personalausweis, Mietvertrag, Rentenbescheid, Kontoauszug, Heizkostenabrechnung,
+Versicherungsbescheinigung) — no generation, no invented figures. Sabine and Sandor have no
+matching scans, so their documents are watermarked one-page PDFs generated from the
+persona's own `raw_data`. Resolution order comes from `DEMO_ASSETS_PATH`; see
+[assets/README.md](assets/README.md). Generated assets are always PDFs regardless of what
+`display_name` suggests — a persona documenting a phone photo as `.jpg` would otherwise
+produce an unopenable file.
 
 **`milestone_level` from `GET /application/{id}/status` caps at 2**, however many documents
 are verified. `/validate-form` never returns `required_documents`, so `application.py` falls
@@ -156,6 +161,13 @@ requires `pension_insurance_provider` and `pension_insurance_number` uncondition
 60-year-old asylberechtigter man who has never contributed to the German pension system has
 neither — the form demands a Rentenversicherungsnummer that cannot exist. Sabine and Helmut
 both come back submittable, so this is specific to his case, not a seeding failure.
+
+**Official Anlagen exist for the biggest missing_documents gaps, but the middleware only
+fills the main `antrag_grundsicherung` form.** `schemas/pdfs/` has the real attachments:
+Anlage 1 (Unterhalt/maintenance), Anlage 2 (Ausländer/Asylbewerber — exactly Sandor's case),
+Anlage 3 (Grundvermögen/real estate assets), Anlage 6 (Mietschulden/rent arrears). Wiring one
+up means a new `forms/mappings/anlage_N.toml`, a `["form_type", ...]`-keyed export, and a
+`GET /export/{form_type}` call per attachment — worth doing, not attempted here.
 
 **The Social Worker persona is not here.** [04_social_worker.md](research/04_social_worker.md)
 is committed as research context, but there is no schema behind it: no roles, no consent, no
