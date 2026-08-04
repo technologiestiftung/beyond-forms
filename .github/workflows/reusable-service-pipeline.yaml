@@ -33,7 +33,7 @@ jobs:
     outputs:
       skip: ${{ steps.context.outputs.skip }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check for Dockerfile
         id: context
@@ -70,7 +70,7 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check for Dockerfile
         id: context
@@ -88,13 +88,13 @@ jobs:
 
       - id: auth
         name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@v3
 
       - name: Configure Docker
         run: |
@@ -120,11 +120,11 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - id: auth
         name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
@@ -195,7 +195,8 @@ jobs:
           if [ "$INPUT_SERVICE_NAME" = "wallet-frontend" ]; then
             SUBSTITUTIONS="${SUBSTITUTIONS},_API_PROXY_URL=$VAR_API_PROXY_URL,_AUTH_PROXY_URL=$VAR_AUTH_PROXY_URL"
           elif [ "$INPUT_SERVICE_NAME" = "orchestration-middleware-service" ]; then
-            SUBSTITUTIONS="${SUBSTITUTIONS},_ENDPOINT_RULES_ENGINE=$VAR_ENDPOINT_RULES_ENGINE,_ENDPOINT_FORMS_FILLER=$VAR_ENDPOINT_FORMS_FILLER,_ENDPOINT_DOC_INTELLIGENCE=$VAR_ENDPOINT_DOC_INTELLIGENCE,_MIDDLEWARE_SERVICE_URL=$VAR_MIDDLEWARE_SERVICE_URL,_DB_NAME=$VAR_DB_NAME,_GCS_BUCKET_NAME=$VAR_GCS_BUCKET,_PUBSUB_PROJECT_ID=$VAR_PUBSUB_PROJECT_ID,_PUBSUB_TOPIC_ID=$VAR_PUBSUB_TOPIC_ID,_PUBSUB_SUBSCRIPTION_ID=$VAR_PUBSUB_SUBSCRIPTION_ID,_PUBSUB_DLQ_TOPIC_ID=$VAR_PUBSUB_DLQ_TOPIC_ID,_GCLOUD_PROJECT=$VAR_GCLOUD_PROJECT,_DB_HOST=$SECRET_ALLOYDB_HOST,_NETWORK=$VAR_NETWORK,_SUBNET=$VAR_SUBNET,_RAG_ENGINE_CORPUS=$SECRET_RAG_ENGINE_CORPUS,_AUTHENTIK_SERVER_URL=$VAR_AUTHENTIK_URL,_AUTHENTIK_ISSUER_URL=$VAR_AUTHENTIK_URL/application/o/beyondforms/,_DB_USER_SECRET=$VAR_DB_USER_SECRET,_DB_PASSWORD_SECRET=$VAR_DB_PASSWORD_SECRET"
+            DEMO_SEED_ENABLED=$([ "$INPUT_ENVIRONMENT_NAME" = "staging" ] && echo "true" || echo "false")
+            SUBSTITUTIONS="${SUBSTITUTIONS},_ENDPOINT_RULES_ENGINE=$VAR_ENDPOINT_RULES_ENGINE,_ENDPOINT_FORMS_FILLER=$VAR_ENDPOINT_FORMS_FILLER,_ENDPOINT_DOC_INTELLIGENCE=$VAR_ENDPOINT_DOC_INTELLIGENCE,_MIDDLEWARE_SERVICE_URL=$VAR_MIDDLEWARE_SERVICE_URL,_DB_NAME=$VAR_DB_NAME,_GCS_BUCKET_NAME=$VAR_GCS_BUCKET,_PUBSUB_PROJECT_ID=$VAR_PUBSUB_PROJECT_ID,_PUBSUB_TOPIC_ID=$VAR_PUBSUB_TOPIC_ID,_PUBSUB_SUBSCRIPTION_ID=$VAR_PUBSUB_SUBSCRIPTION_ID,_PUBSUB_DLQ_TOPIC_ID=$VAR_PUBSUB_DLQ_TOPIC_ID,_GCLOUD_PROJECT=$VAR_GCLOUD_PROJECT,_DB_HOST=$SECRET_ALLOYDB_HOST,_NETWORK=$VAR_NETWORK,_SUBNET=$VAR_SUBNET,_RAG_ENGINE_CORPUS=$SECRET_RAG_ENGINE_CORPUS,_AUTHENTIK_SERVER_URL=$VAR_AUTHENTIK_URL,_AUTHENTIK_ISSUER_URL=$VAR_AUTHENTIK_URL/application/o/beyondforms/,_DB_USER_SECRET=$VAR_DB_USER_SECRET,_DB_PASSWORD_SECRET=$VAR_DB_PASSWORD_SECRET,_DEMO_SEED_ENABLED=$DEMO_SEED_ENABLED"
           elif [ "$INPUT_SERVICE_NAME" = "auth-service" ]; then
             SUBSTITUTIONS="${SUBSTITUTIONS},_AUTHENTIK_SERVER_URL=$VAR_AUTHENTIK_URL,_OIDC_REDIRECT_URI=$VAR_AUTHENTIK_URL/auth/callback,_DB_NAME=$VAR_DB_NAME,_DB_HOST=$SECRET_ALLOYDB_HOST,_NETWORK=$VAR_NETWORK,_SUBNET=$VAR_SUBNET,_ENV=$INPUT_ENVIRONMENT_NAME"
           elif [ "$INPUT_SERVICE_NAME" = "document-intelligence-service" ]; then

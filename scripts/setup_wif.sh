@@ -6,7 +6,7 @@ PROJECT_ID=$(gcloud config get-value project)
 POOL_NAME="github-pool"
 PROVIDER_NAME="github-provider"
 SA_NAME="github-actions"
-REPO="technologiestiftung/beyondforms" # Adjust if your repo differs
+REPO="technologiestiftung/beyond-forms" # Adjust if your repo differs
 REGION="europe-west3" # Adjust if needed, or prompt user
 
 echo "Using Project: $PROJECT_ID"
