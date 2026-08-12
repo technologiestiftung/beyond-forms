@@ -43,29 +43,40 @@ Staging is publicly reachable and has `DEMO_SEED_ENABLED=true`, so any teammate 
 agent — can browse and seed the same three personas without running anything locally:
 
 ```bash
-STAGING=https://staging.bf.citylab-berlin.org      # confirm the actual staging host/API path
+API=https://staging.bf.citylab-berlin.org/api            # middleware
+AUTH=https://staging.bf.citylab-berlin.org/auth-proxy    # auth-service
 
 # 1. Browse what's available — no login needed, since these files hold no real data.
-curl -s $STAGING/api/v1/demo/personas | jq
+#    This returns each persona file in full: profile, documents with raw_data, research.
+curl -s $API/api/v1/demo/personas | jq
 
-# 2. Log in as a persona's phone number. Drama numbers skip the SMS step — any code works.
-PHONE=+493023125102   # helmut; see step 1 for the others
-START=$(curl -s -X POST $STAGING/login/start -H 'Content-Type: application/json' \
+# 2. Log in with a drama number of YOUR OWN — not a persona's. The match is on prefix,
+#    so any unused suffix works; an unseen number enrols itself and skips the SMS step.
+PHONE=+493023125142   # …101/102/103 are the personas — pick anything else
+START=$(curl -s -X POST $AUTH/login/start -H 'Content-Type: application/json' \
         -d "{\"phone_number\": \"$PHONE\"}")
-TOKEN0=$(echo "$START" | jq -r .token); FLOW=$(echo "$START" | jq -r .flow)
-TOKEN=$(curl -s -X POST $STAGING/login/finish -H 'Content-Type: application/json' \
-        -H "Authorization: Bearer $TOKEN0" -H "X-BeyondForms-Auth-Flow: $FLOW" \
+TOKEN=$(curl -s -X POST $AUTH/login/finish -H 'Content-Type: application/json' \
+        -H "Authorization: Bearer $(echo "$START" | jq -r .token)" \
+        -H "X-BeyondForms-Auth-Flow: $(echo "$START" | jq -r .flow)" \
         -d '{"code":"123456"}' | jq -r .token)
 
-# 3. Seed, then drive it like any other account — GET /profile, GET /files, POST /chat, ...
-curl -s -X POST $STAGING/api/v1/demo/seed -H "Authorization: Bearer $TOKEN" \
-     -H 'Content-Type: application/json' -d '{"persona":"helmut"}' | jq
-curl -s $STAGING/profile -H "Authorization: Bearer $TOKEN" | jq
+# 3. Seed a persona's fixture into your own account, then drive it.
+curl -s -X POST $API/api/v1/demo/seed -H "Authorization: Bearer $TOKEN" \
+     -H 'Content-Type: application/json' -d '{"persona":"helmut","reset":true}' | jq
+curl -s $API/profile -H "Authorization: Bearer $TOKEN" | jq
 ```
 
 Whatever they build against this is the same REST surface production runs on — same JSON
 shapes, same auth, same computed fields — just pointed at a synthetic account instead of a
 real citizen's. Tokens are short-lived; re-run step 2 rather than caching one.
+
+**Seed into your own number, never a persona's.** The write endpoints resolve the account
+from the caller's own token, so a private copy is the default behaviour, not extra work —
+and `reset: true` is then safe, because the data being cleared is yours. Logging in as
+`+493023125102` instead makes your test state visible to everyone and puts a colleague's
+work one `reset` away from deletion. The persona *definitions* are always readable from
+`GET /api/v1/demo/personas`; the accounts behind those three numbers are live state and
+drift from the fixtures as soon as anyone touches them.
 
 ## Get a token
 

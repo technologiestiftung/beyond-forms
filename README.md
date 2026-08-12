@@ -43,6 +43,55 @@ Additionally, a folder named `infrastructure` is mandatory inside each service. 
 
 Please refer to the detailed instructions in [DEVELOPMENT.md](DEVELOPMENT.md) for how to set up the project locally. It includes instructions on bootstrapping the environment variables, setting up the Docker network, and spinning up the required infrastructure using `docker compose`.
 
+## Agent Skill
+
+[`skills/beyond-forms/SKILL.md`](skills/beyond-forms/SKILL.md) lets an AI agent call the hosted staging services directly — classify and extract German administrative documents, validate application fields, fill the official PDFs, and drive a demo account. It is one self-contained file that needs only `curl` and `jq`; no checkout and no local services required.
+
+**Hermes Agent** — installs straight from this repo:
+
+```bash
+hermes skills install technologiestiftung/beyond-forms/skills/beyond-forms
+```
+
+**Claude Code** — the repo doubles as a plugin marketplace:
+
+```
+/plugin marketplace add technologiestiftung/beyond-forms
+/plugin install beyond-forms@beyond-forms
+```
+
+**opencode and OpenClaw** — both read `~/.agents/skills/`, so one clone and one symlink covers them together:
+
+```bash
+git clone https://github.com/technologiestiftung/beyond-forms.git
+mkdir -p ~/.agents/skills
+ln -s "$PWD/beyond-forms/skills/beyond-forms" ~/.agents/skills/beyond-forms
+```
+
+opencode also picks it up from `~/.claude/skills/`, `~/.config/opencode/skills/`, or a project-local `.claude/skills/`; confirm it loaded with `opencode debug skill`. OpenClaw can alternatively install from the clone — `openclaw skills install ./beyond-forms/skills/beyond-forms --as beyond-forms`, adding `--global` for `~/.openclaw/skills`. Its `git:` source expects `SKILL.md` at the repository root, so it cannot target this repo's `skills/` subdirectory directly.
+
+**Claude.ai** — needs a zip whose root *is* the skill folder:
+
+```bash
+cd beyond-forms/skills && zip -r ~/beyond-forms.zip beyond-forms
+```
+
+Then Settings → Capabilities → enable "Code execution and file creation", and upload the zip under Skills. Requires a Pro, Max, Team or Enterprise plan.
+
+**Anything else** — the skill is a single file:
+
+```bash
+curl -O https://raw.githubusercontent.com/technologiestiftung/beyond-forms/main/skills/beyond-forms/SKILL.md
+```
+
+Installers resolve against the default branch, so changes only become installable once merged to `main`. While editing the skill, point your agent at the working copy instead of reinstalling — Hermes via `skills.external_dirs` in `~/.hermes/config.yaml`, Claude Code via a symlink at `.claude/skills/beyond-forms`.
+
+The middleware and auth hostnames are public, so the demo-persona workflow works as soon as the skill is installed. The rules-engine, document-intelligence and forms-filling services are internal Cloud Run addresses that accept unauthenticated requests — they are deliberately **not** committed anywhere in this repo, and the skill resolves them at runtime from the project instead:
+
+```bash
+gcloud run services list --project beyond-forms-staging --region europe-west10
+```
+
 ## Credits
 
 <table>
