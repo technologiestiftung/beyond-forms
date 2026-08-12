@@ -161,6 +161,33 @@ def test_list_personas_includes_research_context(service):
     assert personas["sandor"]["documents"]
 
 
+def test_list_personas_returns_the_whole_file(service):
+    """The endpoint exists so a caller can see what a seeded account will contain, which
+    means the filled-in values — not just the field names. A summary that omits `profile`
+    or a document's `raw_data` forces everyone back to reading the repo."""
+    personas = {p["slug"]: p for p in service.list_personas()}
+    helmut = personas["helmut"]
+
+    assert helmut["profile"]["monthly_income"] == 650.00
+    assert helmut["profile"]["iban"] == "DE65940594210000123456"
+    assert helmut["application"]["form_type"] == "antrag_grundsicherung"
+
+    pension = next(d for d in helmut["documents"] if d["document_type"] == "pension_notice")
+    assert pension["raw_data"]["pension_reason"] == "Altersrente"
+    assert pension["display_name"] == "Rentenbescheid_Helmut_Klar.pdf"
+
+    # `derived` keeps the name it has in the file, and the file's own $schema pointer is
+    # repo-relative, so it must not be served.
+    assert "birth_name" in helmut["derived"]
+    assert "$schema" not in helmut
+
+    # Every key the persona schema defines is reachable, so this cannot silently narrow
+    # again if a new block is added to the files.
+    schema = json.loads((PERSONAS_DIR.parent / "persona.schema.json").read_text(encoding="utf-8"))
+    expected = set(schema["properties"]) - {"$schema"}
+    assert expected <= set(helmut)
+
+
 # ------------------------------------------------------------ document seeding
 
 

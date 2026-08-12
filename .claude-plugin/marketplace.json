@@ -1,0 +1,17 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+  "name": "beyond-forms",
+  "description": "Call the hosted BeyondForms services — document classification and extraction, form validation, PDF filling, and synthetic demo accounts.",
+  "owner": {
+    "name": "Technologiestiftung Berlin",
+    "url": "https://github.com/technologiestiftung"
+  },
+  "plugins": [
+    {
+      "name": "beyond-forms",
+      "description": "Classify and extract German administrative documents, validate benefit-application fields, fill official AcroForm PDFs, and drive synthetic demo accounts over the hosted BeyondForms API.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

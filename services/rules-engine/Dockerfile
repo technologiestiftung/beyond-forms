@@ -24,6 +24,7 @@ RUN useradd -u 10001 -m app
 COPY --from=test /app/services/rules-engine/pyproject.toml /dev/null
 COPY --from=builder --chown=app:app /app/services/rules-engine /app/services/rules-engine
 COPY --from=builder --chown=app:app /app/libs/document-schemas /app/libs/document-schemas
+COPY --from=builder --chown=app:app /app/schemas/rules /app/schemas/rules
 COPY --from=builder --chown=app:app /opt/venv /opt/venv
 WORKDIR /app/services/rules-engine
 ENV PATH="/opt/venv/bin:$PATH"

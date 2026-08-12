@@ -133,11 +133,16 @@ class DemoSeedService:
 
     def list_personas(self) -> list[dict[str, Any]]:
         """
-        Summarises every persona file, including its `research` block.
+        Returns every persona file in full — `profile`, `application`, `documents` with
+        their extracted `raw_data`, `missing_documents`, `derived` and `research`.
 
-        The research narrative is returned deliberately: it is what lets an experiment
-        reason about the person rather than only about the row, and it records the facts
-        the schema cannot hold.
+        The whole file is returned rather than a summary because a caller needs the
+        filled-in values, not only the field names: the profile is what a seeded account
+        will actually contain, and each document's `raw_data` is what the review UI shows.
+        There is nothing to withhold — these are invented people, and the same files are
+        committed to the repo.
+
+        `$schema` is dropped: it is a repo-relative pointer that means nothing over HTTP.
         """
         personas = []
         for path in sorted(self.personas_dir.glob("*.json")):
@@ -146,28 +151,9 @@ class DemoSeedService:
             except json.JSONDecodeError as exc:
                 logger.error("Skipping malformed persona file %s: %s", path.name, exc)
                 continue
-            personas.append(
-                {
-                    "slug": persona.get("slug", path.stem),
-                    "title": persona.get("title"),
-                    "phone_number": persona.get("phone_number"),
-                    "scenario": persona.get("scenario"),
-                    "source": persona.get("source"),
-                    "portrait": persona.get("portrait"),
-                    "derived_fields": persona.get("derived", []),
-                    "research": persona.get("research", {}),
-                    "documents": [
-                        {
-                            "document_type": doc["document_type"],
-                            "status": doc["status"],
-                            "confidence_score": doc.get("confidence_score"),
-                            "user_error_code": doc.get("user_error_code"),
-                        }
-                        for doc in persona.get("documents", [])
-                    ],
-                    "missing_documents": persona.get("missing_documents", []),
-                }
-            )
+            persona.pop("$schema", None)
+            persona.setdefault("slug", path.stem)
+            personas.append(persona)
         return personas
 
     # -------------------------------------------------------------------- reset
