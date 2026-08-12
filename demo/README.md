@@ -108,7 +108,7 @@ Full interactive reference: <http://localhost:8080/docs>.
 
 | | Auth | |
 |---|---|---|
-| `GET /api/v1/demo/personas` | none | Every persona with its documents **and its research block** |
+| `GET /api/v1/demo/personas` | none | Every persona file **in full** — `profile`, `application`, `documents` with their `raw_data`, `missing_documents`, `derived` and `research` |
 | `POST /api/v1/demo/seed` | drama number | `{"persona": "helmut", "reset": true}` |
 | `DELETE /api/v1/demo/seed` | drama number | Cold start; add `?reset_tutorials=true` to replay onboarding |
 
@@ -146,6 +146,11 @@ drifted fixture fails the image build.
   ones.
 - `research` — narrative the seeder ignores and `GET /api/v1/demo/personas` returns:
   barriers, wishes, usage context, and the facts the schema cannot hold.
+
+`GET /api/v1/demo/personas` serves each of these files verbatim, minus the `$schema`
+pointer — so everything documented in this section is readable over the API without a
+checkout, and a teammate's agent can see the values a seeded account will hold before
+deciding to seed one.
 
 Adding a fourth persona is one JSON file plus a drama number; nothing needs registering.
 
