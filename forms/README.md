@@ -67,6 +67,14 @@ Ensure all `{{ column_name }}` substitutions refer to valid columns in the datab
 ./forms/scripts/validate_mappings.sh
 ```
 
+### Decrypting a PDF
+
+Some source PDFs (e.g. exports from official portals) are encrypted with an empty user password, which blocks tools like `extract_to_mapping.sh` and `pikepdf`/`pdfrw` from opening them. This strips the encryption in place, assuming an empty user password.
+
+```bash
+./forms/scripts/decrypt_pdf.sh forms/pdfs/my_new_form.pdf
+```
+
 ## Technical Details
 
 - **ID Normalization**: PDF field IDs are prefixed with the page number (e.g., `p1_`) and normalized to lowercase with underscores.
