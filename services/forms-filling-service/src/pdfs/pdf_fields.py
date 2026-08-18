@@ -60,22 +60,13 @@ def _process_field(
             field_type = "choice"
             opt = field.get("/Opt") or (field.get("/Parent") and field["/Parent"].get("/Opt"))
             if opt:
-                options = []
-                for o in opt:
-                    s = str(o)
-                    if s.startswith("("):
-                        s = s[1:-1]
-                    options.append(s)
+                options = [(o[-1] if isinstance(o, pdfrw.PdfArray) else o).to_unicode() for o in opt]
         elif ft == "/Sig":
             field_type = "signature"
 
         # Extract Description (Tooltip) from /TU
         tooltip = field.get("/TU") or (field.get("/Parent") and field["/Parent"].get("/TU"))
-        description = None
-        if tooltip:
-            description = str(tooltip)
-            if description.startswith("("):
-                description = description[1:-1]
+        description = tooltip.to_unicode() if tooltip else None
 
         field_map[full_name] = {
             "id": generate_id(page_num, full_name),

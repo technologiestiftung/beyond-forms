@@ -24,7 +24,7 @@ mkdir -p "$MAPPING_DIR"
 echo "Calling forms-filling-service to extract fields from $PDF_PATH..."
 
 # Encode PDF and send via pipe to curl to avoid "Argument list too long" errors
-RESPONSE=$(base64 -w 0 "$PDF_PATH" | jq -Rs '{pdf_base64: .}' | curl -s -X POST "http://localhost:8005/api/fields" \
+RESPONSE=$(base64 < "$PDF_PATH" | tr -d '\n' | jq -Rs '{pdf_base64: .}' | curl -s -X POST "http://localhost:8005/api/fields" \
   -H "Content-Type: application/json" \
   -d @-)
 
