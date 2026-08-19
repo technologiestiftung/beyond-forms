@@ -15,7 +15,7 @@ value = """
 Profile Summary:
 - Name: {{ first_name }} {{ last_name }}
 - Contact: {{ phone_number }}
-- Verification: {{ authentik_id ? 'Authenticated' : 'Local' }}
+- City: {{ city ? city : '' }}
 """
 
 ["p1_visible_checkbox_1"]
