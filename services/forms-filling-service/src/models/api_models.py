@@ -16,6 +16,23 @@ class FormField(BaseModel):
     read_only: bool = Field(False, description="Whether the field is flagged as read-only in the PDF")
     multiline: bool = Field(False, description="Whether the field supports multiple lines of text")
     description: Optional[str] = Field(None, description="Human-readable description or tooltip for the field")
+    option_labels: Optional[Dict[str, str]] = Field(
+        None,
+        description="Maps each radio option's internal export value to its on-page label text, "
+        "for option groups whose export values (e.g. Auswahl1, Auswahl2) carry no inherent meaning",
+    )
+    nearby_label: Optional[str] = Field(
+        None,
+        description="Best-effort description fallback for fields with no /TU tooltip at all: text "
+        "read from the page immediately beside the field (left, then right). Heuristic, not "
+        "authoritative PDF metadata - only ever set when `description` is otherwise empty",
+    )
+    default_value: Optional[str] = Field(
+        None,
+        description="The PDF's own baked-in /V default value, for string-type fields only. An empty "
+        "string means the field ships genuinely blank - useful for read-only fields, where 'read-only' "
+        "alone doesn't tell you whether the field actually holds real static content or was never filled",
+    )
 
 
 class FieldsRequest(BaseModel):
