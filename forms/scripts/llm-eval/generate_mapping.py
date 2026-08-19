@@ -222,6 +222,10 @@ def render_toml_in_place(
         new_value = values.get(key)
 
         value_span = None  # (first_line_idx, last_line_idx) inclusive - covers multi-line """ values
+        for i in range(start, end):
+            if re.match(r"^value\s*=", lines[i].lstrip()):
+                value_span = (i, _value_span_end(lines, i, end))
+                break
 
         if value_span is None:
             raise RuntimeError(f"Table '{key}' has no `value` line (aborting, no write performed)")
@@ -261,8 +265,8 @@ def main() -> None:
         description="Fill in JEXL mapping values for a PDF field mapping TOML, using an LLM grounded in the "
         "live Users/documents schema. Fields with no plausible data source are left blank."
     )
-    parser.add_argument("--form", required=True, help="Name of the form mapping to fill (without .toml suffix)")
-    parser.add_argument("--model", default="gemini-3.5-flash", help="LLM model name")
+    parser.add_argument("--form", required=True, help="Path to the form mapping to fill")
+    parser.add_argument("--model", default="gemini-3.5-flash-lite", help="LLM model name")
     parser.add_argument("--prompt", default="rich_schema_documents", help="Prompt template file name")
     parser.add_argument("--chunk-size", type=int, default=100, help="Fields submitted per LLM request chunk")
     parser.add_argument(
@@ -279,7 +283,7 @@ def main() -> None:
     script_dir = os.path.dirname(os.path.realpath(__file__))
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(script_dir)))
 
-    toml_path = os.path.join(project_root, f"forms/mappings/{args.form}.toml")
+    toml_path = args.form
     if not os.path.exists(toml_path):
         print(f"Error: Mapping file not found at {toml_path}", file=sys.stderr)
         sys.exit(1)
