@@ -59,12 +59,30 @@ Generate a boilerplate mapping for a new PDF. This script extracts field names, 
 ./forms/scripts/extract_to_mapping.sh forms/pdfs/my_new_form.pdf
 ```
 
+### Generating Mapping Values
+
+Fill in the boilerplate's blank `value` fields with LLM-drafted JEXL, grounded in the live `Users` columns and the `documents` namespace (see `forms/scripts/llm-eval/README.md` for how the underlying model/prompt were chosen).
+
+```bash
+uv run forms/scripts/llm-eval/generate_mapping.py --form forms/mappings/my_new_form.toml
+```
+
+**The output is AI-drafted and must be reviewed by a human before use** — every generated line is a guess, not a verified fact about the database. Re-running is safe by default: only fields whose value is still blank get (re-)submitted to the model, so a reviewed hand-written value is never clobbered unless you pass `--overwrite-existing`.
+
 ### Validating Mappings
 
 Ensure all `{{ column_name }}` substitutions refer to valid columns in the database. If it fails, it will list all available columns.
 
 ```bash
 ./forms/scripts/validate_mappings.sh
+```
+
+### Decrypting a PDF
+
+Some source PDFs (e.g. exports from official portals) are encrypted with an empty user password, which blocks tools like `extract_to_mapping.sh` and `pikepdf`/`pdfrw` from opening them. This strips the encryption in place, assuming an empty user password.
+
+```bash
+./forms/scripts/decrypt_pdf.sh forms/pdfs/my_new_form.pdf
 ```
 
 ## Technical Details
@@ -75,7 +93,7 @@ Ensure all `{{ column_name }}` substitutions refer to valid columns in the datab
 
 ## Document Data Namespace
 
-OCR-extracted fields from uploaded documents are exposed under the `documents` namespace as `documents.<type>.<field>`. The full list of `<type>` identifiers matches the `document_type` strings registered in `services/document-intelligence-service/src/app/domain/document_types.py` (e.g. `bank_statements`, `wage_slips`, `pension_notice`, `marriage_certificate`, `housing_costs_form`, `health_insurance_proof`, `savings_statements`, `securities_statements`, …).
+OCR-extracted fields from uploaded documents are exposed under the `documents` namespace as `documents.<type>.<field>`. The full list of `<type>` identifiers matches the `document_type` strings registered in `libs/document-schemas/src/beyondforms/document_schemas/document_types.py` (e.g. `bank_statements`, `wage_slips`, `pension_notice`, `marriage_certificate`, `housing_costs_form`, `health_insurance_proof`, `savings_statements`, `securities_statements`, …).
 
 ### Rules
 
@@ -101,6 +119,9 @@ value = "{{ documents.bank_statements ? documents.bank_statements.amount_rent : 
 
 ### Adding a new document type binding
 
-1. Add a `@register_document("my_doc_type")` class in `services/document-intelligence-service/src/app/domain/document_types.py` with the OCR fields.
-2. Append `"my_doc_type"` to the `DOCUMENT_TYPES` list in `forms/scripts/validate_mappings.sh` so the validator pre-fills the namespace.
-3. Reference `documents.my_doc_type.<field>` from a TOML mapping.
+1. Add a `@register_document("my_doc_type")` class in `libs/document-schemas/src/beyondforms/document_schemas/document_types.py` with the OCR fields.
+2. Reference `documents.my_doc_type.<field>` from a TOML mapping. `forms/scripts/validate_mappings.sh` picks up the new type automatically (it derives the list live from `document_types.py` — no file to keep in sync by hand anymore).
+
+### Known limitation: unlabeled radio/choice options
+
+Some source PDFs give their radio button widgets meaningless export values (`Auswahl1`, `Auswahl2`, …) with no tooltip anywhere — on the field or on individual widgets — that says what each option actually means. There's currently no automated way to resolve these (it would require extracting the page text positioned near each widget, which the field-extraction pipeline doesn't do).

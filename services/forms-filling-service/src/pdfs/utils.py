@@ -8,7 +8,7 @@ def get_full_name(field: pdfrw.PdfDict) -> Optional[str]:
     curr = field
     while curr:
         if curr.get("/T"):
-            names.append(curr["/T"][1:-1])
+            names.append(curr["/T"].to_unicode())
         curr = curr.get("/Parent")
     if not names:
         return None

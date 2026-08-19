@@ -1,0 +1,15 @@
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS license_plate VARCHAR(20);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_student_or_trainee BOOLEAN;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS professional_expenses DECIMAL(10, 2);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS has_childcare_expenses BOOLEAN;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_subsidized_housing BOOLEAN;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS has_other_residence BOOLEAN;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS has_secondary_residence BOOLEAN;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS has_garage_costs BOOLEAN;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS garage_costs DECIMAL(10, 2);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS has_household_energy_costs BOOLEAN;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS household_energy_costs DECIMAL(10, 2);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_living_area_used_commercially BOOLEAN;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS commercially_used_area_sqm DECIMAL(10, 2);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_victim_of_national_socialist_persecution BOOLEAN;

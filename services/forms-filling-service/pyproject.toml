@@ -10,6 +10,7 @@ dependencies = [
     "pdfrw",
     "reportlab",
     "python-multipart",
+    "pymupdf",
 ]
 
 [tool.uv]

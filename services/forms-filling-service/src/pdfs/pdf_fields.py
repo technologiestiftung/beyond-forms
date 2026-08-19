@@ -1,6 +1,7 @@
 import pdfrw
 from typing import List, Dict, Any, Optional, Set, NamedTuple
 from src.pdfs.utils import get_full_name, get_field_type, generate_id
+from src.pdfs.option_labels import extract_option_labels, extract_nearby_labels
 
 
 class DiscoveredField(NamedTuple):
@@ -60,22 +61,24 @@ def _process_field(
             field_type = "choice"
             opt = field.get("/Opt") or (field.get("/Parent") and field["/Parent"].get("/Opt"))
             if opt:
-                options = []
-                for o in opt:
-                    s = str(o)
-                    if s.startswith("("):
-                        s = s[1:-1]
-                    options.append(s)
+                options = [(o[-1] if isinstance(o, pdfrw.PdfArray) else o).to_unicode() for o in opt]
         elif ft == "/Sig":
             field_type = "signature"
 
         # Extract Description (Tooltip) from /TU
         tooltip = field.get("/TU") or (field.get("/Parent") and field["/Parent"].get("/TU"))
-        description = None
-        if tooltip:
-            description = str(tooltip)
-            if description.startswith("("):
-                description = description[1:-1]
+        description = tooltip.to_unicode() if tooltip else None
+
+        # Extract the PDF's own baked-in default value (/V) for text fields. Mainly
+        # useful for read-only fields: one shipped with real pre-filled content is
+        # genuinely static; one shipped blank never got its data - "read-only" alone
+        # doesn't tell you which.
+        default_value = None
+        if field_type == "string":
+            raw_v = field.get("/V") or (field.get("/Parent") and field["/Parent"].get("/V"))
+            if raw_v is not None:
+                decoded = raw_v.to_unicode() if hasattr(raw_v, "to_unicode") else str(raw_v)
+                default_value = decoded if decoded else ""
 
         field_map[full_name] = {
             "id": generate_id(page_num, full_name),
@@ -86,6 +89,7 @@ def _process_field(
             "read_only": is_read_only,
             "multiline": is_multiline,
             "description": description,
+            "default_value": default_value,
         }
         widget_map[full_name] = []
 
@@ -146,15 +150,21 @@ def _walk_tree(
             )
 
 
-def discover_fields(reader: pdfrw.PdfReader) -> Dict[str, DiscoveredField]:
+def discover_fields(reader: pdfrw.PdfReader, pdf_bytes: Optional[bytes] = None) -> Dict[str, DiscoveredField]:
     """
     Internal engine that performs an exhaustive scan of the PDF and returns
     a mapping from logical name to metadata, physical widgets, and the root logical field.
+
+    `pdf_bytes` is optional: only needed to additionally extract on-page option labels
+    for radio groups whose internal export values are meaningless codes (Auswahl1,
+    Auswahl2, ...) with no /TU tooltip anywhere. Callers that only need fields for
+    filling (which never reads option_labels) can omit it and skip that pass.
     """
     field_map = {}  # logical_name -> field_info
     widget_map = {}  # logical_name -> list of PdfDict (widgets ONLY)
     root_map = {}  # logical_name -> PdfDict (Root logical field)
     on_values = {}  # id(widget) -> export_value
+    widget_page_num = {}  # id(widget) -> 1-indexed page number
     processed_widgets = set()
 
     # Scan pages for widgets
@@ -163,6 +173,7 @@ def discover_fields(reader: pdfrw.PdfReader) -> Dict[str, DiscoveredField]:
         if annots:
             for annot in annots:
                 if annot.get("/Subtype") == "/Widget":
+                    widget_page_num[id(annot)] = page_num
                     _process_field(
                         annot,
                         field_map,
@@ -189,6 +200,15 @@ def discover_fields(reader: pdfrw.PdfReader) -> Dict[str, DiscoveredField]:
         if meta["type"] == "checkbox":
             meta["options"] = []
 
+    if pdf_bytes is not None:
+        option_labels = extract_option_labels(pdf_bytes, widget_map, widget_page_num, on_values)
+        for name, labels in option_labels.items():
+            field_map[name]["option_labels"] = labels
+
+        nearby_labels = extract_nearby_labels(pdf_bytes, field_map, widget_map, widget_page_num)
+        for name, label in nearby_labels.items():
+            field_map[name]["nearby_label"] = label
+
     return {
         name: DiscoveredField(
             metadata=meta,
@@ -205,5 +225,5 @@ def get_pdf_fields(pdf_bytes: bytes) -> List[Dict[str, Any]]:
     Parses PDF bytes and returns a list of all fillable fields.
     """
     reader = pdfrw.PdfReader(fdata=pdf_bytes)
-    discovered = discover_fields(reader)
+    discovered = discover_fields(reader, pdf_bytes=pdf_bytes)
     return [df.metadata for df in discovered.values()]

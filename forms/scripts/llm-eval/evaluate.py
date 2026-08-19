@@ -2,7 +2,6 @@ import os
 import sys
 import json
 import argparse
-import ast
 import re
 import datetime
 from zoneinfo import ZoneInfo
@@ -12,80 +11,21 @@ from concurrent.futures import ThreadPoolExecutor
 from litellm import completion
 from pyjexl import JEXL
 
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+from schema_context import parse_schemas, parse_models, build_schema_context  # noqa: E402,F401
+
 
 def load_profile(profile_path: str) -> Dict[str, Any]:
     if not os.path.exists(profile_path):
         print(f"Error: Evaluation profile not found at {profile_path}", file=sys.stderr)
         sys.exit(1)
     with open(profile_path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def parse_schemas_py(file_path: str) -> Dict[str, Any]:
-    if not os.path.exists(file_path):
-        print(f"Warning: schemas.py not found at {file_path}", file=sys.stderr)
-        return {}
-
-    with open(file_path, "r", encoding="utf-8") as f:
-        tree = ast.parse(f.read())
-
-    schema_fields = {}
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef) and node.name == "UserInformationUpdateSchema":
-            for item in node.body:
-                if isinstance(item, ast.AnnAssign) and isinstance(item.target, ast.Name):
-                    field_name = item.target.id
-                    description = ""
-                    if (
-                        isinstance(item.value, ast.Call)
-                        and isinstance(item.value.func, ast.Name)
-                        and item.value.func.id == "Field"
-                    ):
-                        for kw in item.value.keywords:
-                            if kw.arg == "description" and isinstance(kw.value, ast.Constant):
-                                description = kw.value.value
-
-                    schema_fields[field_name] = {"type": ast.unparse(item.annotation), "description": description}
-    return schema_fields
-
-
-def parse_models_py(file_path: str) -> tuple[Dict[str, Any], Dict[str, list]]:
-    if not os.path.exists(file_path):
-        print(f"Warning: models.py not found at {file_path}", file=sys.stderr)
-        return {}, {}
-
-    with open(file_path, "r", encoding="utf-8") as f:
-        tree = ast.parse(f.read())
-
-    enums = {}
-    users_fields = {}
-
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef):
-            is_enum = False
-            for base in node.bases:
-                if isinstance(base, ast.Attribute) and base.attr == "Enum":
-                    is_enum = True
-                elif isinstance(base, ast.Name) and "Enum" in base.id:
-                    is_enum = True
-
-            if is_enum or node.name.endswith("Type"):
-                allowed_values = []
-                for item in node.body:
-                    if isinstance(item, ast.Assign):
-                        if isinstance(item.value, ast.Constant):
-                            allowed_values.append(item.value.value)
-                if allowed_values:
-                    enums[node.name] = allowed_values
-
-            if node.name == "Users":
-                for item in node.body:
-                    if isinstance(item, ast.AnnAssign) and isinstance(item.target, ast.Name):
-                        field_name = item.target.id
-                        field_type = ast.unparse(item.annotation)
-                        users_fields[field_name] = field_type
-
-    return users_fields, enums
+        profile = json.load(f)
+    # Every JEXL profile must carry a `documents` key: pyjexl 0.3 has no safe-nav
+    # operator, and `documents.X ? documents.X.y : ...` raises AttributeError (not just
+    # evaluates falsy) when `documents` is absent entirely from the context.
+    profile.setdefault("documents", {})
+    return profile
 
 
 def load_boilerplate(toml_path: str) -> Dict[str, Any]:
@@ -99,9 +39,21 @@ def load_boilerplate(toml_path: str) -> Dict[str, Any]:
                 "type": field_info.get("type", "string"),
                 "description": field_info.get("description", ""),
                 "options": field_info.get("options", []),
+                "option_labels": field_info.get("option_labels", {}),
+                "nearby_label": field_info.get("nearby_label", ""),
+                "read_only": field_info.get("read_only", False),
+                "default_value": field_info.get("default_value"),
             }
         else:
-            boilerplate[field_id] = {"type": "string", "description": "", "options": []}
+            boilerplate[field_id] = {
+                "type": "string",
+                "description": "",
+                "options": [],
+                "option_labels": {},
+                "nearby_label": "",
+                "read_only": False,
+                "default_value": None,
+            }
     return boilerplate
 
 
@@ -115,7 +67,7 @@ def sanitize_json_response(raw_content: str) -> dict:
 
     s = re.sub(r"\\([0-7]{1,3})", _fix_octal, s)
 
-    s = re.sub(r"\\([()%\-_?!])", r"\1", s)
+    s = re.sub(r"\\([()%\-_?!.])", r"\1", s)
     s = re.sub(r'\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})', r"\\\\", s)
 
     try:
@@ -127,33 +79,18 @@ def sanitize_json_response(raw_content: str) -> dict:
         raise jde
 
 
-def run_llm_chunk(prompt_template: str, schema_context: dict, boilerplate_chunk: dict, model_name: str) -> dict:
-    schema_str = json.dumps(schema_context, indent=2)
+def _vertex_completion(prompt: str, model_name: str) -> str:
+    """Resolves the litellm "vertex_ai/" model prefix + Vertex ADC token, calls
+    completion(), and returns the raw response content. Shared by run_llm_chunk and
+    run_self_correction (and by generate_mapping.py's own chunk loop).
 
-    bp_list = []
-    for fid, finfo in boilerplate_chunk.items():
-        bp_list.append(
-            f'- ID: "{fid}", Type: "{finfo["type"]}", Description: "{finfo["description"]}", Options: {finfo["options"]}'
-        )
-    bp_str = "\n".join(bp_list)
-
-    prompt = prompt_template.replace("__SCHEMA_CONTEXT__", schema_str).replace("__BOILERPLATE_TOML__", bp_str)
+    Only Vertex AI (Gemini, and Model Garden models like the litert-community/gemma-*
+    benchmarked in this directory's README) is used here - no other litellm provider is
+    ever configured in this codebase, so the prefix resolution is a plain prepend rather
+    than a multi-provider lookup."""
     project_id = os.getenv("GCLOUD_PROJECT", "beyond-forms-staging")
 
-    model_id = model_name
-    known_providers = (
-        "vertex_ai/",
-        "openai/",
-        "huggingface/",
-        "ollama/",
-        "anthropic/",
-        "together_ai/",
-        "openrouter/",
-        "cohere/",
-        "anyscale/",
-    )
-    if not any(model_id.startswith(p) for p in known_providers):
-        model_id = "vertex_ai/" + model_name
+    model_id = model_name if model_name.startswith("vertex_ai/") else "vertex_ai/" + model_name
 
     oauth_token = None
     try:
@@ -171,14 +108,37 @@ def run_llm_chunk(prompt_template: str, schema_context: dict, boilerplate_chunk:
     response = completion(
         model=model_id,
         messages=[{"role": "user", "content": prompt}],
-        temperature=0,
         response_format={"type": "json_object"},
         vertex_project=project_id,
         vertex_location="global",
         oauth_token=oauth_token,
     )
 
-    return sanitize_json_response(response.choices[0].message.content)
+    return response.choices[0].message.content
+
+
+def run_llm_chunk(prompt_template: str, schema_context: dict, boilerplate_chunk: dict, model_name: str) -> dict:
+    schema_str = json.dumps(schema_context, indent=2)
+
+    bp_list = []
+    for fid, finfo in boilerplate_chunk.items():
+        line = (
+            f'- ID: "{fid}", Type: "{finfo["type"]}", Description: "{finfo["description"]}", '
+            f'Options: {finfo["options"]}'
+        )
+        if finfo.get("option_labels"):
+            line += f', Option Labels: {finfo["option_labels"]}'
+        if finfo.get("nearby_label"):
+            line += f', Nearby Label (heuristic, unverified): "{finfo["nearby_label"]}"'
+        if finfo.get("read_only"):
+            line += ", Read-Only: true"
+            if finfo.get("default_value") is not None:
+                line += f', Default Value: "{finfo["default_value"]}"'
+        bp_list.append(line)
+    bp_str = "\n".join(bp_list)
+
+    prompt = prompt_template.replace("__SCHEMA_CONTEXT__", schema_str).replace("__BOILERPLATE_TOML__", bp_str)
+    return sanitize_json_response(_vertex_completion(prompt, model_name))
 
 
 def run_self_correction(
@@ -191,48 +151,9 @@ def run_self_correction(
         .replace("__GENERATED_JEXL__", bad_jexl)
         .replace("__ERROR_MESSAGE__", err_msg)
     )
-    project_id = os.getenv("GCLOUD_PROJECT", "beyond-forms-staging")
-
-    model_id = model_name
-    known_providers = (
-        "vertex_ai/",
-        "openai/",
-        "huggingface/",
-        "ollama/",
-        "anthropic/",
-        "together_ai/",
-        "openrouter/",
-        "cohere/",
-        "anyscale/",
-    )
-    if not any(model_id.startswith(p) for p in known_providers):
-        model_id = "vertex_ai/" + model_name
-
-    oauth_token = None
-    try:
-        import google.auth
-        from google.auth.transport.requests import Request
-
-        creds, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
-        creds.refresh(Request())
-        oauth_token = creds.token
-        if oauth_token:
-            os.environ["VERTEX_AI_ACCESS_TOKEN"] = oauth_token
-    except Exception as e:
-        print(f"Warning: Pure Python OAuth token resolution failed in self-correction: {e}", file=sys.stderr)
-
-    response = completion(
-        model=model_id,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0,
-        response_format={"type": "json_object"},
-        vertex_project=project_id,
-        vertex_location="global",
-        oauth_token=oauth_token,
-    )
 
     try:
-        data = sanitize_json_response(response.choices[0].message.content)
+        data = sanitize_json_response(_vertex_completion(prompt, model_name))
         return data.get("corrected_value", bad_jexl)
     except Exception:
         return bad_jexl
@@ -532,6 +453,11 @@ def main():
         action="store_true",
         help="Execute agentic self-correction loop when JEXL syntax crashes occur",
     )
+    parser.add_argument(
+        "--no-documents",
+        action="store_true",
+        help="Exclude the documents namespace from the schema context",
+    )
     args = parser.parse_args()
 
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -564,56 +490,7 @@ def main():
         )
         sys.exit(1)
 
-    schemas_path = os.path.join(project_root, "services/orchestration-middleware-service/src/schemas.py")
-    models_path = os.path.join(project_root, "services/orchestration-middleware-service/src/models.py")
-
-    schema_fields = parse_schemas_py(schemas_path)
-    model_fields, enums = parse_models_py(models_path)
-
-    schema_context = {}
-    ignored_fields = {
-        "conversations",
-        "user_applications",
-        "user_tutorial_states",
-        "user_documents",
-        "created_at",
-        "updated_at",
-        "fcm_token",
-        "authentik_id",
-    }
-
-    for field_name, model_type in model_fields.items():
-        if field_name in ignored_fields:
-            continue
-
-        clean_type = "String"
-        allowed_values = []
-
-        matched_enum = None
-        for enum_name in enums:
-            if enum_name in model_type:
-                matched_enum = enum_name
-                break
-
-        if matched_enum:
-            clean_type = f"Enum ({', '.join(enums[matched_enum])})"
-            allowed_values = enums[matched_enum]
-        elif "bool" in model_type.lower():
-            clean_type = "Boolean"
-        elif "date" in model_type.lower():
-            clean_type = "Date (ISO YYYY-MM-DD)"
-        elif "decimal" in model_type.lower() or "numeric" in model_type.lower():
-            clean_type = "Decimal"
-        elif "int" in model_type.lower():
-            clean_type = "Integer"
-
-        description = ""
-        if field_name in schema_fields:
-            description = schema_fields[field_name].get("description", "")
-
-        schema_context[field_name] = {"type": clean_type, "description": description}
-        if allowed_values:
-            schema_context[field_name]["allowed_values"] = allowed_values
+    schema_context = build_schema_context(project_root, include_documents=not args.no_documents)
 
     toml_path = os.path.join(project_root, f"forms/mappings/{args.form}.toml")
     if not os.path.exists(toml_path):

@@ -4,35 +4,20 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MAPPING_DIR="$(dirname "$SCRIPT_DIR")/mappings"
-COLUMNS_FILE="${1:-$SCRIPT_DIR/db_columns.txt}"
+REPO_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
+COLUMNS_FILE="$1"
 
 # Allow callers to point at a Python that has pyjexl installed (e.g. a service venv).
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 
-if [ ! -f "$COLUMNS_FILE" ]; then
-    echo "Error: Columns file '$COLUMNS_FILE' not found."
-    echo "Please run '$SCRIPT_DIR/fetch_db_columns.sh' first or provide the path to a columns file."
-    exit 1
-fi
-
-echo "Reading column names from $COLUMNS_FILE..."
-DB_COLUMNS=$(cat "$COLUMNS_FILE" | grep -v '^$')
-
-COLUMN_COUNT=$(echo "$DB_COLUMNS" | wc -l)
-echo "Successfully loaded $COLUMN_COUNT columns."
-
-# Prepare the Python validation script
 PYTHON_VALIDATOR=$(cat <<EOF
 import sys
 import tomllib
 import re
 from pyjexl import JEXL
 
-class StrictDict(dict):
-    def __getitem__(self, key):
-        if key not in self:
-            raise NameError(f"Undefined identifier: {key}")
-        return super().__getitem__(key)
+sys.path.insert(0, "$SCRIPT_DIR/llm-eval")
+from schema_context import build_schema_context, list_document_types, StrictDict, dummy_value
 
 class PermissiveDict(dict):
     def __missing__(self, key):
@@ -42,35 +27,25 @@ class PermissiveDict(dict):
             return PermissiveDict()
         return super().__getitem__(key)
 
-# Mirrors services/document-intelligence-service/src/app/domain/document_types.py.
-# Keep in sync if new document types are added.
-DOCUMENT_TYPES = [
-    "income_declaration", "assets_declaration", "housing_costs_form",
-    "bank_details", "household_declaration", "identity_document",
-    "registration_certificate", "address_proof", "residence_permit",
-    "recognition_decision", "asylum_stay_permit", "bank_statements",
-    "wage_slips", "social_benefits_proof", "alimony_proof",
-    "irregular_income_proof", "pension_notice", "private_pension_proof",
-    "private_pension_yearly_information", "disability_decision",
-    "savings_statements", "securities_statements", "life_insurance_contract",
-    "property_ownership_proof", "rental_contract", "rent_increase_notice",
-    "utility_cost_statement", "heating_costs_proof", "home_ownership_costs",
-    "health_insurance_proof", "care_level_notice", "care_service_invoice",
-    "care_home_contract", "care_facility_costs", "disability_id",
-    "medical_reports", "special_diet_evidence", "pregnancy_certificate",
-    "power_of_attorney", "legal_guardianship_papers", "marriage_certificate",
-    "divorce_decree", "cooperation_agreement", "asylblg_application",
-    "accommodation_assignment",
-]
+def build_context(repo_root, columns_file):
+    # Same filtered column set the LLM prompt sees (no internal/audit fields)
+    user_columns = build_schema_context(repo_root, include_documents=False)
+    documents = list_document_types(repo_root)
 
-def validate(toml_path, columns):
+    if columns_file:
+        # Explicit override: a flat name list with no type info, so dummy values fall
+        # back to untyped strings for these (numeric-comparison false-rejects are
+        # possible here, same as before this script derived types automatically).
+        with open(columns_file) as f:
+            names = [line.strip() for line in f if line.strip()]
+        user_columns = {name: {"type": "String"} for name in names}
+
+    ctx = StrictDict({name: dummy_value(info) for name, info in user_columns.items()})
+    ctx["documents"] = {slug: PermissiveDict() for slug in documents}
+    return ctx, user_columns, documents
+
+def validate(toml_path, ctx):
     jexl = JEXL()
-    # Fill context with dummy values for all valid columns
-    ctx = StrictDict({col: "dummy" for col in columns})
-    # Pre-fill the documents namespace so dotted paths like
-    # documents.bank_statements.amount_rent parse without raising.
-    ctx["documents"] = {t: PermissiveDict() for t in DOCUMENT_TYPES}
-
     errors = []
     try:
         with open(toml_path, "rb") as f:
@@ -99,16 +74,36 @@ def validate(toml_path, columns):
 
 if __name__ == "__main__":
     toml_file = sys.argv[1]
-    cols = sys.argv[2].split(",")
-    errs = validate(toml_file, cols)
+    repo_root = sys.argv[2]
+    columns_file = sys.argv[3] if len(sys.argv) > 3 and sys.argv[3] else None
+
+    ctx, user_columns, documents = build_context(repo_root, columns_file)
+    errs = validate(toml_file, ctx)
     for err in errs:
         print(err)
     sys.exit(1 if errs else 0)
 EOF
 )
 
+if [ -n "$COLUMNS_FILE" ] && [ ! -f "$COLUMNS_FILE" ]; then
+    echo "Error: Columns file '$COLUMNS_FILE' not found."
+    exit 1
+fi
+
+if [ -n "$COLUMNS_FILE" ]; then
+    echo "Using explicit columns file: $COLUMNS_FILE (no type info - numeric comparisons may false-reject)"
+else
+    echo "Deriving Users columns and document types from models.py / document_types.py..."
+    "$PYTHON_BIN" -c "
+import sys
+sys.path.insert(0, '$SCRIPT_DIR/llm-eval')
+from schema_context import build_schema_context
+ctx = build_schema_context('$REPO_ROOT', include_documents=True)
+print(f\"Loaded {len(ctx['user_columns'])} Users columns and {len(ctx['documents'])} document types.\")
+"
+fi
+
 ERRORS_FOUND=0
-COL_CSV=$(echo "$DB_COLUMNS" | paste -sd "," -)
 
 # Validate mappings
 for toml_file in "$MAPPING_DIR"/*.toml; do
@@ -116,8 +111,7 @@ for toml_file in "$MAPPING_DIR"/*.toml; do
 
     echo "Validating $toml_file..."
 
-    # Run the embedded Python validator
-    if ! "$PYTHON_BIN" -c "$PYTHON_VALIDATOR" "$toml_file" "$COL_CSV"; then
+    if ! "$PYTHON_BIN" -c "$PYTHON_VALIDATOR" "$toml_file" "$REPO_ROOT" "$COLUMNS_FILE"; then
         ERRORS_FOUND=1
     fi
 done
@@ -126,7 +120,5 @@ if [ "$ERRORS_FOUND" -eq 0 ]; then
     echo -e "\nAll mappings validated successfully!"
 else
     echo -e "\nValidation failed with errors."
-    echo -e "\nAvailable columns (from $COLUMNS_FILE):"
-    echo "$DB_COLUMNS" | sed 's/^/  - /'
     exit 1
 fi

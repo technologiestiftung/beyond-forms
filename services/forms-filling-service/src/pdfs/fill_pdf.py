@@ -19,10 +19,8 @@ def _resolve_choice_value(value: str, options: list[str]) -> str:
 
 
 def _opt_entry_str(opt_entry: Any) -> str:
-    text = str(opt_entry)
-    if text.startswith("(") and text.endswith(")"):
-        return text[1:-1]
-    return text
+    display = opt_entry[-1] if isinstance(opt_entry, pdfrw.PdfArray) else opt_entry
+    return display.to_unicode()
 
 
 def _get_opt_array(root: pdfrw.PdfDict, widgets: list[pdfrw.PdfDict]) -> list[Any]:
@@ -37,7 +35,8 @@ def _match_choice_pdf_value(value: str, options: list[str], opt_array: list[Any]
     for index, entry in enumerate(opt_array):
         entry_str = _opt_entry_str(entry)
         if entry_str == resolved or _pdf_literal_to_unicode(entry_str) == _pdf_literal_to_unicode(resolved):
-            return entry, index
+            pdf_val = entry[0] if isinstance(entry, pdfrw.PdfArray) else entry
+            return pdf_val, index
     return pdfrw.PdfString.encode(resolved), None
 
 
