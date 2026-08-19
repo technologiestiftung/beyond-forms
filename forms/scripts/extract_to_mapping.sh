@@ -47,6 +47,10 @@ fi
         TYPE=$(echo "$field" | jq -r '.type')
         DESC_TOML=$(echo "$field" | jq '.description')
         OPTIONS_TOML=$(echo "$field" | jq '.options')
+        LABELS_TOML=$(echo "$field" | jq -r '(.option_labels // {}) | to_entries | map("\"" + .key + "\" = " + (.value | tojson)) | join(", ")')
+        NEARBY_LABEL_TOML=$(echo "$field" | jq '.nearby_label')
+        IS_READ_ONLY=$(echo "$field" | jq -r '.read_only')
+        DEFAULT_VALUE_TOML=$(echo "$field" | jq '.default_value')
 
         DEFAULT_VAL='""'
         if [ "$TYPE" == "checkbox" ]; then
@@ -60,6 +64,28 @@ fi
         fi
         if [ "$OPTIONS_TOML" != "null" ] && [ "$OPTIONS_TOML" != "[]" ]; then
             echo "options = $OPTIONS_TOML"
+        fi
+        if [ -n "$LABELS_TOML" ]; then
+            # On-page text next to each option's checkbox, for PDFs whose internal
+            # export values (e.g. Auswahl1, Auswahl2) carry no inherent meaning.
+            # Read-only reference for whoever fills in `value` - not consumed at fill time.
+            echo "option_labels = { $LABELS_TOML }"
+        fi
+        if [ "$NEARBY_LABEL_TOML" != "null" ]; then
+            # Best-effort description fallback, only set when the field has no /TU
+            # tooltip at all. Heuristic (read from nearby page text), not authoritative.
+            echo "nearby_label = $NEARBY_LABEL_TOML"
+        fi
+        if [ "$IS_READ_ONLY" == "true" ]; then
+            # The PDF itself marks this field non-editable - it's typically static
+            # boilerplate (e.g. an authority's own letterhead address), not citizen data.
+            echo "read_only = true"
+        fi
+        if [ "$DEFAULT_VALUE_TOML" != "null" ]; then
+            # The PDF's own baked-in /V value (string fields only). An empty string
+            # means the field ships genuinely blank - read_only alone doesn't tell you
+            # whether a field holds real static content or was simply never filled.
+            echo "default_value = $DEFAULT_VALUE_TOML"
         fi
         echo "value = $DEFAULT_VAL"
         echo ""
