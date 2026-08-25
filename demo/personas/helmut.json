@@ -235,38 +235,5 @@
     "previous_benefits_ref_no",
     "identification_numbers",
     "tax_id"
-  ],
-
-  "research": {
-    "core_barrier": "Low media literacy combined with bureaucratic language. Overwhelmed by jargon; afraid that a mistake causes disadvantage or delay; distrusts digital handling of sensitive data.",
-    "usage_context": "PC with support from relatives or a counselling centre (Caritas, Bezirksamt). Smartphone use for official matters is the exception — a mobile-only application would be risky for him.",
-    "key_wishes": [
-      "Step-by-step guidance with visible interim successes rather than everything at once",
-      "Only genuinely relevant questions, asked once, in everyday language with examples",
-      "Document checklists per section, with a 'not yet available — I will request it' option",
-      "A legally secure confirmation of receipt he can download or print",
-      "Reminders for deadlines and appointments",
-      "Proactive hints about coverable costs such as household and liability insurance",
-      "Data protection explained where the sensitive question is asked, not only in the fine print"
-    ],
-    "key_fears": [
-      "That the application is 'lost' digitally because no confirmation arrives",
-      "That old or unclear proofs (e.g. a pension notice from 20 years ago) cannot be produced",
-      "That the multi-step nature of the process (appointments, follow-ups, deadlines) is not transparent"
-    ],
-    "not_representable": {
-      "partner_pension_net_eur": 320,
-      "partner_has_small_additional_income": true,
-      "insurance_liability_household_life_total_eur": 290,
-      "children_count": 2,
-      "note": "`users` has a single `monthly_income` scalar and no household-member entity, so his wife's pension cannot be stored — only `persons_in_household_count: 2` hints at the couple. There are also no insurance-cost columns, even though his User Story 9 is specifically about insurance being coverable; the Tierhaftpflicht debit of €52.67 visible on the Kontoauszug is recorded in the stmt3 document's `amount_liability_insurance` as the closest available home. Both are filed schema gaps."
-    },
-    "unreconciled": {
-      "figures_follow_the_documents_not_the_research": "The research document describes a €1,200 Warmmiete in Charlottenburg-Wilmersdorf and a €450 pension. The committed scans say otherwise — €650 Altersrente, €430,87 rent-and-Nebenkosten debit, Hauptstr. 4 in 10820 — and the documents win, so that nothing contradicts itself when a reviewer opens them during a demo. The consequence is that Helmut is no longer the high-rent case the research captured; if that scenario is needed, it has to move to a persona of its own.",
-      "age": "Short profile says 75–85+, User Story 1 says 68. The source document flags this itself. Resolved in favour of the short profile (born 1947), which also places him past retirement age and therefore on a genuinely different eligibility branch from Sabine.",
-      "pension_contribution_years": "Stated both as 'over 17 years' and as 'over 30 years of minimum contributions while self-employed'.",
-      "fixture_addresses_disagree": "The Rentenbescheid and Heizkostenabrechnung say Hauptstr. 4, 10820 Berlin; the Kontoauszug says Hauptstr. 3, 10829 Berlin; the Heizkostenabrechnung is also addressed to 'Herr Mustermann' in its salutation. The majority reading (Hauptstr. 4, 10820) is used, which is also the only unambiguous postcode of the two."
-    },
-    "notes": "All six documents are real committed scans — nothing generated. The seven supporting Anlagen (Meldebescheinigung, Kontobestätigung, Betriebskostenabrechnung, KdU, Haushaltsbescheinigung, Einkommens- and Vermögenserklärung) are deliberately left unseeded rather than fabricated; see missing_documents. He now has assets (€5.267,56 on the Kontoauszug) — still well inside the SGB XII Schonvermögen, so he stays eligible. No BIC is set: the Kontoauszug does not show one, and inventing one for a fictional 'Sparkasse Musterstadt' would reintroduce exactly the kind of contradiction this persona now avoids."
-  }
+  ]
 }
