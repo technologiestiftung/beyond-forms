@@ -70,6 +70,15 @@ class UserProfileValidationSchema(BaseModel):
     free_housing_right_holder: Optional[str] = None
     hot_water_costs: Optional[decimal.Decimal] = None
     cable_tv_costs: Optional[decimal.Decimal] = None
+    is_subsidized_housing: Optional[bool] = None
+    has_other_residence: Optional[bool] = None
+    has_secondary_residence: Optional[bool] = None
+    has_garage_costs: Optional[bool] = None
+    garage_costs: Optional[decimal.Decimal] = None
+    has_household_energy_costs: Optional[bool] = None
+    household_energy_costs: Optional[decimal.Decimal] = None
+    is_living_area_used_commercially: Optional[bool] = None
+    commercially_used_area_sqm: Optional[decimal.Decimal] = None
 
     # Financial and Asset fields
     monthly_income: Optional[decimal.Decimal] = Field(None, ge=0)
@@ -77,6 +86,12 @@ class UserProfileValidationSchema(BaseModel):
     assets_description: Optional[str] = Field(None, max_length=1000)
     income_sources: Optional[list[str]] = None
     assets_types: Optional[list[str]] = None
+    household_members: Optional[list[dict]] = None
+    is_student_or_trainee: Optional[bool] = None
+    professional_expenses: Optional[decimal.Decimal] = None
+    has_childcare_expenses: Optional[bool] = None
+    is_victim_of_national_socialist_persecution: Optional[bool] = None
+    email: Optional[str] = None
 
     # Health fields
     has_disability_id: Optional[bool] = None
@@ -177,6 +192,26 @@ class UserInformationUpdateSchema(BaseModel):
     landlord_name: Optional[str] = Field(None, description="Landlord name")
     heating_type: Optional[str] = Field(None, description="Heating system type")
     free_housing_right_holder: Optional[str] = Field(None, description="Name of housing right provider")
+    is_subsidized_housing: Optional[bool] = Field(None, description="Whether the housing is publicly subsidized")
+    has_other_residence: Optional[bool] = Field(None, description="Has another residence besides this one")
+    has_secondary_residence: Optional[bool] = Field(None, description="Has a secondary residence")
+    has_garage_costs: Optional[bool] = Field(None, description="Has garage/parking costs included in rent")
+    garage_costs: Optional[decimal.Decimal] = Field(None, description="Monthly garage/parking costs")
+    has_household_energy_costs: Optional[bool] = Field(None, description="Has household energy costs included in rent")
+    household_energy_costs: Optional[decimal.Decimal] = Field(None, description="Monthly household energy costs")
+    is_living_area_used_commercially: Optional[bool] = Field(
+        None, description="Whether part of the living area is used commercially"
+    )
+    commercially_used_area_sqm: Optional[decimal.Decimal] = Field(
+        None, description="Commercially used area in square meters"
+    )
+    is_student_or_trainee: Optional[bool] = Field(None, description="Is a student or trainee")
+    professional_expenses: Optional[decimal.Decimal] = Field(None, description="Monthly work-related expenses")
+    has_childcare_expenses: Optional[bool] = Field(None, description="Has childcare expenses")
+    is_victim_of_national_socialist_persecution: Optional[bool] = Field(
+        None, description="Victim of National Socialist persecution (BEG)"
+    )
+    email: Optional[str] = Field(None, description="Email address")
     persons_in_household_count: Optional[int] = Field(None, description="Number of persons in household")
     bank_name: Optional[str] = Field(None, description="Bank name")
     account_holder: Optional[str] = Field(None, description="Account holder name")
@@ -190,6 +225,9 @@ class UserInformationUpdateSchema(BaseModel):
     assets_description: Optional[str] = Field(None, max_length=1000, description="A description of the user's assets")
     income_sources: Optional[list[str]] = Field(None, description="List of the user's monthly income source categories")
     assets_types: Optional[list[str]] = Field(None, description="List of the user's asset types")
+    household_members: Optional[list[dict]] = Field(
+        None, description="Other household members (e.g. a spouse) besides the applicant"
+    )
     has_costly_medical_nutrition: Optional[bool] = Field(
         None, description="Whether the user requires a costly medical nutrition diet"
     )
@@ -231,6 +269,7 @@ class UserInformationUpdateSchema(BaseModel):
     zip_code: Optional[str] = Field(None, description="Postal code (PLZ)")
     city: Optional[str] = Field(None, description="City")
     state: Optional[str] = Field(None, description="State or federal state")
+    license_plate: Optional[str] = Field(None, max_length=20, description="Vehicle license plate")
 
 
 class ChatMessageResponseSchema(BaseModel):
