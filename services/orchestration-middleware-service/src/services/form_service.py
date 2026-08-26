@@ -7,12 +7,13 @@ import logging
 import os
 import re
 import tomllib
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import aiofiles
 import httpx
 from fastapi import Depends, Request
 from pyjexl import JEXL
+from pyjexl.parser import Identifier, Literal
 from sqlalchemy.exc import DatabaseError, DisconnectionError
 from sqlalchemy.orm import Session
 
@@ -47,6 +48,59 @@ def _extract_document_refs(mapping: Dict[str, Any]) -> Dict[str, set[str] | None
             elif refs[doc_type] is not None:
                 refs[doc_type].add(key)
     return refs
+
+
+def _collect_identifier_roots(node: Any, out: set[str]) -> None:
+    """Walks a pyjexl AST node, collecting the root context key of every identifier
+    chain (e.g. `documents.wage_slips.gross_amount` contributes only `documents`)."""
+    if node is None or isinstance(node, Literal):
+        return
+    if isinstance(node, Identifier):
+        if node.subject is None:
+            out.add(node.value)
+        else:
+            _collect_identifier_roots(node.subject, out)
+        return
+    for field_name in getattr(node, "fields", []):
+        if field_name == "parent":
+            continue
+        value = getattr(node, field_name, None)
+        if isinstance(value, list):
+            for item in value:
+                _collect_identifier_roots(item, out)
+        else:
+            _collect_identifier_roots(value, out)
+
+
+def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set[str]:
+    """
+    Collects the top-level context keys a mapping's JEXL expressions read from,
+    used to judge whether a user's profile carries enough data to fill this form.
+    Fields under the `documents.*` namespace are excluded: those come from verified
+    document uploads rather than the profile, and aren't required to check readiness.
+    """
+    fields: set[str] = set()
+    for val in mapping.values():
+        if not isinstance(val, str):
+            continue
+        for match in re.finditer(r"\{\{\s*(.*?)\s*\}\}", val, flags=re.DOTALL):
+            try:
+                tree = jexl.parse(match.group(1))
+            except Exception:
+                continue
+            _collect_identifier_roots(tree, fields)
+    fields.discard("documents")
+    return fields
+
+
+def _is_context_value_filled(value: Any) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, str):
+        return value.strip() != ""
+    if isinstance(value, (list, dict, tuple, set)):
+        return len(value) > 0
+    return True
 
 
 class FormAssetCacheManager:
@@ -188,6 +242,104 @@ class FormService:
         self.http_client = http_client
         self.jexl = JEXL()
 
+    def _build_base_context(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], Optional[UserApplications]]:
+        """
+        Builds the JEXL context from `Users` columns merged with the matching
+        application's `form_data` (falling back to the user's most recently updated
+        application — see the note below — since `get_or_create_user_application`
+        writes form_type="grundsicherung" while exports are requested as
+        "antrag_grundsicherung", so an exact match never hits).
+
+        Does not include the `documents` namespace; `fill_form` layers that on top
+        using the returned application, since it's the only caller that needs it.
+        """
+        user_dict = {c.name: getattr(user, c.name) for c in user.__table__.columns}
+
+        if not user_dict.get("district") and user_dict.get("zip_code"):
+            city = user_dict.get("city", "")
+            if city and city.strip().lower() == "berlin":
+                user_dict["district"] = resolve_berlin_district(
+                    db=self.db,
+                    street=user_dict.get("street"),
+                    house_number=user_dict.get("house_number"),
+                    zip_code=user_dict.get("zip_code"),
+                )
+
+        form_data: Dict[str, Any] = {}
+        application: Optional[UserApplications] = None
+        try:
+            application = (
+                self.db.query(UserApplications)
+                .filter(
+                    UserApplications.fk_user_id == user.id,
+                    UserApplications.form_type == form_type,
+                )
+                .order_by(UserApplications.updated_at.desc())
+                .first()
+            )
+            if application is None:
+                application = (
+                    self.db.query(UserApplications)
+                    .filter(UserApplications.fk_user_id == user.id)
+                    .order_by(UserApplications.updated_at.desc())
+                    .first()
+                )
+                if application:
+                    logger.info(
+                        "No application with form_type=%r; falling back to most recent application %s (form_type=%r)",
+                        form_type,
+                        application.application_id,
+                        application.form_type,
+                    )
+            if application and application.form_data:
+                form_data = application.form_data
+        except DatabaseError:
+            logger.warning("Internal database error")
+        except DisconnectionError:
+            logger.warning("Database is currently not reachable")
+
+        context = user_dict.copy()
+        context["today"] = datetime.date.today()
+        if context.get("household_members"):
+            # Stored as ISO strings in JSONB (unlike native `Date` columns), so they
+            # need parsing here to get the same automatic dd.mm.yyyy formatting as
+            # every other date field in the mapping layer.
+            context["household_members"] = [
+                {
+                    **member,
+                    "date_of_birth": (
+                        datetime.date.fromisoformat(member["date_of_birth"])
+                        if member.get("date_of_birth")
+                        else member.get("date_of_birth")
+                    ),
+                }
+                for member in context["household_members"]
+            ]
+        for k, v in form_data.items():
+            if k in context:
+                logger.warning(f"Key collision for {k}. Skipping document value and keeping user profile value.")
+            else:
+                context[k] = v
+
+        return context, application
+
+    async def get_completeness(self, form_type: str, user: Users) -> Tuple[int, int]:
+        """
+        Reports how many of the profile fields a form's mapping reads from are
+        filled in, so the frontend can show a per-form readiness indicator without
+        needing to know each form's specific field list. Deliberately ignores the
+        `documents` namespace: document verification isn't required to generate
+        these simpler (non-Grundsicherung) forms today.
+        """
+        mapping, _field_types, _pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
+        required_fields = _extract_required_context_fields(mapping, self.jexl)
+        if not required_fields:
+            return 0, 0
+
+        context, _application = self._build_base_context(form_type, user)
+        filled = sum(1 for field in required_fields if _is_context_value_filled(context.get(field)))
+        return filled, len(required_fields)
+
     async def fill_form(self, form_type: str, user: Users) -> bytes:
         """
         Fills a PDF form using a merged JEXL context built from the user profile
@@ -205,98 +357,49 @@ class FormService:
         """
         mapping, field_types, pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
         needed_refs = _extract_document_refs(mapping)
-        user_dict = {c.name: getattr(user, c.name) for c in user.__table__.columns}
+        context, application = self._build_base_context(form_type, user)
 
-        if not user_dict.get("district") and user_dict.get("zip_code"):
-            city = user_dict.get("city", "")
-            if city and city.strip().lower() == "berlin":
-                user_dict["district"] = resolve_berlin_district(
-                    db=self.db,
-                    street=user_dict.get("street"),
-                    house_number=user_dict.get("house_number"),
-                    zip_code=user_dict.get("zip_code"),
-                )
-
-        form_data: Dict[str, Any] = {}
         documents_ctx: Dict[str, Dict[str, Any]] = {}
-        try:
-            application = (
-                self.db.query(UserApplications)
-                .filter(
-                    UserApplications.fk_user_id == user.id,
-                    UserApplications.form_type == form_type,
-                )
-                .order_by(UserApplications.updated_at.desc())
-                .first()
-            )
-            if application is None:
-                # `get_or_create_user_application` writes form_type="grundsicherung" while
-                # exports are requested as "antrag_grundsicherung", so the exact match above
-                # never hits and both namespaces below stay empty. Fall back to the user's
-                # most recent application rather than silently exporting a profile-only PDF.
-                application = (
-                    self.db.query(UserApplications)
-                    .filter(UserApplications.fk_user_id == user.id)
-                    .order_by(UserApplications.updated_at.desc())
-                    .first()
-                )
-                if application:
-                    logger.info(
-                        "No application with form_type=%r; falling back to most recent application %s (form_type=%r)",
-                        form_type,
-                        application.application_id,
-                        application.form_type,
+        if application and needed_refs:
+            try:
+                verified_docs = (
+                    self.db.query(UserDocuments.raw_data, UserDocuments.document_type)
+                    .filter(
+                        UserDocuments.fk_application_id == application.application_id,
+                        UserDocuments.fk_user_id == user.id,
+                        UserDocuments.status == DocumentStatusType.VERIFIED,
                     )
-            if application:
-                if application.form_data:
-                    form_data = application.form_data
-
-                if needed_refs:
-                    verified_docs = (
-                        self.db.query(UserDocuments.raw_data, UserDocuments.document_type)
-                        .filter(
-                            UserDocuments.fk_application_id == application.application_id,
-                            UserDocuments.fk_user_id == user.id,
-                            UserDocuments.status == DocumentStatusType.VERIFIED,
-                        )
-                        .order_by(UserDocuments.document_type, UserDocuments.created_at.desc())
-                        .all()
-                    )
-                    for doc in verified_docs:
-                        if not doc.raw_data:
+                    .order_by(UserDocuments.document_type, UserDocuments.created_at.desc())
+                    .all()
+                )
+                for doc in verified_docs:
+                    if not doc.raw_data:
+                        continue
+                    # Documents are stored under frontend slot ids (`id_card`, `rent`, …)
+                    # while the TOML mappings reference document-intelligence registry
+                    # names (`documents.identity_document.*`). The two vocabularies
+                    # overlap on `pension_notice` alone, so register each document under
+                    # both names and let the mapping use whichever it was written against.
+                    aliases = {
+                        doc.document_type,
+                        SLOT_ID_TO_DIS_TYPE.get(doc.document_type, doc.document_type),
+                    }
+                    for alias in aliases:
+                        if alias in documents_ctx:
                             continue
-                        # Documents are stored under frontend slot ids (`id_card`, `rent`, …)
-                        # while the TOML mappings reference document-intelligence registry
-                        # names (`documents.identity_document.*`). The two vocabularies
-                        # overlap on `pension_notice` alone, so register each document under
-                        # both names and let the mapping use whichever it was written against.
-                        aliases = {
-                            doc.document_type,
-                            SLOT_ID_TO_DIS_TYPE.get(doc.document_type, doc.document_type),
-                        }
-                        for alias in aliases:
-                            if alias in documents_ctx:
-                                continue
-                            needed = needed_refs.get(alias, _UNREFERENCED)
-                            if needed is _UNREFERENCED:
-                                continue
-                            if needed is None:
-                                documents_ctx[alias] = dict(doc.raw_data)
-                            else:
-                                documents_ctx[alias] = {k: v for k, v in doc.raw_data.items() if k in needed}
+                        needed = needed_refs.get(alias, _UNREFERENCED)
+                        if needed is _UNREFERENCED:
+                            continue
+                        if needed is None:
+                            documents_ctx[alias] = dict(doc.raw_data)
+                        else:
+                            documents_ctx[alias] = {k: v for k, v in doc.raw_data.items() if k in needed}
+            except DatabaseError:
+                logger.warning("Internal database error")
+            except DisconnectionError:
+                logger.warning("Database is currently not reachable")
 
-        except DatabaseError:
-            logger.warning("Internal database error")
-        except DisconnectionError:
-            logger.warning("Database is currently not reachable")
-
-        context = user_dict.copy()
         context["documents"] = documents_ctx
-        for k, v in form_data.items():
-            if k in context:
-                logger.warning(f"Key collision for {k}. Skipping document value and keeping user profile value.")
-            else:
-                context[k] = v
 
         filled_values = {}
         for field_id, default_value in mapping.items():
@@ -344,6 +447,8 @@ class FormService:
                     res = res.strftime("%d.%m.%Y")
                 elif isinstance(res, (decimal.Decimal, float, int)):
                     res = str(res)
+                elif isinstance(res, (list, tuple)):
+                    res = ", ".join(str(item) for item in res)
 
             filled_values[field_id] = res
 

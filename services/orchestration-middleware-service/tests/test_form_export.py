@@ -327,3 +327,65 @@ async def test_export_filled_form_gcs_signing_fails_respects_x_forwarded_proto(m
             assert data["signed_download_url"].startswith("https://testserver")
         finally:
             app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_get_form_completeness_returns_counts(mock_db):
+    local_user_id = uuid.uuid4()
+    auth_sub = "test-auth-id-uuid"
+
+    mock_user = DbUser(id=local_user_id, authentik_id=auth_sub, phone_number="1234567890")
+    mock_db.query.return_value.filter.return_value.first.return_value = mock_user
+
+    mock_form_service = MagicMock(spec=FormService)
+    mock_form_service.get_completeness = AsyncMock(return_value=(2, 3))
+
+    from src.services.form_service import get_form_service
+
+    app.dependency_overrides[get_form_service] = lambda: mock_form_service
+
+    try:
+        response = client.get("/export/antrag_bewohnerparkausweis/completeness")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data == {
+            "form_type": "antrag_bewohnerparkausweis",
+            "filled_fields": 2,
+            "total_fields": 3,
+        }
+        mock_form_service.get_completeness.assert_called_once_with("antrag_bewohnerparkausweis", mock_user)
+    finally:
+        del app.dependency_overrides[get_form_service]
+
+
+def test_get_form_completeness_user_not_found(mock_db):
+    mock_db.query.return_value.filter.return_value.first.return_value = None
+
+    response = client.get("/export/antrag_wohngeld/completeness")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "User profile not found"
+
+
+@pytest.mark.asyncio
+async def test_get_form_completeness_error_handling(mock_db):
+    local_user_id = uuid.uuid4()
+    auth_sub = "test-auth-id-uuid"
+
+    mock_user = DbUser(id=local_user_id, authentik_id=auth_sub)
+    mock_db.query.return_value.filter.return_value.first.return_value = mock_user
+
+    mock_form_service = MagicMock(spec=FormService)
+    mock_form_service.get_completeness = AsyncMock(side_effect=Exception("mapping unreadable"))
+
+    from src.services.form_service import get_form_service
+
+    app.dependency_overrides[get_form_service] = lambda: mock_form_service
+
+    try:
+        response = client.get("/export/antrag_wohngeld/completeness")
+
+        assert response.status_code == 500
+        assert "Completeness check failed: mapping unreadable" in response.json()["detail"]
+    finally:
+        del app.dependency_overrides[get_form_service]
