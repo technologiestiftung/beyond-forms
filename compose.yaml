@@ -295,6 +295,7 @@ services:
       - ./services/wallet-frontend:/app/services/wallet-frontend
       - /app/services/wallet-frontend/node_modules
       - ./libs:/app/libs
+      - ./demo:/app/demo
     networks:
       - app-network
     restart: unless-stopped
