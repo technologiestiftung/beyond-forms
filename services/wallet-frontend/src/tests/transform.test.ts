@@ -313,6 +313,7 @@ describe("Profile Transformation Utilities", () => {
 					hasDisabilityId: true,
 					hasCostlyMedicalNutrition: false,
 				},
+				vehicle: {},
 				documents: [],
 				settings: {
 					language: "de",

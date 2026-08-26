@@ -28,6 +28,10 @@ vi.mock("../../hooks/useProfile", () => ({
 	useProfile: () => mockProfileReturn,
 }));
 
+vi.mock("../../hooks/useFormCompleteness", () => ({
+	useFormCompleteness: () => ({ level: 0, isLoading: false }),
+}));
+
 vi.mock("../../services/cms", () => ({
 	cmsService: {
 		getMyTutorials: vi.fn().mockResolvedValue([
@@ -93,6 +97,16 @@ describe("DashboardView", () => {
 			screen.getByRole("button", { name: "Fortfahren" }),
 		).toBeInTheDocument();
 		expect(screen.getByTestId("language-switcher")).toBeInTheDocument();
+
+		expect(
+			screen.getByRole("heading", { level: 2, name: "Bewohnerparkausweis" }),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("heading", { level: 2, name: "Wohngeld" }),
+		).toBeInTheDocument();
+		expect(
+			screen.getAllByRole("button", { name: "Antrag generieren" }),
+		).toHaveLength(2);
 	});
 
 	it("renders anonymous greeting when firstName is empty or whitespace", async () => {

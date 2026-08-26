@@ -13,6 +13,7 @@ export const SettingsView: React.FC = () => {
 	const { t } = useTranslation("profile");
 
 	const logout = useAuthStore((s) => s.logout);
+	const phoneNumber = useAuthStore((s) => s.phoneNumber);
 	const resetProfileStore = useProfileStore((s) => s.reset);
 
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -99,6 +100,26 @@ export const SettingsView: React.FC = () => {
 					{t("settings.title", "Einstellungen")}
 				</h1>
 			</div>
+
+			{phoneNumber && (
+				<div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-4 mb-4">
+					<p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
+						{t("settings.account.phone_label", "Deine Anmeldenummer")}
+					</p>
+					<p
+						className="text-base font-bold text-slate-900"
+						data-testid="settings-phone-number"
+					>
+						{phoneNumber}
+					</p>
+					<p className="text-xs text-slate-500 mt-1">
+						{t(
+							"settings.account.phone_hint",
+							"Merke Dir diese Nummer, um Dich später wieder anzumelden.",
+						)}
+					</p>
+				</div>
+			)}
 
 			{/* Stacked Action Buttons at bottom */}
 			<div className="flex flex-col gap-3 w-full max-w-md">
