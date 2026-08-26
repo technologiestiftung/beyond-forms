@@ -143,7 +143,14 @@
 		"groups": {
 			"identity": "Rechtliche Identität",
 			"status": "Staatsangehörigkeit und Status",
-			"address": "Meldeadresse"
+			"address": "Meldeadresse",
+			"contact": "Kontakt",
+			"vehicle": "Fahrzeug",
+			"insurance": "Versicherung und Erwerbstätigkeit",
+			"household": "Haushalt",
+			"housing": "Wohnsituation",
+			"financial": "Einkommen und Vermögen",
+			"health": "Gesundheit und Pflege"
 		},
 		"choice": {
 			"title": "Wie möchtest Du Deine Angaben hinzufügen?",
@@ -246,6 +253,53 @@
 		"errors": {
 			"update_failed": "Aktualisierung fehlgeschlagen",
 			"system_error": "Ein Systemfehler ist aufgetreten"
+		},
+		"displacedStatus": {
+			"Expellee (Resettler)": "Vertriebene(r) / Spätaussiedler",
+			"Displaced Person (Resettler)": "Heimatlose(r) Ausländer(in)",
+			"Late Resettler": "Spätaussiedler(in)",
+			"Spouse or Descendant of a Late Resettler": "Ehegatte/Abkömmling eines Spätaussiedlers",
+			"Soviet Zone Refugee": "Sowjetzonenflüchtling",
+			"none": "Keines davon"
+		},
+		"socialSecurityType": {
+			"None": "Keine",
+			"Pension Insurance": "Rentenversicherung",
+			"Long-term Care Insurance": "Pflegeversicherung"
+		},
+		"healthInsuranceStatus": {
+			"Compulsory Insurance": "Pflichtversicherung",
+			"Voluntary Insurance": "Freiwillige Versicherung",
+			"Family Insurance": "Familienversicherung",
+			"Private Insurance": "Private Versicherung",
+			"Care by Health Funds under § 264 SGB V": "Betreuung der Krankenkassen nach § 264 SGB V"
+		},
+		"abilityToWork": {
+			"Fully able": "Voll erwerbsfähig",
+			"Temporarily disabled": "Vorübergehend erwerbsgemindert",
+			"Permanently disabled": "Dauerhaft erwerbsgemindert"
+		},
+		"accomodationType": {
+			"Rental Apartment": "Mietwohnung",
+			"Own Home": "Eigenheim",
+			"Condominium": "Eigentumswohnung",
+			"Relative": "Bei Verwandten",
+			"Shared Household": "Wohngemeinschaft"
+		},
+		"incomeSources": {
+			"pension": "Rente",
+			"none_pension": "Keine Rente",
+			"employment_employed": "Angestellt",
+			"employment_self": "Selbstständig",
+			"employment_student": "Schüler(in)/Studierende(r)",
+			"employment_unemployed": "Arbeitslos",
+			"employment_none": "Keine Erwerbstätigkeit",
+			"other_benefits": "Sonstige Leistungen (z. B. Wohngeld, Unterhalt)",
+			"other_alimony": "Unterhalt",
+			"other_rent": "Mieteinnahmen",
+			"other_sick": "Krankengeld",
+			"other": "Sonstiges",
+			"none_other": "Keine sonstigen Einkünfte"
 		}
 	},
 	"address_placeholder": {
@@ -531,6 +585,10 @@
 				"confirm": "Konto löschen",
 				"cancel": "Abbrechen"
 			}
+		},
+		"account": {
+			"phone_label": "Deine Anmeldenummer",
+			"phone_hint": "Merke Dir diese Nummer, um Dich später wieder anzumelden."
 		}
 	},
 	"housing": {

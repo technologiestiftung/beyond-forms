@@ -43,6 +43,17 @@
 					"disability_proof": "If you apply due to reduced earning capacity: proof of this (e.g. from the pension insurance provider).",
 					"disability_hint": "Only needed if you apply for Grundsicherung due to reduced earning capacity."
 				}
+			},
+			"generate_button": "Generate application",
+			"generate_error": "Could not generate the application. Please try again later.",
+			"open_button": "Open application",
+			"parking_permit": {
+				"title": "Resident parking permit",
+				"description": "Apply for your resident parking permit directly with your saved details."
+			},
+			"housing_allowance": {
+				"title": "Housing allowance",
+				"description": "Apply for housing allowance (Wohngeld) directly with your saved details."
 			}
 		}
 	},
