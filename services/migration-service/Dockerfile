@@ -8,6 +8,9 @@ RUN go mod download
 # Build the Go application
 RUN CGO_ENABLED=0 GOOS=linux go build -o migration-service main.go
 
+FROM builder AS test
+RUN go vet ./... && go test ./...
+
 # Standard Alpine runner
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates

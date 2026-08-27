@@ -186,6 +186,9 @@ class DemoSeedService:
                 results.append({"status": "seeded", **summary})
             return results
         finally:
+            # A failed query poisons the transaction; without the rollback the unlock
+            # raises InFailedSqlTransaction and masks the original error.
+            self.db.rollback()
             self.db.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": _ENSURE_LOCK_KEY})
 
     def _insert_persona_user(self, phone_number: str) -> Users:
