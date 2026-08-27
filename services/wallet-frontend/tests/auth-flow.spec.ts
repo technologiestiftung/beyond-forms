@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { generateRandomTestPhoneNumber } from "./helpers/auth";
+import {
+	generateRandomTestPhoneNumber,
+	openManualPhoneForm,
+} from "./helpers/auth";
 
 test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 	test.beforeEach(async ({ page, context }) => {
@@ -16,11 +19,9 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 		await page.goto("/");
 		await page.getByTestId("promo-card-start-button").click();
 		await expect(page).toHaveURL(/\/auth\?mode=login/);
-		await expect(
-			page.getByText(
-				/Mit Telefonnummer fortfahren|Continue with Phone Number/i,
-			),
-		).toBeVisible();
+		// Fresh sessions land on the persona picker; the phone form is one click away.
+		await expect(page.getByTestId("persona-picker")).toBeVisible();
+		await openManualPhoneForm(page);
 	});
 
 	test("Happy Path: New User Registration with Data Sync", async ({ page }) => {
@@ -49,6 +50,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 		await expect(page).toHaveURL(/\/auth\?origin=eligibility/);
 
 		const randomPhone = generateRandomTestPhoneNumber();
+		await openManualPhoneForm(page);
 		await page.getByTestId("phone-input").fill(randomPhone);
 		await page.getByTestId("send-code-button").click();
 
@@ -64,22 +66,8 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 		});
 		await page.getByTestId("registration-success-next-button").click();
 
-		// Complete mandatory onboarding tutorial
-		await expect(page).toHaveURL(
-			/\/tutorial\/wie-funktioniert-die-applikation/,
-		);
-		const nextBtn = page.getByRole("button", { name: "Weiter" });
-		await expect(nextBtn).toBeVisible({ timeout: 15000 });
-		for (let i = 0; i < 3; i++) {
-			await nextBtn.click();
-			await page.waitForTimeout(1000);
-		}
-		const startBtn = page.locator(
-			'button:has-text("Jetzt starten"), button:has-text("Verstanden"), button:has-text("Start now"), button:has-text("Understood")',
-		);
-		await expect(startBtn).toBeVisible({ timeout: 10000 });
-		await startBtn.click();
-
+		// The mandatory tutorial gate is disabled (demo mode): new users land
+		// directly on the dashboard.
 		await expect(page).toHaveURL(/\/dashboard/, { timeout: 20000 });
 	});
 
@@ -87,7 +75,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 		const testNumber = generateRandomTestPhoneNumber();
 
 		await page.goto("/auth?mode=login");
-		await expect(page.getByTestId("phone-number-form")).toBeVisible();
+		await openManualPhoneForm(page);
 
 		await page.getByTestId("phone-input").fill(testNumber);
 		await page.getByTestId("send-code-button").click();
@@ -104,40 +92,27 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 		});
 		await page.getByTestId("registration-success-next-button").click();
 
-		await page.waitForURL(/\/tutorial\//, { timeout: 30000 });
-
-		if (page.url().includes("/tutorial")) {
-			const nextBtn = page.getByRole("button", { name: "Weiter" });
-			await expect(nextBtn).toBeVisible({ timeout: 15000 });
-			for (let i = 0; i < 3; i++) {
-				await nextBtn.click();
-				await page.waitForTimeout(1000);
-			}
-			const startBtn = page.locator(
-				'button:has-text("Jetzt starten"), button:has-text("Verstanden"), button:has-text("Start now"), button:has-text("Understood")',
-			);
-			await expect(startBtn).toBeVisible({ timeout: 10000 });
-
-			const isRemote =
-				baseURL &&
-				!baseURL.includes("localhost") &&
-				!baseURL.includes("127.0.0.1");
-			if (isRemote) {
-				// Wait for completion PATCH request response triggered by click
-				const progressPromise = page.waitForResponse(
-					(response) =>
-						response.url().includes("/cms/my-tutorials/progress") &&
-						response.status() === 200,
-					{ timeout: 15000 },
-				);
-				await startBtn.click();
-				await progressPromise;
-			} else {
-				await startBtn.click();
-			}
-		}
-
+		// The mandatory tutorial gate is disabled (demo mode): new users land
+		// directly on the dashboard.
 		await expect(page).toHaveURL(/\/dashboard/, { timeout: 20000 });
+
+		// In the local mock, "returning user" is decided by a lazily persisted
+		// mock profile in localStorage (written on first dashboard load). Wait
+		// for it so the re-login below isn't misclassified as a new user.
+		const isRemote =
+			baseURL &&
+			!baseURL.includes("localhost") &&
+			!baseURL.includes("127.0.0.1");
+		if (!isRemote) {
+			await page.waitForFunction(
+				() =>
+					Object.keys(window.localStorage).some((k) =>
+						k.startsWith("beyond-forms-mock-profile-"),
+					),
+				null,
+				{ timeout: 10000 },
+			);
+		}
 
 		// Clear session storage only to simulate re-login
 		await page.evaluate(() => {
@@ -146,6 +121,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 
 		await page.goto("/auth?mode=login");
 
+		await openManualPhoneForm(page);
 		await page.getByTestId("phone-input").fill(testNumber);
 		await page.getByTestId("send-code-button").click();
 		await expect(page.getByTestId("otp-form")).toBeVisible({ timeout: 20000 });
@@ -161,6 +137,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 		page,
 	}) => {
 		await page.goto("/auth");
+		await openManualPhoneForm(page);
 		await page.getByTestId("phone-input").fill("30231250003");
 		await page.getByTestId("send-code-button").click();
 
@@ -172,11 +149,12 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 
 	test("Sad Path: Handle Sync Failure", async ({ page }) => {
 		await page.goto("/auth?origin=eligibility");
-		await expect(page.getByTestId("phone-number-form")).toBeVisible();
+		await openManualPhoneForm(page);
 	});
 
 	test("Security: Rate Limit Handling", async ({ page }) => {
 		await page.goto("/auth");
+		await openManualPhoneForm(page);
 		await page.getByTestId("phone-input").fill("999999999"); // Mock provider uses 999999 for error
 		// We skip actual trigger to avoid flakiness, just ensuring the view is there
 		await expect(page.getByTestId("phone-number-form")).toBeVisible();
@@ -184,18 +162,35 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 
 	test("Language Switching: Verify multilingual support", async ({ page }) => {
 		await page.goto("/auth");
-		await expect(page.getByText(/Mit Telefonnummer fortfahren/i)).toBeVisible();
+		// The persona picker is the first screen of the auth view.
+		await expect(
+			page.getByText(/Mit Telefonnummer anmelden/i),
+		).toBeVisible();
 
 		await page.getByTestId("language-switcher").click();
 		await page.getByText("EN", { exact: true }).click();
-		await expect(page.getByText(/Continue with Phone Number/i)).toBeVisible();
+		await expect(
+			page.getByText(/Log in with a phone number/i),
+		).toBeVisible();
 	});
 
 	test("Accessibility: Auth Flow Deep Audit", async ({ page }) => {
+		// Three axe audits (picker, phone form, OTP form) need more than the
+		// default 30s local budget.
+		test.setTimeout(90000);
+
 		await page.goto("/auth");
 
-		// Ensure form is fully loaded
-		await expect(page.getByTestId("phone-number-form")).toBeVisible();
+		// The persona picker is the new entry screen — audit it, then continue
+		// to the phone form.
+		await expect(page.getByTestId("persona-picker")).toBeVisible();
+		await page.waitForTimeout(1000);
+		const pickerResults = await new AxeBuilder({ page })
+			.withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+			.analyze();
+		expect(pickerResults.violations).toEqual([]);
+
+		await openManualPhoneForm(page);
 
 		await page.waitForTimeout(1000);
 		const phoneResults = await new AxeBuilder({ page })

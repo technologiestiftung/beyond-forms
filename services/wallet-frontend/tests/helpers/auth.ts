@@ -19,6 +19,17 @@ export async function registerAuthBypassRoute(page: Page) {
 	}
 }
 
+export async function openManualPhoneForm(page: Page) {
+	// Fresh sessions land on the persona picker; opt into manual phone entry.
+	const phoneForm = page.getByTestId("phone-number-form");
+	const pickerLink = page.getByTestId("use-phone-instead-link");
+	await expect(pickerLink.or(phoneForm)).toBeVisible({ timeout: 15000 });
+	if (await pickerLink.isVisible()) {
+		await pickerLink.click();
+		await expect(phoneForm).toBeVisible();
+	}
+}
+
 export async function ensureAuthenticatedSession(
 	page: Page,
 	baseURL: string | undefined,
@@ -68,6 +79,7 @@ export async function ensureAuthenticatedSession(
 	await registerAuthBypassRoute(page);
 
 	await page.goto("/auth?mode=login");
+	await openManualPhoneForm(page);
 	await page.getByTestId("phone-input").fill(cleanPhone);
 	await page.getByTestId("send-code-button").click();
 	await expect(page.getByTestId("otp-form")).toBeVisible({ timeout: 20000 });
