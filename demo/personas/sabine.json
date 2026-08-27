@@ -96,11 +96,13 @@
     "tax_id": "27 604 913 558"
   },
 
-  "application": {
-    "form_type": "antrag_grundsicherung",
-    "status": "in_progress",
-    "form_data": {}
-  },
+  "applications": [
+    {
+      "form_type": "antrag_grundsicherung",
+      "status": "in_progress",
+      "form_data": {}
+    }
+  ],
 
   "documents": [
     {

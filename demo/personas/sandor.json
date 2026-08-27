@@ -91,11 +91,13 @@
     "tax_id": "51 297 806 344"
   },
 
-  "application": {
-    "form_type": "antrag_grundsicherung",
-    "status": "in_progress",
-    "form_data": {}
-  },
+  "applications": [
+    {
+      "form_type": "antrag_grundsicherung",
+      "status": "in_progress",
+      "form_data": {}
+    }
+  ],
 
   "documents": [
     {

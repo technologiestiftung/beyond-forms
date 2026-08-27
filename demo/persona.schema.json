@@ -4,12 +4,8 @@
   "title": "BeyondForms demo persona",
   "description": "A reviewable fixture describing one demo account: the `users` row, its application, its documents, and the research context that the database cannot hold. Materialised by src/services/demo_seed_service.py.",
   "type": "object",
-  "required": ["slug", "phone_number", "title", "source", "scenario", "profile", "documents"],
+  "required": ["slug", "phone_number", "title", "source", "scenario", "profile", "applications", "documents"],
   "additionalProperties": false,
-  "oneOf": [
-    { "required": ["application"] },
-    { "required": ["applications"] }
-  ],
   "properties": {
     "$schema": { "type": "string" },
     "slug": {
@@ -43,21 +39,9 @@
       "minProperties": 1
     },
 
-    "application": {
-      "type": "object",
-      "description": "A single Grundsicherung application. Use `applications` (plural) instead when a persona needs form-specific `form_data` scoped to more than one form_type (e.g. Wohngeld facts must not leak into the Grundsicherung context).",
-      "required": ["form_type", "status"],
-      "additionalProperties": false,
-      "properties": {
-        "form_type": { "type": "string" },
-        "status": { "enum": ["in_progress", "completed", "submitted"] },
-        "form_data": { "type": "object" }
-      }
-    },
-
     "applications": {
       "type": "array",
-      "description": "One entry per form_type this persona needs scoped `form_data` for. The first entry is primary: it's the row documents attach to, and the one `get_or_create_user_application`'s Grundsicherung flow reuses. Each further entry gets its own `UserApplications` row, matched by exact form_type at export time — see src/services/form_service.py::_build_base_context.",
+      "description": "One entry per form_type this persona needs scoped `form_data` for. Each is get-or-created by form_type. Documents attach to the first entry's row (user_documents has a single fk_application_id).",
       "minItems": 1,
       "items": {
         "type": "object",
