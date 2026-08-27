@@ -101,3 +101,13 @@ jobs:
       environment_name: ${{ needs.setup-env.outputs.env_name }}
       environment_prefix: ${{ needs.setup-env.outputs.prefix }}
     secrets: inherit
+
+  migration-service:
+    needs: setup-env
+    uses: ./.github/workflows/reusable-service-pipeline.yaml
+    with:
+      service_name: migration-service
+      service_path: services/migration-service
+      environment_name: ${{ needs.setup-env.outputs.env_name }}
+      environment_prefix: ${{ needs.setup-env.outputs.prefix }}
+    secrets: inherit

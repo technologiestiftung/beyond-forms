@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { test, expect, type Page } from "@playwright/test";
 import { testWithAuthenticatedUser } from "./fixtures/test-with-authenticated-user";
 import { waitForFadeInAnimations, waitForPageReady } from "./helpers/a11y";
+import { openManualPhoneForm } from "./helpers/auth";
 
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
 
@@ -89,12 +90,13 @@ test.describe("Deep Accessibility Audit - WCAG 2.1 AA", () => {
 
 	test("Auth phone form", async ({ page }) => {
 		await page.goto("/auth");
-		await expect(page.getByTestId("phone-number-form")).toBeVisible();
+		await openManualPhoneForm(page);
 		await assertNoViolations(page);
 	});
 
 	test("Auth OTP form", async ({ page }) => {
 		await page.goto("/auth");
+		await openManualPhoneForm(page);
 		await page.getByTestId("phone-input").fill("30231250004");
 		await page.getByTestId("send-code-button").click();
 		await expect(page.getByTestId("otp-form")).toBeVisible();

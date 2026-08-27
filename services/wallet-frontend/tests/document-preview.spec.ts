@@ -4,6 +4,7 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import {
 	generateRandomTestPhoneNumber,
+	openManualPhoneForm,
 	registerAuthBypassRoute,
 } from "./helpers/auth";
 
@@ -86,6 +87,7 @@ test.describe("MVP Citizen Document Preview & E2E Visual Audit", () => {
 		await registerAuthBypassRoute(page);
 
 		const phoneNumber = generateRandomTestPhoneNumber();
+		await openManualPhoneForm(page);
 		await page.getByTestId("phone-input").fill(phoneNumber);
 		await page.getByTestId("send-code-button").click();
 
@@ -98,19 +100,8 @@ test.describe("MVP Citizen Document Preview & E2E Visual Audit", () => {
 		await expect(welcomeBtn).toBeVisible({ timeout: 15000 });
 		await welcomeBtn.click();
 
-		// 2. Complete the 4 tutorial steps
-		await page.waitForURL(/\/tutorial\/[a-zA-Z0-9-]+/, { timeout: 15000 });
-		for (let step = 1; step <= 3; step++) {
-			await page.getByRole("button", { name: /Weiter|Next|Continue/i }).click();
-			await page.waitForTimeout(500);
-		}
-
-		const finishBtn = page.locator(
-			'button:has-text("Jetzt starten"), button:has-text("Verstanden"), button:has-text("Back to application")',
-		);
-		await expect(finishBtn).toBeVisible({ timeout: 10000 });
-		await finishBtn.click();
-
+		// 2. The mandatory tutorial gate is disabled (demo mode): new users
+		// land directly on the dashboard.
 		await page.waitForURL(/\/dashboard/, { timeout: 20000 });
 
 		// 2. Go to Profile Documents ("Meine Dokumente")

@@ -1,10 +1,15 @@
 import { test, expect } from "@playwright/test";
 import {
 	generateRandomTestPhoneNumber,
+	openManualPhoneForm,
 	registerAuthBypassRoute,
 } from "./helpers/auth";
 
-test.describe("Mandatory Onboarding Technical Tutorial E2E Gate & Session purification", () => {
+// The mandatory tutorial gate was disabled in the demo-mode PR (see the
+// commented-out block in src/components/Auth/ProtectedRoute.tsx): new users
+// land directly on the dashboard. These tests encode the removed gate and
+// are kept skipped until the gate is re-enabled.
+test.describe.skip("Mandatory Onboarding Technical Tutorial E2E Gate & Session purification", () => {
 	test.beforeEach(async ({ page, context }) => {
 		await registerAuthBypassRoute(page);
 
@@ -46,6 +51,7 @@ test.describe("Mandatory Onboarding Technical Tutorial E2E Gate & Session purifi
 
 		// 2. Trigger Authentication success for a new user (phone ending in 1)
 		const newCitizenPhone = generateRandomTestPhoneNumber();
+		await openManualPhoneForm(page);
 		await page.getByTestId("phone-input").fill(newCitizenPhone);
 		await page.getByTestId("send-code-button").click();
 		await expect(page.getByTestId("otp-form")).toBeVisible({ timeout: 20000 });
@@ -106,6 +112,7 @@ test.describe("Mandatory Onboarding Technical Tutorial E2E Gate & Session purifi
 		// 1. Authenticate Citizen A (returning user, phone ending in 2)
 		await page.goto("/auth");
 		const citizenAPhone = generateRandomTestPhoneNumber();
+		await openManualPhoneForm(page);
 		await page.getByTestId("phone-input").fill(citizenAPhone);
 		await page.getByTestId("send-code-button").click();
 		await expect(page.getByTestId("otp-form")).toBeVisible({ timeout: 20000 });
@@ -152,6 +159,7 @@ test.describe("Mandatory Onboarding Technical Tutorial E2E Gate & Session purifi
 		// 4. Authenticate Citizen B (returning user in same browser context, phone ending in 3)
 		await page.goto("/auth");
 		const citizenBPhone = generateRandomTestPhoneNumber();
+		await openManualPhoneForm(page);
 		await page.getByTestId("phone-input").fill(citizenBPhone);
 		await page.getByTestId("send-code-button").click();
 		await expect(page.getByTestId("otp-form")).toBeVisible({ timeout: 20000 });
