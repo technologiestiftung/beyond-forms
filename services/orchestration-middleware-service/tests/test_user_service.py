@@ -1,6 +1,6 @@
 import uuid
 from unittest.mock import MagicMock
-from src.models import UserDocuments, UploadedFiles, DocumentStatusType
+from src.models import UserDocuments, UploadedFiles, DocumentStatusType, UserApplications
 from src.services.user_service import UserService
 
 
@@ -43,3 +43,37 @@ def test_cleanup_missing_gcs_files():
     assert mock_doc.internal_error_log is not None
     assert "scrubbed by storage TTL policy" in mock_doc.internal_error_log
     db.commit.assert_called_once()
+
+
+def test_get_or_create_user_application_reuses_matching_form_type():
+    db = MagicMock()
+    user_id = uuid.uuid4()
+    existing = UserApplications(
+        application_id=uuid.uuid4(),
+        fk_user_id=user_id,
+        form_type="antrag_wohngeld",
+        status="in_progress",
+        form_data={},
+    )
+    db.query.return_value.filter.return_value.first.return_value = existing
+
+    _, application_id = UserService(db).get_or_create_user_application(user_id, "antrag_wohngeld")
+
+    assert application_id == existing.application_id
+    db.add.assert_not_called()
+
+
+def test_get_or_create_user_application_creates_with_the_requested_form_type():
+    db = MagicMock()
+    user_id = uuid.uuid4()
+    db.query.return_value.filter.return_value.first.return_value = None
+
+    _, application_id = UserService(db).get_or_create_user_application(user_id, "antrag_grundsicherung")
+
+    db.add.assert_called_once()
+    created = db.add.call_args.args[0]
+    assert isinstance(created, UserApplications)
+    assert created.fk_user_id == user_id
+    assert created.form_type == "antrag_grundsicherung"
+    assert created.application_id == application_id
+    db.flush.assert_called_once()

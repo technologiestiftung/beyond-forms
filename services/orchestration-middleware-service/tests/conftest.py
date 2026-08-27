@@ -7,3 +7,4 @@ os.environ["CHAT_CONTEXT_WINDOW_SIZE"] = os.environ.get("CHAT_CONTEXT_WINDOW_SIZ
 os.environ["ENDPOINT_RULES_ENGINE"] = os.environ.get("ENDPOINT_RULES_ENGINE", "http://rules-engine:8080")
 os.environ["ENDPOINT_FORMS_FILLER"] = os.environ.get("ENDPOINT_FORMS_FILLER", "http://forms-filling-service:8080")
 os.environ["AUTHENTIK_PUBLIC_KEY_PATH"] = os.environ.get("AUTHENTIK_PUBLIC_KEY_PATH", "")
+os.environ["DEMO_SEED_ENABLED"] = "false"

@@ -163,11 +163,9 @@ Field `type` is one of `string`, `checkbox`, `radio`, `choice`. An unknown field
 
 ## Driving a demo account
 
-Three synthetic personas exist on staging, each in a deliberately different state. Their phone numbers are Bundesnetzagentur "drama numbers", so the SMS step is skipped and **any six-digit code works**.
+Three synthetic personas exist on staging, each in a deliberately different state. Their phone numbers are Bundesnetzagentur "drama numbers", so the SMS step is skipped and **any six-digit code works**. Middleware creates them on startup when `DEMO_SEED_ENABLED=true`, if they are not already in the database.
 
-```bash
-curl -s "$API/api/v1/demo/personas" | jq -r '.personas[] | "\(.phone_number)  \(.slug)  \(.title)"'
-```
+Fixture definitions (profile, documents, research) live in `demo/personas/` in the repo — there is no HTTP listing.
 
 | Phone | Persona | State |
 |---|---|---|
@@ -175,28 +173,17 @@ curl -s "$API/api/v1/demo/personas" | jq -r '.personas[] | "\(.phone_number)  \(
 | `+493023125102` | Helmut | 6 documents, all verified — the case that completes |
 | `+493023125103` | Sandor | Mid-flow; one document failed as illegible |
 
-That endpoint returns each persona **in full**, so the exact values a seeded account will hold are readable before seeding anything — no login required:
-
-```bash
-P=$(curl -s "$API/api/v1/demo/personas")
-echo "$P" | jq '.personas[] | select(.slug=="helmut") | .profile'          # every profile field
-echo "$P" | jq '.personas[] | select(.slug=="helmut") | .documents[]
-                | {document_type, status, raw_data}'                        # extracted values per document
-echo "$P" | jq -r '.personas[] | select(.slug=="sandor") | .missing_documents[]
-                   | "\(.document_type): \(.reason)"'                       # and why each is absent
-```
-
 `derived` names the profile fields invented to satisfy the schema rather than taken from research — check it before quoting a number as a finding. `research.not_representable` records facts the schema cannot hold at all.
 
-### Log in as yourself, not as a persona
+### Log in as a persona to read, or as yourself to write
 
-Those three numbers are **shared** — anyone on the team can log into them, so treat them as read-only reference. **Do not write to them.** Take a drama number of your own instead:
+Those three numbers are **shared** — anyone on the team can log into them. Treat them as read-only reference. **Do not write to them.** Take a drama number of your own for experiments (empty account):
 
 ```bash
-PHONE=+493023125142        # pick your own unused suffix
+PHONE=+493023125102        # Helmut, already seeded — or pick your own unused suffix
 ```
 
-Drama numbers are matched by **prefix**, so the suffix is yours to choose: `+493023125` (Berlin), `+496990009` (Frankfurt), `+494066969` (Hamburg), `+492214710` (Köln), `+498999998` (München). Only `…101`, `…102` and `…103` are taken. A number that has never been used enrols itself on first login, no SMS and no setup, and every write resolves the account from your own token — so your data stays yours and the personas stay clean.
+Drama numbers are matched by **prefix**, so the suffix is yours to choose: `+493023125` (Berlin), `+496990009` (Frankfurt), `+494066969` (Hamburg), `+492214710` (Köln), `+498999998` (München). Only `…101`, `…102` and `…103` are taken. A number that has never been used enrols itself on first login, no SMS and no setup.
 
 Log in — two calls, and the token is short-lived, so re-run rather than cache it:
 
@@ -211,15 +198,11 @@ H="Authorization: Bearer $TOKEN"
 curl -s "$API/verify_auth" -H "$H" | jq        # {"is_authenticated": true, ...}
 ```
 
-Now seed a persona's fixture into *your* account and work from there. `reset: true` is the right default here — it is your own data to clear:
+Then read the record (Helmut is already filled in):
 
 ```bash
-APP=$(curl -s -X POST "$API/api/v1/demo/seed" -H "$H" -H 'Content-Type: application/json' \
-      -d '{"persona":"helmut","reset":true}' | jq -r .application_id)
-
 curl -s "$API/profile" -H "$H" | jq                       # the whole profile
 curl -s "$API/files" -H "$H" | jq -c '[.[]|{document_type,status}]'
-curl -s "$API/application/$APP/status" -H "$H" | jq       # completeness, milestone, can_submit
 curl -s "$API/export/antrag_grundsicherung" -H "$H" | jq  # filled PDF as a signed URL (60s)
 
 DOC=$(curl -s "$API/files" -H "$H" | jq -r '.[0].document_id')
@@ -336,17 +319,17 @@ curl -s "$API/openapi.json" | jq '.components.schemas.ChatRequest'
 4. **`validate-fields` maps by field name**, not by type, and rejects names it has no validator for. `/validate-field` is the one that takes an explicit `field_type`.
 5. **Sandor is deliberately not submittable.** The form demands a Rentenversicherungsnummer he cannot have. That is a documented finding about the form, not a broken fixture.
 6. **`milestone_level` caps at 2** even when everything is verified, and `can_submit` from `/application/{id}/status` is always `true`. Known limitations; do not read them as signals.
-7. **Demo endpoints only exist on staging.** They 404 in production by design.
+7. **There is no demo seed HTTP API.** Personas are created on middleware startup when `DEMO_SEED_ENABLED=true`, and only if that drama number does not already have a profile. Fixture definitions live in `demo/personas/` in the repo.
 8. **Export URLs expire after 60 seconds.** Follow `signed_open_url` promptly or request a new one.
 9. **The rules file is JSONC and half of it is commented out.** `json.loads` fails on it outright, and the commented blocks are steps that are defined but not yet live — partner details, household members, accommodation, special needs. Only 4 of 10 sections are active. Do not present a commented-out step as a question the form asks.
-10. **A persona account is not guaranteed to hold persona data.** The fixtures describe what seeding *writes*; a persona account may since have been written to by someone testing. `GET /api/v1/demo/personas` is the fixture definition and always reliable — the account behind the phone number is live state. Another reason to seed into your own number and read the fixture from the endpoint.
+10. **A persona account is not guaranteed to hold persona data.** The fixtures describe what the first seed *writes*; a persona account may since have been written to by someone testing. A later deploy will not reset it. Read `demo/personas/<slug>.json` for the fixture; `GET $API/profile` for live state.
 
 
 ## Verification Checklist
 
 - [ ] `$API` and `$AUTH` health checks return `200`
 - [ ] Login as `+493023125102` returns a token and `verify_auth` reports `is_authenticated: true`
-- [ ] After seeding `helmut`, `GET $API/files` shows 6 verified documents and status reports 100% complete
+- [ ] `GET $API/files` for Helmut shows 6 verified documents
 
 With `$RULES`, `$DOCS` and `$PDF` resolved:
 

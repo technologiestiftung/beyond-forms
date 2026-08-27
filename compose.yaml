@@ -132,7 +132,7 @@ services:
       # Local blob storage. Unset this to use the real bucket (needs gcloud ADC).
       - STORAGE_EMULATOR_HOST=${STORAGE_EMULATOR_HOST-http://gcs-emulator:4443}
       - API_PUBLIC_URL=http://localhost:8080
-      # Mounts /api/v1/demo/*. Terraform sets it for staging only. See demo/README.md.
+      # When true, middleware startup seeds any demo persona not already in the DB.
       - DEMO_SEED_ENABLED=${DEMO_SEED_ENABLED:-true}
     depends_on:
       postgres:

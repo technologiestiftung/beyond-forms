@@ -104,11 +104,18 @@ class UserService:
 
         return user.id
 
-    def get_or_create_user_application(self, internal_user_id: str) -> tuple[str, str]:
+    def get_or_create_user_application(self, internal_user_id: str, form_type: str) -> tuple[str, str]:
         """
-        Finds or creates an application for the user.
+        Finds the user's application for `form_type`, or creates one.
         """
-        application = self.db.query(UserApplications).filter(UserApplications.fk_user_id == internal_user_id).first()
+        application = (
+            self.db.query(UserApplications)
+            .filter(
+                UserApplications.fk_user_id == internal_user_id,
+                UserApplications.form_type == form_type,
+            )
+            .first()
+        )
 
         if application:
             application_id = application.application_id
@@ -117,7 +124,7 @@ class UserService:
             new_app = UserApplications(
                 application_id=application_id,
                 fk_user_id=internal_user_id,
-                form_type="grundsicherung",  # hardcoded for now
+                form_type=form_type,
                 status="in_progress",
                 form_data={},
             )

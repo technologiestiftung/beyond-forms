@@ -466,9 +466,9 @@ async def test_fill_form_still_resolves_the_stored_slot_id(form_service, mock_us
 @pytest.mark.asyncio
 async def test_fill_form_falls_back_when_form_type_does_not_match(form_service, mock_user):
     """
-    `get_or_create_user_application` writes form_type="grundsicherung" while exports are
-    requested as "antrag_grundsicherung", so the exact match never hit and both the
-    form_data and documents namespaces were empty for every user.
+    `get_or_create_user_application` used to write form_type="grundsicherung" while
+    exports are requested as "antrag_grundsicherung". Legacy rows still exist, so
+    the exact match can miss and we fall back to the most recently updated application.
     """
     application = _mock_application({"cost_of_rent": decimal.Decimal("1200.00")})
     query = form_service.db.query.return_value

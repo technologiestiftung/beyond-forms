@@ -245,10 +245,10 @@ class FormService:
     def _build_base_context(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], Optional[UserApplications]]:
         """
         Builds the JEXL context from `Users` columns merged with the matching
-        application's `form_data` (falling back to the user's most recently updated
-        application — see the note below — since `get_or_create_user_application`
-        writes form_type="grundsicherung" while exports are requested as
-        "antrag_grundsicherung", so an exact match never hits).
+        application's `form_data`. Falls back to the user's most recently updated
+        application when no row has this exact `form_type` — older accounts were
+        written with form_type="grundsicherung" while exports ask for
+        "antrag_grundsicherung".
 
         Does not include the `documents` namespace; `fill_form` layers that on top
         using the returned application, since it's the only caller that needs it.

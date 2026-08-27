@@ -142,7 +142,7 @@
 
     "research": {
       "type": "object",
-      "description": "Narrative context the seeder ignores. Surfaced by GET /api/v1/demo/personas so experiments can reason about the person, not just the row.",
+      "description": "Narrative context the seeder ignores. Lets a reviewer — or an agent — reason about the person, not just the row.",
       "additionalProperties": true,
       "properties": {
         "core_barrier": { "type": "string" },

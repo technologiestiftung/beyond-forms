@@ -23,6 +23,7 @@ async def lifespan(app: FastAPI):
     # Initialize global httpx client
     app.state.http_client = httpx.AsyncClient()
     ensure_emulator_bucket()
+    _ensure_demo_personas()
     yield
     # Clean up
     await app.state.http_client.aclose()
@@ -31,6 +32,36 @@ async def lifespan(app: FastAPI):
 initialize_pubsub()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
+
+def _demo_seed_enabled() -> bool:
+    return os.environ.get("DEMO_SEED_ENABLED", "").strip().lower() == "true"
+
+
+def _ensure_demo_personas() -> None:
+    """Materialise fixture personas that are not already in the database."""
+    if not _demo_seed_enabled():
+        return
+
+    from src.gcs import get_gcs_client
+    from src.services.demo_seed_service import DemoSeedService
+
+    db = SessionLocal()
+    try:
+        storage_client = None
+        try:
+            storage_client = get_gcs_client()
+        except Exception as exc:
+            logger.warning("Demo ensure: no GCS client (%s); document blobs will not be uploaded", exc)
+        summaries = DemoSeedService(db, storage_client=storage_client).ensure_missing_personas()
+        for row in summaries:
+            logger.info("Demo persona %s: %s", row.get("persona"), row.get("status"))
+    except Exception:
+        logger.exception("Demo persona ensure failed; service will still start")
+    finally:
+        db.close()
+
+
 app = FastAPI(title="Beyond Forms - Orchestration Middleware API", lifespan=lifespan)
 
 app.add_middleware(
@@ -171,12 +202,3 @@ app.include_router(llm.router)
 app.include_router(application.router)
 app.include_router(form_export.router)
 app.include_router(cms.router, prefix="/cms")
-
-# Demo-persona seeding is mounted only where it is explicitly enabled, so the routes do
-# not exist at all in production (404 rather than 403 — nothing to fingerprint). The
-# handlers apply a second gate: they only ever seed the caller's own test account.
-if os.environ.get("DEMO_SEED_ENABLED", "").strip().lower() == "true":
-    from src.routes import demo
-
-    app.include_router(demo.router)
-    logger.warning("DEMO_SEED_ENABLED=true: demo persona seeding routes are mounted at /api/v1/demo.")

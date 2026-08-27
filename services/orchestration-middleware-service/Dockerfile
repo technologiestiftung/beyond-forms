@@ -30,8 +30,8 @@ COPY --from=builder --chown=app:app /app/services/orchestration-middleware-servi
 COPY --from=builder --chown=app:app /app/libs/auth /app/libs/auth
 COPY --from=builder --chown=app:app /app/libs/document-schemas /app/libs/document-schemas
 COPY --from=builder --chown=app:app /app/forms /app/forms
-# Demo persona fixtures. Read by src/services/demo_seed_service.py; harmless when
-# DEMO_SEED_ENABLED is unset, since the router is not mounted then.
+# Demo persona fixtures. Read by src/services/demo_seed_service.py on startup
+# when DEMO_SEED_ENABLED=true.
 COPY --from=builder --chown=app:app /app/demo /app/demo
 COPY --from=builder --chown=app:app /opt/venv /opt/venv
 WORKDIR /app/services/orchestration-middleware-service
