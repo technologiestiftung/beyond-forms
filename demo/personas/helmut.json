@@ -23,7 +23,8 @@
     "has_guardian": false,
     "has_custodian": false,
     "displaced_status": null,
-    "residence_status": "Deutsche Staatsangehörigkeit",
+    "residence_status": null,
+    "license_plate": "B-HK 1947",
 
     "street": "Hauptstraße",
     "house_number": "4",
@@ -54,7 +55,7 @@
     "number_of_rooms": 3,
     "living_area": 68.00,
     "sublet_room_count": null,
-    "sublet_rent_income": null,
+    "sublet_rent_income": 0.00,
     "rent_paid_until": "2026-07-31",
     "landlord_name": "Wohngenossenschaft Berlin eG",
     "heating_type": "Zentralheizung",
@@ -63,7 +64,7 @@
     "monthly_income": 650.00,
     "income_sources": ["pension"],
     "has_assets": true,
-    "assets_types": [],
+    "assets_types": ["Liquid Assets"],
     "assets_description": null,
 
     "bank_name": "Sparkasse Musterstadt",
@@ -72,7 +73,7 @@
     "bic": null,
 
     "has_received_previous_benefits": true,
-    "previous_benefits_authority": "Bezirksamt Tempelhof-Schöneberg von Berlin, Amt für Soziales",
+    "previous_benefits_authority": "Bezirksamt Tempelhof-Schöneberg, Amt für Soziales, Tempelhofer Damm 165, 12099 Berlin",
     "previous_benefits_period": "01.03.2021 - 30.06.2026",
     "previous_benefits_ref_no": "GS-TS-2021-4471",
     "has_applied_for_asylum_benefits": false,
@@ -87,16 +88,78 @@
     "disability_application_pending": false,
     "is_care_dependent": false,
     "has_costly_medical_nutrition": false,
+    "is_victim_of_national_socialist_persecution": false,
 
     "identification_numbers": "L7XKP29TM",
-    "tax_id": "63 815 402 917"
+    "tax_id": "63 815 402 917",
+
+    "is_subsidized_housing": false,
+    "has_other_residence": false,
+    "has_secondary_residence": false,
+    "has_garage_costs": false,
+    "garage_costs": 0.00,
+    "has_household_energy_costs": false,
+    "household_energy_costs": 0.00,
+    "is_living_area_used_commercially": false,
+    "commercially_used_area_sqm": null,
+    "is_student_or_trainee": false,
+    "professional_expenses": 0.00,
+    "has_childcare_expenses": false,
+
+    "household_members": [
+      {
+        "first_name": "Ingrid",
+        "last_name": "Klar",
+        "birth_name": "Neumann",
+        "date_of_birth": "1949-11-03",
+        "place_of_birth": "Berlin",
+        "nationality": "deutsch",
+        "gender": "Female",
+        "marital_status": "verheiratet",
+        "employment_status": "Rentnerin",
+        "relationship_to_applicant": "Ehefrau",
+        "monthly_pension_income": 520.00
+      }
+    ]
   },
 
-  "application": {
-    "form_type": "antrag_grundsicherung",
-    "status": "in_progress",
-    "form_data": {}
-  },
+  "applications": [
+    {
+      "form_type": "antrag_grundsicherung",
+      "status": "in_progress",
+      "form_data": {}
+    },
+    {
+      "form_type": "antrag_wohngeld",
+      "status": "in_progress",
+      "form_data": {
+        "is_wohngeld_first_application": true,
+        "receives_wohngeld_for_other_dwelling": false,
+        "has_unlisted_household_members": false,
+        "household_member_died_recently": false,
+        "household_size_will_change": false,
+        "receives_other_transfer_benefits": false,
+        "pays_child_or_spousal_support": false,
+        "receives_support_from_others": false,
+        "expects_future_income_change": false,
+        "assets_exceed_wohngeld_threshold": false,
+        "related_to_landlord": false,
+        "service_costs_included_in_rent": false,
+        "rent_paid_partly_by_third_party": false,
+        "receives_rent_contribution_from_others": false,
+        "expects_rent_change": false,
+        "wohngeld_payment_to_applicant": true,
+        "consents_to_bank_statement_retention": true
+      }
+    },
+    {
+      "form_type": "antrag_bewohnerparkausweis",
+      "status": "in_progress",
+      "form_data": {
+        "consents_to_registry_verification": true
+      }
+    }
+  ],
 
   "documents": [
     {
@@ -234,39 +297,17 @@
     "previous_benefits_period",
     "previous_benefits_ref_no",
     "identification_numbers",
-    "tax_id"
-  ],
-
-  "research": {
-    "core_barrier": "Low media literacy combined with bureaucratic language. Overwhelmed by jargon; afraid that a mistake causes disadvantage or delay; distrusts digital handling of sensitive data.",
-    "usage_context": "PC with support from relatives or a counselling centre (Caritas, Bezirksamt). Smartphone use for official matters is the exception — a mobile-only application would be risky for him.",
-    "key_wishes": [
-      "Step-by-step guidance with visible interim successes rather than everything at once",
-      "Only genuinely relevant questions, asked once, in everyday language with examples",
-      "Document checklists per section, with a 'not yet available — I will request it' option",
-      "A legally secure confirmation of receipt he can download or print",
-      "Reminders for deadlines and appointments",
-      "Proactive hints about coverable costs such as household and liability insurance",
-      "Data protection explained where the sensitive question is asked, not only in the fine print"
-    ],
-    "key_fears": [
-      "That the application is 'lost' digitally because no confirmation arrives",
-      "That old or unclear proofs (e.g. a pension notice from 20 years ago) cannot be produced",
-      "That the multi-step nature of the process (appointments, follow-ups, deadlines) is not transparent"
-    ],
-    "not_representable": {
-      "partner_pension_net_eur": 320,
-      "partner_has_small_additional_income": true,
-      "insurance_liability_household_life_total_eur": 290,
-      "children_count": 2,
-      "note": "`users` has a single `monthly_income` scalar and no household-member entity, so his wife's pension cannot be stored — only `persons_in_household_count: 2` hints at the couple. There are also no insurance-cost columns, even though his User Story 9 is specifically about insurance being coverable; the Tierhaftpflicht debit of €52.67 visible on the Kontoauszug is recorded in the stmt3 document's `amount_liability_insurance` as the closest available home. Both are filed schema gaps."
-    },
-    "unreconciled": {
-      "figures_follow_the_documents_not_the_research": "The research document describes a €1,200 Warmmiete in Charlottenburg-Wilmersdorf and a €450 pension. The committed scans say otherwise — €650 Altersrente, €430,87 rent-and-Nebenkosten debit, Hauptstr. 4 in 10820 — and the documents win, so that nothing contradicts itself when a reviewer opens them during a demo. The consequence is that Helmut is no longer the high-rent case the research captured; if that scenario is needed, it has to move to a persona of its own.",
-      "age": "Short profile says 75–85+, User Story 1 says 68. The source document flags this itself. Resolved in favour of the short profile (born 1947), which also places him past retirement age and therefore on a genuinely different eligibility branch from Sabine.",
-      "pension_contribution_years": "Stated both as 'over 17 years' and as 'over 30 years of minimum contributions while self-employed'.",
-      "fixture_addresses_disagree": "The Rentenbescheid and Heizkostenabrechnung say Hauptstr. 4, 10820 Berlin; the Kontoauszug says Hauptstr. 3, 10829 Berlin; the Heizkostenabrechnung is also addressed to 'Herr Mustermann' in its salutation. The majority reading (Hauptstr. 4, 10820) is used, which is also the only unambiguous postcode of the two."
-    },
-    "notes": "All six documents are real committed scans — nothing generated. The seven supporting Anlagen (Meldebescheinigung, Kontobestätigung, Betriebskostenabrechnung, KdU, Haushaltsbescheinigung, Einkommens- and Vermögenserklärung) are deliberately left unseeded rather than fabricated; see missing_documents. He now has assets (€5.267,56 on the Kontoauszug) — still well inside the SGB XII Schonvermögen, so he stays eligible. No BIC is set: the Kontoauszug does not show one, and inventing one for a fictional 'Sparkasse Musterstadt' would reintroduce exactly the kind of contradiction this persona now avoids."
-  }
+    "tax_id",
+    "household_members",
+    "is_subsidized_housing",
+    "has_other_residence",
+    "has_secondary_residence",
+    "has_garage_costs",
+    "has_household_energy_costs",
+    "is_living_area_used_commercially",
+    "is_student_or_trainee",
+    "professional_expenses",
+    "has_childcare_expenses",
+    "is_victim_of_national_socialist_persecution"
+  ]
 }

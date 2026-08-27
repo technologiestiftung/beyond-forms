@@ -19,11 +19,14 @@ stop exercising the review and to-do paths, which is most of what there is to st
 
 ## Seed them
 
+When `DEMO_SEED_ENABLED=true` (the compose default, and every deployed environment),
+middleware startup inserts any persona whose drama number does not already have a
+profile. Existing profiles are left alone.
+
 ```bash
-docker compose up -d                         # DEMO_SEED_ENABLED defaults to true locally
-./scripts/seed_demo_personas.sh              # all three, prints a phone/token table
-./scripts/seed_demo_personas.sh helmut       # just one
-./scripts/seed_demo_personas.sh --no-reset   # keep what's already there
+docker compose up -d                         # seeds Sabine, Helmut, Sandor on first boot
+./scripts/seed_demo_personas.sh              # same check, from inside the container
+./scripts/seed_demo_personas.sh helmut       # force-reset one
 ```
 
 Document blobs go to a local [fake-gcs-server](https://github.com/fsouza/fake-gcs-server)
@@ -39,20 +42,18 @@ code works.
 
 ## Give this to your team
 
-Staging is publicly reachable and has `DEMO_SEED_ENABLED=true`, so any teammate — or their
-agent — can browse and seed the same three personas without running anything locally:
+Staging and production both have `DEMO_SEED_ENABLED=true`, so the first middleware
+revision that boots against an empty database creates Helmut, Sabine and Sandor.
+Later deploys skip them if those accounts already have a profile. Treat the three
+numbers as shared reference — log in as one of them to *read* the case, and take a
+drama number of your own (any unused suffix) if you need a private empty account.
 
 ```bash
 API=https://staging.bf.citylab-berlin.org/api            # middleware
 AUTH=https://staging.bf.citylab-berlin.org/auth-proxy    # auth-service
 
-# 1. Browse what's available — no login needed, since these files hold no real data.
-#    This returns each persona file in full: profile, documents with raw_data, research.
-curl -s $API/api/v1/demo/personas | jq
-
-# 2. Log in with a drama number of YOUR OWN — not a persona's. The match is on prefix,
-#    so any unused suffix works; an unseen number enrols itself and skips the SMS step.
-PHONE=+493023125142   # …101/102/103 are the personas — pick anything else
+# Log in as Helmut (already seeded on deploy) and read the record.
+PHONE=+493023125102
 START=$(curl -s -X POST $AUTH/login/start -H 'Content-Type: application/json' \
         -d "{\"phone_number\": \"$PHONE\"}")
 TOKEN=$(curl -s -X POST $AUTH/login/finish -H 'Content-Type: application/json' \
@@ -60,23 +61,13 @@ TOKEN=$(curl -s -X POST $AUTH/login/finish -H 'Content-Type: application/json' \
         -H "X-BeyondForms-Auth-Flow: $(echo "$START" | jq -r .flow)" \
         -d '{"code":"123456"}' | jq -r .token)
 
-# 3. Seed a persona's fixture into your own account, then drive it.
-curl -s -X POST $API/api/v1/demo/seed -H "Authorization: Bearer $TOKEN" \
-     -H 'Content-Type: application/json' -d '{"persona":"helmut","reset":true}' | jq
 curl -s $API/profile -H "Authorization: Bearer $TOKEN" | jq
+curl -s $API/files -H "Authorization: Bearer $TOKEN" | jq
 ```
 
-Whatever they build against this is the same REST surface production runs on — same JSON
-shapes, same auth, same computed fields — just pointed at a synthetic account instead of a
-real citizen's. Tokens are short-lived; re-run step 2 rather than caching one.
-
-**Seed into your own number, never a persona's.** The write endpoints resolve the account
-from the caller's own token, so a private copy is the default behaviour, not extra work —
-and `reset: true` is then safe, because the data being cleared is yours. Logging in as
-`+493023125102` instead makes your test state visible to everyone and puts a colleague's
-work one `reset` away from deletion. The persona *definitions* are always readable from
-`GET /api/v1/demo/personas`; the accounts behind those three numbers are live state and
-drift from the fixtures as soon as anyone touches them.
+The fixture *definitions* live in `demo/personas/` in the repo. The accounts behind
+those three numbers are live state and can drift once someone writes to them; a
+deploy will not reset them.
 
 ## Get a token
 
@@ -103,34 +94,14 @@ DOC=$(curl -s $API/files -H "$AUTH" | jq -r '.[0].document_id')
 curl -s $API/api/v1/documents/$DOC/extractions -H "$AUTH" | jq   # raw_data as the review UI sees it
 curl -s $API/api/v1/documents/$DOC/file -H "$AUTH" -o document.pdf
 
-APP=$(curl -s -X POST $API/api/v1/demo/seed -H "$AUTH" -H 'Content-Type: application/json' \
-        -d '{"persona":"helmut"}' | jq -r .application_id)
-curl -s $API/application/$APP/status -H "$AUTH" | jq        # completeness + milestone
-
 curl -s $API/export/antrag_grundsicherung -H "$AUTH" | jq   # filled PDF, signed URL
 
 curl -s -X POST $API/chat -H "$AUTH" -H 'Content-Type: application/json' \
   -d '{"content":"Wie hoch ist meine Miete laut meinem Profil?"}' | jq -r .content
 ```
 
-Full interactive reference: <http://localhost:8080/docs>.
-
-### Demo endpoints
-
-| | Auth | |
-|---|---|---|
-| `GET /api/v1/demo/personas` | none | Every persona file **in full** — `profile`, `application`, `documents` with their `raw_data`, `missing_documents`, `derived` and `research` |
-| `POST /api/v1/demo/seed` | drama number | `{"persona": "helmut", "reset": true}` |
-| `DELETE /api/v1/demo/seed` | drama number | Cold start; add `?reset_tutorials=true` to replay onboarding |
-
-`GET /personas` is unauthenticated because it only reads files committed to the repo — there
-is nothing in them to protect. Seeding writes to a real `users` row, so it stays behind the
-same drama-number check as everything else.
-
-All three exist only where `DEMO_SEED_ENABLED=true` (staging and local; **never production**,
-where they 404). The two write endpoints resolve the target user from the caller's own
-token and refuse anything that is not a drama number — you can only ever seed your own
-demo account.
+Full interactive reference: <http://localhost:8080/docs>. There is no HTTP seed API —
+personas are created on middleware startup when `DEMO_SEED_ENABLED=true`.
 
 ## Reading a persona file
 
@@ -155,15 +126,11 @@ drifted fixture fails the image build.
   would never be asked), or `not_yet_supplied` (fair game to author). A test asserts every
   absent slot is accounted for, so a forgotten document cannot hide among the intentional
   ones.
-- `research` — narrative the seeder ignores and `GET /api/v1/demo/personas` returns:
-  barriers, wishes, usage context, and the facts the schema cannot hold.
-
-`GET /api/v1/demo/personas` serves each of these files verbatim, minus the `$schema`
-pointer — so everything documented in this section is readable over the API without a
-checkout, and a teammate's agent can see the values a seeded account will hold before
-deciding to seed one.
+- `research` — narrative the seeder ignores: barriers, wishes, usage context, and the
+  facts the schema cannot hold.
 
 Adding a fourth persona is one JSON file plus a drama number; nothing needs registering.
+A restart (or `./scripts/seed_demo_personas.sh`) will pick it up if `DEMO_SEED_ENABLED=true`.
 
 ## Seeing what comes out
 
@@ -228,16 +195,15 @@ across all four research documents and the largest thing that is researched but 
 The co-use scenario the documents describe is partly reachable today, since worker and client
 share one session — `./scripts/demo_token.sh --all` gives one operator all three at once.
 
-## Seeding without HTTP
+## Re-seed one account
 
 ```bash
-docker compose exec orchestration-middleware-service python -m src.demo_cli --list +493023125102
+docker compose exec orchestration-middleware-service python -m src.demo_cli --ensure
 docker compose exec orchestration-middleware-service python -m src.demo_cli +493023125102 helmut --reset
 ```
 
-For when Authentik isn't running locally. The account must already exist —
-`auth-service.get_or_create_user` is the only writer of a `users` row, so log in once first.
-On staging use the HTTP endpoint: AlloyDB has a private IP reachable only from inside the VPC.
+`--ensure` is the same check middleware runs on startup. `--reset` rewrites one account.
+A `users` row is created if missing; `authentik_id` stays null until first login.
 
 ## Everything here is synthetic
 

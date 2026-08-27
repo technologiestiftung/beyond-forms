@@ -91,11 +91,13 @@
     "tax_id": "51 297 806 344"
   },
 
-  "application": {
-    "form_type": "antrag_grundsicherung",
-    "status": "in_progress",
-    "form_data": {}
-  },
+  "applications": [
+    {
+      "form_type": "antrag_grundsicherung",
+      "status": "in_progress",
+      "form_data": {}
+    }
+  ],
 
   "documents": [
     {
@@ -213,37 +215,5 @@
     "previous_benefits_ref_no",
     "identification_numbers",
     "tax_id"
-  ],
-
-  "research": {
-    "core_barrier": "A false start. The system landscape (AsylbLG / SGB II / SGB XII) is opaque, so the biggest risk is applying down the wrong path and losing time. On top of that sit language barriers, bureaucratic vocabulary, shame and fear of mistakes — which together produce the incomplete submissions that trigger follow-up requests and delay.",
-    "usage_context": "Rarely alone. Supported self-service at a terminal or PC in an office or counselling centre (Caritas, ASB), where an advisor can look at the case with his consent and missing documents can be added on the spot. Phone and chat groups are supplementary, informal channels.",
-    "key_wishes": [
-      "Understand at the start which benefit actually applies to him, and why",
-      "Language selection and simple language available at any point, including mid-application",
-      "Only relevant questions — no empty fields to puzzle over",
-      "A guided housing-cost path: rent → operating costs → heating → hot water, with the proof required at each step",
-      "Example documents and format hints so he knows what will be accepted",
-      "Immediate upload feedback on legibility and completeness, with concrete fixes",
-      "The ability to submit on time even when incomplete, then follow up in a structured way",
-      "Status transparency at every stage so long processing times become comprehensible"
-    ],
-    "key_fears": [
-      "Choosing the wrong application path and losing time",
-      "Shame at not understanding, and at not being able to supply documents correctly",
-      "Being caught in a loop of follow-up requests after an incomplete submission",
-      "Not knowing what proof is still required 'with no assets', or why"
-    ],
-    "not_representable": {
-      "duration_of_benefit_receipt_years": 4,
-      "hot_water_supply_decentralised": null,
-      "note": "Duration of receipt is only expressible as free text in `previous_benefits_period`. Decentralised hot water supply — which triggers an additional need under SGB XII and is one of the things his research says applicants most often forget — has no column at all, only the `hot_water_costs` amount. Filed as a gap."
-    },
-    "unreconciled": {
-      "age": "Stated as either 50–65 or 65+; born 1965 here, so 60.",
-      "need_and_entitlement": "Stated household need above €1,000 with net entitlement €790–900. Reconciled here as a €620 Warmmiete plus one Regelsatz, less €290 of income — but the source leaves the income unstated, so the €290 is derived."
-    },
-    "finding": "He is the only persona the rules engine rejects, and the reason is worth keeping: `/validate-form` requires `pension_insurance_provider` and `pension_insurance_number` unconditionally, but a 60-year-old asylberechtigter man who has never contributed to the German pension system has neither. The form therefore demands a Rentenversicherungsnummer that cannot exist. This is a real constraint on the target group, surfaced by the fixture rather than invented for it — leave him non-submittable.",
-    "notes": "The source document says only 'non-German, entitled to asylum'. The specific nationality is therefore this fixture's choice, not a characterisation drawn from the research: Syria is the largest group with asylum status in Germany, and SY was added to rules-engine CountryCode for it. Swapping it is a one-line edit here plus one enum member. Note also that `displaced_status` is deliberately null — DisplacedStatusType only holds BVFG Aussiedler/Vertriebene categories, none of which mean asylberechtigt, so the status lives in the free-text `residence_status` column. The surname differs from the Hungarian 'Kovacs' in forms/scripts/llm-eval/profiles/sandor.json; that file is left untouched for the eval harness."
-  }
+  ]
 }

@@ -24,7 +24,7 @@ failures=0
 for file in "$PERSONAS_DIR"/*.json; do
   slug=$(jq -r '.slug' "$file")
   phone=$(jq -r '.phone_number' "$file")
-  form_type=$(jq -r '.application.form_type' "$file")
+  form_type=$(jq -r '.applications[0].form_type' "$file")
   [ -n "$ONLY" ] && [ "$ONLY" != "$slug" ] && continue
 
   echo "=== $slug ==="

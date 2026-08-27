@@ -28,12 +28,18 @@ read_only = true
 default_value = "Bitte Bezirk auswählen:"
 value = "{{ district ? district : '' }}"
 
+# The real PDF has five separate single-line AcroForm fields for this address block
+# (Zeile 1 is narrow — it sits on the same row as the static "Bezirksamt" label — Zeile
+# 2-5 are full-width lines below), plus separate FAX/E-Mail fields to the right. Cramming
+# the whole address into Zeile 1 alone clipped it; each line below now carries one part.
+# Only the Tempelhof-Schöneberg address is verified (real, from berlin.de) so far; other
+# districts fall back to blank rather than guessing an unverified address.
 ["p1_anschrift_bezirk_zeile_1"]
 type = "string"
 nearby_label = "An das Bezirksamt"
 read_only = true
 default_value = ""
-value = ""
+value = "{{ district == 'Tempelhof-Schöneberg' ? 'Tempelhof-Schöneberg von Berlin' : '' }}"
 
 ["p1_fax"]
 type = "string"
@@ -47,26 +53,26 @@ type = "string"
 nearby_label = "oder per E-Mail:"
 read_only = true
 default_value = ""
-value = ""
+value = "{{ district == 'Tempelhof-Schöneberg' ? 'Vignettenstelle' : '' }}"
 
 ["p1_anschrift_bezirk_zeile_3"]
 type = "string"
 nearby_label = "oder per E-Mail:"
 read_only = true
 default_value = ""
-value = ""
+value = "{{ district == 'Tempelhof-Schöneberg' ? 'Tempelhofer Damm 165' : '' }}"
 
 ["p1_anschrift_bezirk_zeile_4"]
 type = "string"
 read_only = true
 default_value = ""
-value = ""
+value = "{{ district == 'Tempelhof-Schöneberg' ? '12099 Berlin' : '' }}"
 
 ["p1_e-mail"]
 type = "string"
 read_only = true
 default_value = ""
-value = ""
+value = "{{ district == 'Tempelhof-Schöneberg' ? 'post-buergeramt@ba-ts.berlin.de' : '' }}"
 
 ["p1_anschrift_bezirk_zeile_5"]
 type = "string"
@@ -90,7 +96,7 @@ value = "{{ 'Auswahl1' }}"
 type = "string"
 description = "Bitte geben Sie das aktuelle Kennzeichen Ihres Kraftfahrzeugs an. "
 default_value = ""
-value = ""
+value = "{{ license_plate ? license_plate : '' }}"
 
 ["p1_name_vorname_antragsteller"]
 type = "string"
@@ -183,7 +189,7 @@ value = "{{ false }}"
 ["p2_auswahl_einverständnis_melderegister"]
 type = "checkbox"
 nearby_label = "Einverständnis Melderegister:"
-value = "{{ false }}"
+value = "{{ consents_to_registry_verification == true ? true : '' }}"
 
 ["p2_freitext"]
 type = "string"
@@ -195,7 +201,7 @@ value = ""
 type = "string"
 description = "Das aktuell vorgetragene Tagesdatum können Sie ändern."
 default_value = ""
-value = ""
+value = "{{ today }}"
 
 ["p2_drucken"]
 type = "checkbox"

@@ -96,11 +96,13 @@
     "tax_id": "27 604 913 558"
   },
 
-  "application": {
-    "form_type": "antrag_grundsicherung",
-    "status": "in_progress",
-    "form_data": {}
-  },
+  "applications": [
+    {
+      "form_type": "antrag_grundsicherung",
+      "status": "in_progress",
+      "form_data": {}
+    }
+  ],
 
   "documents": [
     {
@@ -221,36 +223,5 @@
     "previous_benefits_ref_no",
     "identification_numbers",
     "tax_id"
-  ],
-
-  "research": {
-    "core_barrier": "Fear and overwhelm from long, complex applications. Cognitive limitations mean she needs support with difficult questions, and stress further reduces her concentration. A calming entry point is what reduces her drop-off risk.",
-    "usage_context": "Supported self-service: normally at a PC or terminal in a counselling setting (Caritas, hospital, Sozialamt) together with a professional — not alone at home on a phone. Co-use is the core case, and she must stay in control while it happens.",
-    "key_wishes": [
-      "Small steps with a clear structure and no overwhelm",
-      "Reassurance and expectation-setting at the start (duration, steps, what is needed)",
-      "Encouragement and confirmation — 'everything done correctly', 'almost done'",
-      "Specific document instructions per section (what exactly, which period)",
-      "Help with unclear or old proofs, including how to request them",
-      "A 'filling out together' mode that does not take control away from her",
-      "Understanding the monthly deadline logic and being able to submit on time even when incomplete"
-    ],
-    "key_fears": [
-      "Entering something incorrectly and being disadvantaged or delayed for it",
-      "The sheer scope — 'no less than 80 pages if everything is included'",
-      "Not knowing which documents are really necessary, e.g. a pension notice from years ago",
-      "Hesitation to ask what she fears are 'silly questions'"
-    ],
-    "not_representable": {
-      "insurance_liability_household_total_eur": 120,
-      "in_a_relationship_but_living_alone": true,
-      "needs_cognitive_support": true,
-      "note": "There are no insurance-cost columns, so the €120 is recorded only in the stmt3 document's `amount_liability_insurance`. 'Living alone but in a relationship' has no representation — `marital_status: Single` with a 1-person household is the closest fit. Cognitive support needs are deliberately NOT stored: they are research context, and Art. 9 GDPR data has no business in this table. Both gaps are filed."
-    },
-    "unreconciled": {
-      "need_and_entitlement": "Stated gross need approx. €1,120 excluding housing costs, with net entitlement €860–890, alongside a €780 Warmmiete and a note that recognised housing costs typically run €400–500. The €1,120 is only consistent with a recognised (appropriateness-capped) housing cost well below her actual rent. Recorded as stated.",
-      "age": "Stated as a 50–65 range; born 1968 here, so 58."
-    },
-    "notes": "The missing pension_notice is intentional and is the point of this persona — it is the concrete instance of the 'I do not know whether I need the old Rentenbescheid, and I cannot find it' problem. Do not 'fix' it by adding the document."
-  }
+  ]
 }

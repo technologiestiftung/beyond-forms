@@ -2,8 +2,14 @@ import decimal
 import uuid
 import pytest
 from unittest.mock import MagicMock, patch
+from pyjexl import JEXL
 from sqlalchemy.exc import DatabaseError
-from src.services.form_service import FormService, _extract_document_refs
+from src.services.form_service import (
+    FormService,
+    _extract_document_refs,
+    _extract_required_context_fields,
+    _is_context_value_filled,
+)
 from src.models import Users
 
 
@@ -460,9 +466,9 @@ async def test_fill_form_still_resolves_the_stored_slot_id(form_service, mock_us
 @pytest.mark.asyncio
 async def test_fill_form_falls_back_when_form_type_does_not_match(form_service, mock_user):
     """
-    `get_or_create_user_application` writes form_type="grundsicherung" while exports are
-    requested as "antrag_grundsicherung", so the exact match never hit and both the
-    form_data and documents namespaces were empty for every user.
+    `get_or_create_user_application` used to write form_type="grundsicherung" while
+    exports are requested as "antrag_grundsicherung". Legacy rows still exist, so
+    the exact match can miss and we fall back to the most recently updated application.
     """
     application = _mock_application({"cost_of_rent": decimal.Decimal("1200.00")})
     query = form_service.db.query.return_value
@@ -581,3 +587,95 @@ async def test_fill_form_survives_an_unevaluable_mapping_entry(form_service, moc
         field_values = mock_post.call_args.kwargs["json"]["field_values"]
         assert field_values["p1_broken"] == ""
         assert field_values["p1_ok"] == "Max"
+
+
+def test_extract_required_context_fields_excludes_documents_and_string_literals():
+    """Only bare identifiers referenced outside the `documents.*` namespace count as
+    profile fields a form needs; string literals like 'Auswahl1' must not leak in."""
+    mapping = {
+        "p1_name": "{{ first_name }} {{ last_name }}",
+        "p1_doc": "{{ documents.wage_slips ? documents.wage_slips.net_amount : '' }}",
+        "p1_choice": "{{ status == 'Auswahl1' ? 'Ja' : '' }}",
+        "p1_static": "Berlin",
+        "p1_checkbox": True,
+    }
+    fields = _extract_required_context_fields(mapping, JEXL())
+    assert fields == {"first_name", "last_name", "status"}
+
+
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        (None, False),
+        ("", False),
+        ("   ", False),
+        ([], False),
+        ({}, False),
+        (False, True),
+        (0, True),
+        ("Berlin", True),
+        (["employment"], True),
+    ],
+)
+def test_is_context_value_filled_semantics(value, expected):
+    assert _is_context_value_filled(value) is expected
+
+
+@pytest.mark.asyncio
+async def test_get_completeness_counts_filled_and_missing_fields(form_service):
+    user = MagicMock(spec=Users)
+    col_first, col_last, col_plate = MagicMock(), MagicMock(), MagicMock()
+    col_first.name = "first_name"
+    col_last.name = "last_name"
+    col_plate.name = "license_plate"
+    user.__table__.columns = [col_first, col_last, col_plate]
+    user.first_name = "Max"
+    user.last_name = ""
+    user.license_plate = None
+
+    mock_mapping = {
+        "p1_name": "{{ first_name }} {{ last_name }}",
+        "p1_plate": "{{ license_plate }}",
+    }
+    _set_application_query(form_service, None)
+
+    with patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")):
+        filled, total = await form_service.get_completeness("antrag_bewohnerparkausweis", user)
+
+    assert total == 3
+    assert filled == 1
+
+
+@pytest.mark.asyncio
+async def test_get_completeness_no_mapped_fields_returns_zero_total(form_service, mock_user):
+    mock_mapping = {"p1_static": "Berlin", "p1_checkbox": True}
+    _set_application_query(form_service, None)
+
+    with patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")):
+        filled, total = await form_service.get_completeness("test_form", mock_user)
+
+    assert (filled, total) == (0, 0)
+
+
+@pytest.mark.asyncio
+async def test_get_completeness_counts_application_form_data(form_service, mock_user):
+    _set_application_query(form_service, _mock_application({"income_sources": ["employment"]}))
+    mock_mapping = {"p1_income": "{{ income_sources }}"}
+
+    with patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")):
+        filled, total = await form_service.get_completeness("test_form", mock_user)
+
+    assert (filled, total) == (1, 1)
+
+
+@pytest.mark.asyncio
+async def test_get_completeness_ignores_documents_namespace(form_service, mock_user):
+    """Neither the parking permit nor Wohngeld require document uploads today, so a
+    field that's only reachable via `documents.*` must not count toward the total."""
+    _set_application_query(form_service, None)
+    mock_mapping = {"p1_doc": "{{ documents.wage_slips ? documents.wage_slips.net_amount : '' }}"}
+
+    with patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")):
+        filled, total = await form_service.get_completeness("test_form", mock_user)
+
+    assert (filled, total) == (0, 0)

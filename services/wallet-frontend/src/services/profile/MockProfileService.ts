@@ -29,6 +29,7 @@ export class MockProfileService implements IProfileService {
 			household: {},
 			housing: {},
 			health: {},
+			vehicle: {},
 			documents: [],
 			settings: {
 				language: DEFAULT_LOCALE,
@@ -82,6 +83,7 @@ export class MockProfileService implements IProfileService {
 				numberOfRooms: 3,
 			},
 			health: {},
+			vehicle: {},
 			documents: [
 				{
 					id: "doc-1",

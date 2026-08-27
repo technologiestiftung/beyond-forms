@@ -23,6 +23,12 @@ router = APIRouter(prefix="/export", tags=["export"])
 GCS_BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME", "beyondforms-dev-bucket")
 
 
+class FormCompletenessResponse(BaseModel):
+    form_type: str = Field(..., description="Application form identifier")
+    filled_fields: int = Field(..., description="Number of mapped profile fields that currently have a value")
+    total_fields: int = Field(..., description="Number of distinct profile fields the form's mapping reads from")
+
+
 class ExportFormResponse(BaseModel):
     signed_open_url: str = Field(..., description="V4 Signed GCS URL with Content-Disposition: inline for tab preview")
     signed_download_url: str = Field(
@@ -225,3 +231,30 @@ async def export_filled_form(
     except Exception as e:
         logger.error(f"Form export failed: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}")
+
+
+@router.get("/{form_type}/completeness", response_model=FormCompletenessResponse)
+async def get_form_completeness(
+    form_type: str,
+    current_user: AuthUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+    form_service: FormService = Depends(get_form_service),
+):
+    """
+    Reports how many of the profile fields a form's mapping reads from are filled
+    in, for a lightweight per-form readiness indicator (e.g. on the dashboard).
+    """
+    db_user = db.query(DbUser).filter(DbUser.authentik_id == current_user.user_id).first()
+    if not db_user:
+        if current_user.user_name and current_user.user_name.strip():
+            db_user = db.query(DbUser).filter(DbUser.phone_number == current_user.user_name).first()
+        if not db_user:
+            raise HTTPException(status_code=404, detail="User profile not found")
+
+    try:
+        filled_fields, total_fields = await form_service.get_completeness(form_type, db_user)
+    except Exception as e:
+        logger.error(f"Form completeness check failed: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Completeness check failed: {str(e)}")
+
+    return FormCompletenessResponse(form_type=form_type, filled_fields=filled_fields, total_fields=total_fields)

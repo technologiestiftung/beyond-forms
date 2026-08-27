@@ -6,13 +6,14 @@ document reaches VERIFIED via `POST /upload` -> Pub/Sub -> Gemini OCR -> `POST
 /api/v1/documents/{id}/verify`, which is slow, costs money and is non-deterministic.
 Here the extraction is a reviewed fixture, so the rows are written directly.
 
-Two rules follow from that and must not be relaxed:
+One rule must not be relaxed:
 
 * **Never publish to Pub/Sub.** That would hand the document straight back to
   `src/worker.py` and the OCR path this exists to bypass.
-* **Never insert a `users` row.** `auth-service.get_or_create_user` is the only writer
-  and owns the `authentik_id` linkage that `routes/application.py` and
-  `routes/form_export.py` look users up by. Log in first, then seed.
+
+`ensure_missing_personas` may insert a `users` row with `phone_number` set and
+`authentik_id` left null. First login fills `authentik_id` via auth-service's
+`ON CONFLICT (phone_number) DO UPDATE`.
 """
 
 import datetime
@@ -27,8 +28,9 @@ from pathlib import Path
 from typing import Any, Optional
 
 import requests
-from sqlalchemy import ARRAY, Date, DateTime, Enum, Numeric
+from sqlalchemy import ARRAY, Date, DateTime, Enum, Numeric, text
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from src.mappers import map_flat_to_rules_engine_payload
@@ -49,6 +51,9 @@ logger = logging.getLogger(__name__)
 DEFAULT_PERSONAS_DIR = Path("/app/demo/personas")
 GCS_BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME", "beyondforms-dev-bucket")
 ENDPOINT_RULES_ENGINE = os.environ.get("ENDPOINT_RULES_ENGINE", "http://rules-engine:8080")
+
+# Session-level advisory lock so concurrent Cloud Run instances do not double-seed.
+_ENSURE_LOCK_KEY = 7350102
 
 # Identity and audit columns belong to auth-service and to Postgres respectively.
 # A persona that tried to set them would break the Authentik linkage.
@@ -133,7 +138,7 @@ class DemoSeedService:
 
     def list_personas(self) -> list[dict[str, Any]]:
         """
-        Returns every persona file in full — `profile`, `application`, `documents` with
+        Returns every persona file in full — `profile`, `applications`, `documents` with
         their extracted `raw_data`, `missing_documents`, `derived` and `research`.
 
         The whole file is returned rather than a summary because a caller needs the
@@ -155,6 +160,46 @@ class DemoSeedService:
             persona.setdefault("slug", path.stem)
             personas.append(persona)
         return personas
+
+    def ensure_missing_personas(self) -> list[dict[str, Any]]:
+        """
+        Inserts each persona that does not already have a profile.
+
+        A persona is considered present when its drama number has a `users` row
+        with `first_name` set — we do not overwrite live demo state. Missing
+        accounts get a `users` row (`authentik_id` stays null until first login)
+        and then the usual seed.
+        """
+        self.db.execute(text("SELECT pg_advisory_lock(:k)"), {"k": _ENSURE_LOCK_KEY})
+        try:
+            results: list[dict[str, Any]] = []
+            for persona in self.list_personas():
+                slug = persona["slug"]
+                phone = persona["phone_number"]
+                user = self.db.query(Users).filter(Users.phone_number == phone).first()
+                if user is not None and user.first_name is not None:
+                    results.append({"persona": slug, "phone_number": phone, "status": "already_present"})
+                    continue
+                if user is None:
+                    user = self._insert_persona_user(phone)
+                summary = self.seed(user.id, slug, reset=True)
+                results.append({"status": "seeded", **summary})
+            return results
+        finally:
+            self.db.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": _ENSURE_LOCK_KEY})
+
+    def _insert_persona_user(self, phone_number: str) -> Users:
+        try:
+            with self.db.begin_nested():
+                user = Users(phone_number=phone_number)
+                self.db.add(user)
+                self.db.flush()
+                return user
+        except IntegrityError:
+            user = self.db.query(Users).filter(Users.phone_number == phone_number).first()
+            if user is None:
+                raise DemoSeedError(f"Could not create or load user for {phone_number}.")
+            return user
 
     # -------------------------------------------------------------------- reset
 
@@ -264,15 +309,21 @@ class DemoSeedService:
                 city=db_user.city,
             )
 
-        application_spec = persona["application"]
-        _, application_id = self.user_service.get_or_create_user_application(internal_user_id)
-        application = self.db.query(UserApplications).filter(UserApplications.application_id == application_id).first()
-        # get_or_create_user_application hardcodes form_type="grundsicherung"; the export
-        # is requested as "antrag_grundsicherung", so the persona states the form_type it
-        # wants and we apply it here.
-        application.form_type = application_spec["form_type"]
-        application.status = application_spec["status"]
-        application.form_data = application_spec.get("form_data", {})
+        # One UserApplications row per form_type so form_data cannot leak into a
+        # different form's export. Documents have a single fk_application_id, so
+        # they attach to the first entry.
+        application_id = None
+        application = None
+        for spec in persona["applications"]:
+            _, this_id = self.user_service.get_or_create_user_application(internal_user_id, spec["form_type"])
+            this_app = (
+                self.db.query(UserApplications).filter(UserApplications.application_id == this_id).first()
+            )
+            this_app.status = spec["status"]
+            this_app.form_data = spec.get("form_data", {})
+            if application_id is None:
+                application_id = this_id
+                application = this_app
 
         seeded_documents = []
         uploaded_objects: list[str] = []

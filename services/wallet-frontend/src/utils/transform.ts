@@ -156,6 +156,14 @@ export const mapProfileToFrontend = (
 		previousBenefitsAuthority: getVal<string>("previousBenefitsAuthority"),
 		previousBenefitsRefNo: getVal<string>("previousBenefitsRefNo"),
 		isCurrentlyEmployed: getVal<boolean>("isCurrentlyEmployed"),
+		isResidentInGermany: getVal<boolean>("isResidentInGermany"),
+		isVictimOfNationalSocialistPersecution: getVal<boolean>(
+			"isVictimOfNationalSocialistPersecution",
+		),
+		healthInsuranceProvider: getVal<string>("healthInsuranceProvider"),
+		pensionInsuranceProvider: getVal<string>("pensionInsuranceProvider"),
+		pensionInsuranceNo: getVal<string>("pensionInsuranceNo"),
+		isStudentOrTrainee: getVal<boolean>("isStudentOrTrainee"),
 	};
 
 	const address = (camelData["address"] as
@@ -209,6 +217,10 @@ export const mapProfileToFrontend = (
 			"oneTimePaymentsExpectedAmount",
 		),
 		oneTimePaymentsExpectedDate: getVal<string>("oneTimePaymentsExpectedDate"),
+		professionalExpenses: getVal<number>("professionalExpenses"),
+		hasChildcareExpenses: getVal<boolean>("hasChildcareExpenses"),
+		gaveAwayAssetsLast10Years: getVal<boolean>("gaveAwayAssetsLast10Years"),
+		grossNegligenceLast10Years: getVal<boolean>("grossNegligenceLast10Years"),
 	};
 
 	const household = (camelData["household"] as
@@ -226,6 +238,23 @@ export const mapProfileToFrontend = (
 		heatingCosts: getVal<number>("heatingCosts"),
 		livingArea: getVal<number>("livingArea"),
 		numberOfRooms: getVal<number>("numberOfRooms"),
+		hotWaterCosts: getVal<number>("hotWaterCosts"),
+		cableTvCosts: getVal<number>("cableTvCosts"),
+		subletRoomCount: getVal<number>("subletRoomCount"),
+		subletRentIncome: getVal<number>("subletRentIncome"),
+		rentPaidUntil: getVal<string>("rentPaidUntil"),
+		landlordName: getVal<string>("landlordName"),
+		heatingType: getVal<string>("heatingType"),
+		freeHousingRightHolder: getVal<string>("freeHousingRightHolder"),
+		isSubsidizedHousing: getVal<boolean>("isSubsidizedHousing"),
+		hasOtherResidence: getVal<boolean>("hasOtherResidence"),
+		hasSecondaryResidence: getVal<boolean>("hasSecondaryResidence"),
+		hasGarageCosts: getVal<boolean>("hasGarageCosts"),
+		garageCosts: getVal<number>("garageCosts"),
+		hasHouseholdEnergyCosts: getVal<boolean>("hasHouseholdEnergyCosts"),
+		householdEnergyCosts: getVal<number>("householdEnergyCosts"),
+		isLivingAreaUsedCommercially: getVal<boolean>("isLivingAreaUsedCommercially"),
+		commerciallyUsedAreaSqm: getVal<number>("commerciallyUsedAreaSqm"),
 	};
 
 	const health = (camelData["health"] as
@@ -248,6 +277,14 @@ export const mapProfileToFrontend = (
 		abilityToWork: getVal<AbilityToWorkType>("abilityToWork"),
 		disabilityValidUntil: getVal<string>("disabilityValidUntil"),
 		merkzeichen: getVal<DisabilityMerkzeichenType>("merkzeichen"),
+		hasPermanentReductionInEarningCapacity: getVal<boolean>(
+			"hasPermanentReductionInEarningCapacity",
+		),
+		disabilityApplicationPending: getVal<boolean>("disabilityApplicationPending"),
+	};
+
+	const vehicle = (camelData["vehicle"] as Record<string, unknown> | undefined) || {
+		licensePlate: getVal<string>("licensePlate"),
 	};
 
 	const documents = (camelData["documents"] as unknown[]) || [];
@@ -267,6 +304,7 @@ export const mapProfileToFrontend = (
 		household,
 		housing,
 		health,
+		vehicle,
 		documents,
 		settings,
 	};
@@ -290,6 +328,7 @@ export const mapProfileToBackend = (
 		profile.household,
 		profile.housing,
 		profile.health,
+		profile.vehicle,
 		profile.settings,
 	];
 

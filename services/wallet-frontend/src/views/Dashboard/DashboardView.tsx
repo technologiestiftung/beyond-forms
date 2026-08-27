@@ -11,6 +11,7 @@ import { DashboardSkeleton } from "./DashboardSkeleton";
 import { PageContainer } from "../../components/Layout/PageContainer";
 import { PrimaryButton } from "../../components/ui/PrimaryButton";
 import { ApplicationCard } from "./ApplicationCard";
+import { SimpleApplicationCard } from "./SimpleApplicationCard";
 import profileIllustration from "../../assets/illustrations/profile.svg";
 import { DEFAULT_LOCALE } from "../../constants/locale";
 import { DashboardTutorials } from "./DashboardTutorials";
@@ -129,6 +130,30 @@ export const DashboardView: React.FC = () => {
 				</div>
 
 				<ApplicationCard status={appCardStatus} level={milestoneLevel} />
+
+				<SimpleApplicationCard
+					title={t(
+						"sections.applications.parking_permit.title",
+						"Bewohnerparkausweis",
+					)}
+					description={t(
+						"sections.applications.parking_permit.description",
+						"Beantrage Deinen Bewohnerparkausweis direkt mit Deinen hinterlegten Angaben.",
+					)}
+					formType="antrag_bewohnerparkausweis"
+				/>
+
+				<SimpleApplicationCard
+					title={t(
+						"sections.applications.housing_allowance.title",
+						"Wohngeld",
+					)}
+					description={t(
+						"sections.applications.housing_allowance.description",
+						"Beantrage Wohngeld für Deine Miete direkt mit Deinen hinterlegten Angaben.",
+					)}
+					formType="antrag_wohngeld"
+				/>
 
 				<DashboardTutorials
 					tutorials={tutorials}

@@ -18,6 +18,9 @@ COPY services/wallet-frontend/ ./
 # Copy libs directory for tests that depend on it
 COPY libs/ /app/libs/
 
+# Copy demo directory (contains persona JSON fixtures)
+COPY demo/ /app/demo/
+
 # Build the app (mode can be passed as a build arg, defaults to production)
 ARG MODE=production
 RUN npx vite build --mode $MODE

@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
-import { Navigate, useLocation, matchPath } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
+// import { matchPath } from "react-router-dom"; // disabled: tutorial gate commented out below
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useTutorialStore } from "../../store/useTutorialStore";
 import { AppRoutes } from "../../constants/routes";
-import { ONBOARDING_TUTORIAL_SLUGS } from "../../constants/onboardingTutorials";
+// import { ONBOARDING_TUTORIAL_SLUGS } from "../../constants/onboardingTutorials"; // disabled: tutorial gate commented out below
 
 interface ProtectedRouteProps {
 	children: React.ReactNode;
@@ -49,6 +50,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 		);
 	}
 
+	// DISABLED: Mandatory tutorial gate. To re-enable, uncomment the code below and restore
+	// matchPath and ONBOARDING_TUTORIAL_SLUGS imports at the top of this file.
+	/*
 	// Clean, param-based route path matching
 	const match = matchPath(
 		{ path: AppRoutes.TutorialViewer, end: true },
@@ -80,6 +84,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 			/>
 		);
 	}
+	*/
 
 	return <>{children}</>;
 };

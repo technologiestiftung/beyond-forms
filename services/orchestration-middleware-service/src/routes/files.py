@@ -138,8 +138,12 @@ def save_file_to_database(
     db.add(new_uploaded_file)
     db.flush()
 
-    # Link document to user and application
-    internal_user_id, application_id = user_service.get_or_create_user_application(internal_user_id)
+    # Profile-document uploads hang off the Grundsicherung application — the
+    # form the documents flow is built around. Other form_types are created
+    # explicitly (seed, or a future per-form start).
+    _, application_id = user_service.get_or_create_user_application(
+        internal_user_id, form_type="antrag_grundsicherung"
+    )
 
     new_doc = UserDocuments(
         document_id=uuid.uuid4(),

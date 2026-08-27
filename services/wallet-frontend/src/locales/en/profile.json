@@ -143,7 +143,14 @@
 		"groups": {
 			"identity": "Legal Identity",
 			"status": "Nationality and Status",
-			"address": "Registration Address"
+			"address": "Registration Address",
+			"contact": "Contact",
+			"vehicle": "Vehicle",
+			"insurance": "Insurance and employment",
+			"household": "Household",
+			"housing": "Housing situation",
+			"financial": "Income and assets",
+			"health": "Health and care"
 		},
 		"choice": {
 			"title": "How would you like to add your information?",
@@ -246,6 +253,53 @@
 		"errors": {
 			"update_failed": "Update failed",
 			"system_error": "A system error occurred"
+		},
+		"displacedStatus": {
+			"Expellee (Resettler)": "Expellee / resettler",
+			"Displaced Person (Resettler)": "Stateless foreigner",
+			"Late Resettler": "Late resettler",
+			"Spouse or Descendant of a Late Resettler": "Spouse or descendant of a late resettler",
+			"Soviet Zone Refugee": "Soviet zone refugee",
+			"none": "None of these"
+		},
+		"socialSecurityType": {
+			"None": "None",
+			"Pension Insurance": "Pension insurance",
+			"Long-term Care Insurance": "Long-term care insurance"
+		},
+		"healthInsuranceStatus": {
+			"Compulsory Insurance": "Compulsory insurance",
+			"Voluntary Insurance": "Voluntary insurance",
+			"Family Insurance": "Family insurance",
+			"Private Insurance": "Private insurance",
+			"Care by Health Funds under § 264 SGB V": "Care by health funds under § 264 SGB V"
+		},
+		"abilityToWork": {
+			"Fully able": "Fully able to work",
+			"Temporarily disabled": "Temporarily reduced earning capacity",
+			"Permanently disabled": "Permanently reduced earning capacity"
+		},
+		"accomodationType": {
+			"Rental Apartment": "Rental apartment",
+			"Own Home": "Own home",
+			"Condominium": "Condominium",
+			"Relative": "Living with relatives",
+			"Shared Household": "Shared household"
+		},
+		"incomeSources": {
+			"pension": "Pension",
+			"none_pension": "No pension",
+			"employment_employed": "Employed",
+			"employment_self": "Self-employed",
+			"employment_student": "Pupil/student",
+			"employment_unemployed": "Unemployed",
+			"employment_none": "Not employed",
+			"other_benefits": "Other benefits (e.g. housing allowance, maintenance)",
+			"other_alimony": "Alimony",
+			"other_rent": "Rental income",
+			"other_sick": "Sick pay",
+			"other": "Other",
+			"none_other": "No other income"
 		}
 	},
 	"address_placeholder": {
@@ -531,6 +585,10 @@
 				"confirm": "Delete Account",
 				"cancel": "Cancel"
 			}
+		},
+		"account": {
+			"phone_label": "Your login number",
+			"phone_hint": "Remember this number so you can log back in later."
 		}
 	},
 	"housing": {

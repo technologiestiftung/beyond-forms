@@ -43,6 +43,17 @@
 					"disability_proof": "Wenn Du den Antrag wegen Erwerbsminderung stellst: Nachweis darüber (z. B. vom Rentenversicherungsträger).",
 					"disability_hint": "Nur nötig, wenn Du Grundsicherung wegen Erwerbsminderung beantragst."
 				}
+			},
+			"generate_button": "Antrag generieren",
+			"generate_error": "Konnte den Antrag nicht generieren. Bitte versuche es später noch einmal.",
+			"open_button": "Antrag öffnen",
+			"parking_permit": {
+				"title": "Bewohnerparkausweis",
+				"description": "Beantrage Deinen Bewohnerparkausweis direkt mit Deinen hinterlegten Angaben."
+			},
+			"housing_allowance": {
+				"title": "Wohngeld",
+				"description": "Beantrage Wohngeld für Deine Miete direkt mit Deinen hinterlegten Angaben."
 			}
 		}
 	},

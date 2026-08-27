@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useAuthStore, type AuthStatus } from "../store/useAuthStore";
@@ -6,6 +6,7 @@ import { useEligibilityStore } from "../store/useEligibilityStore";
 import { applicationService } from "../services/application.service";
 import { PhoneNumberForm } from "../components/Auth/PhoneNumberForm";
 import { OTPForm } from "../components/Auth/OTPForm";
+import { PersonaPicker } from "../components/Auth/PersonaPicker";
 import { RegistrationSuccess } from "../components/Auth/RegistrationSuccess";
 import { PageContainer } from "../components/Layout/PageContainer";
 import { AppRoutes, URL_PARAMS } from "../constants/routes";
@@ -24,6 +25,12 @@ export const AuthView: React.FC = () => {
 	const status: AuthStatus = useAuthStore((s) => s.status);
 	const currentPhoneNumber = useAuthStore((s) => s.phoneNumber);
 	const answers = useEligibilityStore((s) => s.answers);
+	// Defaults to true if a phone number is already set on mount (e.g. after a
+	// page reload mid manual entry) so that state isn't stranded behind the
+	// picker; a fresh session always starts at the picker.
+	const [manualFlow, setManualFlow] = useState(
+		() => !!useAuthStore.getState().phoneNumber,
+	);
 
 	const origin = searchParams.get(URL_PARAMS.ORIGIN);
 	const mode = searchParams.get("mode");
@@ -102,6 +109,11 @@ export const AuthView: React.FC = () => {
 	}, [navigate]);
 
 	const handleCancelOrBack = () => {
+		if (status === "IDLE" || status === "ERROR") {
+			// Manual phone entry, not mid-OTP: just return to the persona picker.
+			setManualFlow(false);
+			return;
+		}
 		useAuthStore.getState().logout();
 	};
 
@@ -125,16 +137,26 @@ export const AuthView: React.FC = () => {
 			case "VERIFYING_USERNAME":
 			case "VERIFYING_CODE":
 				return <AuthLoading authStatus={status} />;
-			case "IDLE":
-			case "ERROR":
 			case "AWAITING_OTP":
-				return currentPhoneNumber ? (
+				// An instant persona login also passes through AWAITING_OTP briefly;
+				// only show the OTP form for the manual phone-entry flow.
+				return manualFlow ? (
 					<OTPForm onSuccess={handleAuthSuccess} />
 				) : (
+					<AuthLoading authStatus={status} />
+				);
+			case "IDLE":
+			case "ERROR":
+				if (currentPhoneNumber) {
+					return <OTPForm onSuccess={handleAuthSuccess} />;
+				}
+				return manualFlow ? (
 					<PhoneNumberForm />
+				) : (
+					<PersonaPicker onUsePhoneNumber={() => setManualFlow(true)} />
 				);
 			default:
-				return <PhoneNumberForm />;
+				return <PersonaPicker onUsePhoneNumber={() => setManualFlow(true)} />;
 		}
 	};
 
@@ -142,7 +164,13 @@ export const AuthView: React.FC = () => {
 		<PageContainer
 			maxWidth="md"
 			topBarProps={{
-				onBack: status === "AWAITING_OTP" ? handleCancelOrBack : undefined,
+				onBack:
+					status === "AWAITING_OTP" ||
+					((status === "IDLE" || status === "ERROR") &&
+						manualFlow &&
+						!currentPhoneNumber)
+						? handleCancelOrBack
+						: undefined,
 				showLanguageSwitcher: true,
 			}}
 			data-testid="auth-view"

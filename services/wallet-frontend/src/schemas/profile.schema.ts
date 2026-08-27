@@ -131,6 +131,12 @@ export const DraftPersonalDataSchema = z.object({
 	previousBenefitsAuthority: z.string().max(255).optional().nullable(),
 	previousBenefitsRefNo: z.string().max(255).optional().nullable(),
 	isCurrentlyEmployed: z.boolean().optional().nullable(),
+	isResidentInGermany: z.boolean().optional().nullable(),
+	isVictimOfNationalSocialistPersecution: z.boolean().optional().nullable(),
+	healthInsuranceProvider: z.string().max(255).optional().nullable(),
+	pensionInsuranceProvider: z.string().max(255).optional().nullable(),
+	pensionInsuranceNo: z.string().max(255).optional().nullable(),
+	isStudentOrTrainee: z.boolean().optional().nullable(),
 });
 export type DraftPersonalData = z.infer<typeof DraftPersonalDataSchema>;
 
@@ -152,35 +158,6 @@ export const AddressSchema = z.object({
 	district: z.string().max(255).nullable().optional(),
 });
 export type Address = z.infer<typeof AddressSchema>;
-
-export const ProfileEditFormSchema = DraftPersonalDataSchema.partial()
-	.extend(AddressSchema.partial().shape)
-	.extend({
-		legalGender: GenderEnum.nullable().optional().or(z.literal("")),
-		maritalStatus: MaritalStatusEnum.nullable().optional().or(z.literal("")),
-	});
-export type ProfileEditForm = z.infer<typeof ProfileEditFormSchema>;
-
-export const DraftProfileUpdatePayloadSchema =
-	DraftPersonalDataSchema.partial().extend({
-		street: z.string().max(255).nullable().optional(),
-		houseNumber: z.string().max(20).nullable().optional(),
-		zipCode: z.string().max(10).nullable().optional(),
-		city: z.string().max(255).nullable().optional(),
-		state: z.string().max(255).nullable().optional(),
-	});
-export type DraftProfileUpdatePayload = z.infer<
-	typeof DraftProfileUpdatePayloadSchema
->;
-
-export const ProfileUpdatePayloadSchema = PersonalDataSchema.partial().extend({
-	street: z.string().max(255).optional(),
-	houseNumber: z.string().max(20).optional(),
-	zipCode: z.string().max(10).optional(),
-	city: z.string().max(255).optional(),
-	state: z.string().max(255).optional(),
-});
-export type ProfileUpdatePayload = z.infer<typeof ProfileUpdatePayloadSchema>;
 
 export const CompleteAddressSchema = AddressSchema.extend({
 	street: z.string().min(1),
@@ -244,6 +221,10 @@ export const FinancialDataSchema = z.object({
 	oneTimePaymentsExpectedType: z.string().max(255).optional().nullable(),
 	oneTimePaymentsExpectedAmount: z.number().nonnegative().optional().nullable(),
 	oneTimePaymentsExpectedDate: DateStringSchema.optional().nullable(),
+	professionalExpenses: z.number().nonnegative().optional().nullable(),
+	hasChildcareExpenses: z.boolean().optional().nullable(),
+	gaveAwayAssetsLast10Years: z.boolean().optional().nullable(),
+	grossNegligenceLast10Years: z.boolean().optional().nullable(),
 });
 export type FinancialData = z.infer<typeof FinancialDataSchema>;
 
@@ -339,6 +320,15 @@ export const HousingDataSchema = z.object({
 	freeHousingRightHolder: z.string().max(255).optional().nullable(),
 	hotWaterCosts: z.number().nonnegative().optional().nullable(),
 	cableTvCosts: z.number().nonnegative().optional().nullable(),
+	isSubsidizedHousing: z.boolean().optional().nullable(),
+	hasOtherResidence: z.boolean().optional().nullable(),
+	hasSecondaryResidence: z.boolean().optional().nullable(),
+	hasGarageCosts: z.boolean().optional().nullable(),
+	garageCosts: z.number().nonnegative().optional().nullable(),
+	hasHouseholdEnergyCosts: z.boolean().optional().nullable(),
+	householdEnergyCosts: z.number().nonnegative().optional().nullable(),
+	isLivingAreaUsedCommercially: z.boolean().optional().nullable(),
+	commerciallyUsedAreaSqm: z.number().nonnegative().optional().nullable(),
 });
 export type HousingData = z.infer<typeof HousingDataSchema>;
 
@@ -380,8 +370,15 @@ export const HealthDataSchema = z.object({
 	abilityToWork: AbilityToWorkEnum.optional().nullable(),
 	disabilityValidUntil: DateStringSchema.optional().nullable(),
 	merkzeichen: DisabilityMerkzeichenEnum.optional().nullable(),
+	hasPermanentReductionInEarningCapacity: z.boolean().optional().nullable(),
+	disabilityApplicationPending: z.boolean().optional().nullable(),
 });
 export type HealthData = z.infer<typeof HealthDataSchema>;
+
+export const VehicleDataSchema = z.object({
+	licensePlate: z.string().max(20).optional().nullable(),
+});
+export type VehicleData = z.infer<typeof VehicleDataSchema>;
 
 export const SettingsSchema = z.object({
 	language: z.enum(["de", "en"]),
@@ -391,6 +388,73 @@ export const SettingsSchema = z.object({
 });
 export type Settings = z.infer<typeof SettingsSchema>;
 
+/**
+ * Flat, editable superset of every profile field the User Profile edit form
+ * exposes, covering all sections (not only personal data + address) since
+ * simplified application types (e.g. Parkausweis, Wohngeld) skip the guided
+ * wizard entirely and rely on the profile edit form to collect their fields.
+ */
+export const ProfileEditFormSchema = DraftPersonalDataSchema.partial()
+	.extend(AddressSchema.partial().shape)
+	.extend(ContactSchema.partial().shape)
+	.extend(VehicleDataSchema.partial().shape)
+	.extend(FinancialDataSchema.omit({ bankDetails: true }).partial().shape)
+	.extend(BankSchema.partial().shape)
+	.extend(HouseholdDataSchema.omit({ maritalStatus: true }).partial().shape)
+	.extend(HousingDataSchema.partial().shape)
+	.extend(HealthDataSchema.partial().shape)
+	.extend({
+		// Native <select> elements report an empty string until a real option
+		// is chosen, so every enum-backed select field needs to tolerate "" in
+		// addition to its real values (and to unset/null).
+		legalGender: GenderEnum.nullable().optional().or(z.literal("")),
+		maritalStatus: MaritalStatusEnum.nullable().optional().or(z.literal("")),
+		displacedStatus: DisplacedStatusEnum.optional()
+			.nullable()
+			.or(z.literal("")),
+		socialSecurityType: SocialSecurityTypeEnum.optional()
+			.nullable()
+			.or(z.literal("")),
+		healthInsuranceStatus: HealthInsuranceStatusEnum.optional()
+			.nullable()
+			.or(z.literal("")),
+		abilityToWork: AbilityToWorkEnum.optional().nullable().or(z.literal("")),
+		merkzeichen: DisabilityMerkzeichenEnum.optional()
+			.nullable()
+			.or(z.literal("")),
+		accomodationType: z
+			.enum([
+				"Rental Apartment",
+				"Own Home",
+				"Condominium",
+				"Relative",
+				"Shared Household",
+			])
+			.optional()
+			.nullable()
+			.or(z.literal("")),
+		tenancyStatus: z
+			.enum(["Main Tenant", "Subtenant"])
+			.optional()
+			.nullable()
+			.or(z.literal("")),
+		iban: BankSchema.shape.iban.or(z.literal("")),
+		bic: BankSchema.shape.bic.or(z.literal("")),
+	});
+export type ProfileEditForm = z.infer<typeof ProfileEditFormSchema>;
+
+/**
+ * The full-form submission payload has the same flat shape as the edit form
+ * (see ProfileEditFormSchema above) since both flow from the same form values.
+ */
+export const DraftProfileUpdatePayloadSchema = ProfileEditFormSchema;
+export type DraftProfileUpdatePayload = z.infer<
+	typeof DraftProfileUpdatePayloadSchema
+>;
+
+export const ProfileUpdatePayloadSchema = ProfileEditFormSchema;
+export type ProfileUpdatePayload = z.infer<typeof ProfileUpdatePayloadSchema>;
+
 export const ProfileSchema = z.object({
 	personalData: PersonalDataSchema,
 	address: AddressSchema,
@@ -399,6 +463,7 @@ export const ProfileSchema = z.object({
 	household: HouseholdDataSchema,
 	housing: HousingDataSchema,
 	health: HealthDataSchema,
+	vehicle: VehicleDataSchema.default({}),
 	documents: z.array(DocumentSchema),
 	settings: SettingsSchema,
 });

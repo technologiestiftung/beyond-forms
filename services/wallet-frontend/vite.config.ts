@@ -2,11 +2,13 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { searchForWorkspaceRoot } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
 	plugins: [react(), tailwindcss()],
 	server: {
+		fs: { allow: [searchForWorkspaceRoot(process.cwd()), "../../demo"] },
 		hmr: !process.env.VITE_E2E_TEST,
 		proxy: {
 			"/auth-proxy": {

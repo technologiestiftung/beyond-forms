@@ -152,15 +152,6 @@ def test_load_persona_reports_available_slugs(service):
     assert "helmut" in str(exc.value)
 
 
-def test_list_personas_includes_research_context(service):
-    personas = {p["slug"]: p for p in service.list_personas()}
-    assert {"sabine", "helmut", "sandor"} <= set(personas)
-    # The research block is what makes these fixtures useful beyond seeding rows.
-    assert personas["sabine"]["research"]["core_barrier"]
-    assert personas["helmut"]["research"]["not_representable"]
-    assert personas["sandor"]["documents"]
-
-
 def test_list_personas_returns_the_whole_file(service):
     """The endpoint exists so a caller can see what a seeded account will contain, which
     means the filled-in values — not just the field names. A summary that omits `profile`
@@ -170,7 +161,12 @@ def test_list_personas_returns_the_whole_file(service):
 
     assert helmut["profile"]["monthly_income"] == 650.00
     assert helmut["profile"]["iban"] == "DE65940594210000123456"
-    assert helmut["application"]["form_type"] == "antrag_grundsicherung"
+    assert helmut["applications"][0]["form_type"] == "antrag_grundsicherung"
+    assert {a["form_type"] for a in helmut["applications"]} == {
+        "antrag_grundsicherung",
+        "antrag_wohngeld",
+        "antrag_bewohnerparkausweis",
+    }
 
     pension = next(d for d in helmut["documents"] if d["document_type"] == "pension_notice")
     assert pension["raw_data"]["pension_reason"] == "Altersrente"
@@ -181,10 +177,10 @@ def test_list_personas_returns_the_whole_file(service):
     assert "birth_name" in helmut["derived"]
     assert "$schema" not in helmut
 
-    # Every key the persona schema defines is reachable, so this cannot silently narrow
-    # again if a new block is added to the files.
+    # Every required key from the persona schema is reachable, so this cannot silently
+    # narrow again if a new required block is added to the files.
     schema = json.loads((PERSONAS_DIR.parent / "persona.schema.json").read_text(encoding="utf-8"))
-    expected = set(schema["properties"]) - {"$schema"}
+    expected = set(schema.get("required", [])) - {"$schema"}
     assert expected <= set(helmut)
 
 
@@ -271,13 +267,156 @@ def test_seeding_never_publishes_to_pubsub():
     publish.assert_not_called()
 
 
-# ---------------------------------------------------------------- route gating
+# --------------------------------------------------------- multi-application seeding
 
 
-def test_demo_routes_are_not_mounted_by_default():
-    """DEMO_SEED_ENABLED is unset in the test environment, so the routes must not exist
-    at all — a 404, with nothing to fingerprint. Applies even to the unauthenticated
-    /personas listing: the flag gates existence, not just the write paths."""
+def test_seed_gives_each_applications_entry_its_own_row():
+    """Each `applications` entry is get-or-created by form_type so a form's
+    `form_data` stays scoped to that type — e.g. Wohngeld-specific facts must not
+    leak into the Grundsicherung export context. Documents attach to the first
+    entry."""
+    db = MagicMock(spec=Session)
+    service = DemoSeedService(db, storage_client=MagicMock(), personas_dir=PERSONAS_DIR)
+
+    internal_user_id = uuid.uuid4()
+    db_user = MagicMock(spec=Users)
+    created: list[tuple[str, MagicMock]] = []
+
+    def fake_get_or_create(_user_id, form_type):
+        app = MagicMock()
+        app.form_type = form_type
+        created.append((form_type, app))
+        return _user_id, uuid.uuid4()
+
+    def query_side_effect(model):
+        m = MagicMock()
+        m.filter.return_value.first.return_value = db_user if model is Users else created[-1][1]
+        return m
+
+    db.query.side_effect = query_side_effect
+
+    persona = {
+        "profile": {},
+        "applications": [
+            {"form_type": "antrag_grundsicherung", "status": "in_progress", "form_data": {}},
+            {
+                "form_type": "antrag_wohngeld",
+                "status": "in_progress",
+                "form_data": {"is_wohngeld_first_application": True},
+            },
+            {
+                "form_type": "antrag_bewohnerparkausweis",
+                "status": "in_progress",
+                "form_data": {"consents_to_registry_verification": True},
+            },
+        ],
+        "documents": [],
+    }
+
+    with (
+        patch.object(service, "load_persona", return_value=persona),
+        patch.object(
+            service.user_service,
+            "get_or_create_user_application",
+            side_effect=fake_get_or_create,
+        ),
+    ):
+        service.seed(internal_user_id, "helmut", reset=False)
+
+    assert [form_type for form_type, _ in created] == [
+        "antrag_grundsicherung",
+        "antrag_wohngeld",
+        "antrag_bewohnerparkausweis",
+    ]
+    assert created[0][1].form_data == {}
+    assert created[1][1].form_data == {"is_wohngeld_first_application": True}
+    assert created[2][1].form_data == {"consents_to_registry_verification": True}
+
+
+# --------------------------------------------------------- ensure-on-startup
+
+
+def test_ensure_skips_a_persona_that_already_has_a_profile():
+    db = MagicMock(spec=Session)
+    service = DemoSeedService(db, storage_client=MagicMock(), personas_dir=PERSONAS_DIR)
+    existing = MagicMock(spec=Users)
+    existing.first_name = "Helmut"
+    db.query.return_value.filter.return_value.first.return_value = existing
+
+    with (
+        patch.object(
+            service,
+            "list_personas",
+            return_value=[{"slug": "helmut", "phone_number": "+493023125102"}],
+        ),
+        patch.object(service, "seed") as seed,
+    ):
+        results = service.ensure_missing_personas()
+
+    seed.assert_not_called()
+    assert results == [
+        {"persona": "helmut", "phone_number": "+493023125102", "status": "already_present"}
+    ]
+
+
+def test_ensure_inserts_and_seeds_a_missing_persona():
+    db = MagicMock(spec=Session)
+    service = DemoSeedService(db, storage_client=MagicMock(), personas_dir=PERSONAS_DIR)
+    db.query.return_value.filter.return_value.first.return_value = None
+    created = MagicMock(spec=Users)
+    created.id = uuid.uuid4()
+
+    with (
+        patch.object(
+            service,
+            "list_personas",
+            return_value=[{"slug": "helmut", "phone_number": "+493023125102"}],
+        ),
+        patch.object(service, "_insert_persona_user", return_value=created) as insert,
+        patch.object(service, "seed", return_value={"persona": "helmut"}) as seed,
+    ):
+        results = service.ensure_missing_personas()
+
+    insert.assert_called_once_with("+493023125102")
+    seed.assert_called_once_with(created.id, "helmut", reset=True)
+    assert results[0]["status"] == "seeded"
+
+
+def test_ensure_seeds_an_empty_existing_account():
+    """Logged in but never filled — first_name is still null, so we seed onto the row."""
+    db = MagicMock(spec=Session)
+    service = DemoSeedService(db, storage_client=MagicMock(), personas_dir=PERSONAS_DIR)
+    existing = MagicMock(spec=Users)
+    existing.first_name = None
+    existing.id = uuid.uuid4()
+    db.query.return_value.filter.return_value.first.return_value = existing
+
+    with (
+        patch.object(
+            service,
+            "list_personas",
+            return_value=[{"slug": "sabine", "phone_number": "+493023125101"}],
+        ),
+        patch.object(service, "_insert_persona_user") as insert,
+        patch.object(service, "seed", return_value={"persona": "sabine"}) as seed,
+    ):
+        service.ensure_missing_personas()
+
+    insert.assert_not_called()
+    seed.assert_called_once_with(existing.id, "sabine", reset=True)
+
+
+def test_ensure_is_a_noop_when_the_flag_is_off(monkeypatch):
+    from src import main as main_mod
+
+    monkeypatch.setenv("DEMO_SEED_ENABLED", "false")
+    with patch.object(main_mod, "SessionLocal") as session_local:
+        main_mod._ensure_demo_personas()
+    session_local.assert_not_called()
+
+
+def test_demo_routes_are_not_mounted():
+    """The seed API is gone. Personas are ensured on startup, not over HTTP."""
     from fastapi.testclient import TestClient
 
     from src.main import app
@@ -288,47 +427,3 @@ def test_demo_routes_are_not_mounted_by_default():
     client = TestClient(app)
     assert client.get("/api/v1/demo/personas").status_code == 404
     assert client.post("/api/v1/demo/seed", json={"persona": "helmut"}).status_code == 404
-
-
-def test_seeding_is_refused_for_a_non_test_account():
-    from beyondforms.auth import User as AuthUser
-    from fastapi import HTTPException
-
-    from src.routes.demo import get_demo_service_for_caller
-
-    real_user = AuthUser(
-        user_id="real-auth-id",
-        user_name="+4930123456789",
-        session_id="s",
-        is_authenticated=True,
-    )
-    with pytest.raises(HTTPException) as exc:
-        get_demo_service_for_caller(current_user=real_user, db=MagicMock(spec=Session))
-    assert exc.value.status_code == 403
-
-
-def test_seeding_is_allowed_for_a_drama_number():
-    from beyondforms.auth import User as AuthUser
-
-    from src.routes.demo import get_demo_service_for_caller
-
-    demo_user = AuthUser(
-        user_id="demo-auth-id",
-        user_name="+493023125102",
-        session_id="s",
-        is_authenticated=True,
-    )
-    service, returned = get_demo_service_for_caller(current_user=demo_user, db=MagicMock(spec=Session))
-    assert isinstance(service, DemoSeedService)
-    assert returned is demo_user
-
-
-def test_personas_are_listable_without_authentication():
-    """The persona files are committed to the repo and contain no real data — nothing to
-    protect. Only seeding (a write) needs the drama-number check."""
-    from src.routes.demo import get_demo_service_readonly
-
-    service = get_demo_service_readonly(db=MagicMock(spec=Session))
-    service.personas_dir = PERSONAS_DIR  # get_demo_service_readonly defaults to the container path
-    slugs = {p["slug"] for p in service.list_personas()}
-    assert {"sabine", "helmut", "sandor"} <= slugs

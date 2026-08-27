@@ -9,7 +9,7 @@
 ["p1_mz1.3-cb_allgantragstyp_erstantrag"]
 type = "checkbox"
 description = "Erstantrag/Weiterleistungsantrag ab"
-value = "{{ has_received_previous_benefits == false ? 'true' : '' }}"
+value = "{{ is_wohngeld_first_application == true ? true : '' }}"
 
 ["p1_monat/jahr_af_date"]
 type = "string"
@@ -19,7 +19,7 @@ value = ""
 ["p1_mz1.3-cb_allgantragstyp_weiterleistungsantrag"]
 type = "checkbox"
 description = "Erhöhungsantrag"
-value = "{{ has_received_previous_benefits == true ? 'true' : '' }}"
+value = "{{ is_wohngeld_first_application == false ? true : '' }}"
 
 ["p1_mz1.3-mtf_allgwognr_akz"]
 type = "string"
@@ -44,7 +44,7 @@ value = "{{ first_name ? first_name : '' }}"
 ["p1_mz1.3-et_persanggeburtsname"]
 type = "string"
 description = "Geburtsname"
-value = "{{ birth_name ? birth_name : '' }}"
+value = "{{ birth_name && birth_name != last_name ? birth_name : '' }}"
 
 ["p1_mz1.3-et_persanggeburtsort"]
 type = "string"
@@ -59,7 +59,7 @@ value = "{{ date_of_birth ? date_of_birth : '' }}"
 ["p1_mz1.3-et_persangstaatsangehörigkeit"]
 type = "string"
 description = "Staatsangehörigkeit(en)"
-value = "{{ nationality ? nationality : '' }}"
+value = "{{ nationality == 'DE' ? 'deutsch' : (nationality ? nationality : '') }}"
 
 ["p1_mz1.3-cb_persanggeschlechtmännlich"]
 type = "checkbox"
@@ -174,22 +174,24 @@ value = "{{ city ? city : '' }}"
 ["p1_mz1.3-et_wohnungzkanschriftstraße"]
 type = "string"
 description = "Straße "
-value = "{{ street ? street : '' }}"
+# This "zk" block is the planned/future address for someone not yet living at the
+# reported flat — must stay blank for applicants who already live there.
+value = ""
 
 ["p1_mz1.3-et_wohnungzkanschrifthausnummer"]
 type = "string"
 description = "Hausnummer (ggf. weitere Zusätze)"
-value = "{{ house_number ? house_number : '' }}"
+value = ""
 
 ["p1_mz1.3-et_wohnungzkanschriftpostleitzahl"]
 type = "string"
 description = "Postleitzahl"
-value = "{{ zip_code ? zip_code : '' }}"
+value = ""
 
 ["p1_mz1.3-et_wohnungzkanschriftwohnort"]
 type = "string"
 description = "Ort "
-value = "{{ city ? city : '' }}"
+value = ""
 
 ["p1_mz1.3-da_wohnungzkanschrifteinzugsdatum"]
 type = "string"
@@ -199,12 +201,12 @@ value = ""
 ["p1_mz1.3-cb_wohnunggefördertnein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ is_subsidized_housing == false ? true : '' }}"
 
 ["p1_mz1.3-cb_wohnunggefördertja"]
 type = "checkbox"
 description = "Ja"
-value = ""
+value = "{{ is_subsidized_housing == true ? true : '' }}"
 
 ["p1_mz1.3-cb_persangerwerbarbeitslos"]
 type = "checkbox"
@@ -214,7 +216,7 @@ value = ""
 ["p2_mz1.3-cb_wohnunganderewohnungnein"]
 type = "checkbox"
 description = "nein"
-value = ""
+value = "{{ receives_wohngeld_for_other_dwelling == false ? true : '' }}"
 
 ["p2_mz1.3-cb_wohnunganderewohnungja"]
 type = "checkbox"
@@ -224,57 +226,60 @@ value = ""
 ["p2_mz1.3-cb_wohnungzweitwohnsitznein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ has_secondary_residence == false ? true : '' }}"
 
 ["p2_mz1.3-cb_wohnungzweitwohnsitzja"]
 type = "checkbox"
 description = "Ja"
 value = ""
 
+# Household member 1 — read from the `household_members` profile field (see Users
+# model / demo persona JSON) rather than hardcoded here, so this mapping stays
+# correct for any user/persona, not just Helmut.
 ["p2_mz1.3-et_haushalthhm1familienname"]
 type = "string"
 description = "Familienname"
-value = ""
+value = "{{ household_members && household_members[0] ? household_members[0].last_name : '' }}"
 
 ["p2_mz1.3-et__haushalthhm1vornamen"]
 type = "string"
 description = "Vorname(n)"
-value = ""
+value = "{{ household_members && household_members[0] ? household_members[0].first_name : '' }}"
 
 ["p2_mz1.3-et__haushalthhm1geburtsname"]
 type = "string"
 description = "Geburtsname"
-value = ""
+value = "{{ household_members && household_members[0] && household_members[0].birth_name != household_members[0].last_name ? household_members[0].birth_name : '' }}"
 
 ["p2_mz1.3-da__haushalthhm1geburtsdatum"]
 type = "string"
 description = "Geburtsdatum"
-value = ""
+value = "{{ household_members && household_members[0] ? household_members[0].date_of_birth : '' }}"
 
 ["p2_mz1.3-et__haushalthhm1geburtsort"]
 type = "string"
 description = "Geburtsort (zusätzlich Land, wenn nicht Deutschland)"
-value = ""
+value = "{{ household_members && household_members[0] ? household_members[0].place_of_birth : '' }}"
 
 ["p2_mz1.3-et__haushalthhm1staatsangehörigkeiten"]
 type = "string"
 description = "Staatsangehörigkeit(en)"
-value = ""
+value = "{{ household_members && household_members[0] ? household_members[0].nationality : '' }}"
 
 ["p2_mz1.3-cb__haushalthhm1geschlechtmännlich"]
 type = "checkbox"
 description = "männlich"
-value = ""
+value = "{{ household_members && household_members[0] && household_members[0].gender == 'Male' ? true : '' }}"
 
 ["p2_mz1.3-cb__haushalthhm1geschlechtweiblich"]
 type = "checkbox"
 description = "weiblich"
-value = ""
+value = "{{ household_members && household_members[0] && household_members[0].gender == 'Female' ? true : '' }}"
 
 ["p2_mz1.3-cb__haushalthhm1geschlechtdivers"]
 type = "checkbox"
 description = "divers"
-value = ""
+value = "{{ household_members && household_members[0] && household_members[0].gender == 'Diverse' ? true : '' }}"
 
 ["p2_mz1.3-cb__haushalthhm1geschlechtkeineangabe"]
 type = "checkbox"
@@ -284,17 +289,17 @@ value = ""
 ["p2_mz1.3-et__haushalthhm1famstand"]
 type = "string"
 description = "Familienstand (Beispiele siehe Frage 1)"
-value = ""
+value = "{{ household_members && household_members[0] ? household_members[0].marital_status : '' }}"
 
 ["p2_mz1.3-et__haushalthhm1erwerbstatus"]
 type = "string"
 description = "Erwerbsstatus (Beispiele siehe Frage 1)"
-value = ""
+value = "{{ household_members && household_members[0] ? household_members[0].employment_status : '' }}"
 
 ["p2_mz1.3-et__haushalthhm1verhältnisangp"]
 type = "string"
 description = "Verhältnis zu Ihnen (z.B. (Ehe-)Partner/in, (Pflege-)Kind)"
-value = ""
+value = "{{ household_members && household_members[0] ? household_members[0].relationship_to_applicant : '' }}"
 
 ["p2_mz1.3-et_haushalthhm2familienname"]
 type = "string"
@@ -529,7 +534,7 @@ value = ""
 ["p3_mz1.3-cb_weiterepersonennein"]
 type = "checkbox"
 description = "Nein"
-value = "false"
+value = "{{ has_unlisted_household_members == false ? true : '' }}"
 
 ["p3_mz1.3-cb_weiterepersonenja"]
 type = "checkbox"
@@ -559,7 +564,7 @@ value = ""
 ["p3_mz1.3-cb_verändhhmverstorbennein"]
 type = "checkbox"
 description = "Nein"
-value = "false"
+value = "{{ household_member_died_recently == false ? true : '' }}"
 
 ["p3_mz1.3-cb_verändhhmverstorbenja"]
 type = "checkbox"
@@ -629,7 +634,7 @@ value = ""
 ["p4_mz1.3-cb_verändhhmanzahlnein"]
 type = "checkbox"
 description = "Nein"
-value = "false"
+value = "{{ household_size_will_change == false ? true : '' }}"
 
 ["p4_mz1.3-cb_verändhhmanzahlja"]
 type = "checkbox"
@@ -654,7 +659,7 @@ value = ""
 ["p4_mz1.3-cb_transfleistungnein"]
 type = "checkbox"
 description = "Nein"
-value = "false"
+value = "{{ receives_other_transfer_benefits == false ? true : '' }}"
 
 ["p4_mz1.3-cb_transfleistungja"]
 type = "checkbox"
@@ -769,7 +774,7 @@ value = ""
 ["p5_mz1.3-cb_transfwohngeldbeantragennein"]
 type = "checkbox"
 description = "Nein"
-value = "false"
+value = "{{ has_applied_for_benefits_awaiting_decision == false ? 'Nein' : '' }}"
 
 ["p5_mz1.3-cb_transfwohngeldbeantragenja"]
 type = "checkbox"
@@ -789,7 +794,7 @@ value = "{{ first_name ? first_name : '' }}"
 ["p5_mz1.3-et_einnahmehhm1art1"]
 type = "string"
 description = "1. Art der Einnahme bzw. keine Einahmen"
-value = "{{ income_sources ? income_sources : '' }}"
+value = "{{ 'pension' in income_sources ? 'Rente' : (income_sources ? income_sources : '') }}"
 
 ["p5_mz1.3-et_einnahmehhm1art1brutto"]
 type = "string"
@@ -864,22 +869,22 @@ value = "false"
 ["p5_mz1.3-et_einnahmehhm2familienname"]
 type = "string"
 description = "Familienname"
-value = ""
+value = "{{ household_members && household_members[0] && household_members[0].monthly_pension_income ? household_members[0].last_name : '' }}"
 
 ["p5_mz1.3-et_einnahmehhm2vorname"]
 type = "string"
 description = "Vorname(n)"
-value = ""
+value = "{{ household_members && household_members[0] && household_members[0].monthly_pension_income ? household_members[0].first_name : '' }}"
 
 ["p5_mz1.3-et_einnahmehhm2art1"]
 type = "string"
 description = "1. Art der Einnahme bzw. keine Einnahmen"
-value = ""
+value = "{{ household_members && household_members[0] && household_members[0].monthly_pension_income ? 'Rente' : '' }}"
 
 ["p5_mz1.3-et_einnahmehhm2art1brutto"]
 type = "string"
 description = "Brutto in EUR"
-value = ""
+value = "{{ household_members && household_members[0] ? household_members[0].monthly_pension_income : '' }}"
 
 ["p5_mz1.3-et_einnahmehhm2art1turnus"]
 type = "string"
@@ -1204,7 +1209,7 @@ value = false
 ["p7_mz1.3-cb_freibwerbnein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ professional_expenses == 0 ? true : '' }}"
 
 ["p7_mz1.3-cb_freibwerbja"]
 type = "checkbox"
@@ -1244,7 +1249,7 @@ value = ""
 ["p7_mz1.3-cb_freibkinderbetreunein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ has_childcare_expenses == false ? true : '' }}"
 
 ["p7_mz1.3-cb_freibkinderbetreuja"]
 type = "checkbox"
@@ -1284,7 +1289,7 @@ value = ""
 ["p7_mz1.3-cb_freibschwerbenein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ has_disability_id == false && is_victim_of_national_socialist_persecution == false ? true : '' }}"
 
 ["p7_mz1.3-cb_freibschwerbeja"]
 type = "checkbox"
@@ -1354,7 +1359,7 @@ value = false
 ["p7_mz1.3-cb_freibunterhnein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ pays_child_or_spousal_support == false ? true : '' }}"
 
 ["p7_mz1.3-cb_freibunterhja"]
 type = "checkbox"
@@ -1444,7 +1449,7 @@ value = ""
 ["p8_mz1.3-cb_sonsteinunterhnein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ receives_support_from_others == false ? true : '' }}"
 
 ["p8_mz1.3-cb_sonsteinunterhja"]
 type = "checkbox"
@@ -1494,7 +1499,7 @@ value = false
 ["p8_mz1.3-cb_sonsteineinmnein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ are_one_time_payments_expected == false ? true : '' }}"
 
 ["p8_mz1.3-cb_sonsteineinmja"]
 type = "checkbox"
@@ -1554,7 +1559,7 @@ value = ""
 ["p9_mz1.3-cb_sonsteinerhnein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ expects_future_income_change == false ? true : '' }}"
 
 ["p9_mz1.3-cb_sonsteinerhjaver"]
 type = "checkbox"
@@ -1629,17 +1634,22 @@ value = ""
 ["p9_mz1.3-cb_sonsteinvermögennein"]
 type = "checkbox"
 description = "Nein"
-value = "{{ has_assets == false ? 'Nein' : '' }}"
+# This question is specifically about assets EXCEEDING the Wohngeld threshold
+# (60.000 EUR + 30.000 EUR/additional household member) — not "do you have any
+# assets at all" (that's the generic `has_assets` flag, a different question from
+# the Grundsicherung side). Helmut's assets are below the threshold, so this stays
+# a plain "Nein" without disclosing the below-threshold amount below.
+value = "{{ assets_exceed_wohngeld_threshold == false ? true : '' }}"
 
 ["p9_mz1.3-cb_sonsteinvermögenja"]
 type = "checkbox"
 description = "Ja "
-value = "{{ has_assets == true ? 'Ja' : '' }}"
+value = ""
 
 ["p9_mz1.3-cb_sonsteinvermögenimmobilie"]
 type = "checkbox"
 description = "Immobilien, Grundbesitz (auch im Ausland)"
-value = "{{ 'Real Estate' in assets_types ? 'Immobilien, Grundbesitz (auch im Ausland)' : '' }}"
+value = ""
 
 ["p9_mz1.3-et_sonsteinvermögenimmobiliewert"]
 type = "string"
@@ -1649,17 +1659,17 @@ value = ""
 ["p9_mz1.3-cb_sonsteinvermögengeldvermögen"]
 type = "checkbox"
 description = "Geldvermögen, Forderungen und sonstige Rechte "
-value = "{{ 'Liquid Assets' in assets_types ? 'Geldvermögen, Forderungen und sonstige Rechte' : '' }}"
+value = ""
 
 ["p9_mz1.3-et_sonsteinvermögengeldvermögenwert"]
 type = "string"
 description = "Wertangabe in EUR (circa)"
-value = "{{ documents.assets_declaration ? documents.assets_declaration.total_liquid_assets : '' }}"
+value = ""
 
 ["p9_mz1.3-cb_sonsteinvermögengegenstände"]
 type = "checkbox"
 description = "Wertgegenstände, bewegliche Sachen (zum Beispiel Auto, Schmuck)"
-value = "{{ 'Valuables' in assets_types ? 'Wertgegenstände, bewegliche Sachen' : '' }}"
+value = ""
 
 ["p9_mz1.3-et_sonsteinvermögengegenständewert"]
 type = "string"
@@ -1669,7 +1679,7 @@ value = ""
 ["p9_mz1.3-cb_sonsteinvermögensonstiges"]
 type = "checkbox"
 description = "Sonstige Vermögenswerte (z.B. Bausparvertrag, Lebensversicherung)"
-value = "{{ 'Other Assets' in assets_types ? 'Sonstige Vermögenswerte' : '' }}"
+value = ""
 
 ["p9_mz1.3-et_sonsteinvermögensonstigeswert"]
 type = "string"
@@ -1709,7 +1719,7 @@ value = ""
 ["p10_mz1.3-cb_ichbinverwandtvernein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ related_to_landlord == false ? true : '' }}"
 
 ["p10_mz1.3-cb_iichbinverwandtverja"]
 type = "checkbox"
@@ -1749,7 +1759,7 @@ value = ""
 ["p10_mz1.3-cb_monatmietewarmwassernein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ hot_water_costs == 0 ? true : '' }}"
 
 ["p10_mz1.3-cb_monatmietewarmwasserja"]
 type = "checkbox"
@@ -1769,17 +1779,17 @@ value = ""
 ["p10_mz1.3-cb_monatmietegaragenein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ has_garage_costs == false ? true : '' }}"
 
 ["p10_mz1.3-cb_monatmietegarageja"]
 type = "checkbox"
 description = "Ja"
-value = ""
+value = "{{ has_garage_costs == true ? true : '' }}"
 
 ["p10_mz1.3-et_monatmietegaragebetrag"]
 type = "string"
 description = "Betrag im EUR/Monat"
-value = ""
+value = "{{ garage_costs ? garage_costs : '' }}"
 
 ["p10_mz1.3-cb_monatmietegaragejagesond"]
 type = "checkbox"
@@ -1789,7 +1799,7 @@ value = ""
 ["p10_mz1.3-cb_monatmieteservicenein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ service_costs_included_in_rent == false ? true : '' }}"
 
 ["p10_mz1.3-cb_monatmieteserviceja"]
 type = "checkbox"
@@ -1809,17 +1819,17 @@ value = ""
 ["p10_mz1.3-cb_monatmietehaushaltsenergienein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ has_household_energy_costs == false ? true : '' }}"
 
 ["p10_mz1.3-cb_monatmietehaushaltsenergieja"]
 type = "checkbox"
 description = "Ja"
-value = ""
+value = "{{ has_household_energy_costs == true ? true : '' }}"
 
 ["p10_mz1.3-et_monatmietehaushaltsenergiebetrag"]
 type = "string"
 description = "Betrag im EUR/Monat"
-value = ""
+value = "{{ household_energy_costs ? household_energy_costs : '' }}"
 
 ["p10_mz1.3-cb_monatmietehaushaltsenergiejagesond"]
 type = "checkbox"
@@ -1829,7 +1839,7 @@ value = ""
 ["p10_mz1.3-cb_mietedrittenein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ rent_paid_partly_by_third_party == false ? true : '' }}"
 
 ["p10_mz1.3-cb_mietedritteja"]
 type = "checkbox"
@@ -1844,7 +1854,7 @@ value = ""
 ["p10_mz1.3-cb_mieteanderepersnein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ receives_rent_contribution_from_others == false ? true : '' }}"
 
 ["p10_mz1.3-cb_mieteanderepersja"]
 type = "checkbox"
@@ -1874,7 +1884,7 @@ value = ""
 ["p10_mz1.3-cb_mieteverändnein"]
 type = "checkbox"
 description = "Nein"
-value = ""
+value = "{{ expects_rent_change == false ? true : '' }}"
 
 ["p10_mz1.3-cb_mieteverändjaverringern"]
 type = "checkbox"
@@ -1969,7 +1979,7 @@ value = ""
 ["p11_mz1.3-cb_zahlunganmich"]
 type = "checkbox"
 description = "An mich"
-value = ""
+value = "{{ wohngeld_payment_to_applicant == true ? true : '' }}"
 
 ["p11_mz1.3-cb_auszahlunghhm"]
 type = "checkbox"
@@ -1979,182 +1989,182 @@ value = ""
 ["p11_mz1.3-et_auszahlungfamilienname"]
 type = "string"
 description = "Name/Familienname"
-value = ""
+value = "{{ last_name ? last_name : '' }}"
 
 ["p11_mz1.3-et_auszahlungvorname"]
 type = "string"
 description = "Vorname(n)"
-value = ""
+value = "{{ first_name ? first_name : '' }}"
 
 ["p11_mz1.3-et_auszahlunganschrift"]
 type = "string"
 description = "Anschrift (Straße, Hausnummer, ggf. weitere Zusätze, Postleitzahl, Ort)"
-value = ""
+value = "{{ street && house_number && zip_code && city ? street + ' ' + house_number + ', ' + zip_code + ' ' + city : '' }}"
 
 ["p11_mz1.3-an_iban1"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = "{{ documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')) }}"
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[0] }}"
 
 ["p11_mz1.3-an_iban2"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[1] }}"
 
 ["p11_mz1.3-an_iban3"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[2] }}"
 
 ["p11_mz1.3-an_iban4"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[3] }}"
 
 ["p11_mz1.3-an_iban5"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[4] }}"
 
 ["p11_mz1.3-an_iban6"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[5] }}"
 
 ["p11_mz1.3-an_iban7"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[6] }}"
 
 ["p11_mz1.3-an_iban8"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[7] }}"
 
 ["p11_mz1.3-an_iban9"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[8] }}"
 
 ["p11_mz1.3-an_iban10"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[9] }}"
 
 ["p11_mz1.3-an_iban11"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[10] }}"
 
 ["p11_mz1.3-an_iban12"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[11] }}"
 
 ["p11_mz1.3-an_iban13"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[12] }}"
 
 ["p11_mz1.3-an_iban14"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[13] }}"
 
 ["p11_mz1.3-an_iban15"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[14] }}"
 
 ["p11_mz1.3-an_iban16"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[15] }}"
 
 ["p11_mz1.3-an_iban17"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[16] }}"
 
 ["p11_mz1.3-an_iban18"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[17] }}"
 
 ["p11_mz1.3-an_iban19"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[18] }}"
 
 ["p11_mz1.3-an_iban20"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[19] }}"
 
 ["p11_mz1.3-an_iban21"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[20] }}"
 
 ["p11_mz1.3-an_iban22"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[21] }}"
 
 ["p11_mz1.3-an_iban23"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[22] }}"
 
 ["p11_mz1.3-an_iban24"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[23] }}"
 
 ["p11_mz1.3-an_iban25"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[24] }}"
 
 ["p11_mz1.3-an_iban26"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[25] }}"
 
 ["p11_mz1.3-an_iban27"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[26] }}"
 
 ["p11_mz1.3-an_iban28"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[27] }}"
 
 ["p11_mz1.3-an_iban29"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[28] }}"
 
 ["p11_mz1.3-an_iban30"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[29] }}"
 
 ["p11_mz1.3-an_iban31"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[30] }}"
 
 ["p11_mz1.3-an_iban32"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[31] }}"
 
 ["p11_mz1.3-an_iban33"]
 type = "string"
 description = "Alphanumerisches Feld für 1. Stelle IBAN SEPA-Raum"
-value = ""
+value = "{{ (documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : (documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '')))[32] }}"
 
 ["p11_mz1.3-et_auszahlungnamebank"]
 type = "string"
@@ -2164,12 +2174,12 @@ value = "{{ bank_name ? bank_name : '' }}"
 ["p11_mz1.3-cb_hinweisabfrage"]
 type = "checkbox"
 description = "Ich bin damit einverstanden, dass meine eingereichten Kontoauszüge zu den Akten genommen werden."
-value = ""
+value = "{{ consents_to_bank_statement_retention == true ? true : '' }}"
 
 ["p11_mz1.3-da_hinweisdatumunterschrift"]
 type = "string"
 description = "Datum"
-value = ""
+value = "{{ today }}"
 
 ["px_mz1"]
 type = "unknown"
