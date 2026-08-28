@@ -4,6 +4,11 @@ import {
 	generateRandomTestPhoneNumber,
 } from "./helpers/auth";
 
+// Against the docker-compose e2e stack, the Gemini call is short-circuited
+// server-side (MOCK_LLM_RESPONSES=true) with a canned, unformatted reply —
+// this exercises the chat UI plumbing but can't verify the real prompt's
+// pronoun-unbolding behavior, since the mock reply has no markdown to strip.
+// Against staging/prod it still exercises the real model.
 test.describe("Chat Overall Flow (MVP Verification Suite)", () => {
 	test.use({ viewport: { width: 393, height: 852 } });
 

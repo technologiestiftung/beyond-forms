@@ -1,5 +1,6 @@
 /* global Buffer */
 import { test, expect, type Page } from "@playwright/test";
+import { isRemoteEnvironment } from "./helpers/auth";
 
 async function navigateAndBypassTutorial(page: Page, targetUrl: string) {
 	await page.goto(targetUrl);
@@ -18,11 +19,7 @@ async function navigateAndBypassTutorial(page: Page, targetUrl: string) {
 
 test.describe("Document Upload and Mobile Camera Capture Audit", () => {
 	test.beforeEach(async ({ page, baseURL }) => {
-		if (
-			baseURL &&
-			!baseURL.includes("localhost") &&
-			!baseURL.includes("127.0.0.1")
-		) {
+		if (isRemoteEnvironment(baseURL)) {
 			test.skip();
 			return;
 		}

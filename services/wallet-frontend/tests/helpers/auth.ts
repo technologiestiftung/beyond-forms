@@ -6,6 +6,16 @@ export function generateRandomTestPhoneNumber(): string {
 	return `3023125${randomDigits}`;
 }
 
+/**
+ * The local mock dev server (playwright.config.ts) always runs on :5173 with
+ * VITE_USE_MOCKS enabled. Every other baseURL — staging, prod, or a
+ * docker-composed real backend served on localhost:3000 — needs a real login;
+ * a plain "localhost" substring check can't tell those apart from the mock server.
+ */
+export function isRemoteEnvironment(baseURL: string | undefined): boolean {
+	return !!baseURL && !baseURL.includes(":5173");
+}
+
 export async function registerAuthBypassRoute(page: Page) {
 	const bypassKey = process.env.PROD_TEST_BYPASS_KEY;
 	if (bypassKey) {
@@ -35,8 +45,7 @@ export async function ensureAuthenticatedSession(
 	baseURL: string | undefined,
 	phoneNumber: string = "+4930231250005",
 ) {
-	const isRemote =
-		baseURL && !baseURL.includes("localhost") && !baseURL.includes("127.0.0.1");
+	const isRemote = isRemoteEnvironment(baseURL);
 
 	if (!isRemote) {
 		// Local mock session seeding
