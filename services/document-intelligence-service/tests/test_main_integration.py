@@ -64,7 +64,7 @@ async def test_classify_endpoint_full_flow(mock_classifier, mock_extractor):
 
     file_content = b"fake-binary-data-for-testing"
     files = {"file": ("test_identity.jpg", file_content, "image/jpeg")}
-    data = {"model": "gemini/gemini-3.5-flash", "entity-extraction": "true"}
+    data = {"model": "gemini/gemini-3.7-flash", "entity-extraction": "true"}
 
     response = client.post("/classify", files=files, data=data)
 

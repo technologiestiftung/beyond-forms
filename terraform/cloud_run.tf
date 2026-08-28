@@ -9,7 +9,7 @@ locals {
       min_scale          = 0
       max_scale          = 10
       domain_suffix      = "staging"
-      gemini_model       = "gemini-3.5-flash"
+      gemini_model       = "gemini-3.7-flash"
       internal_key       = var.internal_key_stg
       rag_corpus         = var.rag_corpus
       rag_region         = "europe-west3"
@@ -27,7 +27,7 @@ locals {
       min_scale          = 0
       max_scale          = 20
       domain_suffix      = "prod"
-      gemini_model       = "gemini-3.5-flash"
+      gemini_model       = "gemini-3.7-flash"
       internal_key       = var.internal_key_prd
       rag_corpus         = ""
       rag_region         = ""
