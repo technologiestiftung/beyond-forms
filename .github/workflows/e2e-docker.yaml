@@ -22,6 +22,20 @@ jobs:
           chmod +x scripts/bootstrap.sh
           ./scripts/bootstrap.sh
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: services/wallet-frontend/package-lock.json
+      - name: Install Dependencies
+        run: npm ci
+        working-directory: services/wallet-frontend
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: services/wallet-frontend
+
       - name: Build and start the backend stack
         env:
           # Skips real Vertex AI/Gemini calls (document extraction + chat)
@@ -66,21 +80,6 @@ jobs:
           docker compose ps
           docker compose logs --tail=100 auth-service orchestration-middleware-service document-intelligence-service wallet-frontend authentik-server
           exit 1
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: "npm"
-          cache-dependency-path: services/wallet-frontend/package-lock.json
-
-      - name: Install Dependencies
-        run: npm ci
-        working-directory: services/wallet-frontend
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
-        working-directory: services/wallet-frontend
 
       - name: Run E2E Audit against the docker stack
         env:
