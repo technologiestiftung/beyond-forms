@@ -60,17 +60,31 @@ jobs:
 
       - name: Wait for the stack to be ready
         run: |
-          echo "Waiting for auth-service, orchestration-middleware, document-intelligence-service, and wallet-frontend to answer..."
+          echo "Waiting for auth-service, orchestration-middleware, document-intelligence-service, wallet-frontend, and Authentik blueprints to be ready..."
+          BLUEPRINTS=(
+            "custom/oidc-provider.yaml"
+            "custom/passwordless-sms-enrollment.yaml"
+            "custom/passwordless-sms-login.yaml"
+            "custom/username-password-enrollment.yaml"
+          )
           for i in $(seq 1 60); do
             AUTH_OK=0
             MW_OK=0
             DIS_OK=0
             FE_OK=0
+            BLUEPRINTS_OK=1
             curl -sf -o /dev/null http://localhost:8003/health && AUTH_OK=1
             curl -sf -o /dev/null http://localhost:8080/health && MW_OK=1
             curl -sf -o /dev/null http://localhost:8001/health && DIS_OK=1
             curl -sf -o /dev/null http://localhost:3000 && FE_OK=1
-            if [ "$AUTH_OK" = "1" ] && [ "$MW_OK" = "1" ] && [ "$DIS_OK" = "1" ] && [ "$FE_OK" = "1" ]; then
+            for bp in "${BLUEPRINTS[@]}"; do
+              STATUS=$(docker compose exec -T authentik-postgresql psql -U authentik -d authentik -t -c \
+                "SELECT status FROM authentik_blueprints_blueprintinstance WHERE name = '$bp';" 2>/dev/null | xargs)
+              if [ "$STATUS" != "successful" ]; then
+                BLUEPRINTS_OK=0
+              fi
+            done
+            if [ "$AUTH_OK" = "1" ] && [ "$MW_OK" = "1" ] && [ "$DIS_OK" = "1" ] && [ "$FE_OK" = "1" ] && [ "$BLUEPRINTS_OK" = "1" ]; then
               echo "Stack is ready."
               exit 0
             fi
@@ -78,7 +92,7 @@ jobs:
           done
           echo "::error::Stack did not become ready in time."
           docker compose ps
-          docker compose logs --tail=100 auth-service orchestration-middleware-service document-intelligence-service wallet-frontend authentik-server
+          docker compose logs --tail=100 auth-service orchestration-middleware-service document-intelligence-service wallet-frontend authentik-server authentik-worker
           exit 1
 
       - name: Run E2E Audit against the docker stack
