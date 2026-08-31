@@ -15,6 +15,11 @@ services:
     restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devuser -d devdb"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
 
   migration-service:
     build:
@@ -35,7 +40,7 @@ services:
       - app-network
     depends_on:
       postgres:
-        condition: service_started
+        condition: service_healthy
 
   document-intelligence-service:
     build:
@@ -144,7 +149,7 @@ services:
       - MOCK_LLM_RESPONSES=${MOCK_LLM_RESPONSES:-false}
     depends_on:
       postgres:
-        condition: service_started
+        condition: service_healthy
       gcs-emulator:
         condition: service_started
       forms-filling-service:
@@ -196,7 +201,7 @@ services:
 
     depends_on:
       postgres:
-        condition: service_started
+        condition: service_healthy
       orchestration-middleware-service:
         condition: service_started
     volumes:
@@ -279,7 +284,7 @@ services:
     restart: unless-stopped
     depends_on:
       postgres:
-        condition: service_started
+        condition: service_healthy
       # authentik-server:
       #   condition: service_started
       # authentik-worker:
