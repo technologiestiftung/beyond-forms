@@ -25,12 +25,12 @@
     "residence_status": "Asylberechtigt, Aufenthaltserlaubnis nach § 25 Abs. 1 AufenthG",
     "license_plate": "B-SH 309",
 
-    "street": "Sonnenallee",
+    "street": "Boxhagener Straße",
     "house_number": "112",
-    "zip_code": "12045",
+    "zip_code": "10245",
     "city": "Berlin",
     "state": "Berlin",
-    "district": "Neukölln",
+    "district": "Friedrichshain-Kreuzberg",
 
     "persons_in_household_count": 1,
 
@@ -56,12 +56,12 @@
     "sublet_room_count": null,
     "sublet_rent_income": null,
     "rent_paid_until": "2026-07-31",
-    "landlord_name": "Sonnenallee Immobilien KG",
+    "landlord_name": "Boxi Immobilien KG",
     "heating_type": "Gasetagenheizung",
     "free_housing_right_holder": null,
 
     "monthly_income": 290.00,
-    "income_sources": ["other"],
+    "income_sources": ["Asylbezug"],
     "has_assets": false,
     "assets_types": [],
     "assets_description": null,
@@ -72,7 +72,7 @@
     "bic": "NTSBDEB1",
 
     "has_received_previous_benefits": true,
-    "previous_benefits_authority": "Bezirksamt Neukölln von Berlin, Wohngeldstelle",
+    "previous_benefits_authority": "Bezirksamt Friedrichshain-Kreuzberg von Berlin, Wohngeldstelle",
     "previous_benefits_period": "01.02.2022 - 30.06.2026",
     "previous_benefits_ref_no": "WG-NK-2022-11734",
     "has_applied_for_asylum_benefits": true,
@@ -102,7 +102,7 @@
       "form_type": "antrag_wohngeld",
       "status": "in_progress",
       "form_data": {
-        "is_wohngeld_first_application": true,
+        "is_wohngeld_first_application": false,
         "receives_wohngeld_for_other_dwelling": false,
         "has_unlisted_household_members": false,
         "household_member_died_recently": false,
@@ -117,7 +117,7 @@
         "rent_paid_partly_by_third_party": false,
         "receives_rent_contribution_from_others": false,
         "expects_rent_change": false,
-        "wohngeld_payment_to_applicant": true,
+        "wohngeld_payment_to_applicant": false,
         "consents_to_bank_statement_retention": true
       }
     },
@@ -195,52 +195,5 @@
       "internal_error_log": "Demo fixture: photographed at an angle with glare across the totals column; extraction abandoned.",
       "raw_data": {}
     }
-  ],
-
-  "missing_documents": [
-    {
-      "document_type": "heating",
-      "reason": "deliberate",
-      "note": "Never uploaded. Heating is the largest part of his KdU and the thing his User Story 5 walks through step by step — leaving it absent is what makes the housing-cost flow worth testing on him."
-    },
-    {
-      "document_type": "pension_notice",
-      "reason": "not_applicable",
-      "note": "He has never contributed to the German pension system, which is exactly why /validate-form rejects him for a missing Rentenversicherungsnummer. See research.finding."
-    },
-    { "document_type": "health_insurance", "reason": "not_yet_supplied", "note": "Mitgliedsbescheinigung AOK Nordost." },
-    { "document_type": "registration", "reason": "not_yet_supplied", "note": "Meldebescheinigung, Bürgeramt Neukölln — or the Aufenthaltstitel could double as address proof." },
-    { "document_type": "bank", "reason": "not_yet_supplied", "note": "Kontobestätigung, N26 — IBAN DE71100110012629748220." },
-    { "document_type": "income", "reason": "not_yet_supplied", "note": "Einkommenserklärung — €290/month, source deliberately vague in the research." },
-    { "document_type": "assets", "reason": "not_yet_supplied", "note": "Vermögenserklärung — no assets, so a nil declaration. His research notes he must still evidence 'no assets'." },
-    { "document_type": "housing", "reason": "not_yet_supplied", "note": "Anlage KdU — cold rent €507, warm €620. Good candidate for a foreign-document or legibility variant." },
-    { "document_type": "household", "reason": "not_yet_supplied", "note": "Haushaltsbescheinigung — single-person household." },
-    { "document_type": "cooperation_agreement", "reason": "not_applicable", "note": "SGB II instrument; not part of an SGB XII application." }
-  ],
-
-  "derived": [
-    "last_name",
-    "date_of_birth",
-    "place_of_birth",
-    "nationality",
-    "street",
-    "house_number",
-    "zip_code",
-    "monthly_income",
-    "rent_total",
-    "heating_costs",
-    "hot_water_costs",
-    "living_area",
-    "health_insurance_provider",
-    "iban",
-    "bic",
-    "bank_name",
-    "landlord_name",
-    "rent_paid_until",
-    "previous_benefits_authority",
-    "previous_benefits_period",
-    "previous_benefits_ref_no",
-    "identification_numbers",
-    "tax_id"
   ]
 }

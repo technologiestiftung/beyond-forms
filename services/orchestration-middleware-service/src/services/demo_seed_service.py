@@ -139,7 +139,7 @@ class DemoSeedService:
     def list_personas(self) -> list[dict[str, Any]]:
         """
         Returns every persona file in full — `profile`, `applications`, `documents` with
-        their extracted `raw_data`, `missing_documents`, `derived` and `research`.
+        their extracted `raw_data`.
 
         The whole file is returned rather than a summary because a caller needs the
         filled-in values, not only the field names: the profile is what a seeded account

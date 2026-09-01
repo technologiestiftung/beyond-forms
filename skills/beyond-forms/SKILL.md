@@ -172,8 +172,6 @@ Fixture definitions (profile, documents, research) live in `demo/personas/` in t
 | `+493023125102` | Helmut | 6 documents, all verified — the case that completes |
 | `+493023125103` | Sandor | Mid-flow; one document failed as illegible |
 
-`derived` names the profile fields invented to satisfy the schema rather than taken from research — check it before quoting a number as a finding. `research.not_representable` records facts the schema cannot hold at all.
-
 ### Log in as a persona to read, or as yourself to write
 
 Those three numbers are **shared** — anyone on the team can log into them. Treat them as read-only reference. **Do not write to them.** Take a drama number of your own for experiments (empty account):

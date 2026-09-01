@@ -206,49 +206,5 @@
         "amount_liability_insurance": 120.00
       }
     }
-  ],
-
-  "missing_documents": [
-    {
-      "document_type": "pension_notice",
-      "reason": "deliberate",
-      "note": "THE point of this persona. Her Rentenbescheid is old, she is unsure whether it is even needed, and she cannot find it — her User Story 6. Do not add it; add the to-do UX around it instead."
-    },
-    { "document_type": "heating", "reason": "not_yet_supplied", "note": "Gaszentralheizung — a Heizkostenabrechnung from the Wohnungsbaugesellschaft would fit." },
-    { "document_type": "utility_bill", "reason": "not_yet_supplied", "note": "Betriebskostenabrechnung for the 2-room flat." },
-    { "document_type": "registration", "reason": "not_yet_supplied", "note": "Meldebescheinigung, Bürgeramt Mitte." },
-    { "document_type": "bank", "reason": "not_yet_supplied", "note": "Kontobestätigung, Berliner Volksbank — IBAN DE29100900004512873600." },
-    { "document_type": "income", "reason": "not_yet_supplied", "note": "Einkommenserklärung — Erwerbsminderungsrente €245/month." },
-    { "document_type": "assets", "reason": "not_yet_supplied", "note": "Vermögenserklärung — she has none, so a nil declaration." },
-    { "document_type": "housing", "reason": "not_yet_supplied", "note": "Anlage KdU — cold rent €655, warm €780." },
-    { "document_type": "household", "reason": "not_yet_supplied", "note": "Haushaltsbescheinigung — single-person household." },
-    { "document_type": "cooperation_agreement", "reason": "not_applicable", "note": "SGB II instrument; not part of an SGB XII application." }
-  ],
-
-  "derived": [
-    "last_name",
-    "date_of_birth",
-    "place_of_birth",
-    "street",
-    "house_number",
-    "zip_code",
-    "monthly_income",
-    "pension_insurance_no",
-    "pension_insurance_provider",
-    "health_insurance_provider",
-    "reduced_work_capacity_start_date",
-    "iban",
-    "bic",
-    "bank_name",
-    "landlord_name",
-    "heating_costs",
-    "hot_water_costs",
-    "living_area",
-    "rent_paid_until",
-    "previous_benefits_authority",
-    "previous_benefits_period",
-    "previous_benefits_ref_no",
-    "identification_numbers",
-    "tax_id"
   ]
 }

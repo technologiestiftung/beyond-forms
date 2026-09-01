@@ -102,59 +102,6 @@
           "internal_error_log": { "type": "string" }
         }
       }
-    },
-
-    "missing_documents": {
-      "type": "array",
-      "description": "Document slots this persona does NOT have, and why. A to-do list for authoring real fixtures, and a record of which absences are intentional so nobody 'fixes' them.",
-      "items": {
-        "type": "object",
-        "required": ["document_type", "reason", "note"],
-        "additionalProperties": false,
-        "properties": {
-          "document_type": {
-            "enum": [
-              "id_card", "registration", "health_insurance", "pension_notice", "stmt3",
-              "income", "assets", "bank", "rent", "utility_bill", "heating", "housing",
-              "household", "cooperation_agreement"
-            ]
-          },
-          "reason": {
-            "description": "deliberate = absence is the point of the persona, do not add it. not_applicable = this person would never be asked for it. not_yet_supplied = fair game to author.",
-            "enum": ["deliberate", "not_applicable", "not_yet_supplied"]
-          },
-          "note": { "type": "string" }
-        }
-      }
-    },
-
-    "derived": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Profile keys invented to satisfy the schema rather than taken from the research document (IBANs, insurance numbers, amounts the doc leaves open). Lets a reviewer — or an agent — tell fixture invention from researched fact."
-    },
-
-    "research": {
-      "type": "object",
-      "description": "Narrative context the seeder ignores. Lets a reviewer — or an agent — reason about the person, not just the row.",
-      "additionalProperties": true,
-      "properties": {
-        "core_barrier": { "type": "string" },
-        "usage_context": { "type": "string" },
-        "key_wishes": { "type": "array", "items": { "type": "string" } },
-        "key_fears": { "type": "array", "items": { "type": "string" } },
-        "not_representable": {
-          "type": "object",
-          "description": "Facts from the research document that no `users` column can hold. Each is a filed schema gap.",
-          "additionalProperties": true
-        },
-        "unreconciled": {
-          "type": "object",
-          "description": "Figures the research document itself flags as inconsistent. Recorded verbatim rather than silently fixed.",
-          "additionalProperties": true
-        },
-        "notes": { "type": "string" }
-      }
     }
   }
 }

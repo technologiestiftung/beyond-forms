@@ -116,14 +116,6 @@ def test_profile_enum_and_date_values_are_valid(persona):
         pytest.fail(f"{data['slug']}: invalid profile values:\n{exc}")
 
 
-def test_derived_fields_name_real_profile_keys(persona):
-    """`derived` is what tells a reviewer which values were invented rather than taken
-    from the research document. A stale entry makes it misleading."""
-    data, _ = persona
-    stale = sorted(set(data.get("derived", [])) - set(data["profile"]))
-    assert not stale, f"{data['slug']}: derived names non-existent profile keys {stale}"
-
-
 def test_documents_resolve_to_a_registered_document_type(persona):
     data, _ = persona
     for doc in data["documents"]:
@@ -189,37 +181,3 @@ def test_personas_cover_distinct_document_states():
     assert {"verified", "ready_for_review", "failed"} <= states, (
         f"personas only cover {sorted(states)}; the review and failure paths need coverage"
     )
-
-
-def test_missing_documents_do_not_overlap_with_present_ones(persona):
-    """A slot cannot be both seeded and listed as missing — that would make the to-do
-    list lie about what still needs authoring."""
-    data, _ = persona
-    present = {doc["document_type"] for doc in data["documents"]}
-    listed = {entry["document_type"] for entry in data.get("missing_documents", [])}
-    overlap = sorted(present & listed)
-    assert not overlap, f"{data['slug']}: {overlap} are both seeded and listed as missing"
-
-
-def test_missing_documents_cover_every_absent_slot(persona):
-    """
-    Every slot the persona lacks must be accounted for, so a genuinely forgotten document
-    cannot hide among the deliberate omissions. `OTHER` is not a slot.
-    """
-    from src.constants import SLOT_ID_TO_DIS_TYPE
-
-    data, _ = persona
-    present = {doc["document_type"] for doc in data["documents"]}
-    listed = {entry["document_type"] for entry in data.get("missing_documents", [])}
-    unaccounted = sorted(set(SLOT_ID_TO_DIS_TYPE) - present - listed)
-    assert not unaccounted, f"{data['slug']}: slots neither seeded nor listed in missing_documents: {unaccounted}"
-
-
-def test_deliberate_omissions_are_explained(persona):
-    data, _ = persona
-    for entry in data.get("missing_documents", []):
-        if entry["reason"] == "deliberate":
-            assert len(entry["note"]) > 40, (
-                f"{data['slug']} / {entry['document_type']}: a deliberate omission needs a "
-                "note explaining why, or someone will 'fix' it"
-            )

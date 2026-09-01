@@ -256,51 +256,5 @@
         "health_insurance_status": "compulsory_insurance"
       }
     }
-  ],
-
-  "missing_documents": [
-    {
-      "document_type": "cooperation_agreement",
-      "reason": "not_applicable",
-      "note": "A Kooperationsvereinbarung belongs to SGB II (Bürgergeld), not to Grundsicherung im Alter under SGB XII. Helmut would never be asked for one."
-    },
-    { "document_type": "registration", "reason": "not_yet_supplied", "note": "Meldebescheinigung — no scan exists; the same values already come from his profile and identity_document, so this is nice-to-have, not blocking." },
-    { "document_type": "bank", "reason": "not_yet_supplied", "note": "Kontobestätigung — his IBAN is already established via the Kontoauszug." },
-    { "document_type": "utility_bill", "reason": "not_yet_supplied", "note": "Betriebskostenabrechnung — no scan exists." },
-    { "document_type": "housing", "reason": "not_yet_supplied", "note": "Anlage KdU — rent and heating are already covered by the Mietvertrag and Heizkostenabrechnung." },
-    { "document_type": "household", "reason": "not_yet_supplied", "note": "Haushaltsbescheinigung — persons_in_household_count already covers this from the profile." },
-    { "document_type": "income", "reason": "not_yet_supplied", "note": "Einkommenserklärung — his income is already established via the Rentenbescheid and Kontoauszug." },
-    { "document_type": "assets", "reason": "not_yet_supplied", "note": "Vermögenserklärung — his balance is already established via the Kontoauszug." }
-  ],
-
-  "derived": [
-    "birth_name",
-    "date_of_birth",
-    "married_since",
-    "place_of_birth",
-    "number_of_rooms",
-    "living_area",
-    "heating_costs",
-    "hot_water_costs",
-    "landlord_name",
-    "heating_type",
-    "rent_paid_until",
-    "health_insurance_provider",
-    "previous_benefits_authority",
-    "previous_benefits_period",
-    "previous_benefits_ref_no",
-    "identification_numbers",
-    "tax_id",
-    "household_members",
-    "is_subsidized_housing",
-    "has_other_residence",
-    "has_secondary_residence",
-    "has_garage_costs",
-    "has_household_energy_costs",
-    "is_living_area_used_commercially",
-    "is_student_or_trainee",
-    "professional_expenses",
-    "has_childcare_expenses",
-    "is_victim_of_national_socialist_persecution"
   ]
 }

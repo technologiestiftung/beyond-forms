@@ -116,15 +116,6 @@ drifted fixture fails the image build.
   `extra="forbid"`, i.e. the same check the rules engine applies when a real user
   re-verifies a document. Computed fields such as `health_insurance_proof.is_private` must
   not appear.
-- `derived` — profile keys **invented** to satisfy the schema rather than taken from the
-  research document. Read this before quoting a number as a research finding.
-- `missing_documents` — every slot the persona does *not* have, with a reason:
-  `deliberate` (the absence is the point — do not "fix" it), `not_applicable` (this person
-  would never be asked), or `not_yet_supplied` (fair game to author). A test asserts every
-  absent slot is accounted for, so a forgotten document cannot hide among the intentional
-  ones.
-- `research` — narrative the seeder ignores: barriers, wishes, usage context, and the
-  facts the schema cannot hold.
 
 Adding a fourth persona is one JSON file plus a drama number; nothing needs registering.
 A restart (or `./scripts/seed_demo_personas.sh`) will pick it up if `DEMO_SEED_ENABLED=true`.
@@ -177,11 +168,11 @@ requires `pension_insurance_provider` and `pension_insurance_number` uncondition
 neither — the form demands a Rentenversicherungsnummer that cannot exist. Sabine and Helmut
 both come back submittable, so this is specific to his case, not a seeding failure.
 
-**Official Anlagen exist for the biggest missing_documents gaps, but the middleware only
-fills the main `antrag_grundsicherung` form.** `schemas/pdfs/` has the real attachments:
-Anlage 1 (Unterhalt/maintenance), Anlage 2 (Ausländer/Asylbewerber — exactly Sandor's case),
-Anlage 3 (Grundvermögen/real estate assets), Anlage 6 (Mietschulden/rent arrears). Wiring one
-up means a new `forms/mappings/anlage_N.toml`, a `["form_type", ...]`-keyed export, and a
+**The middleware only fills the main `antrag_grundsicherung` form.** 
+`schemas/pdfs/` has the real attachments:
+Anlage 1 (Unterhalt/maintenance), Anlage 2 (Ausländer/Asylbewerber),
+Anlage 3 (Grundvermögen/real estate assets), Anlage 6 (Mietschulden/rent arrears). 
+Wiring one up means a new `forms/mappings/anlage_N.toml`, a `["form_type", ...]`-keyed export, and a
 `GET /export/{form_type}` call per attachment — worth doing, not attempted here.
 
 **The Social Worker persona is not here.** [04_social_worker.md](research/04_social_worker.md)
