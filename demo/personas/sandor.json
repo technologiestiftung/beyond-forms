@@ -23,6 +23,7 @@
     "has_custodian": false,
     "displaced_status": null,
     "residence_status": "Asylberechtigt, Aufenthaltserlaubnis nach § 25 Abs. 1 AufenthG",
+    "license_plate": "B-SH 309",
 
     "street": "Sonnenallee",
     "house_number": "112",
@@ -34,7 +35,7 @@
     "persons_in_household_count": 1,
 
     "social_security_type": "None",
-    "health_insurance_provider": "AOK Nordost",
+    "health_insurance_provider": "DAK",
     "health_insurance_status": "Compulsory Insurance",
     "pension_insurance_provider": null,
     "pension_insurance_no": null,
@@ -96,6 +97,36 @@
       "form_type": "antrag_grundsicherung",
       "status": "in_progress",
       "form_data": {}
+    },
+    {
+      "form_type": "antrag_wohngeld",
+      "status": "in_progress",
+      "form_data": {
+        "is_wohngeld_first_application": true,
+        "receives_wohngeld_for_other_dwelling": false,
+        "has_unlisted_household_members": false,
+        "household_member_died_recently": false,
+        "household_size_will_change": false,
+        "receives_other_transfer_benefits": false,
+        "pays_child_or_spousal_support": false,
+        "receives_support_from_others": false,
+        "expects_future_income_change": false,
+        "assets_exceed_wohngeld_threshold": false,
+        "related_to_landlord": false,
+        "service_costs_included_in_rent": false,
+        "rent_paid_partly_by_third_party": false,
+        "receives_rent_contribution_from_others": false,
+        "expects_rent_change": false,
+        "wohngeld_payment_to_applicant": true,
+        "consents_to_bank_statement_retention": true
+      }
+    },
+    {
+      "form_type": "antrag_bewohnerparkausweis",
+      "status": "in_progress",
+      "form_data": {
+        "consents_to_registry_verification": true
+      }
     }
   ],
 
@@ -103,7 +134,6 @@
     {
       "document_type": "id_card",
       "status": "verified",
-      "confidence_score": 0.82,
       "display_name": "Aufenthaltstitel_Sandor_Haddad.pdf",
       "asset": { "generate": true, "title": "Aufenthaltstitel", "subtitle": "§ 25 Abs. 1 AufenthG" },
       "raw_data": {
@@ -124,7 +154,6 @@
     {
       "document_type": "rent",
       "status": "verified",
-      "confidence_score": 0.88,
       "display_name": "Mietvertrag_Sandor_Haddad.pdf",
       "asset": { "generate": true, "title": "Mietvertrag", "subtitle": "Sonnenallee Immobilien KG" },
       "raw_data": {
@@ -144,7 +173,6 @@
     {
       "document_type": "stmt3",
       "status": "ready_for_review",
-      "confidence_score": 0.55,
       "display_name": "Kontoauszug_Sandor_Haddad.pdf",
       "asset": { "generate": true, "title": "Kontoauszug", "subtitle": "N26 Bank" },
       "user_error_code": "PAGINATION_MISSING_PAGES",
@@ -161,7 +189,6 @@
     {
       "document_type": "utility_bill",
       "status": "failed",
-      "confidence_score": 0.14,
       "display_name": "Nebenkostenabrechnung_Sandor_Haddad.jpg",
       "asset": { "generate": true, "title": "Nebenkostenabrechnung", "subtitle": "Abrechnungszeitraum 2025" },
       "user_error_code": "LEGIBILITY_ISSUES",

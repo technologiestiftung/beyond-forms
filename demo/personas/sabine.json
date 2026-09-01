@@ -22,7 +22,8 @@
     "has_guardian": false,
     "has_custodian": false,
     "displaced_status": null,
-    "residence_status": "Deutsche Staatsangehörigkeit",
+    "residence_status": null,
+    "license_plate": "B-SR 224",
 
     "street": "Invalidenstraße",
     "house_number": "84",
@@ -101,6 +102,36 @@
       "form_type": "antrag_grundsicherung",
       "status": "in_progress",
       "form_data": {}
+    },
+    {
+      "form_type": "antrag_wohngeld",
+      "status": "in_progress",
+      "form_data": {
+        "is_wohngeld_first_application": true,
+        "receives_wohngeld_for_other_dwelling": false,
+        "has_unlisted_household_members": false,
+        "household_member_died_recently": false,
+        "household_size_will_change": false,
+        "receives_other_transfer_benefits": false,
+        "pays_child_or_spousal_support": false,
+        "receives_support_from_others": false,
+        "expects_future_income_change": false,
+        "assets_exceed_wohngeld_threshold": false,
+        "related_to_landlord": false,
+        "service_costs_included_in_rent": false,
+        "rent_paid_partly_by_third_party": false,
+        "receives_rent_contribution_from_others": false,
+        "expects_rent_change": false,
+        "wohngeld_payment_to_applicant": true,
+        "consents_to_bank_statement_retention": true
+      }
+    },
+    {
+      "form_type": "antrag_bewohnerparkausweis",
+      "status": "in_progress",
+      "form_data": {
+        "consents_to_registry_verification": true
+      }
     }
   ],
 
@@ -108,7 +139,6 @@
     {
       "document_type": "id_card",
       "status": "verified",
-      "confidence_score": 0.96,
       "display_name": "Personalausweis_Sabine_Reinhardt.pdf",
       "asset": { "generate": true, "title": "Personalausweis", "subtitle": "Bundesrepublik Deutschland" },
       "raw_data": {
@@ -129,7 +159,6 @@
     {
       "document_type": "rent",
       "status": "verified",
-      "confidence_score": 0.9,
       "display_name": "Mietvertrag_Sabine_Reinhardt.pdf",
       "asset": { "generate": true, "title": "Mietvertrag", "subtitle": "Wohnungsbaugesellschaft Mitte mbH" },
       "raw_data": {
@@ -149,7 +178,6 @@
     {
       "document_type": "health_insurance",
       "status": "verified",
-      "confidence_score": 0.93,
       "display_name": "Mitgliedsbescheinigung_BARMER_Sabine_Reinhardt.pdf",
       "asset": { "generate": true, "title": "Mitgliedsbescheinigung", "subtitle": "BARMER" },
       "raw_data": {
@@ -162,7 +190,6 @@
     {
       "document_type": "stmt3",
       "status": "ready_for_review",
-      "confidence_score": 0.68,
       "display_name": "Kontoauszug_Sabine_Reinhardt.pdf",
       "asset": { "generate": true, "title": "Kontoauszug", "subtitle": "Berliner Volksbank" },
       "user_error_code": "OLD_STATEMENT_WARNING",

@@ -10,7 +10,6 @@
   "profile": {
     "first_name": "Helmut",
     "last_name": "Klar",
-    "birth_name": "Klar",
     "date_of_birth": "1947-02-14",
     "place_of_birth": "Berlin",
     "legal_gender": "Male",
@@ -24,7 +23,7 @@
     "has_custodian": false,
     "displaced_status": null,
     "residence_status": null,
-    "license_plate": "B-HK 1947",
+    "license_plate": "B-HK 142",
 
     "street": "Hauptstraße",
     "house_number": "4",
@@ -165,7 +164,6 @@
     {
       "document_type": "id_card",
       "status": "verified",
-      "confidence_score": 0.97,
       "display_name": "Personalausweis_Helmut_Klar.png",
       "asset": "Personalausweis_ Helmut_Klar.png",
       "raw_data": {
@@ -186,7 +184,6 @@
     {
       "document_type": "rent",
       "status": "verified",
-      "confidence_score": 0.91,
       "display_name": "Mietvertrag_Helmut_Klar.pdf",
       "asset": "Beispiel Mietvertrag.pdf",
       "raw_data": {
@@ -206,7 +203,6 @@
     {
       "document_type": "pension_notice",
       "status": "verified",
-      "confidence_score": 0.94,
       "display_name": "Rentenbescheid_Helmut_Klar.pdf",
       "asset": "Grundsicherung_Rentenbescheid_Helmut Klar.pdf",
       "raw_data": {
@@ -224,7 +220,6 @@
     {
       "document_type": "stmt3",
       "status": "verified",
-      "confidence_score": 0.89,
       "display_name": "Kontoauszug_Helmut_Klar.pdf",
       "asset": "Bank_Statement_Helmut_Klar.pdf",
       "raw_data": {
@@ -242,7 +237,6 @@
     {
       "document_type": "heating",
       "status": "verified",
-      "confidence_score": 0.86,
       "display_name": "Heizkostenabrechnung_Helmut_Klar.pdf",
       "asset": "Heizkostenabrechnung Helmut Klar.pdf",
       "raw_data": {
@@ -253,7 +247,6 @@
     {
       "document_type": "health_insurance",
       "status": "verified",
-      "confidence_score": 0.95,
       "display_name": "Versicherungsbescheinigung_Helmut_Klar.pdf",
       "asset": "Versicherungsbescheinigung_Helmut_Klar.pdf",
       "raw_data": {

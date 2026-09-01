@@ -88,7 +88,7 @@ AUTH="Authorization: Bearer $TOKEN"
 
 curl -s $API/verify_auth -H "$AUTH" | jq                    # who am I
 curl -s $API/profile -H "$AUTH" | jq                        # the whole users row
-curl -s $API/files -H "$AUTH" | jq                          # documents + status + confidence
+curl -s $API/files -H "$AUTH" | jq                          # documents + status
 
 DOC=$(curl -s $API/files -H "$AUTH" | jq -r '.[0].document_id')
 curl -s $API/api/v1/documents/$DOC/extractions -H "$AUTH" | jq   # raw_data as the review UI sees it
@@ -116,9 +116,6 @@ drifted fixture fails the image build.
   `extra="forbid"`, i.e. the same check the rules engine applies when a real user
   re-verifies a document. Computed fields such as `health_insurance_proof.is_private` must
   not appear.
-- `documents[].confidence_score` — **must be ≤ 1.0.** The frontend schema is
-  `z.number().min(0).max(1)` and `FileService.getFiles()` returns `[]` on a parse failure,
-  so one out-of-range score makes the user see *no documents at all*.
 - `derived` — profile keys **invented** to satisfy the schema rather than taken from the
   research document. Read this before quoting a number as a research finding.
 - `missing_documents` — every slot the persona does *not* have, with a reason:

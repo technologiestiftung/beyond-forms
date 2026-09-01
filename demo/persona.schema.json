@@ -71,12 +71,6 @@
             ]
           },
           "status": { "enum": ["processing", "ready_for_review", "completed", "failed", "verified"] },
-          "confidence_score": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "Must be <= 1. The frontend zod schema rejects anything higher and then renders NO documents at all."
-          },
           "display_name": {
             "type": "string",
             "description": "Human filename. German keywords in it are load-bearing for the frontend's slot matching."
