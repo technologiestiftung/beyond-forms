@@ -93,12 +93,11 @@ Classify a document and extract its data in one call. This runs a real vision-mo
 ```bash
 curl -s --max-time 180 -X POST "$DOCS/classify" -F "file=@rentenbescheid.pdf" \
   | jq '{type: .data.classified_document.document_type,
-         confidence: .data.classified_document.confidence,
          data: .data.extraction_result}'
 ```
 
 ```json
-{ "type": "pension_notice", "confidence": 0.85,
+{ "type": "pension_notice",
   "data": { "pension_reason": "Altersrente", "monthly_amount": 650,
             "start_date_of_pension": "2026-01-01", "is_granted": true } }
 ```

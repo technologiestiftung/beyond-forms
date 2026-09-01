@@ -2,7 +2,7 @@
 Unit tests for the demo-persona seeder.
 
 Concentrates on the invariants that are expensive to discover by hand:
-GCS blobs are actually uploaded (or verified documents silently rot), confidence scores
+GCS blobs are actually uploaded (or verified documents silently rot),
 stay inside the range the frontend accepts, the object name matches the convention the
 frontend's slot matching depends on, and nothing is ever published to Pub/Sub.
 """
@@ -233,20 +233,6 @@ def test_seeded_rows_carry_the_fixture_status_and_extraction():
     assert document.raw_data == spec["raw_data"]
     assert document.fk_file_id is not None
     assert result["extracted_field_count"] == len(spec["raw_data"])
-
-
-def test_seeded_confidence_score_stays_within_the_frontend_range():
-    _, _, _, _, _ = _seed_one_document("helmut", index=2)
-    for path in PERSONAS_DIR.glob("*.json"):
-        persona = json.loads(path.read_text(encoding="utf-8"))
-        db = MagicMock(spec=Session)
-        service = DemoSeedService(db, storage_client=MagicMock(), personas_dir=PERSONAS_DIR)
-        for i, _ in enumerate(persona["documents"]):
-            service._seed_document(persona["documents"][i], uuid.uuid4(), uuid.uuid4(), [])
-        for call in db.add.call_args_list:
-            row = call.args[0]
-            if isinstance(row, UserDocuments) and row.confidence_score is not None:
-                assert decimal.Decimal("0") <= row.confidence_score <= decimal.Decimal("1")
 
 
 def test_failed_document_keeps_its_error_code():

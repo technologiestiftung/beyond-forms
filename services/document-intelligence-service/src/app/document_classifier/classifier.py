@@ -20,7 +20,6 @@ Classifier = Callable[[str, str], Coroutine[Any, Any, ClassifiedDocument]]
 
 FAILED_EXTRACTION = ClassifiedDocument(
     document_type=UNKNOWN_TYPE,
-    confidence=0.0,
     system_label=UNKNOWN_LABEL,
 )
 
@@ -29,15 +28,6 @@ doc_type_embeddings = {}
 
 def get_cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
-
-
-def scale_confidence(score: float) -> float:
-    if score > 0.6:
-        return 0.99
-    elif score >= 0.3:
-        return 0.70 + (score - 0.3) * (0.95 - 0.70) / (0.6 - 0.3)
-    else:
-        return score * (0.70 / 0.3)
 
 
 CACHE_DIR = Path(__file__).parent.parent.parent.parent / ".cache"
@@ -116,7 +106,6 @@ def init_document_classifier(model_name: str, candidate_counts: int) -> Classifi
 
         return ClassifiedDocument(
             document_type=best_match or "unknown",
-            confidence=scale_confidence(float(best_score)) if best_score > 0 else 0.0,
             system_label=best_match or "unknown",
         )
 

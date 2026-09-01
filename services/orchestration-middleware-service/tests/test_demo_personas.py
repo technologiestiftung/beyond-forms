@@ -149,20 +149,6 @@ def test_raw_data_validates_against_the_document_schema(persona):
             pytest.fail(f"{data['slug']} / {slot} -> {dis_type}: invalid raw_data:\n{exc}")
 
 
-def test_confidence_scores_are_within_zero_and_one(persona):
-    """
-    The frontend zod schema is `z.number().min(0).max(1)` and `FileService.getFiles()`
-    returns `[]` on a parse failure — so a single out-of-range score makes the demo user
-    see no documents at all, which looks like a total seeding failure.
-    """
-    data, _ = persona
-    for doc in data["documents"]:
-        score = doc.get("confidence_score")
-        if score is None:
-            continue
-        assert 0 <= score <= 1, f"{data['slug']} / {doc['document_type']}: confidence_score {score} not in [0, 1]"
-
-
 def test_error_codes_are_renderable(persona):
     data, _ = persona
     for doc in data["documents"]:

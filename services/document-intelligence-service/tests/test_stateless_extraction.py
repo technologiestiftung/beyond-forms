@@ -83,12 +83,10 @@ async def test_stateless_extract_with_metadata_envelope(mock_acompletion):
         "extraction_metadata": {
             "business_legal_name": {
                 "status": "SUCCESS",
-                "confidence": "HIGH",
                 "reason": "Extracted clearly from header.",
             },
             "business_tax_id": {
                 "status": "SUCCESS",
-                "confidence": "HIGH",
                 "reason": "Found in Tax ID block.",
             },
         },
@@ -116,4 +114,3 @@ async def test_stateless_extract_with_metadata_envelope(mock_acompletion):
 
     assert data_envelope["extracted_data"]["business_legal_name"] == "Acme Corp"
     assert data_envelope["extraction_metadata"]["business_legal_name"]["status"] == "SUCCESS"
-    assert data_envelope["extraction_metadata"]["business_legal_name"]["confidence"] == "HIGH"

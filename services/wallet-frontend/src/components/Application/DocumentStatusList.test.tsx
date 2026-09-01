@@ -33,7 +33,6 @@ describe("DocumentStatusList", () => {
 			type: "ID_CARD",
 			status: ProcessingStatusEnum.enum.PROCESSING,
 			uploadDate: new Date().toISOString(),
-			confidence: 0.9,
 		},
 		{
 			id: "doc-2",
@@ -41,7 +40,6 @@ describe("DocumentStatusList", () => {
 			type: "RENTAL_CONTRACT",
 			status: ProcessingStatusEnum.enum.VERIFIED,
 			uploadDate: new Date().toISOString(),
-			confidence: 0.95,
 		},
 		{
 			id: "doc-3",
@@ -49,7 +47,6 @@ describe("DocumentStatusList", () => {
 			type: "OTHER",
 			status: ProcessingStatusEnum.enum.COMPLETED,
 			uploadDate: new Date().toISOString(),
-			confidence: 0.85,
 		},
 	];
 
@@ -89,7 +86,6 @@ describe("DocumentStatusList", () => {
 			type: "BANK_STATEMENT",
 			status: ProcessingStatusEnum.enum.VERIFIED,
 			uploadDate: new Date().toISOString(),
-			confidence: 0.95,
 		};
 		render(
 			<MemoryRouter>
@@ -108,7 +104,6 @@ describe("DocumentStatusList", () => {
 			type: "PENSION_STATEMENT",
 			status: ProcessingStatusEnum.enum.VERIFIED,
 			uploadDate: new Date().toISOString(),
-			confidence: 0.95,
 		};
 		render(
 			<MemoryRouter>
@@ -127,7 +122,6 @@ describe("DocumentStatusList", () => {
 			type: "ID_CARD",
 			status: ProcessingStatusEnum.enum.VERIFIED,
 			uploadDate: new Date().toISOString(),
-			confidence: 0.95,
 		};
 		const { rerender } = render(
 			<MemoryRouter>
@@ -151,7 +145,6 @@ describe("DocumentStatusList", () => {
 			type: "OTHER",
 			status: ProcessingStatusEnum.enum.PROCESSING,
 			uploadDate: new Date().toISOString(),
-			confidence: 0,
 		};
 
 		render(
@@ -186,7 +179,6 @@ describe("DocumentStatusList", () => {
 				type: "RENTAL_CONTRACT",
 				status: ProcessingStatusEnum.enum.VERIFIED,
 				uploadDate: new Date().toISOString(),
-				confidence: 0.95,
 			},
 			{
 				id: "doc-processing-slot",
@@ -194,7 +186,6 @@ describe("DocumentStatusList", () => {
 				type: "ID_CARD",
 				status: ProcessingStatusEnum.enum.PROCESSING,
 				uploadDate: new Date().toISOString(),
-				confidence: 0.9,
 			},
 			{
 				id: "doc-completed-other",
@@ -202,7 +193,6 @@ describe("DocumentStatusList", () => {
 				type: "OTHER",
 				status: ProcessingStatusEnum.enum.COMPLETED,
 				uploadDate: new Date().toISOString(),
-				confidence: 0.85,
 			},
 		];
 
@@ -233,7 +223,6 @@ describe("DocumentStatusList", () => {
 			type: "PENSION_STATEMENT",
 			status: ProcessingStatusEnum.enum.PROCESSING,
 			uploadDate: new Date().toISOString(),
-			confidence: 0.9,
 		};
 
 		render(
