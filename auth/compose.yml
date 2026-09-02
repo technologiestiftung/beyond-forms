@@ -40,6 +40,8 @@ services:
     depends_on:
       authentik-postgresql:
         condition: service_healthy
+      init-data:
+        condition: service_completed_successfully
     env_file:
       - .env
     environment:
@@ -67,6 +69,8 @@ services:
     depends_on:
       authentik-postgresql:
         condition: service_healthy
+      init-data:
+        condition: service_completed_successfully
     env_file:
       - .env
     environment:

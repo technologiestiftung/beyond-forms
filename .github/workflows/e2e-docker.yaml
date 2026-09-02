@@ -46,6 +46,7 @@ jobs:
             postgres \
             migration-service \
             authentik-postgresql \
+            init-data \
             authentik-server \
             authentik-worker \
             auth-service \
@@ -66,7 +67,7 @@ jobs:
             "custom/passwordless-sms-login.yaml"
             "custom/username-password-enrollment.yaml"
           )
-          for i in $(seq 1 30); do
+          for i in $(seq 1 60); do
             if docker compose exec -T authentik-worker python -m manage apply_blueprint "${BLUEPRINTS[@]/#//blueprints/}"; then
               echo "Blueprints applied."
               exit 0
