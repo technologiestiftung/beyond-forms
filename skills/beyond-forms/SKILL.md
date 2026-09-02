@@ -93,12 +93,11 @@ Classify a document and extract its data in one call. This runs a real vision-mo
 ```bash
 curl -s --max-time 180 -X POST "$DOCS/classify" -F "file=@rentenbescheid.pdf" \
   | jq '{type: .data.classified_document.document_type,
-         confidence: .data.classified_document.confidence,
          data: .data.extraction_result}'
 ```
 
 ```json
-{ "type": "pension_notice", "confidence": 0.85,
+{ "type": "pension_notice",
   "data": { "pension_reason": "Altersrente", "monthly_amount": 650,
             "start_date_of_pension": "2026-01-01", "is_granted": true } }
 ```
@@ -172,8 +171,6 @@ Fixture definitions (profile, documents, research) live in `demo/personas/` in t
 | `+493023125101` | Sabine | Mid-flow; a document missing, one flagged as outdated |
 | `+493023125102` | Helmut | 6 documents, all verified — the case that completes |
 | `+493023125103` | Sandor | Mid-flow; one document failed as illegible |
-
-`derived` names the profile fields invented to satisfy the schema rather than taken from research — check it before quoting a number as a finding. `research.not_representable` records facts the schema cannot hold at all.
 
 ### Log in as a persona to read, or as yourself to write
 

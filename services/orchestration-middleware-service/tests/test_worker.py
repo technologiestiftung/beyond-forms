@@ -34,7 +34,7 @@ def test_process_message_with_soft_validations(mock_db_session, mock_httpx):
     mock_response.json.return_value = {
         "status": "success",
         "data": {
-            "classified_document": {"document_type": "Identity Document", "confidence": 0.95},
+            "classified_document": {"document_type": "Identity Document"},
             "extraction_result": {"first_name": "Max", "warnings": ["PAGINATION_MISSING_PAGES", "LEGIBILITY_ISSUES"]},
         },
     }
@@ -75,7 +75,7 @@ def test_process_message_without_warnings(mock_db_session, mock_httpx):
     mock_response.json.return_value = {
         "status": "success",
         "data": {
-            "classified_document": {"document_type": "Identity Document", "confidence": 0.95},
+            "classified_document": {"document_type": "Identity Document"},
             "extraction_result": {"first_name": "Max"},
         },
     }
@@ -132,5 +132,4 @@ def test_process_message_with_user_selected_type_uses_stateless_extract(mock_db_
     update_args = update_calls[0][0][1]
     assert update_args["new_status"] == DocumentStatusType.READY_FOR_REVIEW.value
     assert update_args["doc_type"] == "stmt3"
-    assert update_args["confidence"] == 1.0
     assert json.loads(update_args["raw_data"]) == {"iban": "DE89370400440532013000", "account_balance": "1234.56"}

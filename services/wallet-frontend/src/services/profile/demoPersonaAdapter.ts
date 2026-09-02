@@ -35,7 +35,6 @@ function mapPersonaDocument(doc: { document_type: string; status: string; displa
     name: doc.display_name,
     type: doc.document_type,
     status: statusMap[status] || "PENDING",
-    confidence: (doc as unknown as Record<string, unknown>).confidence_score || null,
     uploadDate: new Date().toISOString(),
   };
 }

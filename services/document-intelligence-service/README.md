@@ -32,7 +32,6 @@ _The service runs on `http://localhost:8001`._
 Uses an optimized prompting approach for efficient classification.
 
 - **Mechanism:** Maps document types to single-character labels (A, B, C...).
-- **Confidence:** No longer relies on logprobs; uses direct LLM scoring or alternative methods as required.
 
 ### 2. Entity Extraction
 
@@ -76,7 +75,6 @@ The primary entry point for processing files.
     "filename": "id_card.jpg",
     "classified_document": {
       "document_type": "identity_document",
-      "confidence": 0.98,
       "candidate_rankings": [...]
     },
     "extraction_result": {
