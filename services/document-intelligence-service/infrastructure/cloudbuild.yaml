@@ -25,7 +25,7 @@ substitutions:
   # Non-sensitive config — kept as real defaults.
   _GCP_REGION: "europe-west10"
   _LLM_RETRIES: "3"
-  _GEMINI_MODEL_NAME: "gemini-3.5-flash"
+  _GEMINI_MODEL_NAME: "gemini-3.7-flash"
 
 options:
   logging: CLOUD_LOGGING_ONLY

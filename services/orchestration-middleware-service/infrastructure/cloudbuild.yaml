@@ -65,7 +65,7 @@ substitutions:
   _OIDC_CLIENT_ID: "beyondforms"
   _AUTHENTIK_PUBLIC_KEY_PATH: "/app/auth/certs/pub/oidc_public.pem"
   _GCP_REGION: "europe-west10"
-  _GEMINI_MODEL_NAME: "gemini-3.5-flash"
+  _GEMINI_MODEL_NAME: "gemini-3.7-flash"
   _CHAT_CONTEXT_WINDOW_SIZE: "20"
   _GCP_RAG_ENGINE_REGION: "europe-west3"
 

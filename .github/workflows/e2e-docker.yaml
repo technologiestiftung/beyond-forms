@@ -1,0 +1,137 @@
+name: E2E Audit (Docker Compose)
+
+# Runs the wallet-frontend Playwright suite against the repo's own
+# docker-composed backend stack instead of the real staging/prod deployments.
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  e2e-docker:
+    name: Run E2E Audit against docker-composed stack
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Bootstrap local dev environment
+        run: |
+          chmod +x scripts/bootstrap.sh
+          ./scripts/bootstrap.sh
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: services/wallet-frontend/package-lock.json
+      - name: Install Dependencies
+        run: npm ci
+        working-directory: services/wallet-frontend
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: services/wallet-frontend
+
+      - name: Build and start the backend stack
+        env:
+          # Skips real Vertex AI/Gemini calls (document extraction + chat)
+          # and returns canned responses instead — no GCP creds needed.
+          MOCK_LLM_RESPONSES: "true"
+        run: |
+          docker compose up -d --build \
+            postgres \
+            migration-service \
+            authentik-postgresql \
+            init-data \
+            authentik-server \
+            authentik-worker \
+            auth-service \
+            gcs-emulator \
+            pubsub-emulator \
+            rules-engine \
+            forms-filling-service \
+            document-intelligence-service \
+            orchestration-middleware-service \
+            orchestration-middleware-worker \
+            wallet-frontend
+
+      - name: Wait for Authentik to be ready
+        run: |
+          echo "Waiting for authentik-server to finish migrating and start serving..."
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://localhost:9000/-/health/live/; then
+              echo "Authentik is ready."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::Authentik did not become ready in time."
+          docker compose ps
+          docker compose logs --tail=200 authentik-postgresql authentik-server authentik-worker
+          exit 1
+
+      - name: Apply Authentik custom blueprints directly
+        run: |
+          BLUEPRINTS=(
+            "custom/passwordless-sms-enrollment.yaml"
+            "custom/passwordless-sms-login.yaml"
+            "custom/username-password-enrollment.yaml"
+            "custom/oidc-provider.yaml"
+          )
+          if docker compose exec -T authentik-worker python -m manage apply_blueprint "${BLUEPRINTS[@]/#//blueprints/}"; then
+            echo "Blueprints applied."
+            exit 0
+          fi
+          echo "::error::Failed to apply Authentik blueprints."
+          docker compose logs --tail=200 authentik-server authentik-worker
+          exit 1
+
+      - name: Wait for the stack to be ready
+        run: |
+          echo "Waiting for auth-service, orchestration-middleware, document-intelligence-service, and wallet-frontend to be ready..."
+          for i in $(seq 1 60); do
+            AUTH_OK=0
+            MW_OK=0
+            DIS_OK=0
+            FE_OK=0
+            curl -sf -o /dev/null http://localhost:8003/health && AUTH_OK=1
+            curl -sf -o /dev/null http://localhost:8080/health && MW_OK=1
+            curl -sf -o /dev/null http://localhost:8001/health && DIS_OK=1
+            curl -sf -o /dev/null http://localhost:3000 && FE_OK=1
+            if [ "$AUTH_OK" = "1" ] && [ "$MW_OK" = "1" ] && [ "$DIS_OK" = "1" ] && [ "$FE_OK" = "1" ]; then
+              echo "Stack is ready."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::Stack did not become ready in time."
+          docker compose ps
+          docker compose logs --tail=100 auth-service orchestration-middleware-service document-intelligence-service wallet-frontend authentik-server authentik-worker
+          exit 1
+
+      - name: Run E2E Audit against the docker stack
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+        run: |
+          npx playwright test --config=playwright.remote.config.ts
+        working-directory: services/wallet-frontend
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: services/wallet-frontend/playwright-report/
+          retention-days: 14
+
+      - name: Dump container logs on failure
+        if: failure()
+        run: docker compose logs --tail=200
+
+      - name: Tear down the stack
+        if: always()
+        run: docker compose down -v

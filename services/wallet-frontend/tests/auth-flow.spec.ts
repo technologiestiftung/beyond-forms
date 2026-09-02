@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import {
 	generateRandomTestPhoneNumber,
+	isRemoteEnvironment,
 	openManualPhoneForm,
 } from "./helpers/auth";
 
@@ -99,10 +100,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 		// In the local mock, "returning user" is decided by a lazily persisted
 		// mock profile in localStorage (written on first dashboard load). Wait
 		// for it so the re-login below isn't misclassified as a new user.
-		const isRemote =
-			baseURL &&
-			!baseURL.includes("localhost") &&
-			!baseURL.includes("127.0.0.1");
+		const isRemote = isRemoteEnvironment(baseURL);
 		if (!isRemote) {
 			await page.waitForFunction(
 				() =>

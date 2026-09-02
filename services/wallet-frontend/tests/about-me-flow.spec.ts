@@ -36,7 +36,9 @@ test.describe("About Me Progressive Wizard E2E & Accessibility Audits", () => {
 		await page.getByRole("button", { name: "Weiter" }).click();
 
 		// --- Page 2: Birthday & Place ---
-		await expect(page.getByPlaceholder("Geburtsort")).toBeVisible();
+		await expect(page.getByPlaceholder("Geburtsort")).toBeVisible({
+			timeout: 15000,
+		});
 		await page.locator('input[type="date"]').fill("1959-01-20");
 		await page.getByPlaceholder("Geburtsort").fill("Berlin");
 		await page.getByRole("button", { name: "Weiter" }).click();

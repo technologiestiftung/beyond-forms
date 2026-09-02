@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const Buffer: any;
 import { getMockProfileStorageKey } from "../src/utils/profile";
+import { isRemoteEnvironment } from "./helpers/auth";
 
 async function navigateAndBypassTutorial(page: Page, targetUrl: string) {
 	await page.goto(targetUrl);
@@ -20,11 +21,7 @@ async function navigateAndBypassTutorial(page: Page, targetUrl: string) {
 
 test.describe("Bank Statement Mock Auto-Verification", () => {
 	test.beforeEach(async ({ page, baseURL }) => {
-		if (
-			baseURL &&
-			!baseURL.includes("localhost") &&
-			!baseURL.includes("127.0.0.1")
-		) {
+		if (isRemoteEnvironment(baseURL)) {
 			test.skip();
 			return;
 		}
