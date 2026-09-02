@@ -150,6 +150,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      migration-service:
+        condition: service_completed_successfully
       gcs-emulator:
         condition: service_started
       forms-filling-service:
@@ -285,6 +287,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      migration-service:
+        condition: service_completed_successfully
       # authentik-server:
       #   condition: service_started
       # authentik-worker:

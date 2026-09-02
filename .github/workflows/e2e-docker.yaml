@@ -59,22 +59,34 @@ jobs:
             orchestration-middleware-worker \
             wallet-frontend
 
-      - name: Apply Authentik custom blueprints directly
+      - name: Wait for Authentik to be ready
         run: |
-          BLUEPRINTS=(
-            "custom/oidc-provider.yaml"
-            "custom/passwordless-sms-enrollment.yaml"
-            "custom/passwordless-sms-login.yaml"
-            "custom/username-password-enrollment.yaml"
-          )
+          echo "Waiting for authentik-server to finish migrating and start serving..."
           for i in $(seq 1 60); do
-            if docker compose exec -T authentik-worker python -m manage apply_blueprint "${BLUEPRINTS[@]/#//blueprints/}"; then
-              echo "Blueprints applied."
+            if curl -sf -o /dev/null http://localhost:9000/-/health/live/; then
+              echo "Authentik is ready."
               exit 0
             fi
             sleep 5
           done
-          echo "::error::Failed to apply Authentik blueprints in time."
+          echo "::error::Authentik did not become ready in time."
+          docker compose ps
+          docker compose logs --tail=200 authentik-postgresql authentik-server authentik-worker
+          exit 1
+
+      - name: Apply Authentik custom blueprints directly
+        run: |
+          BLUEPRINTS=(
+            "custom/passwordless-sms-enrollment.yaml"
+            "custom/passwordless-sms-login.yaml"
+            "custom/username-password-enrollment.yaml"
+            "custom/oidc-provider.yaml"
+          )
+          if docker compose exec -T authentik-worker python -m manage apply_blueprint "${BLUEPRINTS[@]/#//blueprints/}"; then
+            echo "Blueprints applied."
+            exit 0
+          fi
+          echo "::error::Failed to apply Authentik blueprints."
           docker compose logs --tail=200 authentik-server authentik-worker
           exit 1
 
