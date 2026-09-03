@@ -23,6 +23,7 @@ from src.constants import SLOT_ID_TO_DIS_TYPE
 from src.models import Users
 from src.schemas import UserInformationUpdateSchema
 from src.services.demo_seed_service import PROTECTED_COLUMNS
+from src.services.user_service import RELATION_KEYS
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 PERSONAS_DIR = REPO_ROOT / "demo" / "personas"
@@ -88,7 +89,7 @@ def test_portrait_exists_if_declared(persona):
 
 def test_profile_keys_are_real_columns(persona):
     data, _ = persona
-    unknown = sorted(set(data["profile"]) - USER_COLUMNS)
+    unknown = sorted(set(data["profile"]) - USER_COLUMNS - RELATION_KEYS)
     assert not unknown, f"{data['slug']}: unknown `users` columns {unknown}"
 
 

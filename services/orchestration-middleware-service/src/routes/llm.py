@@ -18,25 +18,45 @@ import logging
 from src.db import get_db
 from src.models import Users as DbUser, ChatMessageRoleType
 from src.prompts import SYSTEM_PROMPT, generate_tool_usage_prompt
-from src.services.user_service import UserService, get_user_service
+from src.services.user_service import (
+    ProfileWriteError,
+    UserService,
+    apply_profile_key,
+    get_user_service,
+)
 from src.services.conversation_service import ConversationService, get_conversation_service
 from src.services.rag_service import search_knowledge_base
 from beyondforms.auth import User as AuthUser, get_current_user, require_authenticated_user
-from src.schemas import UserInformationUpdateSchema
+from src.schemas import AssociatedPersonSchema, UserInformationUpdateSchema
 from src.tools import AVAILABLE_TOOLS
 from src.utils import ndjson_done, ndjson_error, ndjson_token
 
 
 _USER_FIELD_NAMES: frozenset[str] = frozenset(UserInformationUpdateSchema.model_fields)
-_ENUM_ALLOWED_VALUES: dict[str, str] = {}
 
-for name, field_info in UserInformationUpdateSchema.model_fields.items():
-    annotation = field_info.annotation
+
+def _unwrap_annotation(annotation):
+    """`Optional[X]` -> `X`. Every field on these schemas is optional, so the enum is
+    always one level in."""
     args = typing.get_args(annotation)
     if isinstance(args, tuple) and args:
-        annotation = args[0]
+        return args[0]
+    return annotation
+
+
+def _allowed_enum_values(annotation) -> str:
+    """A comma-separated list of an enum field's allowed values, or "" if not an enum."""
+    annotation = _unwrap_annotation(annotation)
     if isinstance(annotation, type) and issubclass(annotation, enum.Enum):
-        _ENUM_ALLOWED_VALUES[name] = ", ".join(repr(m.value) for m in annotation)
+        return ", ".join(repr(m.value) for m in annotation)
+    return ""
+
+
+_ENUM_ALLOWED_VALUES: dict[str, str] = {
+    name: allowed
+    for name, field_info in UserInformationUpdateSchema.model_fields.items()
+    if (allowed := _allowed_enum_values(field_info.annotation))
+}
 
 
 MAX_TOOL_CALL_ROUNDS = 5
@@ -84,10 +104,7 @@ def _update_user_data_sync(updates: dict, current_user: AuthUser, db: Session, u
         if col_name in _USER_FIELD_NAMES:
             if isinstance(value, str) and col_name in _ENUM_ALLOWED_VALUES:
                 try:
-                    annotation = UserInformationUpdateSchema.model_fields[col_name].annotation
-                    args = typing.get_args(annotation)
-                    if args:
-                        annotation = args[0]
+                    annotation = _unwrap_annotation(UserInformationUpdateSchema.model_fields[col_name].annotation)
                     converted = _convert_str_to_enum(annotation, value)
                     value = converted
                 except ValueError as e:
@@ -105,7 +122,12 @@ def _update_user_data_sync(updates: dict, current_user: AuthUser, db: Session, u
 
     try:
         for key, value in updates_by_table.items():
-            setattr(user_row, key, value)
+            try:
+                if not apply_profile_key(user_row, key, value):
+                    setattr(user_row, key, value)
+            except ProfileWriteError as e:
+                db.rollback()
+                return {"error": str(e)}
         db.commit()
     except Exception:
         db.rollback()
@@ -140,21 +162,38 @@ async def get_user_data(current_user: AuthUser, db: Session, user_service: UserS
     return await asyncio.to_thread(_get_user_data_sync, current_user, db, user_service)
 
 
+def _field_lines(model: type[BaseModel], indent: str = "  ") -> list[str]:
+    """One `name: type` line per field, with enum values and descriptions spelled out.
+    A field the model rejects unless it is present is marked required, so a caller told
+    to not guess field names actually has enough to construct a valid value."""
+    lines: list[str] = []
+    for name, field_info in sorted(model.model_fields.items()):
+        annotation = field_info.annotation
+        type_label = annotation.__name__ if isinstance(annotation, type) else str(annotation)
+        line = f"{indent}{name}: {type_label}"
+        allowed = _allowed_enum_values(annotation)
+        if allowed:
+            line += f" — allowed values: {allowed}"
+        if field_info.is_required():
+            line += " — REQUIRED"
+        if field_info.description:
+            line += f" — {field_info.description}"
+        lines.append(line)
+    return lines
+
+
 async def get_user_table_schema() -> str:
     """
     Returns the full schema for user-related tables.
     Enum fields include their allowed values.
+
+    `associated_persons` is a nested list, so its own fields are spelled out too —
+    without them a caller cannot know that `association_type` is mandatory, and every
+    write it attempts is rejected.
     """
-    col_lines: list[str] = []
-    for name, field_info in sorted(UserInformationUpdateSchema.model_fields.items()):
-        type_label = (
-            field_info.annotation.__name__ if isinstance(field_info.annotation, type) else str(field_info.annotation)
-        )
-        if name in _ENUM_ALLOWED_VALUES:
-            col_lines.append(f"  {name}: {type_label} — allowed values: {_ENUM_ALLOWED_VALUES[name]}")
-        else:
-            col_lines.append(f"  {name}: {type_label}")
-    return "Table 'users':\n" + "\n".join(col_lines)
+    schema = "Table 'users':\n" + "\n".join(_field_lines(UserInformationUpdateSchema))
+    person_fields = "\n".join(_field_lines(AssociatedPersonSchema))
+    return f"{schema}\n\nEach entry of 'associated_persons' is an object with these fields:\n{person_fields}"
 
 
 async def check_progress_status(current_user: AuthUser = Depends(get_current_user)) -> dict:
