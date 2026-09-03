@@ -1,4 +1,7 @@
+import datetime
 import decimal
+import importlib.util
+import pathlib
 import uuid
 import pytest
 from unittest.mock import MagicMock, patch
@@ -10,7 +13,9 @@ from src.services.form_service import (
     _extract_required_context_fields,
     _is_context_value_filled,
 )
-from src.models import Users
+from src.services.form_context import age_context, derived_context, person_context
+from src.models import AssociatedPersons, AssociationType, MaritalStatusType, Users
+from src.schemas import UserInformationUpdateSchema, UserProfileValidationSchema
 
 
 @pytest.fixture
@@ -679,3 +684,86 @@ async def test_get_completeness_ignores_documents_namespace(form_service, mock_u
         filled, total = await form_service.get_completeness("test_form", mock_user)
 
     assert (filled, total) == (0, 0)
+
+
+def test_person_context_splits_household_from_partner():
+    """A partner living elsewhere belongs under `partner` but not `household_members`,
+    and the German label fields come along so form slots need no translation chain."""
+    separated_spouse = AssociatedPersons(
+        association_type=AssociationType.SPOUSE,
+        marital_status=MaritalStatusType.MARRIED,
+        nationality="DE",
+        lives_in_household=False,
+        sort_order=1,
+        first_name="Ingrid",
+    )
+    child = AssociatedPersons(
+        association_type=AssociationType.CHILD, lives_in_household=True, sort_order=0, first_name="Jonas"
+    )
+
+    ctx = person_context([separated_spouse, child])
+
+    assert [p["first_name"] for p in ctx["household_members"]] == ["Jonas"]
+    assert ctx["household_members_count"] == 1
+    assert ctx["partner"]["first_name"] == "Ingrid"
+    assert ctx["partner"]["marital_status_de"] == "verheiratet"
+    assert ctx["partner"]["nationality_de"] == "deutsch"
+    assert person_context([child])["partner"] is None
+
+
+def test_person_context_labels_fall_back_without_inventing():
+    """An unmapped country keeps its ISO code; a missing enum yields an empty string
+    rather than a guessed German word on a benefits form."""
+    person = AssociatedPersons(association_type=AssociationType.OTHER, lives_in_household=True, nationality="JP")
+    ctx = person_context([person])
+    assert ctx["household_members"][0]["nationality_de"] == "JP"
+    assert ctx["household_members"][0]["marital_status_de"] == ""
+
+
+def test_age_context_exposes_what_the_dropped_view_derived():
+    today = datetime.date.today()
+    minor = age_context(today.replace(year=today.year - 10))
+    assert (minor["age"], minor["is_adult"], minor["has_reached_retirement_age"]) == (10, False, False)
+
+    pensioner = age_context(today.replace(year=today.year - 70))
+    assert (pensioner["age"], pensioner["is_adult"], pensioner["has_reached_retirement_age"]) == (70, True, True)
+
+    assert age_context(None) == {"age": None, "is_adult": None, "has_reached_retirement_age": None}
+
+
+def test_validator_builds_its_context_from_this_service():
+    """`forms/scripts/validate_mappings.py` learns the derived keys by loading
+    `form_context` and calling it, so it cannot drift from the running service. This
+    asserts that load path still resolves and yields the same keys."""
+    validator_path = pathlib.Path(__file__).resolve().parents[3] / "forms/scripts/validate_mappings.py"
+    # Deliberately not skipped when missing: a guard that switches itself off on a repo
+    # layout change is worse than no guard.
+    assert validator_path.exists(), f"validator not found at {validator_path}"
+
+    spec = importlib.util.spec_from_file_location("_validate_mappings_for_test", validator_path)
+    validator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(validator)
+
+    person = AssociatedPersons(association_type=AssociationType.SPOUSE, lives_in_household=True, sort_order=0)
+    expected = derived_context({"date_of_birth": datetime.date(1950, 1, 1)}, [person])
+    context = validator.build_context()
+
+    assert set(expected) <= set(context), f"validator is missing derived keys: {sorted(set(expected) - set(context))}"
+
+
+@pytest.mark.parametrize(
+    "schema, ignored",
+    [
+        (UserInformationUpdateSchema, set()),
+        (UserProfileValidationSchema, {"validate_entire_form"}),
+    ],
+)
+def test_write_schemas_only_accept_writable_user_fields(schema, ignored):
+    """Both schemas feed a `setattr` loop over a `users` row. A field that is neither a
+    column nor a relationship is accepted, assigned to a plain Python attribute, and
+    discarded at commit — the caller gets a 200 and their answer is gone."""
+    writable = {column.name for column in Users.__table__.columns} | {
+        relationship.key for relationship in Users.__mapper__.relationships
+    }
+    offered = set(schema.model_fields) - ignored
+    assert not offered - writable, f"{schema.__name__} accepts non-persistable fields: {sorted(offered - writable)}"

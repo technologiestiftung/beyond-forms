@@ -6,7 +6,6 @@ import uuid
 
 from sqlalchemy import (
     Boolean,
-    Column,
     Date,
     DateTime,
     Enum,
@@ -16,7 +15,6 @@ from sqlalchemy import (
     Numeric,
     PrimaryKeyConstraint,
     String,
-    Table,
     Text,
     UniqueConstraint,
     Uuid,
@@ -42,6 +40,16 @@ class AccomodationType(str, enum.Enum):
     CONDOMINIUM = "Condominium"
     RELATIVE = "Relative"
     SHARED_HOUSEHOLD = "Shared Household"
+
+
+class AssociationType(str, enum.Enum):
+    SPOUSE = "Spouse"
+    REGISTERED_PARTNER = "Registered Partner"
+    COHABITING_PARTNER = "Cohabiting Partner"
+    CHILD = "Child"
+    PARENT = "Parent"
+    OTHER_RELATIVE = "Other Relative"
+    OTHER = "Other"
 
 
 class ChatMessageRoleType(str, enum.Enum):
@@ -109,6 +117,30 @@ class MaritalStatusType(str, enum.Enum):
     REGISTERED_CIVIL_PARTNERSHIP = "Registered Civil Partnership"
     DIVORCED = "Divorced"
     WIDOWED = "Widowed"
+
+
+# German labels for enums that forms print as free text rather than a checkbox row.
+MARITAL_STATUS_DE = {
+    MaritalStatusType.SINGLE: "ledig",
+    MaritalStatusType.MARRIED: "verheiratet",
+    MaritalStatusType.COHABITING: "in eheähnlicher Gemeinschaft",
+    MaritalStatusType.PERMANENTLY_SEPARATED: "dauernd getrennt lebend",
+    MaritalStatusType.REGISTERED_CIVIL_PARTNERSHIP: "eingetragene Lebenspartnerschaft",
+    MaritalStatusType.DIVORCED: "geschieden",
+    MaritalStatusType.WIDOWED: "verwitwet",
+}
+
+# Only the codes the personas and forms have actually needed; anything else falls back to
+# the raw ISO code rather than a guessed adjective.
+NATIONALITY_DE = {
+    "DE": "deutsch",
+    "AT": "österreichisch",
+    "CH": "schweizerisch",
+    "FR": "französisch",
+    "IT": "italienisch",
+    "PL": "polnisch",
+    "TR": "türkisch",
+}
 
 
 class SocialSecurityTypeType(str, enum.Enum):
@@ -303,7 +335,6 @@ class Users(Base):
     assets_description: Mapped[Optional[str]] = mapped_column(Text)
     income_sources: Mapped[Optional[list[str]]] = mapped_column(JSONB)
     assets_types: Mapped[Optional[list[str]]] = mapped_column(JSONB)
-    household_members: Mapped[Optional[list[dict]]] = mapped_column(JSONB)
     has_costly_medical_nutrition: Mapped[Optional[bool]] = mapped_column(Boolean)
     is_care_dependent: Mapped[Optional[bool]] = mapped_column(Boolean)
     inpatient_facility_move_in_date: Mapped[Optional[datetime.date]] = mapped_column(Date)
@@ -352,6 +383,25 @@ class Users(Base):
     commercially_used_area_sqm: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
     is_victim_of_national_socialist_persecution: Mapped[Optional[bool]] = mapped_column(Boolean)
 
+    # Wohngeld and Bewohnerparkausweis yes/no questions. Nullable: NULL means not asked.
+    is_wohngeld_first_application: Mapped[Optional[bool]] = mapped_column(Boolean)
+    receives_wohngeld_for_other_dwelling: Mapped[Optional[bool]] = mapped_column(Boolean)
+    household_member_died_recently: Mapped[Optional[bool]] = mapped_column(Boolean)
+    household_size_will_change: Mapped[Optional[bool]] = mapped_column(Boolean)
+    receives_other_transfer_benefits: Mapped[Optional[bool]] = mapped_column(Boolean)
+    pays_child_or_spousal_support: Mapped[Optional[bool]] = mapped_column(Boolean)
+    receives_support_from_others: Mapped[Optional[bool]] = mapped_column(Boolean)
+    expects_future_income_change: Mapped[Optional[bool]] = mapped_column(Boolean)
+    assets_exceed_wohngeld_threshold: Mapped[Optional[bool]] = mapped_column(Boolean)
+    related_to_landlord: Mapped[Optional[bool]] = mapped_column(Boolean)
+    service_costs_included_in_rent: Mapped[Optional[bool]] = mapped_column(Boolean)
+    rent_paid_partly_by_third_party: Mapped[Optional[bool]] = mapped_column(Boolean)
+    receives_rent_contribution_from_others: Mapped[Optional[bool]] = mapped_column(Boolean)
+    expects_rent_change: Mapped[Optional[bool]] = mapped_column(Boolean)
+    wohngeld_payment_to_applicant: Mapped[Optional[bool]] = mapped_column(Boolean)
+    consents_to_bank_statement_retention: Mapped[Optional[bool]] = mapped_column(Boolean)
+    consents_to_registry_verification: Mapped[Optional[bool]] = mapped_column(Boolean)
+
     conversations: Mapped[list["Conversations"]] = relationship(
         "Conversations", back_populates="fk_user", cascade="all, delete-orphan"
     )
@@ -364,22 +414,62 @@ class Users(Base):
     user_documents: Mapped[list["UserDocuments"]] = relationship(
         "UserDocuments", back_populates="fk_user", cascade="all, delete-orphan"
     )
+    associated_persons: Mapped[list["AssociatedPersons"]] = relationship(
+        "AssociatedPersons",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        order_by="AssociatedPersons.sort_order",
+    )
 
 
-t_users_age_view = Table(
-    "users_age_view",
-    Base.metadata,
-    Column("id", Uuid),
-    Column("first_name", String(255)),
-    Column("last_name", String(255)),
-    Column("date_of_birth", Date),
-    Column("place_of_birth", String(255)),
-    Column("created_at", DateTime(True)),
-    Column("updated_at", DateTime(True)),
-    Column("age", Integer),
-    Column("is_adult", Boolean),
-    Column("has_reached_retirement_age", Boolean),
-)
+class AssociatedPersons(Base):
+    """A separated spouse matters to several forms without being a household member,
+    hence `association_type` and `lives_in_household` being independent."""
+
+    __tablename__ = "associated_persons"
+    __table_args__ = (
+        ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE", name="associated_persons_user_id_fkey"),
+        PrimaryKeyConstraint("id", name="associated_persons_pkey"),
+        Index("associated_persons_user_id_idx", "user_id", "sort_order"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, server_default=text("gen_random_uuid()"))
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
+    association_type: Mapped[AssociationType] = mapped_column(
+        Enum(AssociationType, values_callable=lambda cls: [member.value for member in cls], name="association_type"),
+        nullable=False,
+    )
+    lives_in_household: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+    # Forms have fixed person slots (Person 1..8), so the order must be stable.
+    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("0"))
+
+    first_name: Mapped[Optional[str]] = mapped_column(String(255))
+    last_name: Mapped[Optional[str]] = mapped_column(String(255))
+    birth_name: Mapped[Optional[str]] = mapped_column(String(255))
+    date_of_birth: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    place_of_birth: Mapped[Optional[str]] = mapped_column(String(255))
+    legal_gender: Mapped[Optional[GenderType]] = mapped_column(
+        Enum(GenderType, values_callable=lambda cls: [member.value for member in cls], name="gender_type")
+    )
+    marital_status: Mapped[Optional[MaritalStatusType]] = mapped_column(
+        Enum(
+            MaritalStatusType, values_callable=lambda cls: [member.value for member in cls], name="marital_status_type"
+        )
+    )
+    nationality: Mapped[Optional[str]] = mapped_column(String(2))
+    second_nationality: Mapped[Optional[str]] = mapped_column(String(2))
+    # Printed verbatim on the forms; no enum to map onto.
+    relationship_to_applicant: Mapped[Optional[str]] = mapped_column(String(255))
+    employment_status: Mapped[Optional[str]] = mapped_column(String(255))
+    monthly_income: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
+    monthly_pension_income: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
+    has_own_income: Mapped[Optional[bool]] = mapped_column(Boolean)
+    is_alimony_obligated: Mapped[Optional[bool]] = mapped_column(Boolean)
+
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text("now()"))
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text("now()"))
+
+    user: Mapped["Users"] = relationship("Users", back_populates="associated_persons")
 
 
 class Conversations(Base):

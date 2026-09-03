@@ -6,7 +6,6 @@
   "source": "demo/research/02_helmut.md",
   "portrait": "portraits/Helmut.png",
   "scenario": "The only persona built entirely from real committed scans — Personalausweis, Mietvertrag, Rentenbescheid, Kontoauszug, Heizkostenabrechnung, Versicherungsbescheinigung — with every profile figure read directly off them. Use this one when you want a document you can open and trust, not a synthetic stand-in.",
-
   "profile": {
     "first_name": "Helmut",
     "last_name": "Klar",
@@ -25,53 +24,49 @@
     "displaced_status": null,
     "residence_status": null,
     "license_plate": "B-HK 1947",
-
     "street": "Hauptstraße",
     "house_number": "4",
     "zip_code": "10820",
     "city": "Berlin",
     "state": "Berlin",
     "district": "Tempelhof-Schöneberg",
-
     "persons_in_household_count": 2,
-
     "social_security_type": "Pension Insurance",
     "health_insurance_provider": "AOK Nordost",
     "health_insurance_status": "Compulsory Insurance",
     "pension_insurance_provider": "Deutsche Rentenversicherung Bund",
     "pension_insurance_no": "52 171060 S 060",
-
     "is_currently_employed": false,
     "ability_to_work": "Fully able",
     "has_permanent_reduction_in_earning_capacity": false,
     "has_inpatient_facility_accommodation": false,
-
     "accomodation_type": "Rental Apartment",
     "tenancy_status": "Main Tenant",
     "rent_total": 430.87,
-    "heating_costs": 25.00,
-    "hot_water_costs": 0.00,
-    "cable_tv_costs": 0.00,
+    "heating_costs": 25.0,
+    "hot_water_costs": 0.0,
+    "cable_tv_costs": 0.0,
     "number_of_rooms": 3,
-    "living_area": 68.00,
+    "living_area": 68.0,
     "sublet_room_count": null,
-    "sublet_rent_income": 0.00,
+    "sublet_rent_income": 0.0,
     "rent_paid_until": "2026-07-31",
     "landlord_name": "Wohngenossenschaft Berlin eG",
     "heating_type": "Zentralheizung",
     "free_housing_right_holder": null,
-
-    "monthly_income": 650.00,
-    "income_sources": ["pension"],
+    "monthly_income": 650.0,
+    "income_sources": [
+      "pension"
+    ],
     "has_assets": true,
-    "assets_types": ["Liquid Assets"],
+    "assets_types": [
+      "Liquid Assets"
+    ],
     "assets_description": null,
-
     "bank_name": "Sparkasse Musterstadt",
     "account_holder": "Helmut Klar",
     "iban": "DE65940594210000123456",
     "bic": null,
-
     "has_received_previous_benefits": true,
     "previous_benefits_authority": "Bezirksamt Tempelhof-Schöneberg, Amt für Soziales, Tempelhofer Damm 165, 12099 Berlin",
     "previous_benefits_period": "01.03.2021 - 30.06.2026",
@@ -81,7 +76,6 @@
     "are_one_time_payments_expected": false,
     "gave_away_assets_last_10_years": false,
     "gross_negligence_last_10_years": false,
-
     "has_disability_id": false,
     "disability_valid_until": null,
     "merkzeichen": null,
@@ -89,40 +83,56 @@
     "is_care_dependent": false,
     "has_costly_medical_nutrition": false,
     "is_victim_of_national_socialist_persecution": false,
-
     "identification_numbers": "L7XKP29TM",
     "tax_id": "63 815 402 917",
-
     "is_subsidized_housing": false,
     "has_other_residence": false,
     "has_secondary_residence": false,
     "has_garage_costs": false,
-    "garage_costs": 0.00,
+    "garage_costs": 0.0,
     "has_household_energy_costs": false,
-    "household_energy_costs": 0.00,
+    "household_energy_costs": 0.0,
     "is_living_area_used_commercially": false,
     "commercially_used_area_sqm": null,
     "is_student_or_trainee": false,
-    "professional_expenses": 0.00,
+    "professional_expenses": 0.0,
     "has_childcare_expenses": false,
-
-    "household_members": [
+    "associated_persons": [
       {
+        "association_type": "Spouse",
+        "lives_in_household": true,
+        "sort_order": 0,
         "first_name": "Ingrid",
         "last_name": "Klar",
         "birth_name": "Neumann",
         "date_of_birth": "1949-11-03",
         "place_of_birth": "Berlin",
-        "nationality": "deutsch",
-        "gender": "Female",
-        "marital_status": "verheiratet",
-        "employment_status": "Rentnerin",
+        "legal_gender": "Female",
+        "marital_status": "Married",
+        "nationality": "DE",
         "relationship_to_applicant": "Ehefrau",
-        "monthly_pension_income": 520.00
+        "employment_status": "Rentnerin",
+        "monthly_pension_income": 520.0
       }
-    ]
+    ],
+    "is_wohngeld_first_application": true,
+    "receives_wohngeld_for_other_dwelling": false,
+    "household_member_died_recently": false,
+    "household_size_will_change": false,
+    "receives_other_transfer_benefits": false,
+    "pays_child_or_spousal_support": false,
+    "receives_support_from_others": false,
+    "expects_future_income_change": false,
+    "assets_exceed_wohngeld_threshold": false,
+    "related_to_landlord": false,
+    "service_costs_included_in_rent": false,
+    "rent_paid_partly_by_third_party": false,
+    "receives_rent_contribution_from_others": false,
+    "expects_rent_change": false,
+    "wohngeld_payment_to_applicant": true,
+    "consents_to_bank_statement_retention": true,
+    "consents_to_registry_verification": true
   },
-
   "applications": [
     {
       "form_type": "antrag_grundsicherung",
@@ -132,35 +142,14 @@
     {
       "form_type": "antrag_wohngeld",
       "status": "in_progress",
-      "form_data": {
-        "is_wohngeld_first_application": true,
-        "receives_wohngeld_for_other_dwelling": false,
-        "has_unlisted_household_members": false,
-        "household_member_died_recently": false,
-        "household_size_will_change": false,
-        "receives_other_transfer_benefits": false,
-        "pays_child_or_spousal_support": false,
-        "receives_support_from_others": false,
-        "expects_future_income_change": false,
-        "assets_exceed_wohngeld_threshold": false,
-        "related_to_landlord": false,
-        "service_costs_included_in_rent": false,
-        "rent_paid_partly_by_third_party": false,
-        "receives_rent_contribution_from_others": false,
-        "expects_rent_change": false,
-        "wohngeld_payment_to_applicant": true,
-        "consents_to_bank_statement_retention": true
-      }
+      "form_data": {}
     },
     {
       "form_type": "antrag_bewohnerparkausweis",
       "status": "in_progress",
-      "form_data": {
-        "consents_to_registry_verification": true
-      }
+      "form_data": {}
     }
   ],
-
   "documents": [
     {
       "document_type": "id_card",
@@ -194,8 +183,8 @@
         "tenant_address": "Hauptstr. 4, 10820 Berlin",
         "net_cold_rent": 355.87,
         "monthly_total_rent": 430.87,
-        "operating_costs": 75.00,
-        "heating_costs": 25.00,
+        "operating_costs": 75.0,
+        "heating_costs": 25.0,
         "square_meters": 68.0,
         "is_main_tenant": true,
         "has_sub_tenants": false,
@@ -215,7 +204,7 @@
         "case_number": "4617 (000-01)",
         "start_date_of_pension": "2026-01-01",
         "end_date_of_pension": null,
-        "monthly_amount": 650.00,
+        "monthly_amount": 650.0,
         "back_pay_amount": null,
         "date_of_issue": "2026-04-23",
         "is_granted": true
@@ -235,7 +224,7 @@
         "statement_date": "2026-04-04",
         "account_balance": 5267.56,
         "amount_rent": 430.87,
-        "amount_pension": 650.00,
+        "amount_pension": 650.0,
         "amount_liability_insurance": 52.67
       }
     },
@@ -264,22 +253,48 @@
       }
     }
   ],
-
   "missing_documents": [
     {
       "document_type": "cooperation_agreement",
       "reason": "not_applicable",
       "note": "A Kooperationsvereinbarung belongs to SGB II (Bürgergeld), not to Grundsicherung im Alter under SGB XII. Helmut would never be asked for one."
     },
-    { "document_type": "registration", "reason": "not_yet_supplied", "note": "Meldebescheinigung — no scan exists; the same values already come from his profile and identity_document, so this is nice-to-have, not blocking." },
-    { "document_type": "bank", "reason": "not_yet_supplied", "note": "Kontobestätigung — his IBAN is already established via the Kontoauszug." },
-    { "document_type": "utility_bill", "reason": "not_yet_supplied", "note": "Betriebskostenabrechnung — no scan exists." },
-    { "document_type": "housing", "reason": "not_yet_supplied", "note": "Anlage KdU — rent and heating are already covered by the Mietvertrag and Heizkostenabrechnung." },
-    { "document_type": "household", "reason": "not_yet_supplied", "note": "Haushaltsbescheinigung — persons_in_household_count already covers this from the profile." },
-    { "document_type": "income", "reason": "not_yet_supplied", "note": "Einkommenserklärung — his income is already established via the Rentenbescheid and Kontoauszug." },
-    { "document_type": "assets", "reason": "not_yet_supplied", "note": "Vermögenserklärung — his balance is already established via the Kontoauszug." }
+    {
+      "document_type": "registration",
+      "reason": "not_yet_supplied",
+      "note": "Meldebescheinigung — no scan exists; the same values already come from his profile and identity_document, so this is nice-to-have, not blocking."
+    },
+    {
+      "document_type": "bank",
+      "reason": "not_yet_supplied",
+      "note": "Kontobestätigung — his IBAN is already established via the Kontoauszug."
+    },
+    {
+      "document_type": "utility_bill",
+      "reason": "not_yet_supplied",
+      "note": "Betriebskostenabrechnung — no scan exists."
+    },
+    {
+      "document_type": "housing",
+      "reason": "not_yet_supplied",
+      "note": "Anlage KdU — rent and heating are already covered by the Mietvertrag and Heizkostenabrechnung."
+    },
+    {
+      "document_type": "household",
+      "reason": "not_yet_supplied",
+      "note": "Haushaltsbescheinigung — persons_in_household_count already covers this from the profile."
+    },
+    {
+      "document_type": "income",
+      "reason": "not_yet_supplied",
+      "note": "Einkommenserklärung — his income is already established via the Rentenbescheid and Kontoauszug."
+    },
+    {
+      "document_type": "assets",
+      "reason": "not_yet_supplied",
+      "note": "Vermögenserklärung — his balance is already established via the Kontoauszug."
+    }
   ],
-
   "derived": [
     "birth_name",
     "date_of_birth",
@@ -298,7 +313,7 @@
     "previous_benefits_ref_no",
     "identification_numbers",
     "tax_id",
-    "household_members",
+    "associated_persons",
     "is_subsidized_housing",
     "has_other_residence",
     "has_secondary_residence",

@@ -1,0 +1,31 @@
+name: Validate Form Mappings
+
+# Every `{{ }}` expression in forms/mappings/*.toml must resolve against a real `users`
+# column, a key form_context derives, or the `documents` OCR namespace. Without this gate,
+# a mapping referencing a field that does not exist fails silently: the PDF field is left
+# blank and nothing reports it.
+on:
+  pull_request:
+    paths:
+      - "forms/mappings/**"
+      - "forms/scripts/validate_mappings.py"
+      - "services/orchestration-middleware-service/src/models.py"
+      - "services/orchestration-middleware-service/src/schemas.py"
+      - "services/orchestration-middleware-service/src/services/form_context.py"
+      - "libs/document-schemas/**"
+      - ".github/workflows/validate-form-mappings.yaml"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate Mapping References
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Validate mapping references
+        run: uv run --frozen --package orchestration-middleware-service forms/scripts/validate_mappings.py

@@ -4,10 +4,21 @@
   "title": "BeyondForms demo persona",
   "description": "A reviewable fixture describing one demo account: the `users` row, its application, its documents, and the research context that the database cannot hold. Materialised by src/services/demo_seed_service.py.",
   "type": "object",
-  "required": ["slug", "phone_number", "title", "source", "scenario", "profile", "applications", "documents"],
+  "required": [
+    "slug",
+    "phone_number",
+    "title",
+    "source",
+    "scenario",
+    "profile",
+    "applications",
+    "documents"
+  ],
   "additionalProperties": false,
   "properties": {
-    "$schema": { "type": "string" },
+    "$schema": {
+      "type": "string"
+    },
     "slug": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$",
@@ -18,7 +29,9 @@
       "description": "Must be a Bundesnetzagentur drama number so is_test_account() accepts it. See libs/auth/src/beyondforms/auth/test_accounts.py.",
       "pattern": "^(\\+49)?(3023125|6990009|4066969|2214710|8999998)[0-9]+$"
     },
-    "title": { "type": "string" },
+    "title": {
+      "type": "string"
+    },
     "source": {
       "type": "string",
       "description": "Repo-relative path to the research document this persona is derived from.",
@@ -32,45 +45,80 @@
       "type": "string",
       "description": "What this persona is for — which part of the process it exercises."
     },
-
     "profile": {
       "type": "object",
-      "description": "Keys must be `users` column names. Values must satisfy the DB enums. Validated in tests/test_demo_personas.py.",
+      "description": "Keys must be `users` column names, or `associated_persons` (a relationship, whose entries follow AssociatedPersonSchema). Values must satisfy the DB enums. Validated in tests/test_demo_personas.py.",
       "minProperties": 1
     },
-
     "applications": {
       "type": "array",
       "description": "One entry per form_type this persona needs scoped `form_data` for. Each is get-or-created by form_type. Documents attach to the first entry's row (user_documents has a single fk_application_id).",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["form_type", "status"],
+        "required": [
+          "form_type",
+          "status"
+        ],
         "additionalProperties": false,
         "properties": {
-          "form_type": { "type": "string" },
-          "status": { "enum": ["in_progress", "completed", "submitted"] },
-          "form_data": { "type": "object" }
+          "form_type": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "in_progress",
+              "completed",
+              "submitted"
+            ]
+          },
+          "form_data": {
+            "type": "object"
+          }
         }
       }
     },
-
     "documents": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["document_type", "status", "asset", "raw_data"],
+        "required": [
+          "document_type",
+          "status",
+          "asset",
+          "raw_data"
+        ],
         "additionalProperties": false,
         "properties": {
           "document_type": {
             "description": "Frontend slot id, as written by src/worker.py. Not a document-intelligence registry name.",
             "enum": [
-              "id_card", "registration", "health_insurance", "pension_notice", "stmt3",
-              "income", "assets", "bank", "rent", "utility_bill", "heating", "housing",
-              "household", "cooperation_agreement", "OTHER"
+              "id_card",
+              "registration",
+              "health_insurance",
+              "pension_notice",
+              "stmt3",
+              "income",
+              "assets",
+              "bank",
+              "rent",
+              "utility_bill",
+              "heating",
+              "housing",
+              "household",
+              "cooperation_agreement",
+              "OTHER"
             ]
           },
-          "status": { "enum": ["processing", "ready_for_review", "completed", "failed", "verified"] },
+          "status": {
+            "enum": [
+              "processing",
+              "ready_for_review",
+              "completed",
+              "failed",
+              "verified"
+            ]
+          },
           "confidence_score": {
             "type": "number",
             "minimum": 0,
@@ -84,15 +132,26 @@
           "asset": {
             "description": "Either a filename resolved against DEMO_ASSETS_PATH, or an instruction to generate a watermarked demo PDF from raw_data.",
             "oneOf": [
-              { "type": "string" },
+              {
+                "type": "string"
+              },
               {
                 "type": "object",
-                "required": ["generate", "title"],
+                "required": [
+                  "generate",
+                  "title"
+                ],
                 "additionalProperties": false,
                 "properties": {
-                  "generate": { "const": true },
-                  "title": { "type": "string" },
-                  "subtitle": { "type": "string" }
+                  "generate": {
+                    "const": true
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "subtitle": {
+                    "type": "string"
+                  }
                 }
               }
             ]
@@ -103,52 +162,93 @@
           },
           "user_error_code": {
             "description": "Only meaningful for failed / ready_for_review documents. These four are the codes DatenPrufenForm.tsx renders a message for.",
-            "enum": ["PAGINATION_MISSING_PAGES", "LEGIBILITY_ISSUES", "DATA_CONFLICTS", "OLD_STATEMENT_WARNING"]
+            "enum": [
+              "PAGINATION_MISSING_PAGES",
+              "LEGIBILITY_ISSUES",
+              "DATA_CONFLICTS",
+              "OLD_STATEMENT_WARNING"
+            ]
           },
-          "internal_error_log": { "type": "string" }
+          "internal_error_log": {
+            "type": "string"
+          }
         }
       }
     },
-
     "missing_documents": {
       "type": "array",
       "description": "Document slots this persona does NOT have, and why. A to-do list for authoring real fixtures, and a record of which absences are intentional so nobody 'fixes' them.",
       "items": {
         "type": "object",
-        "required": ["document_type", "reason", "note"],
+        "required": [
+          "document_type",
+          "reason",
+          "note"
+        ],
         "additionalProperties": false,
         "properties": {
           "document_type": {
             "enum": [
-              "id_card", "registration", "health_insurance", "pension_notice", "stmt3",
-              "income", "assets", "bank", "rent", "utility_bill", "heating", "housing",
-              "household", "cooperation_agreement"
+              "id_card",
+              "registration",
+              "health_insurance",
+              "pension_notice",
+              "stmt3",
+              "income",
+              "assets",
+              "bank",
+              "rent",
+              "utility_bill",
+              "heating",
+              "housing",
+              "household",
+              "cooperation_agreement"
             ]
           },
           "reason": {
             "description": "deliberate = absence is the point of the persona, do not add it. not_applicable = this person would never be asked for it. not_yet_supplied = fair game to author.",
-            "enum": ["deliberate", "not_applicable", "not_yet_supplied"]
+            "enum": [
+              "deliberate",
+              "not_applicable",
+              "not_yet_supplied"
+            ]
           },
-          "note": { "type": "string" }
+          "note": {
+            "type": "string"
+          }
         }
       }
     },
-
     "derived": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Profile keys invented to satisfy the schema rather than taken from the research document (IBANs, insurance numbers, amounts the doc leaves open). Lets a reviewer — or an agent — tell fixture invention from researched fact."
     },
-
     "research": {
       "type": "object",
       "description": "Narrative context the seeder ignores. Lets a reviewer — or an agent — reason about the person, not just the row.",
       "additionalProperties": true,
       "properties": {
-        "core_barrier": { "type": "string" },
-        "usage_context": { "type": "string" },
-        "key_wishes": { "type": "array", "items": { "type": "string" } },
-        "key_fears": { "type": "array", "items": { "type": "string" } },
+        "core_barrier": {
+          "type": "string"
+        },
+        "usage_context": {
+          "type": "string"
+        },
+        "key_wishes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "key_fears": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "not_representable": {
           "type": "object",
           "description": "Facts from the research document that no `users` column can hold. Each is a filed schema gap.",
@@ -159,7 +259,9 @@
           "description": "Figures the research document itself flags as inconsistent. Recorded verbatim rather than silently fixed.",
           "additionalProperties": true
         },
-        "notes": { "type": "string" }
+        "notes": {
+          "type": "string"
+        }
       }
     }
   }
