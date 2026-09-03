@@ -195,21 +195,16 @@ async def extract_generic_envelope_from_document(
     Returns both 'extracted_data' and 'extraction_metadata' fields.
     """
     system_prompt = """# Objective
-Act as a precise Entity Extraction Engine with self-correction auditing. Convert the source document into structured data by identifying the requested attributes and auditing the confidence of each extraction with field-level lineage.
+Act as a precise Entity Extraction Engine with self-correction auditing. Convert the source document into structured data by identifying the requested attributes.
 
 # Execution Instructions
 1. For every requested field in the target schema, locate its value from the source document.
-2. For every field, assign its status and confidence score in the `extraction_metadata` block using these definitions:
+2. For every field, assign its status in the `extraction_metadata` block using these definitions:
    - **status**:
      - `SUCCESS`: The field was clearly found and extracted from the document.
      - `UNCLEAR`: The field text is blurry, ambiguous, or you are unsure about the accuracy of the extraction.
      - `NOT_ON_DOCUMENT`: The field does not exist or cannot be found anywhere in the document.
-   - **confidence**:
-     - `HIGH`: Absolute certainty about the accuracy of the extraction.
-     - `MEDIUM`: Reasonable certainty, minor ambiguity.
-     - `LOW`: Low certainty, text is highly ambiguous or blurry.
-     - `NONE`: Field was not found on the document.
-   - **reason**: A brief explanation of the lineage or evidence supporting the status and confidence score.
+   - **reason**: A brief explanation of the lineage or evidence supporting the status.
 """
 
     system_prompt += "\\n# Target Schema Properties to Extract\\n"
@@ -235,13 +230,9 @@ You MUST return a JSON object matching the specified response schema, containing
                     "type": "string",
                     "enum": ["SUCCESS", "UNCLEAR", "NOT_ON_DOCUMENT"],
                 },
-                "confidence": {
-                    "type": "string",
-                    "enum": ["HIGH", "MEDIUM", "LOW", "NONE"],
-                },
                 "reason": {"type": "string"},
             },
-            "required": ["status", "confidence", "reason"],
+            "required": ["status", "reason"],
         }
 
     wrapped_schema = {

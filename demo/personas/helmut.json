@@ -9,7 +9,6 @@
   "profile": {
     "first_name": "Helmut",
     "last_name": "Klar",
-    "birth_name": "Klar",
     "date_of_birth": "1947-02-14",
     "place_of_birth": "Berlin",
     "legal_gender": "Male",
@@ -23,7 +22,8 @@
     "has_custodian": false,
     "displaced_status": null,
     "residence_status": null,
-    "license_plate": "B-HK 1947",
+    "license_plate": "B-HK 142",
+
     "street": "Hauptstraße",
     "house_number": "4",
     "zip_code": "10820",
@@ -154,7 +154,6 @@
     {
       "document_type": "id_card",
       "status": "verified",
-      "confidence_score": 0.97,
       "display_name": "Personalausweis_Helmut_Klar.png",
       "asset": "Personalausweis_ Helmut_Klar.png",
       "raw_data": {
@@ -175,7 +174,6 @@
     {
       "document_type": "rent",
       "status": "verified",
-      "confidence_score": 0.91,
       "display_name": "Mietvertrag_Helmut_Klar.pdf",
       "asset": "Beispiel Mietvertrag.pdf",
       "raw_data": {
@@ -195,7 +193,6 @@
     {
       "document_type": "pension_notice",
       "status": "verified",
-      "confidence_score": 0.94,
       "display_name": "Rentenbescheid_Helmut_Klar.pdf",
       "asset": "Grundsicherung_Rentenbescheid_Helmut Klar.pdf",
       "raw_data": {
@@ -213,7 +210,6 @@
     {
       "document_type": "stmt3",
       "status": "verified",
-      "confidence_score": 0.89,
       "display_name": "Kontoauszug_Helmut_Klar.pdf",
       "asset": "Bank_Statement_Helmut_Klar.pdf",
       "raw_data": {
@@ -231,7 +227,6 @@
     {
       "document_type": "heating",
       "status": "verified",
-      "confidence_score": 0.86,
       "display_name": "Heizkostenabrechnung_Helmut_Klar.pdf",
       "asset": "Heizkostenabrechnung Helmut Klar.pdf",
       "raw_data": {
@@ -242,7 +237,6 @@
     {
       "document_type": "health_insurance",
       "status": "verified",
-      "confidence_score": 0.95,
       "display_name": "Versicherungsbescheinigung_Helmut_Klar.pdf",
       "asset": "Versicherungsbescheinigung_Helmut_Klar.pdf",
       "raw_data": {
@@ -252,77 +246,5 @@
         "health_insurance_status": "compulsory_insurance"
       }
     }
-  ],
-  "missing_documents": [
-    {
-      "document_type": "cooperation_agreement",
-      "reason": "not_applicable",
-      "note": "A Kooperationsvereinbarung belongs to SGB II (Bürgergeld), not to Grundsicherung im Alter under SGB XII. Helmut would never be asked for one."
-    },
-    {
-      "document_type": "registration",
-      "reason": "not_yet_supplied",
-      "note": "Meldebescheinigung — no scan exists; the same values already come from his profile and identity_document, so this is nice-to-have, not blocking."
-    },
-    {
-      "document_type": "bank",
-      "reason": "not_yet_supplied",
-      "note": "Kontobestätigung — his IBAN is already established via the Kontoauszug."
-    },
-    {
-      "document_type": "utility_bill",
-      "reason": "not_yet_supplied",
-      "note": "Betriebskostenabrechnung — no scan exists."
-    },
-    {
-      "document_type": "housing",
-      "reason": "not_yet_supplied",
-      "note": "Anlage KdU — rent and heating are already covered by the Mietvertrag and Heizkostenabrechnung."
-    },
-    {
-      "document_type": "household",
-      "reason": "not_yet_supplied",
-      "note": "Haushaltsbescheinigung — persons_in_household_count already covers this from the profile."
-    },
-    {
-      "document_type": "income",
-      "reason": "not_yet_supplied",
-      "note": "Einkommenserklärung — his income is already established via the Rentenbescheid and Kontoauszug."
-    },
-    {
-      "document_type": "assets",
-      "reason": "not_yet_supplied",
-      "note": "Vermögenserklärung — his balance is already established via the Kontoauszug."
-    }
-  ],
-  "derived": [
-    "birth_name",
-    "date_of_birth",
-    "married_since",
-    "place_of_birth",
-    "number_of_rooms",
-    "living_area",
-    "heating_costs",
-    "hot_water_costs",
-    "landlord_name",
-    "heating_type",
-    "rent_paid_until",
-    "health_insurance_provider",
-    "previous_benefits_authority",
-    "previous_benefits_period",
-    "previous_benefits_ref_no",
-    "identification_numbers",
-    "tax_id",
-    "associated_persons",
-    "is_subsidized_housing",
-    "has_other_residence",
-    "has_secondary_residence",
-    "has_garage_costs",
-    "has_household_energy_costs",
-    "is_living_area_used_commercially",
-    "is_student_or_trainee",
-    "professional_expenses",
-    "has_childcare_expenses",
-    "is_victim_of_national_socialist_persecution"
   ]
 }

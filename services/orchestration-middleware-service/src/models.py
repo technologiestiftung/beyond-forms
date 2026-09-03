@@ -615,7 +615,6 @@ class UserDocuments(Base):
         nullable=False,
         server_default=text("'processing'::document_status_type"),
     )
-    confidence_score: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True), server_default=text("now()"))
     updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True), server_default=text("now()"))
     fk_file_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)

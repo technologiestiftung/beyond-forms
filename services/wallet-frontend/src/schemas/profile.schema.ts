@@ -282,10 +282,9 @@ export const DocumentSchema = z.object({
 	name: z.string(),
 	type: z.preprocess(normalizeDocumentType, DocumentTypeEnum),
 	status: ProcessingStatusEnum,
-	confidence: z.number().min(0).max(1).optional(),
 	uploadDate: z.string(),
 	updatedAt: z.string().optional(),
-	fileUrl: z.string().url().optional(),
+	fileUrl: z.url().optional(),
 	user_error_code: z.string().optional(),
 });
 export type WalletDocument = z.infer<typeof DocumentSchema>;

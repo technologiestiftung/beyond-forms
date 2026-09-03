@@ -38,7 +38,6 @@ describe("FileService", () => {
 				object_name: "id-card.pdf",
 				document_type: "ID_CARD",
 				status: "COMPLETED",
-				confidence_score: 0.95,
 				upload_date: "2023-10-01T12:00:00Z",
 				file_url: "https://storage.googleapis.com/beyond-forms/id-card.pdf",
 			},
@@ -61,7 +60,6 @@ describe("FileService", () => {
 			name: "id-card.pdf",
 			type: "id_card",
 			status: "COMPLETED",
-			confidence: 0.95,
 			uploadDate: "2023-10-01T12:00:00Z",
 			fileUrl: "https://storage.googleapis.com/beyond-forms/id-card.pdf",
 			user_error_code: undefined,
@@ -74,7 +72,6 @@ describe("FileService", () => {
 				document_id: "doc-123",
 				object_name: "id-card.pdf",
 				document_type: "ID_CARD",
-				confidence_score: 0.95,
 				upload_date: "2023-10-01T12:00:00Z",
 				file_url: "https://storage.googleapis.com/beyond-forms/id-card.pdf",
 			},
@@ -142,7 +139,6 @@ describe("FileService", () => {
 				type: "ID_CARD",
 				status: "PROCESSING",
 				uploadDate: expect.any(String),
-				confidence: 0,
 			},
 		});
 		expect(result[1]).toEqual({
@@ -153,7 +149,6 @@ describe("FileService", () => {
 				type: "bank",
 				status: "PROCESSING",
 				uploadDate: expect.any(String),
-				confidence: 0,
 			},
 		});
 	});

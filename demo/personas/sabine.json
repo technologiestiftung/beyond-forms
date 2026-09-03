@@ -22,7 +22,8 @@
     "has_guardian": false,
     "has_custodian": false,
     "displaced_status": null,
-    "residence_status": "Deutsche Staatsangehörigkeit",
+    "residence_status": null,
+    "license_plate": "B-SR 224",
 
     "street": "Invalidenstraße",
     "house_number": "84",
@@ -65,7 +66,7 @@
     "free_housing_right_holder": null,
 
     "monthly_income": 245.00,
-    "income_sources": ["pension_reduced_earning_capacity"],
+    "income_sources": ["Erwerbsminderungsrente"],
     "has_assets": false,
     "assets_types": [],
     "assets_description": null,
@@ -93,7 +94,22 @@
     "has_costly_medical_nutrition": false,
 
     "identification_numbers": "T4RQ81ZKC",
-    "tax_id": "27 604 913 558"
+    "tax_id": "27 604 913 558",
+
+    "is_subsidized_housing": false,
+    "has_other_residence": false,
+    "has_secondary_residence": false,
+    "has_garage_costs": false,
+    "garage_costs": 0.00,
+    "has_household_energy_costs": false,
+    "household_energy_costs": 0.00,
+    "is_living_area_used_commercially": false,
+    "commercially_used_area_sqm": null,
+    "is_student_or_trainee": false,
+    "professional_expenses": 0.00,
+    "has_childcare_expenses": false,
+    "is_victim_of_national_socialist_persecution": false,
+    "household_members": null
   },
 
   "applications": [
@@ -101,6 +117,36 @@
       "form_type": "antrag_grundsicherung",
       "status": "in_progress",
       "form_data": {}
+    },
+    {
+      "form_type": "antrag_wohngeld",
+      "status": "in_progress",
+      "form_data": {
+        "is_wohngeld_first_application": true,
+        "receives_wohngeld_for_other_dwelling": false,
+        "has_unlisted_household_members": false,
+        "household_member_died_recently": false,
+        "household_size_will_change": false,
+        "receives_other_transfer_benefits": false,
+        "pays_child_or_spousal_support": false,
+        "receives_support_from_others": false,
+        "expects_future_income_change": false,
+        "assets_exceed_wohngeld_threshold": false,
+        "related_to_landlord": false,
+        "service_costs_included_in_rent": false,
+        "rent_paid_partly_by_third_party": false,
+        "receives_rent_contribution_from_others": false,
+        "expects_rent_change": false,
+        "wohngeld_payment_to_applicant": true,
+        "consents_to_bank_statement_retention": true
+      }
+    },
+    {
+      "form_type": "antrag_bewohnerparkausweis",
+      "status": "in_progress",
+      "form_data": {
+        "consents_to_registry_verification": true
+      }
     }
   ],
 
@@ -108,7 +154,6 @@
     {
       "document_type": "id_card",
       "status": "verified",
-      "confidence_score": 0.96,
       "display_name": "Personalausweis_Sabine_Reinhardt.pdf",
       "asset": { "generate": true, "title": "Personalausweis", "subtitle": "Bundesrepublik Deutschland" },
       "raw_data": {
@@ -129,7 +174,6 @@
     {
       "document_type": "rent",
       "status": "verified",
-      "confidence_score": 0.9,
       "display_name": "Mietvertrag_Sabine_Reinhardt.pdf",
       "asset": { "generate": true, "title": "Mietvertrag", "subtitle": "Wohnungsbaugesellschaft Mitte mbH" },
       "raw_data": {
@@ -149,7 +193,6 @@
     {
       "document_type": "health_insurance",
       "status": "verified",
-      "confidence_score": 0.93,
       "display_name": "Mitgliedsbescheinigung_BARMER_Sabine_Reinhardt.pdf",
       "asset": { "generate": true, "title": "Mitgliedsbescheinigung", "subtitle": "BARMER" },
       "raw_data": {
@@ -162,7 +205,6 @@
     {
       "document_type": "stmt3",
       "status": "ready_for_review",
-      "confidence_score": 0.68,
       "display_name": "Kontoauszug_Sabine_Reinhardt.pdf",
       "asset": { "generate": true, "title": "Kontoauszug", "subtitle": "Berliner Volksbank" },
       "user_error_code": "OLD_STATEMENT_WARNING",
@@ -179,49 +221,5 @@
         "amount_liability_insurance": 120.00
       }
     }
-  ],
-
-  "missing_documents": [
-    {
-      "document_type": "pension_notice",
-      "reason": "deliberate",
-      "note": "THE point of this persona. Her Rentenbescheid is old, she is unsure whether it is even needed, and she cannot find it — her User Story 6. Do not add it; add the to-do UX around it instead."
-    },
-    { "document_type": "heating", "reason": "not_yet_supplied", "note": "Gaszentralheizung — a Heizkostenabrechnung from the Wohnungsbaugesellschaft would fit." },
-    { "document_type": "utility_bill", "reason": "not_yet_supplied", "note": "Betriebskostenabrechnung for the 2-room flat." },
-    { "document_type": "registration", "reason": "not_yet_supplied", "note": "Meldebescheinigung, Bürgeramt Mitte." },
-    { "document_type": "bank", "reason": "not_yet_supplied", "note": "Kontobestätigung, Berliner Volksbank — IBAN DE29100900004512873600." },
-    { "document_type": "income", "reason": "not_yet_supplied", "note": "Einkommenserklärung — Erwerbsminderungsrente €245/month." },
-    { "document_type": "assets", "reason": "not_yet_supplied", "note": "Vermögenserklärung — she has none, so a nil declaration." },
-    { "document_type": "housing", "reason": "not_yet_supplied", "note": "Anlage KdU — cold rent €655, warm €780." },
-    { "document_type": "household", "reason": "not_yet_supplied", "note": "Haushaltsbescheinigung — single-person household." },
-    { "document_type": "cooperation_agreement", "reason": "not_applicable", "note": "SGB II instrument; not part of an SGB XII application." }
-  ],
-
-  "derived": [
-    "last_name",
-    "date_of_birth",
-    "place_of_birth",
-    "street",
-    "house_number",
-    "zip_code",
-    "monthly_income",
-    "pension_insurance_no",
-    "pension_insurance_provider",
-    "health_insurance_provider",
-    "reduced_work_capacity_start_date",
-    "iban",
-    "bic",
-    "bank_name",
-    "landlord_name",
-    "heating_costs",
-    "hot_water_costs",
-    "living_area",
-    "rent_paid_until",
-    "previous_benefits_authority",
-    "previous_benefits_period",
-    "previous_benefits_ref_no",
-    "identification_numbers",
-    "tax_id"
   ]
 }

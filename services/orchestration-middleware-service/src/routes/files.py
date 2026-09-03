@@ -152,7 +152,6 @@ def save_file_to_database(
         fk_file_id=new_uploaded_file.id,
         document_type=document_type if document_type else "tbd",
         status=DocumentStatusType.PROCESSING,
-        confidence_score=0,
     )
     db.add(new_doc)
     return new_uploaded_file, new_doc

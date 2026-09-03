@@ -24,7 +24,6 @@ async def test_classifier_success(mock_aembedding):
     result = await classify_func("base64_data", "image/png")
 
     assert result.document_type == "income_declaration"
-    assert result.confidence > 0.8
 
 
 @pytest.mark.asyncio
@@ -36,23 +35,6 @@ async def test_classifier_api_failure(mock_aembedding):
     result = await classify_func("base64_data", "image/png")
 
     assert result.document_type == FAILED_EXTRACTION.document_type
-    assert result.confidence == 0.0
-
-
-def test_log_probability_calculation():
-    """
-    Unit test for the math utility that converts logprobs to linear confidence.
-    Keep this test as the utility function might still be used elsewhere or needed.
-    """
-    from app.utils.llm_calls import log_probability_to_confidence
-
-    # e^-0.6931... is approx 0.5
-    half_confidence = log_probability_to_confidence(-0.69314718056)
-    assert round(half_confidence, 2) == 0.5
-
-    # e^0 is 1.0
-    full_confidence = log_probability_to_confidence(0.0)
-    assert full_confidence == 1.0
 
 
 @pytest.mark.asyncio
@@ -94,20 +76,3 @@ async def test_load_doc_type_embeddings(mock_aembedding, mock_registry):
     # Clean up
     if CACHE_FILE.exists():
         os.remove(CACHE_FILE)
-
-
-def test_scale_confidence():
-    from app.document_classifier.classifier import scale_confidence
-
-    # Test range >= 0.6
-    assert scale_confidence(0.6) == 0.95
-    assert scale_confidence(0.7) == 0.99
-    assert scale_confidence(1.0) == 0.99
-
-    # Test range 0.3 <= score < 0.6
-    assert scale_confidence(0.3) == 0.70
-    assert pytest.approx(scale_confidence(0.41), 0.001) == 0.7916
-
-    # Test range < 0.3
-    assert scale_confidence(0.0) == 0.0
-    assert pytest.approx(scale_confidence(0.15), 0.001) == 0.35

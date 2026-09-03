@@ -143,7 +143,7 @@ class DemoSeedService:
     def list_personas(self) -> list[dict[str, Any]]:
         """
         Returns every persona file in full — `profile`, `applications`, `documents` with
-        their extracted `raw_data`, `missing_documents`, `derived` and `research`.
+        their extracted `raw_data`.
 
         The whole file is returned rather than a summary because a caller needs the
         filled-in values, not only the field names: the profile is what a seeded account
@@ -400,7 +400,6 @@ class DemoSeedService:
         self.db.flush()
 
         document_id = uuid.uuid4()
-        confidence = spec.get("confidence_score")
         self.db.add(
             UserDocuments(
                 document_id=document_id,
@@ -409,7 +408,6 @@ class DemoSeedService:
                 fk_file_id=file_id,
                 document_type=spec["document_type"],
                 status=DocumentStatusType(spec["status"]),
-                confidence_score=decimal.Decimal(str(confidence)) if confidence is not None else None,
                 raw_data=raw_data,
                 user_error_code=spec.get("user_error_code"),
                 internal_error_log=spec.get("internal_error_log"),
@@ -419,7 +417,6 @@ class DemoSeedService:
             "document_id": str(document_id),
             "document_type": spec["document_type"],
             "status": spec["status"],
-            "confidence_score": confidence,
             "object_name": object_name,
             "asset_source": source,
             "size_bytes": len(content),

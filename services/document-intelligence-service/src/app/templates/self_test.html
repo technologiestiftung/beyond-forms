@@ -412,10 +412,6 @@
             <div class="value accent" id="docType">-</div>
           </div>
           <div class="meta-card">
-            <div class="label">Confidence Score</div>
-            <div class="value" id="confidence">-</div>
-          </div>
-          <div class="meta-card">
             <div class="label">Filename</div>
             <div
               class="value"
@@ -564,16 +560,11 @@
             if (skipClassification) {
               document.getElementById("docType").textContent =
                 docTypeSelect.value;
-              document.getElementById("confidence").textContent = "Skipped";
               document.getElementById("resFilename").textContent = file.name;
               renderFields(data.extracted_data);
             } else {
               document.getElementById("docType").textContent =
                 data.classified_document?.document_type || "Unknown";
-              const conf = data.classified_document?.confidence;
-              document.getElementById("confidence").textContent = conf
-                ? (conf * 100).toFixed(1) + "%"
-                : "N/A";
               document.getElementById("resFilename").textContent =
                 data.filename || file.name;
               renderFields(data.extraction_result);
