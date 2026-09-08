@@ -1,9 +1,20 @@
 /* global process */
-import { Page, expect } from "@playwright/test";
+import { type Page, expect } from "@playwright/test";
+import { gotoWithRetry } from "./navigation";
 
 export function generateRandomTestPhoneNumber(): string {
 	const randomDigits = Math.floor(100000 + Math.random() * 900000).toString();
 	return `3023125${randomDigits}`;
+}
+
+/**
+ * The local mock dev server (playwright.config.ts) always runs on :5173 with
+ * VITE_USE_MOCKS enabled. Every other baseURL — staging, prod, or a
+ * docker-composed real backend served on localhost:3000 — needs a real login;
+ * a plain "localhost" substring check can't tell those apart from the mock server.
+ */
+export function isRemoteEnvironment(baseURL: string | undefined): boolean {
+	return !!baseURL && !baseURL.includes(":5173");
 }
 
 export async function registerAuthBypassRoute(page: Page) {
@@ -23,7 +34,8 @@ export async function openManualPhoneForm(page: Page) {
 	// Fresh sessions land on the persona picker; opt into manual phone entry.
 	const phoneForm = page.getByTestId("phone-number-form");
 	const pickerLink = page.getByTestId("use-phone-instead-link");
-	await expect(pickerLink.or(phoneForm)).toBeVisible({ timeout: 15000 });
+	// A loaded CI runner needs more than 15s to paint the auth view in WebKit.
+	await expect(pickerLink.or(phoneForm)).toBeVisible({ timeout: 30000 });
 	if (await pickerLink.isVisible()) {
 		await pickerLink.click();
 		await expect(phoneForm).toBeVisible();
@@ -35,8 +47,7 @@ export async function ensureAuthenticatedSession(
 	baseURL: string | undefined,
 	phoneNumber: string = "+4930231250005",
 ) {
-	const isRemote =
-		baseURL && !baseURL.includes("localhost") && !baseURL.includes("127.0.0.1");
+	const isRemote = isRemoteEnvironment(baseURL);
 
 	if (!isRemote) {
 		// Local mock session seeding
@@ -78,7 +89,7 @@ export async function ensureAuthenticatedSession(
 
 	await registerAuthBypassRoute(page);
 
-	await page.goto("/auth?mode=login");
+	await gotoWithRetry(page, "/auth?mode=login");
 	await openManualPhoneForm(page);
 	await page.getByTestId("phone-input").fill(cleanPhone);
 	await page.getByTestId("send-code-button").click();
@@ -117,7 +128,14 @@ export async function ensureAuthenticatedSession(
 			headers["Authorization"] = `Bearer ${token}`;
 		}
 
-		const listRes = await fetch("/api/cms/my-tutorials", { headers });
+		// The CMS rejects the freshly minted token for a moment after
+		// registration (and the middleware may still be warming up), so give the
+		// list a few tries before failing the whole test.
+		let listRes = await fetch("/api/cms/my-tutorials", { headers });
+		for (let attempt = 0; attempt < 4 && !listRes.ok; attempt++) {
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+			listRes = await fetch("/api/cms/my-tutorials", { headers });
+		}
 		if (!listRes.ok) {
 			const body = await listRes.text().catch(() => "no body");
 			throw new Error(
@@ -170,6 +188,6 @@ export async function ensureAuthenticatedSession(
 	});
 
 	// Direct navigation to the dashboard and wait for it to load
-	await page.goto("/dashboard");
+	await gotoWithRetry(page, "/dashboard");
 	await expect(page).toHaveURL(/\/dashboard/, { timeout: 20000 });
 }

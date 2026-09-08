@@ -63,7 +63,7 @@ The primary entry point for processing files.
 
 - **Form Data:**
   - `file`: Binary file (PDF, PNG, JPEG).
-  - `model`: (Optional) Default: `vertex_ai/gemini-3.5-flash`.
+  - `model`: (Optional) Default: `vertex_ai/gemini-3.7-flash`.
   - `entity-extraction`: (Boolean) Whether to extract fields after classification.
 
 - **Response:**

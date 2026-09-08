@@ -1,5 +1,6 @@
 import io
 import os
+import zlib
 import pytest
 import pdfrw
 from reportlab.pdfgen import canvas
@@ -9,6 +10,16 @@ from src.pdfs.fill_pdf import (
     _resolve_choice_value,
     discover_fields,
 )
+
+
+def _decode_appearance_stream(ap_n: pdfrw.PdfDict) -> str:
+    """Decodes a widget's /AP /N appearance stream to its raw content-stream text,
+    so tests can assert the filled value was actually drawn, not just that /AP
+    exists (a stale/blank template appearance is also non-None)."""
+    raw = ap_n.stream.encode("latin1")
+    if ap_n.Filter == "/FlateDecode":
+        raw = zlib.decompress(raw)
+    return raw.decode("latin1")
 
 
 def create_test_pdf_for_filling():
@@ -135,7 +146,55 @@ def test_fill_grunsicherung_bezirksamt_sets_option_index():
     field = discover_fields(pdfrw.PdfReader(fdata=filled_pdf))["Bezirksamt"]
     assert str(field.root.get("/V")) == "(Mitte)"
     assert int(field.root.get("/I")) == 5
-    assert field.widgets[0].get("/AP") is not None
+    ap_n = field.widgets[0]["/AP"]["/N"]
+    assert ap_n is not None
+    # A stale/blank template appearance is also non-None, so assert the filled
+    # value was actually drawn into the regenerated appearance stream.
+    assert "(Mitte) Tj" in _decode_appearance_stream(ap_n)
+
+
+def test_fill_bewohnerparkausweis_bezirk_sets_export_value_not_display_label():
+    pdf_path = os.path.join(
+        os.path.dirname(__file__), "../../../../forms/pdfs/antrag_bewohnerparkausweis.pdf"
+    )
+    if not os.path.exists(pdf_path):
+        pytest.skip("antrag_bewohnerparkausweis.pdf not available")
+
+    with open(pdf_path, "rb") as f:
+        pdf_bytes = f.read()
+
+    filled_pdf = fill_pdf_form(pdf_bytes, {"p1_bezirk": "Tempelhof-Schöneberg"}, ignore_read_only=True)
+    field = discover_fields(pdfrw.PdfReader(fdata=filled_pdf))["Bezirk"]
+    assert str(field.root.get("/V")) == "(07)"
+    assert int(field.root.get("/I")) == 7
+
+
+def test_fill_pdf_form_string_field_renders_appearance():
+    pdf_bytes = create_test_pdf_for_filling()
+    filled_pdf = fill_pdf_form(pdf_bytes, {"editable_field": "Hello World"})
+
+    field = discover_fields(pdfrw.PdfReader(fdata=filled_pdf))["editable_field"]
+    ap_n = field.widgets[0]["/AP"]["/N"]
+    assert ap_n is not None
+    assert "(Hello World) Tj" in _decode_appearance_stream(ap_n)
+
+
+def test_fill_pdf_form_string_field_has_single_acroform_fields_entry():
+    pdf_bytes = create_test_pdf_for_filling()
+    filled_pdf = fill_pdf_form(pdf_bytes, {"editable_field": "Hello World"})
+
+    reader = pdfrw.PdfReader(fdata=filled_pdf)
+    matches = [f for f in reader.Root.AcroForm.Fields if str(f.get("/T")) == "(editable_field)"]
+    assert len(matches) == 1
+    assert str(matches[0].get("/V")) == "(Hello World)"
+
+
+def test_fill_pdf_form_clears_need_appearances_after_baking_ap_streams():
+    pdf_bytes = create_test_pdf_for_filling()
+    filled_pdf = fill_pdf_form(pdf_bytes, {"editable_field": "Hello World"})
+
+    reader = pdfrw.PdfReader(fdata=filled_pdf)
+    assert str(reader.Root.AcroForm.get("/NeedAppearances")) == "false"
 
 
 def test_fill_pdf_form_no_acroform():

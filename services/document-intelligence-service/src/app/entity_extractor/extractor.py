@@ -117,6 +117,15 @@ You MUST return a JSON object containing only requested properties. Set value to
     while True:
         attempts += 1
         try:
+            # Hermetic e2e mode (docker-compose CI): skip the real Vertex AI
+            # call and return an empty-but-valid extraction. Downstream
+            # review UIs don't gate on field completeness, so this is enough
+            # to exercise the upload -> review -> confirm flow without real
+            # Gemini credentials.
+            mock_kwargs: Dict[str, Any] = {}
+            if os.getenv("MOCK_LLM_RESPONSES") == "true":
+                mock_kwargs["mock_response"] = '{"extracted_data": {}}'
+
             response = await acompletion(
                 model=model_path,
                 messages=[
@@ -140,6 +149,7 @@ You MUST return a JSON object containing only requested properties. Set value to
                 num_retries=get_number_of_retries(),
                 vertex_project=os.getenv("GCLOUD_PROJECT"),
                 vertex_location="global",
+                **mock_kwargs,
             )
 
             raw_json = response.choices[0].message.content

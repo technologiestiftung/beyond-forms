@@ -46,7 +46,8 @@
 			},
 			"generate_button": "Generate application",
 			"generate_error": "Could not generate the application. Please try again later.",
-			"open_button": "Open application",
+			"download_button": "Download application",
+			"download_success": "Application downloaded",
 			"parking_permit": {
 				"title": "Resident parking permit",
 				"description": "Apply for your resident parking permit directly with your saved details."

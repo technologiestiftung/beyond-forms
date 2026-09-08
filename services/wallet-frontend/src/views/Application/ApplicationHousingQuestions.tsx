@@ -327,11 +327,27 @@ export const ApplicationHousingQuestions: React.FC = () => {
 	const calculatedProgress = currentPage > 1.5 ? Math.floor(currentPage) : 1;
 
 	const handleSaveField = async (
-		_section: "address" | "housing",
-		_key: string,
-		_val: string | number | boolean | null | undefined,
+		section: "address" | "housing",
+		key: string,
+		val: string | number | boolean | null | undefined,
 	) => {
-		// Stub out auto-saving on blur. All saving is handled on page transitions in savePageData.
+		try {
+			const result = await updateSection({
+				section,
+				data: { [key]: val, validateEntireForm: false },
+			});
+
+			if (!result.success) {
+				setSaveError(result.message || t("errors.save_failed"));
+				return;
+			}
+			setSaveError(null);
+			setSaveSuccess(true);
+			setTimeout(() => setSaveSuccess(false), 1500);
+		} catch (error) {
+			console.error("Failed to auto-save field:", key, error);
+			setSaveError(t("errors.save_failed"));
+		}
 	};
 
 	const savePageData = async (

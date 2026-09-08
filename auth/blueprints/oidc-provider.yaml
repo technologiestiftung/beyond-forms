@@ -6,7 +6,6 @@ entries:
   - model: authentik_crypto.certificatekeypair
     identifiers:
       name: beyondforms-signing-key
-    id: signing-key
     attrs:
       name: BeyondForms Signing Key
       certificate_data: !File /certs/pub/oidc_public.pem
@@ -16,12 +15,17 @@ entries:
   - model: authentik_providers_oauth2.oauth2provider
     identifiers:
       name: beyondforms-provider
-    id: provider
     attrs:
       name: BeyondForms Provider
       client_id: beyondforms
       client_secret: !Env BEYONDFORMS_OIDC_CLIENT_SECRET
-      signing_key: !KeyOf signing-key
+      # !KeyOf's __repr__ crashes with a misleading "failed to find entry"
+      # error if any log gets emitted while this value is still unresolved
+      # (see authentik.blueprints.v1.common.YAMLTag.__repr__). !Find does a
+      # live DB lookup instead and degrades to None on a miss, so it can't
+      # trigger that crash.
+      signing_key:
+        !Find [authentik_crypto.certificatekeypair, [name, beyondforms-signing-key]]
       authentication_flow:
         !Find [authentik_flows.flow, [slug, passwordless-sms-login]]
       redirect_uris:
@@ -54,8 +58,8 @@ entries:
   - model: authentik_core.application
     identifiers:
       slug: beyondforms
-    id: application
     attrs:
       name: BeyondForms
       slug: beyondforms
-      provider: !KeyOf provider
+      provider:
+        !Find [authentik_providers_oauth2.oauth2provider, [name, beyondforms-provider]]

@@ -3,6 +3,7 @@ import { renderHook } from "@testing-library/react";
 import { useDocumentProcessingSocket } from "./useDocumentProcessingSocket";
 import { useAuthStore } from "../store/useAuthStore";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { env } from "../config/env.config";
 import React from "react";
 
 // Mock dependencies
@@ -29,9 +30,15 @@ describe("useDocumentProcessingSocket", () => {
 		onclose: unknown;
 		onerror: unknown;
 	};
+	let originalMocks: boolean;
+	let originalMockAuth: boolean;
 
 	beforeEach(() => {
 		vi.clearAllMocks();
+		originalMocks = env.VITE_USE_MOCKS;
+		originalMockAuth = env.VITE_USE_MOCK_AUTH;
+		env.VITE_USE_MOCKS = false;
+		env.VITE_USE_MOCK_AUTH = false;
 		mockWebSocket = {
 			send: vi.fn(),
 			close: vi.fn(),
@@ -62,6 +69,8 @@ describe("useDocumentProcessingSocket", () => {
 	afterEach(() => {
 		// @ts-expect-error - Cleaning up mock
 		delete window.WebSocket;
+		env.VITE_USE_MOCKS = originalMocks;
+		env.VITE_USE_MOCK_AUTH = originalMockAuth;
 	});
 
 	it("initializes WebSocket connection when token is present", () => {

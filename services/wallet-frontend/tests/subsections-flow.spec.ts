@@ -1,13 +1,10 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { isRemoteEnvironment } from "./helpers/auth";
 
 test.describe("Questionnaire Subsections E2E & Accessibility Audits", () => {
 	test.beforeEach(async ({ page, baseURL }) => {
-		if (
-			baseURL &&
-			!baseURL.includes("localhost") &&
-			!baseURL.includes("127.0.0.1")
-		) {
+		if (isRemoteEnvironment(baseURL)) {
 			test.skip();
 			return;
 		}

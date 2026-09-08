@@ -16,6 +16,10 @@ const MVP_DOCS_DIR =
 const MVP_SCREENSHOTS_DIR =
 	process.env.MVP_SCREENSHOTS_DIR || "/tmp/mvp-screenshots";
 
+// Real document upload flow. Against the docker-compose e2e stack, the OCR
+// extraction is short-circuited server-side (MOCK_LLM_RESPONSES=true) so
+// this runs without real Gemini credentials; against staging/prod it still
+// exercises the real extraction pipeline.
 test.describe("MVP Citizen Document Preview & E2E Visual Audit", () => {
 	// Relax Timeout for heavy OCR uploads
 	test.setTimeout(240000);

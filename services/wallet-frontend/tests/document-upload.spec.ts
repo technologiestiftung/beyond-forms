@@ -1,5 +1,6 @@
 /* global Buffer */
 import { test, expect, type Page } from "@playwright/test";
+import { isRemoteEnvironment } from "./helpers/auth";
 
 async function navigateAndBypassTutorial(page: Page, targetUrl: string) {
 	await page.goto(targetUrl);
@@ -18,11 +19,7 @@ async function navigateAndBypassTutorial(page: Page, targetUrl: string) {
 
 test.describe("Document Upload and Mobile Camera Capture Audit", () => {
 	test.beforeEach(async ({ page, baseURL }) => {
-		if (
-			baseURL &&
-			!baseURL.includes("localhost") &&
-			!baseURL.includes("127.0.0.1")
-		) {
+		if (isRemoteEnvironment(baseURL)) {
 			test.skip();
 			return;
 		}
@@ -111,7 +108,6 @@ test.describe("Document Upload and Mobile Camera Capture Audit", () => {
 		await expect(dropzone).toContainText(/Kamera öffnen/i);
 
 		// Step 5: Attach mock photo file
-		// @ts-expect-error Node Buffer is available in Playwright execution context
 		const mockImage = Buffer.from(
 			"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
 			"base64",
@@ -181,7 +177,6 @@ test.describe("Document Upload and Mobile Camera Capture Audit", () => {
 		await expect(dropzone).toContainText(/Klicken oder Datei hierher ziehen/i);
 
 		// Step 4: Attach mock PDF file
-		// @ts-expect-error Node Buffer is available in Playwright execution context
 		const mockPdf = Buffer.from(
 			"JVBERi0xLjQKJcOkw7zDtsOfCjEgMCBvYmoKPDwvVHlwZS9DYXRhbG9nPj4KZW5kb2JqCnhyZWYK",
 			"base64",
