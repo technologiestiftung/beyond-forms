@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import { readFileSync } from "node:fs";
 import { test, expect } from "@playwright/test";
 import { PDFDocument, PDFName, PDFDict, PDFBool } from "pdf-lib";
 import { ensureAuthenticatedSession, isRemoteEnvironment } from "./helpers/auth";
@@ -39,7 +39,7 @@ test.describe("Parking Permit PDF export", () => {
 		const download = await downloadPromise;
 		const downloadPath = await download.path();
 		expect(downloadPath).toBeTruthy();
-		const pdfBytes = fs.readFileSync(downloadPath as string);
+		const pdfBytes = readFileSync(downloadPath as string);
 
 		const pdfDoc = await PDFDocument.load(pdfBytes);
 		const form = pdfDoc.getForm();

@@ -1,5 +1,5 @@
 /* global process */
-import { Page, expect } from "@playwright/test";
+import { type Page, expect } from "@playwright/test";
 
 export function generateRandomTestPhoneNumber(): string {
 	const randomDigits = Math.floor(100000 + Math.random() * 900000).toString();
