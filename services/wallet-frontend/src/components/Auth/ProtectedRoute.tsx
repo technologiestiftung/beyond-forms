@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 // import { matchPath } from "react-router-dom"; // disabled: tutorial gate commented out below
 import { useTranslation } from "react-i18next";
@@ -19,9 +19,22 @@ interface ProtectedRouteProps {
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 	const { t } = useTranslation("common");
 	const { token } = useAuthStore();
+	const [hasHydrated, setHasHydrated] = useState(() =>
+		useAuthStore.persist.hasHydrated(),
+	);
 	const { tutorials, initialized, isLoading, fetchTutorials } =
 		useTutorialStore();
 	const location = useLocation();
+
+	// Zustand's persist middleware rehydrates asynchronously, so `token` reads
+	// as null for one render on a fresh page load even when a valid session
+	// exists in sessionStorage — wait for hydration before deciding to redirect.
+	useEffect(() => {
+		if (hasHydrated) {
+			return undefined;
+		}
+		return useAuthStore.persist.onFinishHydration(() => setHasHydrated(true));
+	}, [hasHydrated]);
 
 	// Synchronously trigger onboarding metadata fetch exactly once per session
 	useEffect(() => {
@@ -29,6 +42,15 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 			void fetchTutorials();
 		}
 	}, [token, initialized, isLoading, fetchTutorials]);
+
+	if (!hasHydrated) {
+		return (
+			<main className="flex min-h-screen items-center justify-center bg-brand-bg">
+				<h1 className="sr-only">{t("loading_app")}</h1>
+				<div className="size-12 border-4 border-brand-black/30 border-t-brand-black rounded-full animate-spin" />
+			</main>
+		);
+	}
 
 	if (!token) {
 		return (

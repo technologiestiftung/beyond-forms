@@ -4,6 +4,7 @@ import {
 	ensureAuthenticatedSession,
 	generateRandomTestPhoneNumber,
 } from "./helpers/auth";
+import { gotoWithRetry } from "./helpers/navigation";
 
 test.describe("Chat Accessibility Audit - WCAG 2.1 AA", () => {
 	test.beforeEach(async ({ page, baseURL }) => {
@@ -12,7 +13,7 @@ test.describe("Chat Accessibility Audit - WCAG 2.1 AA", () => {
 		// Authenticate session
 		const phoneNumber = generateRandomTestPhoneNumber();
 		await ensureAuthenticatedSession(page, baseURL, phoneNumber);
-		await page.goto("/dashboard");
+		await gotoWithRetry(page, "/dashboard");
 	});
 
 	test("Chat sheet and chat input form should have no accessibility violations", async ({

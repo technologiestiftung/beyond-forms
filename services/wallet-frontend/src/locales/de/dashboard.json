@@ -46,7 +46,8 @@
 			},
 			"generate_button": "Antrag generieren",
 			"generate_error": "Konnte den Antrag nicht generieren. Bitte versuche es später noch einmal.",
-			"open_button": "Antrag öffnen",
+			"download_button": "Antrag herunterladen",
+			"download_success": "Antrag heruntergeladen",
 			"parking_permit": {
 				"title": "Bewohnerparkausweis",
 				"description": "Beantrage Deinen Bewohnerparkausweis direkt mit Deinen hinterlegten Angaben."

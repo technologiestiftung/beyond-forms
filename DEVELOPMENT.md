@@ -95,7 +95,7 @@ Since our services utilize both remote (ex. Gemini) and local (ex. Gemma/Network
 | Variable       | Description                   | Example(local)            | Example(remote)               |
 | -------------- | ----------------------------- | ------------------------- | ----------------------------- |
 | LLM_ENDPOINT   | The API base URL              | http://192.168.1.50:11434 | https://generativelanguage... |
-| LLM_MODEL_NAME | The specific model identifier | gemma-3-1b-it             | gemini-3.5-flash              |
+| LLM_MODEL_NAME | The specific model identifier | gemma-3-1b-it             | gemini-3.7-flash              |
 | LLM_API_KEY    | Authentication token          | not-needed-for-local      | AIzaSy...                     |
 
 ## 4. Containerization (Docker Compose)

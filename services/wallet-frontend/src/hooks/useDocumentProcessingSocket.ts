@@ -25,7 +25,7 @@ export function useDocumentProcessingSocket() {
 	);
 
 	useEffect(() => {
-		if (!token) {
+		if (!token || env.VITE_USE_MOCKS || env.VITE_USE_MOCK_AUTH) {
 			return undefined;
 		}
 

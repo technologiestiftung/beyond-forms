@@ -65,6 +65,17 @@ CHAT_CONTEXT_WINDOW_SIZE = int(os.getenv("CHAT_CONTEXT_WINDOW_SIZE", "20"))
 router = APIRouter(tags=["llm"])
 logger = logging.getLogger(__name__)
 
+
+def _mock_llm_kwargs() -> dict:
+    """
+    Hermetic e2e mode (docker-compose CI): skip the real Vertex AI call and
+    stream back a canned reply, so the chat UI can be exercised without real
+    Gemini credentials.
+    """
+    if os.getenv("MOCK_LLM_RESPONSES") == "true":
+        return {"mock_response": "Hallo! Wie kann ich dir heute helfen?"}
+    return {}
+
 _USER_TABLE_NAMES = frozenset(
     {
         "users",
@@ -454,6 +465,7 @@ async def handle_chat_stream(
                 vertex_location="global",
                 vertex_project=os.getenv("GCLOUD_PROJECT"),
                 stream=True,
+                **_mock_llm_kwargs(),
             )
 
             accumulated_content = ""
@@ -539,6 +551,7 @@ async def handle_chat_stream(
             vertex_location="global",
             vertex_project=os.getenv("GCLOUD_PROJECT"),
             stream=True,
+            **_mock_llm_kwargs(),
         )
 
         accumulated = ""
@@ -593,7 +606,7 @@ class StatelessChatResponse(BaseModel):
 @router.post("/api/v1/stateless/chat", response_model=StatelessChatResponse)
 async def stateless_chat(
     request: StatelessChatRequest,
-    model_name: str = os.getenv("GEMINI_MODEL_NAME", "gemini-3.5-flash"),
+    model_name: str = os.getenv("GEMINI_MODEL_NAME", "gemini-3.7-flash"),
 ):
     system_prompt = """
 You are assisting a user in filling out a form.

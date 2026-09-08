@@ -435,7 +435,7 @@ def main():
         "--form", default="test_form", help="Name of the form mappings under test (without .toml suffix)"
     )
     parser.add_argument(
-        "--models", nargs="+", default=["gemini-3.5-flash"], help="List of LLM model names to execute & benchmark"
+        "--models", nargs="+", default=["gemini-3.7-flash"], help="List of LLM model names to execute & benchmark"
     )
     parser.add_argument("--prompt", default="rich_schema", help="Prompt template file name (without .txt suffix)")
     parser.add_argument("--profile", help="Path to a single evaluation citizen profile JSON file")

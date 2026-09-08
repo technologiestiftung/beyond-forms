@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
         app.state.self_test_html = "<h1>Template not found</h1>"
 
     # Initialize processors
-    model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-3.5-flash")
+    model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-3.7-flash")
     app.state.classify_document = init_document_classifier(model_name=embedding_model, candidate_counts=3)
     app.state.extract_entities = init_entity_extractor(model_name=model_name, document_registry=document_registry)
 
@@ -204,7 +204,7 @@ async def classify(
             )
             app.state.classify_document = init_document_classifier(model_name=embedding_model, candidate_counts=3)
         if not hasattr(app.state, "extract_entities") or app.state.extract_entities is None:
-            extract_model_name = model_name or os.getenv("GEMINI_MODEL_NAME", "gemini-3.5-flash")
+            extract_model_name = model_name or os.getenv("GEMINI_MODEL_NAME", "gemini-3.7-flash")
             app.state.extract_entities = init_entity_extractor(
                 model_name=extract_model_name, document_registry=document_registry
             )
@@ -324,7 +324,7 @@ async def stateless_extract(
                 base64_data=base64_data,
                 mime_type=mime_type,
                 schema_dict=schema_dict,
-                model_name=model_name or os.getenv("GEMINI_MODEL_NAME", "gemini-3.5-flash"),
+                model_name=model_name or os.getenv("GEMINI_MODEL_NAME", "gemini-3.7-flash"),
             )
             return api_response(data=extraction_res)
         else:
@@ -332,7 +332,7 @@ async def stateless_extract(
                 base64_data=base64_data,
                 mime_type=mime_type,
                 schema_dict=schema_dict,
-                model_name=model_name or os.getenv("GEMINI_MODEL_NAME", "gemini-3.5-flash"),
+                model_name=model_name or os.getenv("GEMINI_MODEL_NAME", "gemini-3.7-flash"),
                 system_prompt_prefix=system_prompt,
             )
 

@@ -2,12 +2,14 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import {
 	generateRandomTestPhoneNumber,
+	isRemoteEnvironment,
 	openManualPhoneForm,
 } from "./helpers/auth";
+import { gotoWithRetry } from "./helpers/navigation";
 
 test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 	test.beforeEach(async ({ page, context }) => {
-		await page.goto("/");
+		await gotoWithRetry(page, "/");
 		await context.clearCookies();
 		await page.evaluate(() => {
 			window.localStorage.clear();
@@ -16,7 +18,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 	});
 
 	test("Start Page: Link to Login flow", async ({ page }) => {
-		await page.goto("/");
+		await gotoWithRetry(page, "/");
 		await page.getByTestId("promo-card-start-button").click();
 		await expect(page).toHaveURL(/\/auth\?mode=login/);
 		// Fresh sessions land on the persona picker; the phone form is one click away.
@@ -25,7 +27,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 	});
 
 	test("Happy Path: New User Registration with Data Sync", async ({ page }) => {
-		await page.goto("/");
+		await gotoWithRetry(page, "/");
 		await page.getByTestId("start-button").click();
 
 		await page.getByTestId("option-german").click();
@@ -74,7 +76,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 	test("Returning User: Direct Login", async ({ page, baseURL }) => {
 		const testNumber = generateRandomTestPhoneNumber();
 
-		await page.goto("/auth?mode=login");
+		await gotoWithRetry(page, "/auth?mode=login");
 		await openManualPhoneForm(page);
 
 		await page.getByTestId("phone-input").fill(testNumber);
@@ -99,10 +101,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 		// In the local mock, "returning user" is decided by a lazily persisted
 		// mock profile in localStorage (written on first dashboard load). Wait
 		// for it so the re-login below isn't misclassified as a new user.
-		const isRemote =
-			baseURL &&
-			!baseURL.includes("localhost") &&
-			!baseURL.includes("127.0.0.1");
+		const isRemote = isRemoteEnvironment(baseURL);
 		if (!isRemote) {
 			await page.waitForFunction(
 				() =>
@@ -119,7 +118,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 			window.sessionStorage.clear();
 		});
 
-		await page.goto("/auth?mode=login");
+		await gotoWithRetry(page, "/auth?mode=login");
 
 		await openManualPhoneForm(page);
 		await page.getByTestId("phone-input").fill(testNumber);
@@ -136,7 +135,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 	test("Resilience: Persist Awaiting OTP state on Refresh", async ({
 		page,
 	}) => {
-		await page.goto("/auth");
+		await gotoWithRetry(page, "/auth");
 		await openManualPhoneForm(page);
 		await page.getByTestId("phone-input").fill("30231250003");
 		await page.getByTestId("send-code-button").click();
@@ -148,12 +147,12 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 	});
 
 	test("Sad Path: Handle Sync Failure", async ({ page }) => {
-		await page.goto("/auth?origin=eligibility");
+		await gotoWithRetry(page, "/auth?origin=eligibility");
 		await openManualPhoneForm(page);
 	});
 
 	test("Security: Rate Limit Handling", async ({ page }) => {
-		await page.goto("/auth");
+		await gotoWithRetry(page, "/auth");
 		await openManualPhoneForm(page);
 		await page.getByTestId("phone-input").fill("999999999"); // Mock provider uses 999999 for error
 		// We skip actual trigger to avoid flakiness, just ensuring the view is there
@@ -161,7 +160,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 	});
 
 	test("Language Switching: Verify multilingual support", async ({ page }) => {
-		await page.goto("/auth");
+		await gotoWithRetry(page, "/auth");
 		// The persona picker is the first screen of the auth view.
 		await expect(
 			page.getByText(/Mit Telefonnummer anmelden/i),
@@ -179,7 +178,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 		// default 30s local budget.
 		test.setTimeout(90000);
 
-		await page.goto("/auth");
+		await gotoWithRetry(page, "/auth");
 
 		// The persona picker is the new entry screen — audit it, then continue
 		// to the phone form.

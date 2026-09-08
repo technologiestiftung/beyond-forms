@@ -1,12 +1,9 @@
 import { test, expect } from "@playwright/test";
+import { isRemoteEnvironment } from "./helpers/auth";
 
 test.describe("Dashboard View Audit", () => {
 	test.beforeEach(async ({ page, baseURL }) => {
-		if (
-			baseURL &&
-			!baseURL.includes("localhost") &&
-			!baseURL.includes("127.0.0.1")
-		) {
+		if (isRemoteEnvironment(baseURL)) {
 			test.skip();
 			return;
 		}
@@ -94,11 +91,7 @@ test.describe("Dashboard View Audit", () => {
 
 test.describe("Dashboard New User Audit", () => {
 	test.beforeEach(async ({ page, baseURL }) => {
-		if (
-			baseURL &&
-			!baseURL.includes("localhost") &&
-			!baseURL.includes("127.0.0.1")
-		) {
+		if (isRemoteEnvironment(baseURL)) {
 			test.skip();
 			return;
 		}

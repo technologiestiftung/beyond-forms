@@ -2,7 +2,7 @@ FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS builder
 ARG UV_INDEX_URL
 ENV UV_INDEX_URL=$UV_INDEX_URL
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
-ENV GEMINI_MODEL_NAME=gemini-3.5-flash
+ENV GEMINI_MODEL_NAME=gemini-3.7-flash
 ENV CHAT_CONTEXT_WINDOW_SIZE=20
 WORKDIR /app
 # Outside the compose bind-mount, so the image's venv is not shadowed and no masking

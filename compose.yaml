@@ -15,6 +15,11 @@ services:
     restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devuser -d devdb"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
 
   migration-service:
     build:
@@ -35,7 +40,7 @@ services:
       - app-network
     depends_on:
       postgres:
-        condition: service_started
+        condition: service_healthy
 
   document-intelligence-service:
     build:
@@ -48,8 +53,13 @@ services:
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/.config/gcloud/application_default_credentials.json
       - LLM_RETRIES=3
-      - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-3.5-flash}
+      - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-3.7-flash}
       - GCLOUD_PROJECT=beyond-forms-staging
+      # When true, skips the real Vertex AI call and returns a canned
+      # extraction. Only meant for hermetic e2e runs (no GCP creds needed).
+      - MOCK_LLM_RESPONSES=${MOCK_LLM_RESPONSES:-false}
+      # Local blob storage. Unset this to use the real bucket (needs gcloud ADC).
+      - STORAGE_EMULATOR_HOST=${STORAGE_EMULATOR_HOST-http://gcs-emulator:4443}
     volumes:
       - ./auth/certs/pub:/app/auth/certs/pub:ro
       - ./services/document-intelligence-service:/app/services/document-intelligence-service
@@ -118,7 +128,7 @@ services:
       - AUTHENTIK_PUBLIC_KEY_PATH=${AUTHENTIK_PUBLIC_KEY_PATH:-/app/auth/certs/pub/oidc_public.pem}
       - ENDPOINT_RULES_ENGINE=http://rules-engine:8080
       - ENDPOINT_FORMS_FILLER=http://forms-filling-service:8080
-      - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-3.5-flash}
+      - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-3.7-flash}
       - CHAT_CONTEXT_WINDOW_SIZE=20
       - POSTGRES_USER=devuser
       - POSTGRES_PASSWORD=devpassword
@@ -134,9 +144,14 @@ services:
       - API_PUBLIC_URL=http://localhost:8080
       # When true, middleware startup seeds any demo persona not already in the DB.
       - DEMO_SEED_ENABLED=${DEMO_SEED_ENABLED:-true}
+      # When true, skips the real Vertex AI call for chat and returns a
+      # canned reply. Only meant for hermetic e2e runs (no GCP creds needed).
+      - MOCK_LLM_RESPONSES=${MOCK_LLM_RESPONSES:-false}
     depends_on:
       postgres:
-        condition: service_started
+        condition: service_healthy
+      migration-service:
+        condition: service_completed_successfully
       gcs-emulator:
         condition: service_started
       forms-filling-service:
@@ -169,7 +184,7 @@ services:
       - AUTHENTIK_SERVER_URL=${AUTHENTIK_SERVER_URL:-http://authentik-server:9000}
       - AUTHENTIK_PUBLIC_KEY_PATH=${AUTHENTIK_PUBLIC_KEY_PATH:-/app/auth/certs/pub/oidc_public.pem}
       - ENDPOINT_RULES_ENGINE=http://rules-engine:8080
-      - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-3.5-flash}
+      - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-3.7-flash}
       - POSTGRES_USER=devuser
       - POSTGRES_PASSWORD=devpassword
       - POSTGRES_HOST=postgres
@@ -188,7 +203,7 @@ services:
 
     depends_on:
       postgres:
-        condition: service_started
+        condition: service_healthy
       orchestration-middleware-service:
         condition: service_started
     volumes:
@@ -271,7 +286,9 @@ services:
     restart: unless-stopped
     depends_on:
       postgres:
-        condition: service_started
+        condition: service_healthy
+      migration-service:
+        condition: service_completed_successfully
       # authentik-server:
       #   condition: service_started
       # authentik-worker:

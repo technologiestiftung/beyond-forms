@@ -20,7 +20,7 @@ value = "{{ district ? district : 'bitte wählen' }}"
 type = "string"
 read_only = true
 default_value = "Bitte Bezirk auswählen:"
-value = "{{ district ? district : '' }}"
+value = "Bitte Bezirk auswählen:"
 
 # The real PDF has five separate single-line AcroForm fields for this address block
 # (Zeile 1 is narrow — it sits on the same row as the static "Bezirksamt" label — Zeile

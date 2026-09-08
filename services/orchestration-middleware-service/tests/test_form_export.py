@@ -66,12 +66,46 @@ async def test_export_filled_form_success_returns_dual_urls(mock_db, monkeypatch
         assert "signed_open_url" in data
         assert "signed_download_url" in data
         assert data["expires_in_seconds"] == 60
-        assert data["filename"] == "antrag_test_form.pdf"
+        assert data["filename"] == "test_form.pdf"
         assert data["form_type"] == "test_form"
         assert "disposition=inline" in data["signed_open_url"]
         assert "disposition=attachment" in data["signed_download_url"]
 
         mock_form_service.fill_form.assert_called_once_with("test_form", mock_user)
+    finally:
+        del app.dependency_overrides[get_form_service]
+
+
+@pytest.mark.asyncio
+async def test_export_filled_form_filename_includes_applicant_name(mock_db, monkeypatch):
+    local_user_id = uuid.uuid4()
+    auth_sub = "test-auth-id-uuid"
+
+    monkeypatch.setenv("ENV", "testing")
+
+    mock_user = DbUser(
+        id=local_user_id,
+        authentik_id=auth_sub,
+        phone_number="1234567890",
+        first_name="Helmut",
+        last_name="Klar",
+    )
+    mock_db.query.return_value.filter.return_value.first.return_value = mock_user
+
+    mock_pdf_content = b"%PDF-1.4 mock content"
+    mock_form_service = MagicMock(spec=FormService)
+    mock_form_service.fill_form = AsyncMock(return_value=mock_pdf_content)
+
+    from src.services.form_service import get_form_service
+
+    app.dependency_overrides[get_form_service] = lambda: mock_form_service
+
+    try:
+        response = client.get("/export/antrag_bewohnerparkausweis")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["filename"] == "antrag_bewohnerparkausweis_Klar_Helmut.pdf"
     finally:
         del app.dependency_overrides[get_form_service]
 
