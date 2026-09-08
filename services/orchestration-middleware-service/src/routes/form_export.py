@@ -3,6 +3,7 @@ import datetime
 import logging
 import os
 import re
+import unicodedata
 import uuid
 from typing import Optional
 
@@ -79,6 +80,22 @@ async def delayed_scrub_export_blob(bucket_name: str, object_name: str, local_pa
 UUID4_CAPABILITY_PATTERN = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}_", re.IGNORECASE
 )
+
+
+def _build_export_filename(form_type: str, user: DbUser) -> str:
+    """Builds a Content-Disposition-safe filename, e.g. "antrag_bewohnerparkausweis_Klar_Helmut.pdf".
+    Falls back to just the form type when the applicant has no usable name on file.
+    """
+    name_parts = [part for part in (user.last_name, user.first_name) if part and part.strip()]
+    if not name_parts:
+        return f"{form_type}.pdf"
+
+    # Strip diacritics (ö -> o) and drop anything outside safe filename/header characters.
+    normalized = unicodedata.normalize("NFKD", " ".join(name_parts))
+    ascii_name = normalized.encode("ascii", "ignore").decode("ascii")
+    safe_name = re.sub(r"[^A-Za-z0-9]+", "_", ascii_name).strip("_")
+
+    return f"{form_type}_{safe_name}.pdf" if safe_name else f"{form_type}.pdf"
 
 
 def verify_export_access_policy(object_name: str, current_user: Optional[AuthUser]) -> str:
@@ -177,7 +194,7 @@ async def export_filled_form(
 
     try:
         pdf_content = await form_service.fill_form(form_type, db_user)
-        filename = f"antrag_{form_type}.pdf"
+        filename = _build_export_filename(form_type, db_user)
         object_name = f"exports/ephemeral/{current_user.user_id}/{uuid.uuid4()}_{filename}"
 
         env_val = os.environ.get("ENV", "development")

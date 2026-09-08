@@ -14,17 +14,29 @@ export default defineConfig({
 		trace: "on-first-retry",
 		screenshot: "only-on-failure",
 		video: "on-first-retry",
-		viewport: { width: 390, height: 844 }, // Mobile viewport since Klaro is mobile-first
-		deviceScaleFactor: 3,
-		isMobile: true,
-		hasTouch: true,
 		navigationTimeout: 30000,
 		locale: "de-DE",
 	},
 	projects: [
 		{
-			name: "chromium",
-			use: { ...devices["Pixel 5"] }, // Use Pixel 5 to emulate mobile behavior
+			name: "chromium-mobile",
+			use: { ...devices["Pixel 5"] },
+		},
+		{
+			name: "chromium-desktop",
+			use: { ...devices["Desktop Chrome"] },
+		},
+		{
+			name: "webkit-mobile",
+			use: { ...devices["iPhone 14"] },
+		},
+		{
+			name: "webkit-desktop",
+			use: { ...devices["Desktop Safari"] },
+		},
+		{
+			name: "firefox",
+			use: { ...devices["Desktop Firefox"] },
 		},
 	],
 });

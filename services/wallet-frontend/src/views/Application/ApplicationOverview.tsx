@@ -177,7 +177,7 @@ interface PreviewModalProps {
 	pdfUrl: string | null;
 	secondsRemaining: number;
 	exportUrls: ExportUrls | null;
-	setInvisibleDownloadUrl: (url: string) => void;
+	downloadAnchorRef: React.RefObject<HTMLAnchorElement | null>;
 	onDownloadSuccess: () => void;
 }
 
@@ -191,7 +191,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
 	pdfUrl,
 	secondsRemaining,
 	exportUrls,
-	setInvisibleDownloadUrl,
+	downloadAnchorRef,
 	onDownloadSuccess,
 }) => (
 	<div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-110 flex items-center justify-center p-4 md:p-10 animate-fadeIn">
@@ -315,11 +315,17 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
 							if (isExpired || !exportUrls) {
 								return;
 							}
-							setInvisibleDownloadUrl(exportUrls.signed_download_url);
+							const anchor = downloadAnchorRef.current;
+							if (anchor) {
+								anchor.href = exportUrls.signed_download_url;
+								anchor.download = "antrag_grundsicherung.pdf";
+								anchor.click();
+							}
 							onDownloadSuccess();
 						}}
 						disabled={isExpired}
 						className="w-full sm:w-auto"
+						data-testid="download-pdf-button"
 					>
 						{t("overview.download_button", "Herunterladen")}
 					</PrimaryButton>
@@ -363,11 +369,9 @@ export const ApplicationOverview: React.FC = () => {
 	const [isMobile, setIsMobile] = useState(false);
 	const [secondsRemaining, setSecondsRemaining] = useState<number>(0);
 	const [isExpired, setIsExpired] = useState<boolean>(false);
-	const [invisibleDownloadUrl, setInvisibleDownloadUrl] = useState<
-		string | null
-	>(null);
 	const generateButtonContainerRef = useRef<HTMLDivElement>(null);
 	const generateButtonRef = useRef<HTMLButtonElement>(null);
+	const downloadAnchorRef = useRef<HTMLAnchorElement>(null);
 
 	const scrollToGenerateButton = () => {
 		generateButtonContainerRef.current?.scrollIntoView({
@@ -640,14 +644,13 @@ export const ApplicationOverview: React.FC = () => {
 					/>
 				)}
 
-				{/* Invisible Iframe for SPA-Safe Downloading */}
-				{invisibleDownloadUrl && (
-					<iframe
-						src={invisibleDownloadUrl}
-						title="Download Handshake"
-						className="hidden border-none"
-					/>
-				)}
+				{/* Hidden anchor used to trigger cross-browser-safe downloads synchronously from a user click */}
+				<a
+					ref={downloadAnchorRef}
+					className="hidden"
+					aria-hidden="true"
+					tabIndex={-1}
+				/>
 
 				{/* PDF Preview Modal */}
 				{showPreviewModal && (
@@ -660,7 +663,6 @@ export const ApplicationOverview: React.FC = () => {
 								URL.revokeObjectURL(pdfUrl);
 							}
 							setPdfUrl(null);
-							setInvisibleDownloadUrl(null);
 						}}
 						isExpired={isExpired}
 						generateAndShowPdf={generateAndShowPdf}
@@ -669,7 +671,7 @@ export const ApplicationOverview: React.FC = () => {
 						pdfUrl={pdfUrl}
 						secondsRemaining={secondsRemaining}
 						exportUrls={exportUrls}
-						setInvisibleDownloadUrl={setInvisibleDownloadUrl}
+						downloadAnchorRef={downloadAnchorRef}
 						onDownloadSuccess={() => {
 							setShowPreviewModal(false);
 							setShowSuccessModal(true);

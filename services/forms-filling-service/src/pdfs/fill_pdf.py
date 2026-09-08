@@ -1,8 +1,12 @@
 import io
+import logging
 import re
 import pdfrw
+import pymupdf
 from typing import Any, Dict, Tuple
 from src.pdfs.pdf_fields import discover_fields
+
+logger = logging.getLogger(__name__)
 
 
 def _pdf_literal_to_unicode(text: str) -> str:
@@ -38,6 +42,52 @@ def _match_choice_pdf_value(value: str, options: list[str], opt_array: list[Any]
             pdf_val = entry[0] if isinstance(entry, pdfrw.PdfArray) else entry
             return pdf_val, index
     return pdfrw.PdfString.encode(resolved), None
+
+
+def _render_text_appearances(
+    pdf_bytes: bytes, targets: Dict[str, str], choice_opt_indices: Dict[str, int]
+) -> bytes:
+    """Regenerates /AP appearance streams for string/choice widgets via pymupdf, then
+    clears /NeedAppearances so viewers display these baked-in streams as-is instead of
+    regenerating their own. Firefox's pdf.js mostly ignores /NeedAppearances and just
+    renders whatever /AP already contains; Chrome's PDFium and Safari's PDF viewer instead honor
+    the flag and regenerate their own appearance for every widget. Widgets not named in `targets` (checkboxes, radios, and any field
+    not being filled) are left untouched.
+    """
+    doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
+    try:
+        for page in doc:
+            for widget in page.widgets() or []:
+                name = widget.field_name
+                if name not in targets:
+                    continue
+                widget.field_value = targets[name]
+                widget.update()
+                opt_index = choice_opt_indices.get(name)
+                if opt_index is not None:
+                    # Widget.update() drops /I for choice fields; restore it since
+                    # some downstream consumers of the raw PDF read it directly.
+                    doc.xref_set_key(widget.xref, "I", str(opt_index))
+
+        catalog_xref = doc.pdf_catalog()
+        kind, value = doc.xref_get_key(catalog_xref, "AcroForm")
+        if kind == "xref":
+            acroform_xref = int(value.split()[0])
+            doc.xref_set_key(acroform_xref, "NeedAppearances", "false")
+
+        return doc.tobytes()
+    finally:
+        doc.close()
+
+
+def _reconcile_acroform_fields(pdf_bytes: bytes) -> bytes:
+    reader = pdfrw.PdfReader(fdata=pdf_bytes)
+    discovered = discover_fields(reader)
+    reader.Root.AcroForm.Fields = pdfrw.PdfArray(info.root for info in discovered.values())
+
+    output_stream = io.BytesIO()
+    pdfrw.PdfWriter().write(output_stream, reader)
+    return output_stream.getvalue()
 
 
 def fill_pdf_form(pdf_bytes: bytes, field_values: Dict[str, Any], ignore_read_only: bool = False) -> bytes:
@@ -99,6 +149,8 @@ def fill_pdf_form(pdf_bytes: bytes, field_values: Dict[str, Any], ignore_read_on
         del reader.Root.AcroForm[pdfrw.PdfName("XFA")]
     reader.Root.AcroForm.update(pdfrw.PdfDict(NeedAppearances=pdfrw.PdfObject("true")))
 
+    choice_opt_indices: Dict[str, int] = {}
+
     for field_name, value in resolved_values.items():
         field_info = discovered_fields[field_name]
         meta = field_info.metadata
@@ -136,6 +188,8 @@ def fill_pdf_form(pdf_bytes: bytes, field_values: Dict[str, Any], ignore_read_on
         elif meta["type"] == "choice":
             opt_array = _get_opt_array(root, field_info.widgets)
             pdf_val, opt_index = _match_choice_pdf_value(value, meta["options"], opt_array)
+            if opt_index is not None:
+                choice_opt_indices[field_name] = opt_index
             update_dict: Dict[Any, Any] = {
                 pdfrw.PdfName("V"): pdf_val,
                 pdfrw.PdfName("DV"): pdf_val,
@@ -159,4 +213,26 @@ def fill_pdf_form(pdf_bytes: bytes, field_values: Dict[str, Any], ignore_read_on
     output_stream = io.BytesIO()
     writer = pdfrw.PdfWriter()
     writer.write(output_stream, reader)
-    return output_stream.getvalue()
+    pdf_out = output_stream.getvalue()
+
+    # Text and choice fields don't ship pre-baked /AP sub-appearances the way
+    # checkboxes/radios do, so /V alone leaves them blank in viewers that don't
+    # honor /NeedAppearances.
+    # Regenerate real appearance streams for just those widgets with pymupdf.
+    appearance_targets = {
+        name: value
+        for name, value in resolved_values.items()
+        if discovered_fields[name].metadata["type"] in ("string", "choice")
+    }
+    if appearance_targets:
+        try:
+            pdf_out = _render_text_appearances(pdf_out, appearance_targets, choice_opt_indices)
+            pdf_out = _reconcile_acroform_fields(pdf_out)
+        except Exception:
+            logger.warning(
+                "Falling back to /NeedAppearances-only rendering: pymupdf appearance "
+                "generation failed for one or more fields.",
+                exc_info=True,
+            )
+
+    return pdf_out
