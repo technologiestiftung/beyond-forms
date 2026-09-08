@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Bootstrap local dev environment
         run: |
@@ -23,9 +23,9 @@ jobs:
           ./scripts/bootstrap.sh
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: "npm"
           cache-dependency-path: services/wallet-frontend/package-lock.json
       - name: Install Dependencies
@@ -127,7 +127,7 @@ jobs:
 
       - name: Upload Playwright report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: services/wallet-frontend/playwright-report/
