@@ -1,13 +1,18 @@
 import { readFileSync } from "node:fs";
 import { test, expect } from "@playwright/test";
 import { PDFDocument, PDFName, PDFDict, PDFBool } from "pdf-lib";
+import helmutPersona from "../../../demo/personas/helmut.json" with { type: "json" };
 import { ensureAuthenticatedSession, isRemoteEnvironment } from "./helpers/auth";
+import { gotoWithRetry } from "./helpers/navigation";
 
-const HELMUT_PHONE = "+493023125102";
+const helmut = helmutPersona.profile;
+
+// Derived from demo/personas/helmut.json, the single source of truth the demo
+// seeder feeds into the profile the form filler reads.
 const HELMUT_EXPECTED_FIELDS: Record<string, string> = {
-	"MZ1.3-ET_PersAngFamilienname": "Klar",
-	"MZ1.3-ET_PersAngVornamen": "Helmut",
-	"MZ1.3-ET_PersAngGeburtsort": "Berlin",
+	"MZ1.3-ET_PersAngFamilienname": helmut.last_name,
+	"MZ1.3-ET_PersAngVornamen": helmut.first_name,
+	"MZ1.3-ET_PersAngGeburtsort": helmut.place_of_birth,
 };
 
 test.describe("Housing Allowance PDF export", () => {
@@ -21,9 +26,9 @@ test.describe("Housing Allowance PDF export", () => {
 		page,
 		baseURL,
 	}) => {
-		await ensureAuthenticatedSession(page, baseURL, HELMUT_PHONE);
+		await ensureAuthenticatedSession(page, baseURL, helmutPersona.phone_number);
 
-		await page.goto("/dashboard");
+		await gotoWithRetry(page, "/dashboard");
 		await page.getByTestId("generate-antrag_wohngeld-button").click();
 
 		const downloadButton = page.getByTestId("download-antrag_wohngeld-button");

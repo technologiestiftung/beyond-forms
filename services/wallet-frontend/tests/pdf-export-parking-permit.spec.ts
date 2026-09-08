@@ -1,14 +1,20 @@
 import { readFileSync } from "node:fs";
 import { test, expect } from "@playwright/test";
 import { PDFDocument, PDFName, PDFDict, PDFBool } from "pdf-lib";
+import helmutPersona from "../../../demo/personas/helmut.json" with { type: "json" };
 import { ensureAuthenticatedSession, isRemoteEnvironment } from "./helpers/auth";
+import { gotoWithRetry } from "./helpers/navigation";
 
-const HELMUT_PHONE = "+493023125102";
+const helmut = helmutPersona.profile;
+
+// Mirrors forms/mappings/antrag_bewohnerparkausweis.toml so a persona edit
+// (demo/personas/helmut.json is the seed's single source of truth) can't
+// silently break this test.
 const HELMUT_EXPECTED_FIELDS: Record<string, string> = {
-	Kennzeichen: "B-HK 1947",
-	"Name Vorname Antragsteller": "Klar, Helmut",
-	"Straße HausNr Antragsteller": "Hauptstraße 4",
-	"PLZ Wohnort Antragsteller": "10820 Berlin",
+	Kennzeichen: helmut.license_plate,
+	"Name Vorname Antragsteller": `${helmut.last_name}, ${helmut.first_name}`,
+	"Straße HausNr Antragsteller": `${helmut.street} ${helmut.house_number}`,
+	"PLZ Wohnort Antragsteller": `${helmut.zip_code} ${helmut.city}`,
 };
 
 test.describe("Parking Permit PDF export", () => {
@@ -22,9 +28,9 @@ test.describe("Parking Permit PDF export", () => {
 		page,
 		baseURL,
 	}) => {
-		await ensureAuthenticatedSession(page, baseURL, HELMUT_PHONE);
+		await ensureAuthenticatedSession(page, baseURL, helmutPersona.phone_number);
 
-		await page.goto("/dashboard");
+		await gotoWithRetry(page, "/dashboard");
 		await page
 			.getByTestId("generate-antrag_bewohnerparkausweis-button")
 			.click();

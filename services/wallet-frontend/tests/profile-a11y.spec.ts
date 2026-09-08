@@ -4,12 +4,13 @@ import {
 	ensureAuthenticatedSession,
 	generateRandomTestPhoneNumber,
 } from "./helpers/auth";
+import { gotoWithRetry } from "./helpers/navigation";
 
 test.describe("Profile MVP - Sandor Accessibility Audit", () => {
 	test.beforeEach(async ({ page, baseURL }) => {
 		const randomPhone = generateRandomTestPhoneNumber();
 		await ensureAuthenticatedSession(page, baseURL, randomPhone);
-		await page.goto("/profile");
+		await gotoWithRetry(page, "/profile");
 		await expect(page.getByTestId("profile-name")).toBeVisible();
 	});
 
