@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import { test, expect } from "@playwright/test";
 import { PDFDocument, PDFName, PDFDict, PDFBool } from "pdf-lib";
 import { ensureAuthenticatedSession, isRemoteEnvironment } from "./helpers/auth";
@@ -25,14 +26,15 @@ test.describe("Housing Allowance PDF export", () => {
 		await page.goto("/dashboard");
 		await page.getByTestId("generate-antrag_wohngeld-button").click();
 
-		const openLink = page.getByTestId("open-antrag_wohngeld-link");
-		await expect(openLink).toBeVisible({ timeout: 30000 });
-		const href = await openLink.getAttribute("href");
-		expect(href).toBeTruthy();
+		const downloadButton = page.getByTestId("download-antrag_wohngeld-button");
+		await expect(downloadButton).toBeVisible({ timeout: 30000 });
 
-		const response = await page.request.get(href as string);
-		expect(response.ok()).toBeTruthy();
-		const pdfBytes = await response.body();
+		const downloadPromise = page.waitForEvent("download", { timeout: 15000 });
+		await downloadButton.click();
+		const download = await downloadPromise;
+		const downloadPath = await download.path();
+		expect(downloadPath).toBeTruthy();
+		const pdfBytes = fs.readFileSync(downloadPath as string);
 
 		const pdfDoc = await PDFDocument.load(pdfBytes);
 		const form = pdfDoc.getForm();

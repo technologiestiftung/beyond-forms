@@ -45,7 +45,10 @@ def _match_choice_pdf_value(value: str, options: list[str], opt_array: list[Any]
 
 
 def _render_text_appearances(
-    pdf_bytes: bytes, targets: Dict[str, str], choice_opt_indices: Dict[str, int]
+    pdf_bytes: bytes,
+    targets: Dict[str, str],
+    choice_opt_indices: Dict[str, int],
+    choice_pdf_values: Dict[str, str],
 ) -> bytes:
     """Regenerates /AP appearance streams for string/choice widgets via pymupdf, then
     clears /NeedAppearances so viewers display these baked-in streams as-is instead of
@@ -68,6 +71,10 @@ def _render_text_appearances(
                     # Widget.update() drops /I for choice fields; restore it since
                     # some downstream consumers of the raw PDF read it directly.
                     doc.xref_set_key(widget.xref, "I", str(opt_index))
+                choice_pdf_value = choice_pdf_values.get(name)
+                if choice_pdf_value is not None:
+                    doc.xref_set_key(widget.xref, "V", choice_pdf_value)
+                    doc.xref_set_key(widget.xref, "DV", choice_pdf_value)
 
         catalog_xref = doc.pdf_catalog()
         kind, value = doc.xref_get_key(catalog_xref, "AcroForm")
@@ -150,6 +157,7 @@ def fill_pdf_form(pdf_bytes: bytes, field_values: Dict[str, Any], ignore_read_on
     reader.Root.AcroForm.update(pdfrw.PdfDict(NeedAppearances=pdfrw.PdfObject("true")))
 
     choice_opt_indices: Dict[str, int] = {}
+    choice_pdf_values: Dict[str, str] = {}
 
     for field_name, value in resolved_values.items():
         field_info = discovered_fields[field_name]
@@ -190,6 +198,7 @@ def fill_pdf_form(pdf_bytes: bytes, field_values: Dict[str, Any], ignore_read_on
             pdf_val, opt_index = _match_choice_pdf_value(value, meta["options"], opt_array)
             if opt_index is not None:
                 choice_opt_indices[field_name] = opt_index
+            choice_pdf_values[field_name] = str(pdf_val)
             update_dict: Dict[Any, Any] = {
                 pdfrw.PdfName("V"): pdf_val,
                 pdfrw.PdfName("DV"): pdf_val,
@@ -226,7 +235,9 @@ def fill_pdf_form(pdf_bytes: bytes, field_values: Dict[str, Any], ignore_read_on
     }
     if appearance_targets:
         try:
-            pdf_out = _render_text_appearances(pdf_out, appearance_targets, choice_opt_indices)
+            pdf_out = _render_text_appearances(
+                pdf_out, appearance_targets, choice_opt_indices, choice_pdf_values
+            )
             pdf_out = _reconcile_acroform_fields(pdf_out)
         except Exception:
             logger.warning(

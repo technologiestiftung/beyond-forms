@@ -3,18 +3,23 @@ import { useTranslation } from "react-i18next";
 import { env } from "../config/env.config";
 import { authenticatedFetch } from "../utils/apiClient";
 
+export interface GeneratedApplication {
+	openUrl: string;
+	downloadUrl: string;
+	filename: string;
+	expiresInSeconds: number;
+}
+
 /**
- * Generates a filled application PDF for a given form type and returns a URL that
- * can be opened or downloaded. Mirrors the mock/real branching already used by the
- * Grundsicherung wizard's PDF export (see ApplicationOverview.tsx), so simplified
- * application types without a wizard can reuse the same behavior.
+ * Generates a filled application PDF for a given form type and returns the signed
+ * URL pair (inline preview + forced download) a PdfPreviewModal needs.
  */
 export function useGenerateApplication(formType: string) {
 	const { t } = useTranslation("dashboard");
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const generate = async (): Promise<string | null> => {
+	const generate = async (): Promise<GeneratedApplication | null> => {
 		setIsGenerating(true);
 		setError(null);
 		try {
@@ -28,7 +33,13 @@ export function useGenerateApplication(formType: string) {
 					bytes[i] = binaryString.charCodeAt(i);
 				}
 				const blob = new Blob([bytes], { type: "application/pdf" });
-				return URL.createObjectURL(blob);
+				const url = URL.createObjectURL(blob);
+				return {
+					openUrl: url,
+					downloadUrl: url,
+					filename: `${formType}.pdf`,
+					expiresInSeconds: 60,
+				};
 			}
 
 			const response = await authenticatedFetch(
@@ -40,10 +51,21 @@ export function useGenerateApplication(formType: string) {
 			const contentType = response.headers.get("content-type") || "";
 			if (contentType.includes("application/json")) {
 				const data = await response.json();
-				return data.signed_open_url as string;
+				return {
+					openUrl: data.signed_open_url as string,
+					downloadUrl: data.signed_download_url as string,
+					filename: (data.filename as string) || `${formType}.pdf`,
+					expiresInSeconds: (data.expires_in_seconds as number) || 60,
+				};
 			}
 			const blob = await response.blob();
-			return URL.createObjectURL(blob);
+			const url = URL.createObjectURL(blob);
+			return {
+				openUrl: url,
+				downloadUrl: url,
+				filename: `${formType}.pdf`,
+				expiresInSeconds: 60,
+			};
 		} catch (err) {
 			console.error(`Failed to generate ${formType}:`, err);
 			setError(

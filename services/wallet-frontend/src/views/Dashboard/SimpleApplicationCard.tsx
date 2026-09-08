@@ -2,7 +2,11 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { PrimaryButton } from "../../components/ui/PrimaryButton";
-import { useGenerateApplication } from "../../hooks/useGenerateApplication";
+import { PdfPreviewModal } from "../../components/Application/PdfPreviewModal";
+import {
+	useGenerateApplication,
+	type GeneratedApplication,
+} from "../../hooks/useGenerateApplication";
 import { useFormCompleteness } from "../../hooks/useFormCompleteness";
 import { CompletenessIndicator } from "../../components/Application/CompletenessIndicator";
 
@@ -30,14 +34,24 @@ export const SimpleApplicationCard: React.FC<SimpleApplicationCardProps> = ({
 	const { t } = useTranslation("dashboard");
 	const { generate, isGenerating, error } = useGenerateApplication(formType);
 	const { level } = useFormCompleteness(formType);
-	const [pdfUrl, setPdfUrl] = React.useState<string | null>(null);
+	const [application, setApplication] =
+		React.useState<GeneratedApplication | null>(null);
+	const [showPreviewModal, setShowPreviewModal] = React.useState(false);
 
 	const handleGenerate = async () => {
-		setPdfUrl(null);
-		const url = await generate();
-		if (url) {
-			setPdfUrl(url);
+		const result = await generate();
+		if (result) {
+			setApplication(result);
+			setShowPreviewModal(true);
 		}
+	};
+
+	const closePreview = () => {
+		setShowPreviewModal(false);
+		if (application?.openUrl.startsWith("blob:")) {
+			URL.revokeObjectURL(application.openUrl);
+		}
+		setApplication(null);
 	};
 
 	return (
@@ -69,27 +83,27 @@ export const SimpleApplicationCard: React.FC<SimpleApplicationCardProps> = ({
 				</p>
 			)}
 
-			{pdfUrl ? (
-				<a
-					href={pdfUrl}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="inline-flex items-center justify-center rounded-full w-full bg-primary-green-500 text-primary-blue-500 text-body-lg font-medium min-h-12 px-10 py-2.5 transition-colors hover:bg-primary-green-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-blue-500"
-					data-testid={`open-${formType}-link`}
-				>
-					{t("sections.applications.open_button", "Antrag öffnen")}
-				</a>
-			) : (
-				<PrimaryButton
-					onClick={() => void handleGenerate()}
-					disabled={isGenerating}
-					data-testid={`generate-${formType}-button`}
-				>
-					{isGenerating && (
-						<Loader2 className="size-5 animate-spin mr-2 shrink-0" />
-					)}
-					{t("sections.applications.generate_button", "Antrag generieren")}
-				</PrimaryButton>
+			<PrimaryButton
+				onClick={() => void handleGenerate()}
+				disabled={isGenerating}
+				data-testid={`generate-${formType}-button`}
+			>
+				{isGenerating && (
+					<Loader2 className="size-5 animate-spin mr-2 shrink-0" />
+				)}
+				{t("sections.applications.generate_button", "Antrag generieren")}
+			</PrimaryButton>
+
+			{showPreviewModal && application && (
+				<PdfPreviewModal
+					key={application.downloadUrl}
+					onClose={closePreview}
+					pdfUrl={application.openUrl}
+					downloadUrl={application.downloadUrl}
+					downloadFilename={application.filename}
+					onDownloadSuccess={closePreview}
+					downloadButtonTestId={`download-${formType}-button`}
+				/>
 			)}
 		</div>
 	);
