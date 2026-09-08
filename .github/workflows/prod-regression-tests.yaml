@@ -37,5 +37,5 @@ jobs:
         env:
           PLAYWRIGHT_BASE_URL: https://prod.bf.citylab-berlin.org
           PROD_TEST_BYPASS_KEY: ${{ secrets.PROD_TEST_BYPASS_KEY }}
-        run: npx playwright test --config=playwright.remote.config.ts
+        run: npx playwright test --config=playwright.remote.config.ts --project=chromium-mobile
         working-directory: services/wallet-frontend

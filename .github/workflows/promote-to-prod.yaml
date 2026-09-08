@@ -39,7 +39,7 @@ jobs:
       - name: Execute Staging E2E Audit Tests
         env:
           PROD_TEST_BYPASS_KEY: ${{ secrets.PROD_TEST_BYPASS_KEY }}
-        run: npx playwright test --config=playwright.remote.config.ts
+        run: npx playwright test --config=playwright.remote.config.ts --project=chromium-mobile
         working-directory: services/wallet-frontend
 
       - name: Promote Staging to Production
