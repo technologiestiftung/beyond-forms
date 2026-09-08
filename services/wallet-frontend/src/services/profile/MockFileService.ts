@@ -44,7 +44,6 @@ export class MockFileService {
 			type,
 			status: ProcessingStatusEnum.enum.PROCESSING,
 			uploadDate: new Date().toISOString(),
-			confidence: 0,
 		};
 
 		// Update localStorage mock DB
@@ -88,7 +87,6 @@ export class MockFileService {
 			type: items[0].type,
 			status: ProcessingStatusEnum.enum.PROCESSING,
 			uploadDate: new Date().toISOString(),
-			confidence: 0,
 		};
 		const mockDoc2: WalletDocument = {
 			id:
@@ -99,7 +97,6 @@ export class MockFileService {
 			type: items[1].type,
 			status: ProcessingStatusEnum.enum.PROCESSING,
 			uploadDate: new Date().toISOString(),
-			confidence: 0,
 		};
 
 		// Update localStorage mock DB

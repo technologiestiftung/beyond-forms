@@ -117,7 +117,6 @@ describe("DocumentDropzone", () => {
 				type: "ID_CARD",
 				status: "PROCESSING",
 				uploadDate: new Date().toISOString(),
-				confidence: 1,
 			},
 		};
 		vi.mocked(fileService.uploadFile).mockResolvedValue(mockResp);
@@ -176,7 +175,6 @@ describe("DocumentDropzone", () => {
 				type: "ID_CARD",
 				status: "PROCESSING",
 				uploadDate: new Date().toISOString(),
-				confidence: 1,
 			},
 		};
 		vi.mocked(fileService.uploadFile).mockResolvedValue(mockResp);
@@ -236,7 +234,6 @@ describe("DocumentDropzone", () => {
 				type: "ID_CARD",
 				status: "PROCESSING",
 				uploadDate: new Date().toISOString(),
-				confidence: 1,
 			},
 		};
 		vi.mocked(fileService.uploadFile).mockResolvedValue(mockResp);
@@ -344,7 +341,6 @@ describe("DocumentDropzone", () => {
 				type: "ID_CARD",
 				status: "PROCESSING",
 				uploadDate: new Date().toISOString(),
-				confidence: 1,
 			},
 		};
 		vi.mocked(fileService.uploadFile).mockResolvedValue(mockResp);
@@ -401,7 +397,6 @@ describe("DocumentDropzone", () => {
 				type: "ID_CARD",
 				status: "PROCESSING",
 				uploadDate: new Date().toISOString(),
-				confidence: 1,
 			},
 		};
 		vi.mocked(fileService.uploadFile).mockResolvedValue(mockResp);
@@ -444,7 +439,6 @@ describe("DocumentDropzone", () => {
 				type: "ID_CARD",
 				status: "PROCESSING",
 				uploadDate: new Date().toISOString(),
-				confidence: 1,
 			},
 		};
 		vi.mocked(fileService.uploadFile).mockResolvedValue(mockResp);
@@ -502,7 +496,6 @@ describe("DocumentDropzone", () => {
 				type: "ID_CARD",
 				status: "PROCESSING",
 				uploadDate: new Date().toISOString(),
-				confidence: 1,
 			},
 		};
 		vi.mocked(fileService.uploadFile).mockResolvedValue(mockResp);
@@ -595,7 +588,6 @@ describe("DocumentDropzone", () => {
 				type: "ID_CARD",
 				status: "PROCESSING",
 				uploadDate: new Date().toISOString(),
-				confidence: 1,
 			},
 		};
 		vi.mocked(fileService.uploadFile).mockResolvedValue(mockResp);
@@ -661,7 +653,6 @@ describe("DocumentDropzone", () => {
 				type: "ID_CARD",
 				status: "PROCESSING",
 				uploadDate: new Date().toISOString(),
-				confidence: 1,
 			},
 		};
 		vi.mocked(fileService.uploadFile).mockResolvedValue(mockResp);

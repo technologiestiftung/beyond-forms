@@ -64,7 +64,7 @@ async def test_entity_extractor_success(mock_acompletion):
     extractor_func = init_entity_extractor(model_name="test-model", document_registry=registry)
 
     # 2. Setup Input and Mock LLM Response
-    classified_doc = ClassifiedDocument(document_type="mock_invoice", system_label="A", confidence=1.0)
+    classified_doc = ClassifiedDocument(document_type="mock_invoice", system_label="A")
 
     class MockMessage:
         def __init__(self, content):
@@ -106,7 +106,7 @@ async def test_extractor_handles_unknown_type_safely(mock_acompletion):
     registry = DocumentRegistry()
     extractor_func = init_entity_extractor("test-model", registry)
 
-    classified_doc = ClassifiedDocument(document_type=UNKNOWN_TYPE, system_label="?", confidence=0.0)
+    classified_doc = ClassifiedDocument(document_type=UNKNOWN_TYPE, system_label="?")
 
     # This should now return gracefully instead of raising ValueError
     result = await extractor_func(classified_doc, "data", "image/png")
@@ -127,7 +127,7 @@ async def test_extractor_returns_none_on_llm_failure(mock_acompletion):
 
     registry.register("dummy_class", DummyClass)
 
-    doc = ClassifiedDocument(document_type="dummy_class", system_label="A", confidence=1.0)
+    doc = ClassifiedDocument(document_type="dummy_class", system_label="A")
 
     async def mock_async_fail(*args, **kwargs):
         raise RuntimeError("Broken connection mock")

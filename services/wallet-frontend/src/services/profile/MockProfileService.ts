@@ -90,7 +90,6 @@ export class MockProfileService implements IProfileService {
 					name: "Personalausweis_Sandor.pdf",
 					type: "ID_CARD",
 					status: "COMPLETED",
-					confidence: 0.98,
 					uploadDate: new Date().toISOString(),
 				},
 			],

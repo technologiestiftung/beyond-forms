@@ -128,14 +128,12 @@ def process_message(message):
             # Stateless extract returns: {extracted_data: {...}}
             extraction_result = dis_data.get("extracted_data", {})
             doc_type = DIS_TO_SLOT_ID_MAP.get(user_selected_type, "OTHER")
-            confidence = 1.0
         else:
             # Classify returns: {classified_document: {...}, extraction_result: {...}}
             classified_doc = dis_data.get("classified_document", {})
             extraction_result = dis_data.get("extraction_result", {})
             raw_doc_type = classified_doc.get("document_type", "unknown")
             doc_type = DIS_TO_SLOT_ID_MAP.get(raw_doc_type, "OTHER")
-            confidence = classified_doc.get("confidence", 0.0)
 
         raw_data = extraction_result if extraction_result else {}
 
@@ -148,7 +146,6 @@ def process_message(message):
                 UPDATE user_documents
                 SET status = :new_status,
                     document_type = :doc_type,
-                    confidence_score = :confidence,
                     raw_data = CAST(:raw_data AS JSONB),
                     user_error_code = :user_error_code,
                     updated_at = NOW()
@@ -157,7 +154,6 @@ def process_message(message):
             {
                 "new_status": new_status,
                 "doc_type": doc_type,
-                "confidence": confidence,
                 "raw_data": json.dumps(raw_data),
                 "user_error_code": user_error_code,
                 "doc_id": document_id,

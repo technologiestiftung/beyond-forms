@@ -97,7 +97,6 @@ describe("CategoryDocumentsView", () => {
 				type: "ID_CARD",
 				status: "VERIFIED",
 				uploadDate: new Date().toISOString(),
-				confidence: 0.98,
 			},
 		]);
 

@@ -57,7 +57,7 @@ async def test_classify_endpoint_full_flow(mock_classifier, mock_extractor):
     An integration test that simulates a file upload and verifies the
     coordination between classification and extraction.
     """
-    mock_classification = ClassifiedDocument(document_type="identity_document", system_label="A", confidence=0.95)
+    mock_classification = ClassifiedDocument(document_type="identity_document", system_label="A")
 
     mock_classifier.return_value = AsyncMock(return_value=mock_classification)
     mock_extractor.return_value = AsyncMock(return_value={"given_names": "Max", "last_name": "Mustermann"})
@@ -132,7 +132,7 @@ def test_stateless_extract_endpoint():
     mock_json = json.dumps(
         {
             "extracted_data": {"first_name": "Jane"},
-            "extraction_metadata": {"first_name": {"status": "SUCCESS", "confidence": "HIGH"}},
+            "extraction_metadata": {"first_name": {"status": "SUCCESS"}},
         }
     )
 

@@ -44,8 +44,6 @@ export class FileService {
 					document_type?: string;
 					type?: string;
 					status?: string;
-					confidence_score?: number;
-					confidence?: number;
 					upload_date?: string;
 					uploadDate?: string;
 					updated_at?: string;
@@ -62,7 +60,6 @@ export class FileService {
 				status: (doc.status
 					? doc.status.toUpperCase()
 					: "PROCESSING") as ProcessingStatus,
-				confidence: doc.confidence_score || doc.confidence,
 				uploadDate:
 					doc.upload_date || doc.uploadDate || new Date().toISOString(),
 				updatedAt: doc.updated_at || doc.updatedAt,
@@ -145,7 +142,6 @@ export class FileService {
 					type: type,
 					status: "PROCESSING",
 					uploadDate: new Date().toISOString(),
-					confidence: 0,
 				},
 			};
 		} catch (error) {
@@ -202,7 +198,6 @@ export class FileService {
 							type: items[index].type,
 							status: "PROCESSING" as const,
 							uploadDate: new Date().toISOString(),
-							confidence: 0,
 						},
 					} as FileUploadResponse;
 				}

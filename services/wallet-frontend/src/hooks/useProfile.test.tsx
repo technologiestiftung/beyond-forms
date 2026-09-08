@@ -49,7 +49,6 @@ describe("useProfile - Deletion & Optimistic Updates", () => {
 				type: "id_card" as const,
 				status: "VERIFIED" as const,
 				uploadDate: new Date().toISOString(),
-				confidence: 0.99,
 			},
 		];
 		queryClient.setQueryData(["profile"], { profile: {}, files: initialDocs });

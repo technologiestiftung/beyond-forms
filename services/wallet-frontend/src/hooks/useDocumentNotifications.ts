@@ -34,7 +34,6 @@ export function useDocumentNotifications() {
 						return {
 							...doc,
 							status: "COMPLETED",
-							confidence: 0.85 + Math.random() * 0.1,
 						} as WalletDocument;
 					}
 					return doc;
