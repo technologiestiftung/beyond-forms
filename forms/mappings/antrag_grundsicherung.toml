@@ -1,5 +1,5 @@
 # Field Mapping for antrag_grundsicherung.pdf
-# Run './forms/scripts/validate_mappings.sh' to verify substitutions.
+# Run 'uv run --package orchestration-middleware-service forms/scripts/validate_mappings.py' to verify substitutions.
 # Expressions wrapped in {{ }} are treated as JEXL.
 # See JEXL syntax: https://commons.apache.org/proper/commons-jexl/reference/syntax.html
 

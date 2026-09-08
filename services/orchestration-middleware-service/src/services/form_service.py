@@ -20,6 +20,7 @@ from sqlalchemy.orm import Session
 from src.constants import SLOT_ID_TO_DIS_TYPE
 from src.db import get_db
 from src.models import DocumentStatusType, UserApplications, UserDocuments, Users
+from src.services.form_context import derived_context, row_to_dict
 from src.services.berlin_districts import resolve_berlin_district
 from src.utils import get_google_id_token
 
@@ -253,7 +254,7 @@ class FormService:
         Does not include the `documents` namespace; `fill_form` layers that on top
         using the returned application, since it's the only caller that needs it.
         """
-        user_dict = {c.name: getattr(user, c.name) for c in user.__table__.columns}
+        user_dict = row_to_dict(user)
 
         if not user_dict.get("district") and user_dict.get("zip_code"):
             city = user_dict.get("city", "")
@@ -299,22 +300,7 @@ class FormService:
             logger.warning("Database is currently not reachable")
 
         context = user_dict.copy()
-        context["today"] = datetime.date.today()
-        if context.get("household_members"):
-            # Stored as ISO strings in JSONB (unlike native `Date` columns), so they
-            # need parsing here to get the same automatic dd.mm.yyyy formatting as
-            # every other date field in the mapping layer.
-            context["household_members"] = [
-                {
-                    **member,
-                    "date_of_birth": (
-                        datetime.date.fromisoformat(member["date_of_birth"])
-                        if member.get("date_of_birth")
-                        else member.get("date_of_birth")
-                    ),
-                }
-                for member in context["household_members"]
-            ]
+        context.update(derived_context(user_dict, user.associated_persons))
         for k, v in form_data.items():
             if k in context:
                 logger.warning(f"Key collision for {k}. Skipping document value and keeping user profile value.")

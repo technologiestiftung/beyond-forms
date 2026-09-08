@@ -37,7 +37,7 @@ fi
 # Generate TOML mapping
 {
     echo "# Field Mapping for $PDF_NAME"
-    echo "# Run './forms/scripts/validate_mappings.sh' to verify substitutions."
+    echo "# Run 'uv run --package orchestration-middleware-service forms/scripts/validate_mappings.py' to verify substitutions."
     echo "# Expressions wrapped in {{ }} are treated as JEXL."
     echo "# See JEXL syntax: https://commons.apache.org/proper/commons-jexl/reference/syntax.html"
     echo ""

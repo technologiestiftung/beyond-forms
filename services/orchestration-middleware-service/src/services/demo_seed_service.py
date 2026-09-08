@@ -44,7 +44,11 @@ from src.models import (
 )
 from src.services.berlin_districts import sync_berlin_district
 from src.services.demo_assets import resolve_asset
-from src.services.user_service import UserService
+from src.services.user_service import (
+    ProfileWriteError,
+    UserService,
+    apply_profile_key,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -248,6 +252,10 @@ class DemoSeedService:
         self.db.query(UserApplications).filter(UserApplications.fk_user_id == internal_user_id).delete(
             synchronize_session=False
         )
+        # `reset` nulls the `users` columns rather than deleting the row, so child rows
+        # are not swept up by a cascade. Without this the previous persona's household
+        # survives into the next seed.
+        db_user.associated_persons.clear()
         if reset_tutorials:
             from src.models import UserTutorialStates
 
@@ -297,6 +305,12 @@ class DemoSeedService:
         for key, value in persona["profile"].items():
             if key in PROTECTED_COLUMNS:
                 raise DemoSeedError(f"Persona {slug!r} may not set protected column {key!r}.")
+            try:
+                if apply_profile_key(db_user, key, value):
+                    applied.append(key)
+                    continue
+            except ProfileWriteError as exc:
+                raise DemoSeedError(f"Persona {slug!r} has an invalid {key!r} entry: {exc}") from exc
             column = columns.get(key)
             if column is None:
                 raise DemoSeedError(f"Persona {slug!r} sets unknown `users` column {key!r}.")

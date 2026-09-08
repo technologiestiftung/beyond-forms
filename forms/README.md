@@ -59,22 +59,22 @@ Generate a boilerplate mapping for a new PDF. This script extracts field names, 
 ./forms/scripts/extract_to_mapping.sh forms/pdfs/my_new_form.pdf
 ```
 
-### Generating Mapping Values
+### Generating Mapping Values (archived)
 
-Fill in the boilerplate's blank `value` fields with LLM-drafted JEXL, grounded in the live `Users` columns and the `documents` namespace (see `forms/scripts/llm-eval/README.md` for how the underlying model/prompt were chosen).
+> **`forms/scripts/llm-eval/` is archived.** It is kept for the benchmark record behind the
+> two mappings it drafted, and nothing live imports from it .
 
-```bash
-uv run forms/scripts/llm-eval/generate_mapping.py --form forms/mappings/my_new_form.toml
-```
-
-**The output is AI-drafted and must be reviewed by a human before use** — every generated line is a guess, not a verified fact about the database. Re-running is safe by default: only fields whose value is still blank get (re-)submitted to the model, so a reviewed hand-written value is never clobbered unless you pass `--overwrite-existing`.
+It filled a boilerplate's blank `value` fields with LLM-drafted JEXL (see
+`forms/scripts/llm-eval/README.md` for how the model and prompt were chosen). Every
+generated line was a guess, not a verified fact about the database, so its output always
+needed human review.
 
 ### Validating Mappings
 
-Ensure all `{{ column_name }}` substitutions refer to valid columns in the database. If it fails, it will list all available columns.
+Ensure every `{{ }}` reference resolves — `users` columns and `associated_persons` attributes are derived live from `models.py`, the derived context keys (`today`, `age`, `household_members`, `partner`, …) from `schema_context.py`.
 
 ```bash
-./forms/scripts/validate_mappings.sh
+uv run --package orchestration-middleware-service forms/scripts/validate_mappings.py
 ```
 
 ### Decrypting a PDF
@@ -89,6 +89,7 @@ Some source PDFs (e.g. exports from official portals) are encrypted with an empt
 
 - **ID Normalization**: PDF field IDs are prefixed with the page number (e.g., `p1_`) and normalized to lowercase with underscores.
 - **Type Safety**: The orchestration service automatically converts "True"/"False" string results from expressions into strict booleans before sending them to the filling service, ensuring checkboxes work correctly.
+- **Person Context**: `associated_persons` (everyone, in `sort_order`), `household_members` (only those with `lives_in_household`, matching a form's Person 1..8 slots), `household_members_count`, and `partner` (spouse/partner as a single object, regardless of whether they live in the household). Also `today`, `age`, `is_adult` and `has_reached_retirement_age`.
 - **Data Context**: Resolution uses a merged JEXL context built from the Postgres `Users` columns, the user's most recently updated `user_applications` row for the requested `form_type` (its `form_data` JSONB), and the latest verified `user_documents.raw_data` per document type (exposed as the `documents` namespace). On top-level key collision, `Users` columns take precedence over `form_data`; the `documents` namespace is isolated. Mappings can reference any of these interchangeably (e.g. `{{ first_name }}` from the profile, `{{ cost_of_rent }}` from `form_data`, `{{ documents.bank_statements.amount_rent }}` from OCR).
 
 ## Document Data Namespace
@@ -120,7 +121,7 @@ value = "{{ documents.bank_statements ? documents.bank_statements.amount_rent : 
 ### Adding a new document type binding
 
 1. Add a `@register_document("my_doc_type")` class in `libs/document-schemas/src/beyondforms/document_schemas/document_types.py` with the OCR fields.
-2. Reference `documents.my_doc_type.<field>` from a TOML mapping. `forms/scripts/validate_mappings.sh` picks up the new type automatically (it derives the list live from `document_types.py` — no file to keep in sync by hand anymore).
+2. Reference `documents.my_doc_type.<field>` from a TOML mapping. `forms/scripts/validate_mappings.py` picks up the new type automatically (it derives the list live from `document_types.py` — no file to keep in sync by hand anymore).
 
 ### Known limitation: unlabeled radio/choice options
 

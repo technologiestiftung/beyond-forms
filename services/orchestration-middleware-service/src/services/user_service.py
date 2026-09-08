@@ -6,10 +6,65 @@ from google.cloud import storage
 from fastapi import HTTPException, Depends
 from sqlalchemy.orm import Session
 
-from src.models import Users as DbUser, UserApplications, UserDocuments, DocumentStatusType, UploadedFiles
+from src.models import (
+    AssociatedPersons,
+    Users as DbUser,
+    UserApplications,
+    UserDocuments,
+    DocumentStatusType,
+    UploadedFiles,
+)
+from pydantic import BaseModel, ValidationError
+
+from src.schemas import AssociatedPersonSchema
 from src.db import get_db
 
 logger = logging.getLogger(__name__)
+
+
+class ProfileWriteError(Exception):
+    """A payload the caller sent is not writable. Every route translates this into its own
+    idiom (tool-error dict, HTTP 422, DemoSeedError) so one bad payload cannot mean three
+    different things depending on which endpoint received it."""
+
+
+def _collection_writer(model: type, schema: type[BaseModel], attr: str):
+    """Builds the writer for one child collection. `sort_order` is renumbered from list
+    order so the PDFs' fixed person slots do not shift when someone is removed from the
+    middle; the whole collection is replaced, and delete-orphan removes what dropped out."""
+
+    def write(user_row: DbUser, items: object) -> None:
+        if items is None:
+            items = []
+        if not isinstance(items, list):
+            raise ProfileWriteError(f"{attr}: expected a list, got {type(items).__name__}")
+        try:
+            rows = [schema.model_validate(item) for item in items]
+        except ValidationError as exc:
+            raise ProfileWriteError(f"{attr}: {exc}") from exc
+        setattr(
+            user_row,
+            attr,
+            [model(**{**row.model_dump(), "sort_order": index}) for index, row in enumerate(rows)],
+        )
+
+    return write
+
+
+RELATION_WRITERS = {
+    "associated_persons": _collection_writer(AssociatedPersons, AssociatedPersonSchema, "associated_persons"),
+}
+RELATION_KEYS = frozenset(RELATION_WRITERS)
+
+
+def apply_profile_key(user_row: DbUser, key: str, value: object) -> bool:
+    """Writes one payload key that is a relationship. Returns False if `key` is a plain
+    column, which the caller then assigns itself. Raises ProfileWriteError on bad input."""
+    writer = RELATION_WRITERS.get(key)
+    if writer is None:
+        return False
+    writer(user_row, value)
+    return True
 
 
 class UserService:

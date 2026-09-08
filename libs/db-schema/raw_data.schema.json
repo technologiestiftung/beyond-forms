@@ -1,0 +1,3385 @@
+{
+  "accommodation_assignment": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Official assignment notice to a specific accommodation or LAF facility.",
+        "title": "Description",
+        "type": "string"
+      },
+      "facility_address": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The full address of the assigned accommodation facility.",
+        "title": "Facility Address"
+      },
+      "assignment_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the individual was officially assigned to the facility.",
+        "title": "Assignment Date"
+      }
+    },
+    "title": "AccommodationAssignment",
+    "type": "object"
+  },
+  "address_proof": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Letter or rental confirmation confirming the current physical address. 'Wohnungsgeberbestätigung' in German.",
+        "title": "Description",
+        "type": "string"
+      },
+      "landlord_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the entity or landlord issuing the address confirmation.",
+        "title": "Landlord Name"
+      },
+      "landlord_address": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The address of the entity or landlord issuing the address confirmation.",
+        "title": "Landlord Address"
+      },
+      "owner_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the owner of the property.",
+        "title": "Owner Name"
+      },
+      "owner_address": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The address of the owner of the property.",
+        "title": "Owner Address"
+      },
+      "is_moving_in": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the document holder is moving in to the address.",
+        "title": "Is Moving In"
+      },
+      "date_of_moving": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the document holder moved in or out of the address.",
+        "title": "Date Of Moving"
+      },
+      "tenant_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the document holder.",
+        "title": "Tenant Name"
+      },
+      "tenant_address": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The address of the document holder.",
+        "title": "Tenant Address"
+      },
+      "confirmation_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the address proof was signed or issued.",
+        "title": "Confirmation Date"
+      }
+    },
+    "title": "AddressProof",
+    "type": "object"
+  },
+  "alimony_proof": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Proof of maintenance or alimony payments received or paid.",
+        "title": "Description",
+        "type": "string"
+      },
+      "recipient_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The full name of the individual receiving the alimony payments.",
+        "title": "Recipient Name"
+      },
+      "monthly_payment": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The recurring monthly alimony or child support amount.",
+        "title": "Monthly Payment"
+      }
+    },
+    "title": "AlimonyProof",
+    "type": "object"
+  },
+  "assets_declaration": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Official 'Anlage Vermögen' form declaring savings, real estate, and valuables.",
+        "title": "Description",
+        "type": "string"
+      },
+      "total_liquid_assets": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total value of readily available financial assets such as cash, bank balances, or stocks.",
+        "title": "Total Liquid Assets"
+      },
+      "owns_real_estate": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the individual owns any land, houses, or apartments.",
+        "title": "Owns Real Estate"
+      }
+    },
+    "title": "AssetsDeclaration",
+    "type": "object"
+  },
+  "asylblg_application": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Specific application form for benefits under the Asylbewerberleistungsgesetz.",
+        "title": "Description",
+        "type": "string"
+      },
+      "district_authority": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the specific social office or district authority receiving the application.",
+        "title": "District Authority"
+      },
+      "application_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the application for asylum benefits was submitted.",
+        "title": "Application Date"
+      }
+    },
+    "title": "AsylblgApplication",
+    "type": "object"
+  },
+  "asylum_stay_permit": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Aufenthaltsgestattung or Duldung document for individuals in the asylum process.",
+        "title": "Description",
+        "type": "string"
+      },
+      "document_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The unique identification number of the document, typically found at the top right.",
+        "title": "Document Id"
+      },
+      "given_names": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Given names of the document holder.",
+        "title": "Given Names"
+      },
+      "last_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Last name of the document holder.",
+        "title": "Last Name"
+      },
+      "valid_until": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the stay permit or suspension of deportation expires.",
+        "title": "Valid Until"
+      },
+      "limited_to_state": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The German state the document is limited to.",
+        "title": "Limited To State"
+      },
+      "employment_permitted": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the holder is legally allowed to pursue employment.",
+        "title": "Employment Permitted"
+      },
+      "issuing_authority": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the authority that issued the document.",
+        "title": "Issuing Authority"
+      }
+    },
+    "title": "AsylumStayPermit",
+    "type": "object"
+  },
+  "bank_details": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Formal document or form providing IBAN and BIC for benefit payments.",
+        "title": "Description",
+        "type": "string"
+      },
+      "iban": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The International Bank Account Number used for identifying the specific bank account.",
+        "title": "Iban"
+      },
+      "account_holder": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The full name of the person or entity who owns the bank account.",
+        "title": "Account Holder"
+      }
+    },
+    "title": "BankDetails",
+    "type": "object"
+  },
+  "bank_statements": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Bank statement, Kontoauszug, list of transactions, account balance, IBAN, credit and debit entries.",
+        "title": "Description",
+        "type": "string"
+      },
+      "iban": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The International Bank Account Number of the bank account.",
+        "title": "Iban"
+      },
+      "account_holder_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The full name of the account holder.",
+        "title": "Account Holder Name"
+      },
+      "statement_period_start": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The start date of the period covered by the bank statement.",
+        "title": "Statement Period Start"
+      },
+      "statement_period_end": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The end date of the period covered by the bank statement.",
+        "title": "Statement Period End"
+      },
+      "statement_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the bank statement was issued.",
+        "title": "Statement Date"
+      },
+      "account_balance": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The balance of the account at the end of the statement period.",
+        "title": "Account Balance"
+      },
+      "amount_health_insurance": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The recurring monthly amount of health insurance paid.",
+        "title": "Amount Health Insurance"
+      },
+      "amount_liability_insurance": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The recurring monthly amount of liability insurance paid.",
+        "title": "Amount Liability Insurance"
+      },
+      "amount_rent": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The recurring monthly amount of rent paid.",
+        "title": "Amount Rent"
+      },
+      "amount_pension": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The recurring monthly amount of pension received.",
+        "title": "Amount Pension"
+      }
+    },
+    "title": "BankStatements",
+    "type": "object"
+  },
+  "care_facility_costs": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Detailed breakdown of costs for accommodation, meals, and care components in a facility.",
+        "title": "Description",
+        "type": "string"
+      },
+      "investment_costs": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Specific costs related to the facility's capital and investment expenses.",
+        "title": "Investment Costs"
+      },
+      "catering_costs": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The portion of the facility fees dedicated to meals and catering.",
+        "title": "Catering Costs"
+      }
+    },
+    "title": "CareFacilityCosts",
+    "type": "object"
+  },
+  "care_home_contract": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Contract for residential care or assisted living facilities.",
+        "title": "Description",
+        "type": "string"
+      },
+      "monthly_base_cost": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The basic monthly cost for room and board in the facility.",
+        "title": "Monthly Base Cost"
+      },
+      "facility_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The official name of the care or assisted living facility.",
+        "title": "Facility Name"
+      }
+    },
+    "title": "CareHomeContract",
+    "type": "object"
+  },
+  "care_level_notice": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Notice defining the assigned care level (Pflegegrad).",
+        "title": "Description",
+        "type": "string"
+      },
+      "care_level": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The officially assigned care level, typically ranging from 1 to 5.",
+        "title": "Care Level"
+      },
+      "effective_from": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date from which the care level status was officially recognized.",
+        "title": "Effective From"
+      }
+    },
+    "title": "CareLevelNotice",
+    "type": "object"
+  },
+  "care_service_invoice": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Invoices from outpatient care services or nursing providers.",
+        "title": "Description",
+        "type": "string"
+      },
+      "invoice_amount": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total amount billed for the care services provided.",
+        "title": "Invoice Amount"
+      },
+      "service_period": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The timeframe during which the care services were performed.",
+        "title": "Service Period"
+      }
+    },
+    "title": "CareServiceInvoice",
+    "type": "object"
+  },
+  "cooperation_agreement": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Signed obligation to cooperate and data protection compliance agreement (Mitwirkungsverpflichtung + Datenschutzerklärung).",
+        "title": "Description",
+        "type": "string"
+      },
+      "is_signed": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the compliance agreement has been fully signed by the applicant.",
+        "title": "Is Signed"
+      },
+      "agreement_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the cooperation agreement was officially signed.",
+        "title": "Agreement Date"
+      }
+    },
+    "title": "CooperationAgreement",
+    "type": "object"
+  },
+  "disability_decision": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Official decision of full and permanent reduction in earning capacity (Erwerbsminderung).",
+        "title": "Description",
+        "type": "string"
+      },
+      "is_permanent": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the reduction in earning capacity is granted indefinitely.",
+        "title": "Is Permanent"
+      },
+      "decision_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the official disability decision was issued.",
+        "title": "Decision Date"
+      }
+    },
+    "title": "DisabilityDecision",
+    "type": "object"
+  },
+  "disability_id": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Official 'Schwerbehindertenausweis' showing the degree of disability (GdB).",
+        "title": "Description",
+        "type": "string"
+      },
+      "disability_degree": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The numerical degree of disability (Grad der Behinderung) from 20 to 100.",
+        "title": "Disability Degree"
+      },
+      "marks": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "A list of official disability codes or marks (e.g., G, aG, H, B, Bl).",
+        "title": "Marks"
+      }
+    },
+    "title": "DisabilityId",
+    "type": "object"
+  },
+  "divorce_decree": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Legal decree or proof of divorce or formal separation.",
+        "title": "Description",
+        "type": "string"
+      },
+      "divorce_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the divorce or dissolution of partnership became legally effective.",
+        "title": "Divorce Date"
+      },
+      "alimony_obligations_exist": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if there are ongoing legal requirements to pay maintenance to a former partner.",
+        "title": "Alimony Obligations Exist"
+      }
+    },
+    "title": "DivorceDecree",
+    "type": "object"
+  },
+  "health_insurance_proof": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Membership certificate or proof of statutory or private health insurance.",
+        "title": "Description",
+        "type": "string"
+      },
+      "full_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The full name of the insured person.",
+        "title": "Full Name"
+      },
+      "insurance_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The full name of the health insurance provider.",
+        "title": "Insurance Name"
+      },
+      "pension_insurance_number": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The unique pension insurance ID number of the insured person.",
+        "title": "Pension Insurance Number"
+      },
+      "health_insurance_status": {
+        "anyOf": [
+          {
+            "enum": [
+              "compulsory_insurance",
+              "voluntary_insurance",
+              "family_insurance",
+              "private_insurance",
+              "care_by_health_insurance_under_264_sgb_v"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The type of health insurance. German terms: 'Pflichtversicherung' (compulsory_insurance), 'Freiwillige Versicherung' (voluntary_insurance), 'Familienversicherung' (family_insurance), 'Private Versicherung' (private_insurance), 'Betreuung der Krankenkassen nach § 264 SGB V' (care_by_health_insurance_under_264_sgb_v).",
+        "title": "Health Insurance Status"
+      }
+    },
+    "title": "HealthInsuranceProof",
+    "type": "object"
+  },
+  "heating_costs_proof": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Invoices or statements specifically for heating costs (gas, district heating, etc.).",
+        "title": "Description",
+        "type": "string"
+      },
+      "fuel_type": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The primary energy source used for heating (e.g., Gas, Oil, Electricity).",
+        "title": "Fuel Type"
+      },
+      "annual_total_heating_costs": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total monetary cost of total heating costs for the year.",
+        "title": "Annual Total Heating Costs"
+      },
+      "annual_consumption_amount_kwh_per_square_meter": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The annual consumption amount of kWh per square meter of the property.",
+        "title": "Annual Consumption Amount Kwh Per Square Meter"
+      },
+      "heating_costs_regardless_of_usage": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total monetary cost of fuel consumption for the year, regardless of usage.",
+        "title": "Heating Costs Regardless Of Usage"
+      },
+      "heating_costs_usage_based": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total monetary cost of fuel consumption for the year, based on usage.",
+        "title": "Heating Costs Usage Based"
+      },
+      "warm_water_costs_regardless_of_usage": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total monetary cost of warm water consumption for the year, regardless of usage.",
+        "title": "Warm Water Costs Regardless Of Usage"
+      },
+      "warm_water_costs_usage_based": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total monetary cost of warm water consumption for the year, based on usage.",
+        "title": "Warm Water Costs Usage Based"
+      }
+    },
+    "title": "HeatingCostsProof",
+    "type": "object"
+  },
+  "home_ownership_costs": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Evidence of ongoing costs for owner-occupiers, including interest and insurance.",
+        "title": "Description",
+        "type": "string"
+      },
+      "monthly_interest": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The monthly interest portion of the mortgage payment (excluding principal).",
+        "title": "Monthly Interest"
+      },
+      "monthly_operating_costs": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The recurring monthly costs for insurance, taxes, and maintenance.",
+        "title": "Monthly Operating Costs"
+      }
+    },
+    "title": "HomeOwnershipCosts",
+    "type": "object"
+  },
+  "household_declaration": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Declaration of household members and community of need (Bedarfsgemeinschaft).",
+        "title": "Description",
+        "type": "string"
+      },
+      "member_count": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total number of people living in the household/community of need.",
+        "title": "Member Count"
+      },
+      "has_partner_in_household": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if a spouse or life partner resides in the same household.",
+        "title": "Has Partner In Household"
+      }
+    },
+    "title": "HouseholdDeclaration",
+    "type": "object"
+  },
+  "housing_costs_form": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Official 'Anlage KDU' form for rent, heating, and service charges.",
+        "title": "Description",
+        "type": "string"
+      },
+      "base_rent": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The basic monthly rent amount excluding heating and utility service charges.",
+        "title": "Base Rent"
+      },
+      "heating_type": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The primary method used for heating the residence (e.g., Gas, District Heating, Oil).",
+        "title": "Heating Type"
+      }
+    },
+    "title": "HousingCostsForm",
+    "type": "object"
+  },
+  "identity_document": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "National ID card or passport showing identity and nationality. Can be called multiple things such as:         Asmens tapatybės kortelė         Cárta aitheantais         Carta d'identità         Cartão de Cidadão         Carte de identitate         Carte nationale d'identité         Δελτίο ταυτότητας         Documento Nacional de Identidad         Dowód osobisty         Henkilökortti         Identitetskort         Identiteitskaart         Isikutunnistus         Karta tal-Identità         Legitimationskort         Лична карта (Lichna karta)         Nafnskírteini         Nasjonalt identitetskort         Občanský průkaz         Občiansky preukaz         Osebna izkaznica         Osobna iskaznica         Personalausweis         Personas apliecība         Személyazonosító igazolvány     ",
+        "title": "Description",
+        "type": "string"
+      },
+      "document_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The unique identification number of the document, typically found at the top right.",
+        "title": "Document Id"
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "enum": [
+              "M",
+              "F",
+              "D",
+              "<"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Gender of the document holder. Can be 'M' (male), 'F' (female), 'D' (diverse) or '<' (other).",
+        "title": "Gender"
+      },
+      "given_names": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Given names of the document holder.",
+        "title": "Given Names"
+      },
+      "last_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Last name of the document holder.",
+        "title": "Last Name"
+      },
+      "nationality": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Nationality of the document holder as official three digit code.",
+        "title": "Nationality"
+      },
+      "valid_until": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The expiration date of the document.",
+        "title": "Valid Until"
+      },
+      "date_of_issue": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the document was officially issued by the authority.",
+        "title": "Date Of Issue"
+      },
+      "place_of_issue": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The city, state, or authority location that issued the document.",
+        "title": "Place Of Issue"
+      },
+      "date_of_birth": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date of birth of the document holder as written on the ID.",
+        "title": "Date Of Birth"
+      },
+      "place_of_birth": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The place of birth of the document holder as written on the ID.",
+        "title": "Place Of Birth"
+      },
+      "address": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The address of the document holder as written on the ID.",
+        "title": "Address"
+      },
+      "issuing_authority": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the authority that issued the document.",
+        "title": "Issuing Authority"
+      }
+    },
+    "title": "IdentityDocument",
+    "type": "object"
+  },
+  "income_declaration": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Official 'Anlage Einkommen' form, declaration of income. Contains sections for wages, self-employment, and social benefits.",
+        "title": "Description",
+        "type": "string"
+      },
+      "has_self_employment_income": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the individual declares income from self-employment or freelance work.",
+        "title": "Has Self Employment Income"
+      },
+      "total_monthly_net": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total net monthly income amount after taxes and social security contributions.",
+        "title": "Total Monthly Net"
+      }
+    },
+    "title": "IncomeDeclaration",
+    "type": "object"
+  },
+  "irregular_income_proof": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Evidence of one-time payments, gifts, or irregular financial inflows.",
+        "title": "Description",
+        "type": "string"
+      },
+      "payment_reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The reason or source of the irregular payment.",
+        "title": "Payment Reason"
+      },
+      "amount": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total monetary value of the irregular payment.",
+        "title": "Amount"
+      }
+    },
+    "title": "IrregularIncomeProof",
+    "type": "object"
+  },
+  "legal_guardianship_papers": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Court orders or certificates defining a legal guardian or representative (Betreuung).",
+        "title": "Description",
+        "type": "string"
+      },
+      "guardian_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the court-appointed legal guardian.",
+        "title": "Guardian Name"
+      },
+      "authority_areas": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The specific domains (e.g., health, finances) covered by the guardianship.",
+        "title": "Authority Areas"
+      }
+    },
+    "title": "LegalGuardianshipPapers",
+    "type": "object"
+  },
+  "life_insurance_contract": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Life or pension insurance contracts, specifically showing the surrender value (Rückkaufswert).",
+        "title": "Description",
+        "type": "string"
+      },
+      "surrender_value": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The current cash value of the policy if it were to be terminated.",
+        "title": "Surrender Value"
+      },
+      "contract_end_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The scheduled maturity or expiration date of the insurance contract.",
+        "title": "Contract End Date"
+      }
+    },
+    "title": "LifeInsuranceContract",
+    "type": "object"
+  },
+  "marriage_certificate": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Official certificate of marriage or registered civil partnership.",
+        "title": "Description",
+        "type": "string"
+      },
+      "partner_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The full name of the spouse or registered partner.",
+        "title": "Partner Name"
+      },
+      "marriage_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the marriage or partnership was officially registered.",
+        "title": "Marriage Date"
+      }
+    },
+    "title": "MarriageCertificate",
+    "type": "object"
+  },
+  "medical_reports": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Doctor's letters or medical assessments requested to verify health status.",
+        "title": "Description",
+        "type": "string"
+      },
+      "diagnosis_summary": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "A brief summary of the medical findings or primary diagnoses.",
+        "title": "Diagnosis Summary"
+      },
+      "report_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the medical report or assessment was signed.",
+        "title": "Report Date"
+      }
+    },
+    "title": "MedicalReports",
+    "type": "object"
+  },
+  "pension_notice": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Official 'Rentenbescheid' detailing monthly pension entitlements.",
+        "title": "Description",
+        "type": "string"
+      },
+      "pension_reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The reason for the pension entitlement, e.g. age or disability.",
+        "title": "Pension Reason"
+      },
+      "pension_insurance_number": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The unique pension insurance number (Rentenversicherungsnummer).",
+        "title": "Pension Insurance Number"
+      },
+      "case_number": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The case number of the pension case.",
+        "title": "Case Number"
+      },
+      "start_date_of_pension": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the pension entitlement started.",
+        "title": "Start Date Of Pension"
+      },
+      "end_date_of_pension": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the pension entitlement ended, e.g. because the recipient will transfer to pension of old age.",
+        "title": "End Date Of Pension"
+      },
+      "monthly_amount": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total monthly pension amount.",
+        "title": "Monthly Amount"
+      },
+      "back_pay_amount": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The amount of back pay for the pension entitlement.",
+        "title": "Back Pay Amount"
+      },
+      "date_of_issue": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the pension notice was issued.",
+        "title": "Date Of Issue"
+      },
+      "is_granted": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the pension entitlement is granted.",
+        "title": "Is Granted"
+      }
+    },
+    "title": "PensionNotice",
+    "type": "object"
+  },
+  "power_of_attorney": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Signed 'Vollmacht' authorizing a third party to represent the applicant.",
+        "title": "Description",
+        "type": "string"
+      },
+      "representative_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The full name of the person authorized to act as a representative.",
+        "title": "Representative Name"
+      },
+      "scope_of_authority": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The specific tasks or areas for which the representative has authority.",
+        "title": "Scope Of Authority"
+      }
+    },
+    "title": "PowerOfAttorney",
+    "type": "object"
+  },
+  "pregnancy_certificate": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Medical proof of pregnancy including the expected due date.",
+        "title": "Description",
+        "type": "string"
+      },
+      "expected_due_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The calculated date on which the birth is expected to occur.",
+        "title": "Expected Due Date"
+      },
+      "maternity_pass_number": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The ID number found on the official maternity passport (Mutterpass).",
+        "title": "Maternity Pass Number"
+      }
+    },
+    "title": "PregnancyCertificate",
+    "type": "object"
+  },
+  "private_pension_proof": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Proof of private pension, annuity, or insurance-based retirement income.",
+        "title": "Description",
+        "type": "string"
+      },
+      "name_of_pensioner": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the pensioner.",
+        "title": "Name Of Pensioner"
+      },
+      "provider_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the insurance company or private pension provider.",
+        "title": "Provider Name"
+      },
+      "insurance_policy_number": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The number of the insurance policy.",
+        "title": "Insurance Policy Number"
+      },
+      "date_of_issue": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the private pension proof was issued.",
+        "title": "Date Of Issue"
+      },
+      "monthly_payout_amount": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The recurring monthly payout amount from the private pension plan.",
+        "title": "Monthly Payout Amount"
+      },
+      "start_date_of_pension": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the private pension entitlement started.",
+        "title": "Start Date Of Pension"
+      },
+      "end_date_of_pension": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the private pension entitlement will end.",
+        "title": "End Date Of Pension"
+      }
+    },
+    "title": "PrivatePensionProof",
+    "type": "object"
+  },
+  "private_pension_yearly_information": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Yearly information about the private pension, such as the total amount of contributions and the total amount of payouts.",
+        "title": "Description",
+        "type": "string"
+      },
+      "year": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The year of the private pension information.",
+        "title": "Year"
+      },
+      "provider_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the insurance company or private pension provider.",
+        "title": "Provider Name"
+      },
+      "current_monthly_pension_amount": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The current monthly pension amount.",
+        "title": "Current Monthly Pension Amount"
+      },
+      "current_one_time_payout_amount": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The current one time payout amount.",
+        "title": "Current One Time Payout Amount"
+      },
+      "estimated_start_of_pension": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The estimated start date of the pension.",
+        "title": "Estimated Start Of Pension"
+      },
+      "start_of_pension_monthly_pension_amount": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The monthly pension amount at the start of the pension.",
+        "title": "Start Of Pension Monthly Pension Amount"
+      }
+    },
+    "title": "PrivatePensionYearlyInformation",
+    "type": "object"
+  },
+  "property_ownership_proof": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Land registry extract or mortgage documents proving ownership of property.",
+        "title": "Description",
+        "type": "string"
+      },
+      "owner_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the owner of the property.",
+        "title": "Owner Name"
+      },
+      "property_address": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The address of the property.",
+        "title": "Property Address"
+      },
+      "property_type": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The type of property owned, such as residential, commercial, or undeveloped land.",
+        "title": "Property Type"
+      },
+      "outstanding_mortgage": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The remaining debt balance on any loans secured by the property.",
+        "title": "Outstanding Mortgage"
+      }
+    },
+    "title": "PropertyOwnershipProof",
+    "type": "object"
+  },
+  "recognition_decision": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "BAMF notice or official decision regarding asylum or refugee status.",
+        "title": "Description",
+        "type": "string"
+      },
+      "file_number": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The BAMF file number (Aktenzeichen) associated with the case.",
+        "title": "File Number"
+      },
+      "status_granted": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The specific protection status granted (e.g., Refugee, Subsidy Protection).",
+        "title": "Status Granted"
+      }
+    },
+    "title": "RecognitionDecision",
+    "type": "object"
+  },
+  "registration_certificate": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Official 'Meldebescheinigung' proving residential registration in a municipality.",
+        "title": "Description",
+        "type": "string"
+      },
+      "given_names": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Given names of the document holder.",
+        "title": "Given Names"
+      },
+      "last_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Last name of the document holder.",
+        "title": "Last Name"
+      },
+      "marital_status": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Marital status of the document holder.",
+        "title": "Marital Status"
+      },
+      "nationality": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Nationality or multiple nationalities of the document holder.",
+        "title": "Nationality"
+      },
+      "place_of_birth": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The place of birth of the document holder.",
+        "title": "Place Of Birth"
+      },
+      "date_of_birth": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date of birth of the document holder.",
+        "title": "Date Of Birth"
+      },
+      "date_of_issue": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the residential registration was officially issued by the authority.",
+        "title": "Date Of Issue"
+      },
+      "address": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The full residential address including street, house number, and postal code.",
+        "title": "Address"
+      },
+      "is_living_with_spouse": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the document holder is living with their spouse.",
+        "title": "Is Living With Spouse"
+      },
+      "is_living_with_children": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the document holder is living with their children.",
+        "title": "Is Living With Children"
+      },
+      "is_living_with_parent": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the document holder is living with their parent(s).",
+        "title": "Is Living With Parent"
+      },
+      "issuing_authority": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the authority that issued the document.",
+        "title": "Issuing Authority"
+      }
+    },
+    "title": "RegistrationCertificate",
+    "type": "object"
+  },
+  "rent_increase_notice": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Official letter from a landlord announcing an increase in rent or utilities.",
+        "title": "Description",
+        "type": "string"
+      },
+      "new_total_rent": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The updated total monthly payment amount after the increase.",
+        "title": "New Total Rent"
+      },
+      "effective_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date from which the new rent amount must be paid.",
+        "title": "Effective Date"
+      }
+    },
+    "title": "RentIncreaseNotice",
+    "type": "object"
+  },
+  "rental_contract": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Legal agreement detailing rent, utilities, and square footage for a rented property.",
+        "title": "Description",
+        "type": "string"
+      },
+      "tenant_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the tenant.",
+        "title": "Tenant Name"
+      },
+      "tenant_address": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The address of the tenant.",
+        "title": "Tenant Address"
+      },
+      "net_cold_rent": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total monthly net cold rent of the property, excluding heating and utility costs.",
+        "title": "Net Cold Rent"
+      },
+      "monthly_total_rent": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total monthly payment including base rent and all utility advances.",
+        "title": "Monthly Total Rent"
+      },
+      "operating_costs": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total monthly operating costs of the property.",
+        "title": "Operating Costs"
+      },
+      "heating_costs": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total monthly heating costs of the property, if not already included in the operating costs.",
+        "title": "Heating Costs"
+      },
+      "square_meters": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total living area of the property as stated in the contract.",
+        "title": "Square Meters"
+      },
+      "is_main_tenant": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the document holder is the main tenant of the property.",
+        "title": "Is Main Tenant"
+      },
+      "has_sub_tenants": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the document holder has sub-tenants.",
+        "title": "Has Sub Tenants"
+      },
+      "start_date_of_rent": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date from which the rent starts.",
+        "title": "Start Date Of Rent"
+      },
+      "end_date_of_rent": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date until the rental contract ends if it's a fixed term contract.",
+        "title": "End Date Of Rent"
+      }
+    },
+    "title": "RentalContract",
+    "type": "object"
+  },
+  "residence_permit": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Official 'Aufenthaltstitel' document or card for non-German citizens.",
+        "title": "Description",
+        "type": "string"
+      },
+      "document_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The unique identification number of the document, typically found at the top right.",
+        "title": "Document Id"
+      },
+      "given_names": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Given names of the document holder.",
+        "title": "Given Names"
+      },
+      "last_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Last name of the document holder.",
+        "title": "Last Name"
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "enum": [
+              "M",
+              "F",
+              "<"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Gender of the document holder. Can be 'M' (male), 'F' (female) or '<' (other).",
+        "title": "Gender"
+      },
+      "nationality": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Nationality of the document holder as official three digit code.",
+        "title": "Nationality"
+      },
+      "valid_until": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The expiration date of the document.",
+        "title": "Valid Until"
+      },
+      "date_of_issue": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the document was officially issued by the authority.",
+        "title": "Date Of Issue"
+      },
+      "place_of_issue": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The city, state, or authority location that issued the document.",
+        "title": "Place Of Issue"
+      },
+      "date_of_birth": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date of birth of the document holder as written on the residence permit.",
+        "title": "Date Of Birth"
+      },
+      "remarks": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Any additional remarks or notes about the residence permit.",
+        "title": "Remarks"
+      },
+      "employment_permitted": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the holder is legally allowed to pursue employment.",
+        "title": "Employment Permitted"
+      },
+      "permit_type": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The specific legal title or paragraph of the residence permit.",
+        "title": "Permit Type"
+      },
+      "address": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The address of the document holder as written on the residence permit.",
+        "title": "Address"
+      },
+      "issuing_authority": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the authority that issued the document.",
+        "title": "Issuing Authority"
+      }
+    },
+    "title": "ResidencePermit",
+    "type": "object"
+  },
+  "savings_statements": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Statements or copies of savings books showing current capital assets.",
+        "title": "Description",
+        "type": "string"
+      },
+      "current_balance": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The current total amount of capital held in the savings account.",
+        "title": "Current Balance"
+      },
+      "bank_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the financial institution where the savings are held.",
+        "title": "Bank Name"
+      }
+    },
+    "title": "SavingsStatements",
+    "type": "object"
+  },
+  "securities_statements": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Portfolio summaries for stocks, bonds, or other securities.",
+        "title": "Description",
+        "type": "string"
+      },
+      "portfolio_value": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total market value of the investment portfolio at the time of the statement.",
+        "title": "Portfolio Value"
+      },
+      "statement_date": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the portfolio summary was generated.",
+        "title": "Statement Date"
+      }
+    },
+    "title": "SecuritiesStatements",
+    "type": "object"
+  },
+  "social_benefits_proof": {
+    "$defs": {
+      "PaymentPeriod": {
+        "properties": {
+          "period_from": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The start date of the payment period.",
+            "title": "Period From"
+          },
+          "period_to": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The end date of the payment period.",
+            "title": "Period To"
+          },
+          "monthly_amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The monthly amount of the benefit.",
+            "title": "Monthly Amount"
+          }
+        },
+        "title": "PaymentPeriod",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Notice of social benefits, such as Bewilligungsbescheid, Jobcenter, Familienkasse, Wohngeldbehörde. Mentions Bürgergeld, Kindergeld, Wohngeld, or Grundsicherung.",
+        "title": "Description",
+        "type": "string"
+      },
+      "benefit_type": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The category of social benefit being received.",
+        "title": "Benefit Type"
+      },
+      "given_names": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Given names of the applicant.",
+        "title": "Given Names"
+      },
+      "last_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Last name of the applicant.",
+        "title": "Last Name"
+      },
+      "address": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The address of the applicant.",
+        "title": "Address"
+      },
+      "issuing_authority": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the authority that issued the document.",
+        "title": "Issuing Authority"
+      },
+      "reference_number": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The reference number of the social benefits notice.",
+        "title": "Reference Number"
+      },
+      "bg_number": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The number of the Bedarfsgemeinschaft aka community in need.",
+        "title": "Bg Number"
+      },
+      "date_of_issue": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the social benefits notice was issued.",
+        "title": "Date Of Issue"
+      },
+      "date_of_application": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the social benefits application was submitted.",
+        "title": "Date Of Application"
+      },
+      "payment_periods": {
+        "anyOf": [
+          {
+            "items": {
+              "$ref": "#/$defs/PaymentPeriod"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The payment periods for the benefit.",
+        "title": "Payment Periods"
+      },
+      "is_granted": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the social benefits are granted.",
+        "title": "Is Granted"
+      }
+    },
+    "title": "SocialBenefitsProof",
+    "type": "object"
+  },
+  "special_diet_evidence": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Medical certificate proving the need for a specific, costly diet due to illness.",
+        "title": "Description",
+        "type": "string"
+      },
+      "reason_for_diet": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The medical condition necessitating the specialized nutrition.",
+        "title": "Reason For Diet"
+      },
+      "is_life_long": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Indicates if the requirement for the special diet is permanent.",
+        "title": "Is Life Long"
+      }
+    },
+    "title": "SpecialDietEvidence",
+    "type": "object"
+  },
+  "utility_cost_statement": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Annual billing for service and utility charges (Betriebskostenabrechnung).",
+        "title": "Description",
+        "type": "string"
+      },
+      "billing_period": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The specific timeframe (usually a year) covered by the utility billing.",
+        "title": "Billing Period"
+      },
+      "balance_due": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The final credit or debit balance resulting from the annual reconciliation.",
+        "title": "Balance Due"
+      }
+    },
+    "title": "UtilityCostStatement",
+    "type": "object"
+  },
+  "wage_slips": {
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "default": "Salary or wage statement, Lohnabrechnung, Gehaltsabrechnung, Verdienstabrechnung. Contains employer details, employee number, gross and net pay (Brutto, Netto).",
+        "title": "Description",
+        "type": "string"
+      },
+      "employee_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The full name of the employee.",
+        "title": "Employee Name"
+      },
+      "employee_address": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The address of the employee.",
+        "title": "Employee Address"
+      },
+      "tax_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The tax identification number of the employee.",
+        "title": "Tax Id"
+      },
+      "social_security_number": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The social security number of the employee.",
+        "title": "Social Security Number"
+      },
+      "health_insurance_provider": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the health insurance provider.",
+        "title": "Health Insurance Provider"
+      },
+      "employer_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The name of the employer.",
+        "title": "Employer Name"
+      },
+      "employer_address": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The address of the employer.",
+        "title": "Employer Address"
+      },
+      "gross_amount": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total gross income before deductions.",
+        "title": "Gross Amount"
+      },
+      "net_amount": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total net income after deductions.",
+        "title": "Net Amount"
+      },
+      "pay_period": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The specific month or timeframe the salary payment covers.",
+        "title": "Pay Period"
+      },
+      "date_issued": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The date the wage slip was issued.",
+        "title": "Date Issued"
+      },
+      "iban": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The International Bank Account Number of the employee's bank account.",
+        "title": "Iban"
+      },
+      "accumulated_yearly_gross_income": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total gross income of the employee for the year.",
+        "title": "Accumulated Yearly Gross Income"
+      },
+      "accumulated_yearly_net_income": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "The total net income of the employee for the year.",
+        "title": "Accumulated Yearly Net Income"
+      }
+    },
+    "title": "WageSlips",
+    "type": "object"
+  }
+}

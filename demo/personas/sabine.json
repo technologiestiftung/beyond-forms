@@ -109,7 +109,23 @@
     "professional_expenses": 0.00,
     "has_childcare_expenses": false,
     "is_victim_of_national_socialist_persecution": false,
-    "household_members": null
+    "is_wohngeld_first_application": true,
+    "receives_wohngeld_for_other_dwelling": false,
+    "household_member_died_recently": false,
+    "household_size_will_change": false,
+    "receives_other_transfer_benefits": false,
+    "pays_child_or_spousal_support": false,
+    "receives_support_from_others": false,
+    "expects_future_income_change": false,
+    "assets_exceed_wohngeld_threshold": false,
+    "related_to_landlord": false,
+    "service_costs_included_in_rent": false,
+    "rent_paid_partly_by_third_party": false,
+    "receives_rent_contribution_from_others": false,
+    "expects_rent_change": false,
+    "wohngeld_payment_to_applicant": true,
+    "consents_to_bank_statement_retention": true,
+    "consents_to_registry_verification": true
   },
 
   "applications": [
@@ -121,32 +137,12 @@
     {
       "form_type": "antrag_wohngeld",
       "status": "in_progress",
-      "form_data": {
-        "is_wohngeld_first_application": true,
-        "receives_wohngeld_for_other_dwelling": false,
-        "has_unlisted_household_members": false,
-        "household_member_died_recently": false,
-        "household_size_will_change": false,
-        "receives_other_transfer_benefits": false,
-        "pays_child_or_spousal_support": false,
-        "receives_support_from_others": false,
-        "expects_future_income_change": false,
-        "assets_exceed_wohngeld_threshold": false,
-        "related_to_landlord": false,
-        "service_costs_included_in_rent": false,
-        "rent_paid_partly_by_third_party": false,
-        "receives_rent_contribution_from_others": false,
-        "expects_rent_change": false,
-        "wohngeld_payment_to_applicant": true,
-        "consents_to_bank_statement_retention": true
-      }
+      "form_data": {}
     },
     {
       "form_type": "antrag_bewohnerparkausweis",
       "status": "in_progress",
-      "form_data": {
-        "consents_to_registry_verification": true
-      }
+      "form_data": {}
     }
   ],
 

@@ -10,8 +10,14 @@ import requests
 from sqlalchemy.orm import Session
 from src.db import get_db
 from src.models import Users as DbUser, UploadedFiles, UserDocuments
-from src.schemas import UserProfileValidationSchema
-from src.services.user_service import UserService, get_user_service
+from src.schemas import AssociatedPersonSchema, UserProfileValidationSchema
+from src.services.user_service import (
+    ProfileWriteError,
+    RELATION_KEYS,
+    UserService,
+    apply_profile_key,
+    get_user_service,
+)
 from src.services.berlin_districts import sync_berlin_district
 from src.utils import get_google_id_token
 from src.mappers import map_flat_to_rules_engine_payload
@@ -53,8 +59,6 @@ def get_profile(
     db_user = db.query(DbUser).filter(DbUser.phone_number == current_user.user_name).first()
 
     if not db_user:
-        # Return a completely valid empty profile representation instead of crashing the frontend with a 404,
-        # delegating database persistence entirely to the auth-service boundary.
         return {
             "id": None,
             "first_name": "",
@@ -69,6 +73,9 @@ def get_profile(
     user_data = {c.name: getattr(db_user, c.name) for c in db_user.__table__.columns}
     if user_data.get("displaced_status") is None:
         user_data["displaced_status"] = "none"
+    user_data["associated_persons"] = [
+        AssociatedPersonSchema.model_validate(person).model_dump(mode="json") for person in db_user.associated_persons
+    ]
 
     return user_data
 
@@ -98,6 +105,15 @@ def update_user_profile(
     address_changed = False
     for key, value in payload.model_dump(exclude_unset=True).items():
         if key not in exclude_keys:
+            if key in RELATION_KEYS:
+                # Already validated by the request schema, so hand over the model
+                # instances rather than round-tripping the dumped dicts.
+                value = getattr(payload, key)
+            try:
+                if apply_profile_key(db_user, key, value):
+                    continue
+            except ProfileWriteError as exc:
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
             if key == "displaced_status" and value == "none":
                 value = None
             if key in DISTRICT_SYNC_FIELDS and getattr(db_user, key) != value:

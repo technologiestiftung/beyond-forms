@@ -5,6 +5,7 @@ import decimal
 import uuid
 
 from src.models import (
+    AssociationType,
     GenderType,
     MaritalStatusType,
     DisplacedStatusType,
@@ -18,6 +19,52 @@ from src.models import (
 )
 
 
+class AssociatedPersonSchema(BaseModel):
+    """One row of `associated_persons`, replacing the untyped `household_members` dicts."""
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+    association_type: AssociationType = Field(description="What this person is to the applicant")
+    lives_in_household: bool = Field(
+        True,
+        description=(
+            "Whether this person lives in the applicant's household. A spouse living "
+            "elsewhere still belongs here with false rather than being omitted."
+        ),
+    )
+    sort_order: int = Field(0, description="Position in the fixed person slots of a form (0-based)")
+
+    first_name: Optional[str] = Field(None, max_length=255)
+    last_name: Optional[str] = Field(None, max_length=255)
+    birth_name: Optional[str] = Field(None, max_length=255)
+    date_of_birth: Optional[date] = None
+    place_of_birth: Optional[str] = Field(None, max_length=255)
+    legal_gender: Optional[GenderType] = None
+    marital_status: Optional[MaritalStatusType] = None
+    nationality: Optional[str] = Field(None, pattern=r"^[A-Z]{2}$", description="ISO 3166-1 alpha-2 country code")
+    second_nationality: Optional[str] = Field(None, pattern=r"^[A-Z]{2}$")
+    relationship_to_applicant: Optional[str] = Field(
+        None,
+        max_length=255,
+        description="How the person is related, as it should be printed on a form (e.g. 'Ehefrau')",
+    )
+    employment_status: Optional[str] = Field(None, max_length=255)
+    monthly_income: Optional[decimal.Decimal] = Field(None, ge=0)
+    monthly_pension_income: Optional[decimal.Decimal] = Field(None, ge=0)
+    has_own_income: Optional[bool] = None
+    is_alimony_obligated: Optional[bool] = None
+
+    @field_validator("date_of_birth")
+    @classmethod
+    def _date_of_birth_is_plausible(cls, value: Optional[date]) -> Optional[date]:
+        """Mirrors the `associated_persons_dob_plausible` CHECK. Without it a typo'd
+        year reaches Postgres and surfaces as an unhandled IntegrityError (a 500)
+        instead of a field-level 422."""
+        if value is not None and not (date(1900, 1, 1) <= value <= date.today()):
+            raise ValueError("must be between 1900-01-01 and today")
+        return value
+
+
 class UserProfileValidationSchema(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
@@ -25,7 +72,6 @@ class UserProfileValidationSchema(BaseModel):
     last_name: Optional[str] = None
     date_of_birth: Optional[date] = None
     place_of_birth: Optional[str] = None
-    city_of_birth: Optional[str] = None
     legal_gender: Optional[str] = None
     is_german_citizen: Optional[bool] = None
     nationality: Optional[str] = None
@@ -86,11 +132,30 @@ class UserProfileValidationSchema(BaseModel):
     assets_description: Optional[str] = Field(None, max_length=1000)
     income_sources: Optional[list[str]] = None
     assets_types: Optional[list[str]] = None
-    household_members: Optional[list[dict]] = None
+    associated_persons: Optional[list[AssociatedPersonSchema]] = None
     is_student_or_trainee: Optional[bool] = None
     professional_expenses: Optional[decimal.Decimal] = None
     has_childcare_expenses: Optional[bool] = None
     is_victim_of_national_socialist_persecution: Optional[bool] = None
+
+    # Wohngeld and Bewohnerparkausweis yes/no questions. Nullable: NULL means not asked.
+    is_wohngeld_first_application: Optional[bool] = None
+    receives_wohngeld_for_other_dwelling: Optional[bool] = None
+    household_member_died_recently: Optional[bool] = None
+    household_size_will_change: Optional[bool] = None
+    receives_other_transfer_benefits: Optional[bool] = None
+    pays_child_or_spousal_support: Optional[bool] = None
+    receives_support_from_others: Optional[bool] = None
+    expects_future_income_change: Optional[bool] = None
+    assets_exceed_wohngeld_threshold: Optional[bool] = None
+    related_to_landlord: Optional[bool] = None
+    service_costs_included_in_rent: Optional[bool] = None
+    rent_paid_partly_by_third_party: Optional[bool] = None
+    receives_rent_contribution_from_others: Optional[bool] = None
+    expects_rent_change: Optional[bool] = None
+    wohngeld_payment_to_applicant: Optional[bool] = None
+    consents_to_bank_statement_retention: Optional[bool] = None
+    consents_to_registry_verification: Optional[bool] = None
     email: Optional[str] = None
 
     # Health fields
@@ -211,6 +276,57 @@ class UserInformationUpdateSchema(BaseModel):
     is_victim_of_national_socialist_persecution: Optional[bool] = Field(
         None, description="Victim of National Socialist persecution (BEG)"
     )
+    is_wohngeld_first_application: Optional[bool] = Field(
+        None, description="Whether this is a first Wohngeld application (false = continuation application)"
+    )
+    receives_wohngeld_for_other_dwelling: Optional[bool] = Field(
+        None, description="Whether the user already receives Wohngeld for another dwelling"
+    )
+    household_member_died_recently: Optional[bool] = Field(
+        None, description="Whether a household member died within the last 12 months"
+    )
+    household_size_will_change: Optional[bool] = Field(
+        None, description="Whether the number of people in the household is about to change"
+    )
+    receives_other_transfer_benefits: Optional[bool] = Field(
+        None, description="Whether the user receives other transfer benefits (e.g. Buergergeld, Grundsicherung)"
+    )
+    pays_child_or_spousal_support: Optional[bool] = Field(
+        None, description="Whether the user pays child or spousal support"
+    )
+    receives_support_from_others: Optional[bool] = Field(
+        None, description="Whether the user receives maintenance or support payments from other people"
+    )
+    expects_future_income_change: Optional[bool] = Field(
+        None, description="Whether the user expects their income to change in the next 12 months"
+    )
+    assets_exceed_wohngeld_threshold: Optional[bool] = Field(
+        None, description="Whether the household's assets exceed the Wohngeld threshold"
+    )
+    related_to_landlord: Optional[bool] = Field(
+        None, description="Whether the user is related to or married to the landlord"
+    )
+    service_costs_included_in_rent: Optional[bool] = Field(
+        None, description="Whether service charges are included in the stated rent"
+    )
+    rent_paid_partly_by_third_party: Optional[bool] = Field(
+        None, description="Whether part of the rent is paid by a third party"
+    )
+    receives_rent_contribution_from_others: Optional[bool] = Field(
+        None, description="Whether other people contribute to the rent"
+    )
+    expects_rent_change: Optional[bool] = Field(
+        None, description="Whether the user expects the rent to change in the next 12 months"
+    )
+    wohngeld_payment_to_applicant: Optional[bool] = Field(
+        None, description="Whether Wohngeld should be paid to the applicant rather than the landlord"
+    )
+    consents_to_bank_statement_retention: Optional[bool] = Field(
+        None, description="Whether the user consents to the authority retaining bank statements"
+    )
+    consents_to_registry_verification: Optional[bool] = Field(
+        None, description="Whether the user consents to verification against the residents' registry"
+    )
     email: Optional[str] = Field(None, description="Email address")
     persons_in_household_count: Optional[int] = Field(None, description="Number of persons in household")
     bank_name: Optional[str] = Field(None, description="Bank name")
@@ -225,8 +341,13 @@ class UserInformationUpdateSchema(BaseModel):
     assets_description: Optional[str] = Field(None, max_length=1000, description="A description of the user's assets")
     income_sources: Optional[list[str]] = Field(None, description="List of the user's monthly income source categories")
     assets_types: Optional[list[str]] = Field(None, description="List of the user's asset types")
-    household_members: Optional[list[dict]] = Field(
-        None, description="Other household members (e.g. a spouse) besides the applicant"
+    associated_persons: Optional[list[AssociatedPersonSchema]] = Field(
+        None,
+        description=(
+            "Everyone besides the applicant who bears on the application: household "
+            "members, plus a spouse or partner even if they live elsewhere. Replaces the "
+            "whole list on write, so send every person, not just the new one."
+        ),
     )
     has_costly_medical_nutrition: Optional[bool] = Field(
         None, description="Whether the user requires a costly medical nutrition diet"
