@@ -23,10 +23,9 @@ value = "{{ district ? district : 'bitte wählen' }}"
 
 ["p1_auswahl_bezirk"]
 type = "string"
-nearby_label = "Tempelhof-Schöneberg :"
 read_only = true
 default_value = "Bitte Bezirk auswählen:"
-value = "{{ district ? district : '' }}"
+value = "Bitte Bezirk auswählen:"
 
 # The real PDF has five separate single-line AcroForm fields for this address block
 # (Zeile 1 is narrow — it sits on the same row as the static "Bezirksamt" label — Zeile
@@ -43,7 +42,6 @@ value = "{{ district == 'Tempelhof-Schöneberg' ? 'Tempelhof-Schöneberg von Ber
 
 ["p1_fax"]
 type = "string"
-nearby_label = "n das ezirksamt"
 read_only = true
 default_value = ""
 value = ""
