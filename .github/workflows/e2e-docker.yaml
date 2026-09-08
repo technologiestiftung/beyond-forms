@@ -10,9 +10,23 @@ on:
 
 jobs:
   e2e-docker:
-    name: Run E2E Audit against docker-composed stack
+    name: E2E Audit (${{ matrix.project }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: chromium-mobile
+            engine: chromium
+          - project: chromium-desktop
+            engine: chromium
+          - project: webkit-mobile
+            engine: webkit
+          - project: webkit-desktop
+            engine: webkit
+          - project: firefox
+            engine: firefox
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -32,8 +46,14 @@ jobs:
         run: npm ci
         working-directory: services/wallet-frontend
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Cache Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ matrix.engine }}-${{ hashFiles('services/wallet-frontend/package-lock.json') }}
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps ${{ matrix.engine }}
         working-directory: services/wallet-frontend
 
       - name: Build and start the backend stack
@@ -122,14 +142,15 @@ jobs:
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:3000
         run: |
-          npx playwright test --config=playwright.remote.config.ts
+          npx playwright test --config=playwright.remote.config.ts \
+            --project=${{ matrix.project }}
         working-directory: services/wallet-frontend
 
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.project }}
           path: services/wallet-frontend/playwright-report/
           retention-days: 14
 

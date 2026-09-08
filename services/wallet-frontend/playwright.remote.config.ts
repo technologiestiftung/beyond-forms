@@ -1,6 +1,19 @@
 /* global process */
 import { defineConfig, devices } from "@playwright/test";
 
+/**
+ * axe-core's rules are the same everywhere, but its inputs are not: contrast,
+ * visibility and reflow findings come out of computed styles and layout, so
+ * they differ by engine and by viewport. Running the four dedicated a11y specs
+ * on one desktop Chromium and one mobile WebKit covers that spread.
+ */
+const A11Y_SPECS = [
+	"**/accessibility.spec.ts",
+	"**/audit-a11y.spec.ts",
+	"**/chat-a11y.spec.ts",
+	"**/profile-a11y.spec.ts",
+];
+
 export default defineConfig({
 	testDir: "./tests",
 	timeout: 60000,
@@ -21,6 +34,7 @@ export default defineConfig({
 		{
 			name: "chromium-mobile",
 			use: { ...devices["Pixel 5"] },
+			testIgnore: A11Y_SPECS,
 		},
 		{
 			name: "chromium-desktop",
@@ -33,10 +47,12 @@ export default defineConfig({
 		{
 			name: "webkit-desktop",
 			use: { ...devices["Desktop Safari"] },
+			testIgnore: A11Y_SPECS,
 		},
 		{
 			name: "firefox",
 			use: { ...devices["Desktop Firefox"] },
+			testIgnore: A11Y_SPECS,
 		},
 	],
 });
