@@ -16,9 +16,9 @@
 		"questionnaire": "Assessment questionnaire"
 	},
 	"start_screen": {
-		"title": "Check Grundsicherung easily and quickly",
-		"description": "With Klaro you can check in just 5 minutes whether you can apply for Grundsicherung.",
-		"description_list": "Quick check in just 5 minutes\nSimply and clearly explained\nFree for everyone",
+		"title": "Check your entitlement to social benefits easily and quickly",
+		"description": "With Klaro you can find out which social benefits might be right for you. Klaro then guides you through the application step by step.",
+		"description_list": "Initial check in just a few minutes\nSimply and clearly explained\nFree for everyone",
 		"feature_cards": {
 			"quick_check": {
 				"title": "Check quickly",
@@ -39,9 +39,9 @@
 			"description": "With Klaro you can currently check whether Grundsicherung is suitable for you and prepare for the application step by step. More services will follow later."
 		},
 		"promo_card": {
-			"title": "Straight to Grundsicherung",
-			"description": "Sign in and start right away with your application for Grundsicherung. Klaro guides you step by step.",
-			"cta": "Start application now"
+			"title": "Straight to your profile",
+			"description": "Already know what you need? Sign in and continue right in your profile.",
+			"cta": "Sign in now"
 		},
 		"intro_cards": {
 			"section_title": "How Klaro works",
@@ -53,8 +53,8 @@
 				"description": "Klaro is a free service. Klaro helps you understand social support better."
 			},
 			"2": {
-				"title": "This is about Grundsicherung",
-				"description": "Klaro first helps you with Grundsicherung. You can check whether this support might suit your situation."
+				"title": "You don't need to be an expert",
+				"description": "There are many social benefits. Klaro helps you find the ones that fit your situation."
 			},
 			"3": {
 				"title": "Answer a few short questions",
@@ -62,10 +62,10 @@
 			},
 			"4": {
 				"title": "Start the check now",
-				"description": "The check only takes a few minutes. You can start right away and don't need an account yet."
+				"description": "The check only takes a few minutes. After that, Klaro helps you with the application. You can start right away and don't need an account yet."
 			}
 		},
-		"cta": "Start quick check now"
+		"cta": "Check your entitlement now"
 	},
 	"questions": {
 		"nationality": {

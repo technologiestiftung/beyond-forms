@@ -53,11 +53,11 @@ export const EligibilityStart: React.FC = () => {
 				<p className="text-brand-black text-body-lg leading-relaxed w-full mb-4">
 					{t(i18nKeys.start.desc)}
 				</p>
-				<ul className="text-brand-black text-body-lg leading-relaxed w-full mb-4 ml-2">
+				<ul className="text-brand-black text-body-lg leading-relaxed w-full mb-4 ml-2 pl-5">
 					{t(i18nKeys.start.descList)
 						.split("\n")
 						.map((item: string) => (
-							<li key={item} className="list-disc list-inside">
+							<li key={item} className="list-disc list-outside">
 								{item}
 							</li>
 						))}
