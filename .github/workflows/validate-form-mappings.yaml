@@ -22,10 +22,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v10.0.0
+        with:
+          version: "latest-known"
 
       - name: Validate mapping references
         run: uv run --frozen --package orchestration-middleware-service forms/scripts/validate_mappings.py
