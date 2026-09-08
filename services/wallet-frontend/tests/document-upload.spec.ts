@@ -108,7 +108,6 @@ test.describe("Document Upload and Mobile Camera Capture Audit", () => {
 		await expect(dropzone).toContainText(/Kamera öffnen/i);
 
 		// Step 5: Attach mock photo file
-		// @ts-expect-error Node Buffer is available in Playwright execution context
 		const mockImage = Buffer.from(
 			"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
 			"base64",
@@ -178,7 +177,6 @@ test.describe("Document Upload and Mobile Camera Capture Audit", () => {
 		await expect(dropzone).toContainText(/Klicken oder Datei hierher ziehen/i);
 
 		// Step 4: Attach mock PDF file
-		// @ts-expect-error Node Buffer is available in Playwright execution context
 		const mockPdf = Buffer.from(
 			"JVBERi0xLjQKJcOkw7zDtsOfCjEgMCBvYmoKPDwvVHlwZS9DYXRhbG9nPj4KZW5kb2JqCnhyZWYK",
 			"base64",
