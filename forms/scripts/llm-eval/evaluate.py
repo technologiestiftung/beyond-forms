@@ -12,10 +12,15 @@ from litellm import completion
 from pyjexl import JEXL
 
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
-from schema_context import parse_schemas, parse_models, build_schema_context  # noqa: E402,F401
+from schema_context import (  # noqa: E402,F401
+    parse_schemas,
+    parse_models,
+    build_schema_context,
+    profile_derived_context,
+)
 
 
-def load_profile(profile_path: str) -> Dict[str, Any]:
+def load_profile(profile_path: str, project_root: str | None = None) -> Dict[str, Any]:
     if not os.path.exists(profile_path):
         print(f"Error: Evaluation profile not found at {profile_path}", file=sys.stderr)
         sys.exit(1)
@@ -25,6 +30,8 @@ def load_profile(profile_path: str) -> Dict[str, Any]:
     # operator, and `documents.X ? documents.X.y : ...` raises AttributeError (not just
     # evaluates falsy) when `documents` is absent entirely from the context.
     profile.setdefault("documents", {})
+    if project_root:
+        profile.update(profile_derived_context(project_root, profile))
     return profile
 
 
@@ -55,6 +62,18 @@ def load_boilerplate(toml_path: str) -> Dict[str, Any]:
                 "default_value": None,
             }
     return boilerplate
+
+
+def normalize_field_id(field_id: str) -> str:
+    """The form of a field ID that survives a round trip through the LLM.
+
+    AcroForm IDs come out of the PDF PDFDocEncoded (`gesch\\344ftsbereich`), and
+    sanitize_json_response() decodes those escapes on the way *back in* - so a key the
+    model echoed verbatim no longer string-matches the boilerplate key it came from, and
+    the field silently vanishes from the result. Both sides are normalized through this
+    before being compared."""
+    decoded = re.sub(r"\\([0-7]{1,3})", lambda m: chr(int(m.group(1), 8)), field_id)
+    return re.sub(r"\\([()%\-_?!.])", r"\1", decoded)
 
 
 def sanitize_json_response(raw_content: str) -> dict:
@@ -458,6 +477,12 @@ def main():
         action="store_true",
         help="Exclude the documents namespace from the schema context",
     )
+    parser.add_argument(
+        "--derived",
+        action="store_true",
+        help="Include the derived_context namespace (partner, household_members, today, age, ...) "
+        "in the schema context. Off by default so the recorded control run stays reproducible.",
+    )
     args = parser.parse_args()
 
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -480,7 +505,7 @@ def main():
 
     for p_path in p_paths:
         full_path = p_path if os.path.isabs(p_path) else os.path.join(project_root, p_path)
-        test_profiles.append(load_profile(full_path))
+        test_profiles.append(load_profile(full_path, project_root))
         profile_names.append(os.path.basename(p_path))
 
     if not test_profiles:
@@ -490,7 +515,9 @@ def main():
         )
         sys.exit(1)
 
-    schema_context = build_schema_context(project_root, include_documents=not args.no_documents)
+    schema_context = build_schema_context(
+        project_root, include_documents=not args.no_documents, include_derived=args.derived
+    )
 
     toml_path = os.path.join(project_root, f"forms/mappings/{args.form}.toml")
     if not os.path.exists(toml_path):

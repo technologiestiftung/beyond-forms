@@ -73,12 +73,29 @@ def _collect_identifier_roots(node: Any, out: set[str]) -> None:
             _collect_identifier_roots(value, out)
 
 
+# Derived keys that carry a money grid's optional free-text extras.
+# A fully answered profile still leaves all of these empty, so counting
+# them would put a floor under the readiness ratio that no profile could ever clear.
+_OPTIONAL_CONTEXT_FIELDS = frozenset(
+    {
+        "documents",
+        "income_office",
+        "income_reference",
+        "expense_notes",
+        "asset_descriptions",
+        "pending_benefit_claims",
+        "expected_one_time_payments",
+    }
+)
+
+
 def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set[str]:
     """
     Collects the top-level context keys a mapping's JEXL expressions read from,
     used to judge whether a user's profile carries enough data to fill this form.
-    Fields under the `documents.*` namespace are excluded: those come from verified
-    document uploads rather than the profile, and aren't required to check readiness.
+    Keys in _OPTIONAL_CONTEXT_FIELDS are excluded: the `documents.*` namespace comes from
+    verified uploads rather than the profile, and the money grids' free-text extras are
+    optional even for a fully answered profile - neither is required to check readiness.
     """
     fields: set[str] = set()
     for val in mapping.values():
@@ -90,8 +107,7 @@ def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set
             except Exception:
                 continue
             _collect_identifier_roots(tree, fields)
-    fields.discard("documents")
-    return fields
+    return fields - _OPTIONAL_CONTEXT_FIELDS
 
 
 def _is_context_value_filled(value: Any) -> bool:
@@ -300,7 +316,13 @@ class FormService:
             logger.warning("Database is currently not reachable")
 
         context = user_dict.copy()
-        context.update(derived_context(user_dict, user.associated_persons))
+        money_entries = [
+            *user.income_entries,
+            *user.expense_entries,
+            *user.asset_entries,
+            *user.benefit_claim_entries,
+        ]
+        context.update(derived_context(user_dict, user.associated_persons, money_entries))
         for k, v in form_data.items():
             if k in context:
                 logger.warning(f"Key collision for {k}. Skipping document value and keeping user profile value.")

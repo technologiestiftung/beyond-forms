@@ -48,6 +48,7 @@ from src.services.user_service import (
     ProfileWriteError,
     UserService,
     apply_profile_key,
+    ordered_profile_items,
 )
 
 logger = logging.getLogger(__name__)
@@ -302,7 +303,7 @@ class DemoSeedService:
 
         columns = {c.name: c for c in Users.__table__.columns}
         applied: list[str] = []
-        for key, value in persona["profile"].items():
+        for key, value in ordered_profile_items(persona["profile"]):
             if key in PROTECTED_COLUMNS:
                 raise DemoSeedError(f"Persona {slug!r} may not set protected column {key!r}.")
             try:

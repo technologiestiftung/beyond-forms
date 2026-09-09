@@ -5,8 +5,8 @@
   "date_of_birth": "1959-01-20",
   "place_of_birth": "Berlin",
   "legal_gender": "Male",
-  "marital_status": "Single",
-  "married_since": null,
+  "marital_status": "Married",
+  "married_since": "1974-05-18",
   "is_german_citizen": true,
   "is_resident_in_germany": true,
   "has_guardian": false,
@@ -36,7 +36,7 @@
   "cable_tv_costs": 0.0,
   "number_of_rooms": 2,
   "living_area": 55.0,
-  "persons_in_household_count": 1,
+  "persons_in_household_count": 2,
   "bank_name": "Sparkasse Berlin",
   "account_holder": "Helmut Klar",
   "iban": "DE12345678901234567890",
@@ -54,5 +54,24 @@
   "zip_code": "10820",
   "city": "Berlin",
   "state": "Berlin",
-  "district": "Tempelhof-Schöneberg"
+  "district": "Tempelhof-Schöneberg",
+  "associated_persons": [
+    {
+      "association_type": "Spouse",
+      "lives_in_household": true,
+      "sort_order": 0,
+      "first_name": "Ingrid",
+      "last_name": "Klar",
+      "birth_name": "Neumann",
+      "date_of_birth": "1949-11-03",
+      "place_of_birth": "Berlin",
+      "legal_gender": "Female",
+      "marital_status": "Married",
+      "nationality": "DE",
+      "relationship_to_applicant": "Ehefrau",
+      "employment_status": "Rentnerin",
+      "monthly_pension_income": 520.0,
+      "has_own_income": true
+    }
+  ]
 }
