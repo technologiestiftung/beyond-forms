@@ -275,7 +275,10 @@ Fokus-Verhalten, damit die Schirme sich nicht unterscheiden.
 
 Die dynamische Liste — der aufwendigste Baustein.
 
-- Pro Kind eine Datumseingabe im Muster von `DateOfBirthCard` (TT / MM / JJJJ getrennt)
+- Pro Kind eine Datumseingabe im Muster von `DateOfBirthCard`: ein natives
+  `<input type="date">` mit `min="1900-01-01"`, `max` auf heute und Gültigkeitsprüfung über
+  `input.validity.valid`. Nicht getrennte Tag/Monat/Jahr-Felder — die Skizze in der
+  Vorbesprechung zeigte das so, das Repo macht es anders, und das bestehende Muster gewinnt
 - „+ Kind hinzufügen" fügt eine leere Zeile an, „Entfernen" pro Zeile
 - Startzustand: eine leere Zeile, damit ohne zusätzlichen Klick begonnen werden kann
 - „Weiter" bleibt inaktiv, solange nicht **jede** Zeile ein gültiges Datum enthält
