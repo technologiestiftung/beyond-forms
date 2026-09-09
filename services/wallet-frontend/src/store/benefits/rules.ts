@@ -137,3 +137,56 @@ export const assessSgbIiBasicIncome = (
 
 	return { benefit, ...assessMeans(answers, today) };
 };
+
+export const assessSgbXiiOldAgeReducedCapacity = (
+	answers: PartialBenefitCheckAnswers,
+	today: string,
+): BenefitAssessment => {
+	const benefit = BenefitId.SGB_XII_OLD_AGE_REDUCED_CAPACITY;
+
+	if (answers.dateOfBirth === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+
+	const retired = hasReachedRetirementAge(answers.dateOfBirth, today);
+	if (!retired && answers.workCapacity === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+
+	const isAdult = ageInYears(answers.dateOfBirth, today) >= 18;
+	const applies =
+		isAdult &&
+		(retired || answers.workCapacity === WorkCapacity.PERMANENTLY_REDUCED);
+
+	if (!applies) {
+		return {
+			benefit,
+			status: BenefitStatus.NOT_APPLICABLE,
+			reasons: [ReasonCode.RETIREMENT_AGE_NOT_REACHED],
+		};
+	}
+
+	const residence = residenceRequirementMet(answers);
+	if (residence === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+	if (!residence) {
+		return {
+			benefit,
+			status: BenefitStatus.LIKELY_NO,
+			reasons: [ReasonCode.RESIDENCE_STATUS_UNCLEAR],
+		};
+	}
+
+	if (answers.receivesBenefitsAlready) {
+		return {
+			benefit,
+			status: BenefitStatus.LIKELY_YES,
+			reasons: [ReasonCode.ALREADY_RECEIVING_BENEFITS],
+		};
+	}
+
+	// The domain spec §6.2 flags an open question of whether SGB XII uses a different
+	// asset allowance table than SGB II. Until that is answered, both share one table.
+	return { benefit, ...assessMeans(answers, today) };
+};
