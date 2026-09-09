@@ -1,0 +1,45 @@
+name: Check DB Schema Snapshot
+
+on:
+  pull_request:
+    paths:
+      - "migrations/**"
+      - "services/migration-service/**"
+      - "libs/db-schema/index.ts"
+      - "scripts/dump_db_schema.sh"
+      - ".github/workflows/check-db-schema.yaml"
+  workflow_dispatch:
+
+jobs:
+  check-db-schema:
+    name: Verify libs/db-schema/index.ts is in sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Bootstrap local dev environment
+        run: |
+          chmod +x scripts/bootstrap.sh
+          ./scripts/bootstrap.sh
+
+      - name: Start postgres and apply migrations
+        run: docker compose up -d --build postgres migration-service
+
+      - name: Wait for migrations to finish
+        run: |
+          timeout 60 docker wait migration-service > /tmp/migration-exit-code
+          test "$(cat /tmp/migration-exit-code)" = "0" || {
+            docker logs migration-service
+            exit 1
+          }
+
+      - name: Regenerate the schema snapshot
+        run: ./scripts/dump_db_schema.sh
+
+      - name: Fail if libs/db-schema/index.ts is out of date
+        run: |
+          if ! git diff --exit-code -- libs/db-schema/index.ts; then
+            echo "::error::libs/db-schema/index.ts is out of sync with migrations/. Run ./scripts/dump_db_schema.sh locally and commit the result."
+            exit 1
+          fi

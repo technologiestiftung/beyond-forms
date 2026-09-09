@@ -322,6 +322,7 @@ def test_ensure_skips_a_persona_that_already_has_a_profile():
     service = DemoSeedService(db, storage_client=MagicMock(), personas_dir=PERSONAS_DIR)
     existing = MagicMock(spec=Users)
     existing.first_name = "Helmut"
+    existing.demo_seed_fixture_hash = service._fixture_hash("helmut")
     db.query.return_value.filter.return_value.first.return_value = existing
 
     with (
@@ -338,6 +339,43 @@ def test_ensure_skips_a_persona_that_already_has_a_profile():
     assert results == [
         {"persona": "helmut", "phone_number": "+493023125102", "status": "already_present"}
     ]
+
+
+def test_ensure_reseeds_a_persona_whose_fixture_hash_changed():
+    """A persona edit (e.g. a new field added to the fixture) must land on the next
+    deploy without anyone having to remember to run `demo_cli --reset` by hand."""
+    db = MagicMock(spec=Session)
+    service = DemoSeedService(db, storage_client=MagicMock(), personas_dir=PERSONAS_DIR)
+    existing = MagicMock(spec=Users)
+    existing.first_name = "Helmut"
+    existing.demo_seed_fixture_hash = "stale-hash-from-before-the-fixture-changed"
+    existing.id = uuid.uuid4()
+    db.query.return_value.filter.return_value.first.return_value = existing
+
+    with (
+        patch.object(
+            service,
+            "list_personas",
+            return_value=[{"slug": "helmut", "phone_number": "+493023125102"}],
+        ),
+        patch.object(service, "seed", return_value={"persona": "helmut"}) as seed,
+    ):
+        results = service.ensure_missing_personas()
+
+    seed.assert_called_once_with(existing.id, "helmut", reset=True)
+    assert results[0]["status"] == "reseeded"
+
+
+def test_fixture_hash_changes_when_the_file_content_changes(tmp_path):
+    service = DemoSeedService(MagicMock(spec=Session), storage_client=MagicMock(), personas_dir=tmp_path)
+    fixture = tmp_path / "test_persona.json"
+
+    fixture.write_text('{"a": 1}', encoding="utf-8")
+    first_hash = service._fixture_hash("test_persona")
+    assert first_hash == service._fixture_hash("test_persona")
+
+    fixture.write_text('{"a": 2}', encoding="utf-8")
+    assert service._fixture_hash("test_persona") != first_hash
 
 
 def test_ensure_inserts_and_seeds_a_missing_persona():

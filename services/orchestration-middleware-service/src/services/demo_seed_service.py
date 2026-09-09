@@ -18,6 +18,7 @@ One rule must not be relaxed:
 
 import datetime
 import decimal
+import hashlib
 import json
 import logging
 import os
@@ -165,14 +166,29 @@ class DemoSeedService:
             personas.append(persona)
         return personas
 
+    def _fixture_hash(self, slug: str) -> str:
+        """
+        Content hash of a persona's fixture file, so a change to `demo/personas/<slug>.json`
+        can be detected even when the account already has a profile. Hashes the raw file
+        bytes rather than a parsed dict — `list_personas()` strips `$schema` and defaults
+        `slug`, `load_persona()` doesn't, so two different in-memory representations of
+        "the same file" would otherwise risk disagreeing on the hash.
+        """
+        path = self.personas_dir / f"{slug}.json"
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+
     def ensure_missing_personas(self) -> list[dict[str, Any]]:
         """
-        Inserts each persona that does not already have a profile.
+        Inserts each persona that does not already have a profile, and re-seeds one whose
+        fixture file has changed since it was last seeded.
 
-        A persona is considered present when its drama number has a `users` row
-        with `first_name` set — we do not overwrite live demo state. Missing
-        accounts get a `users` row (`authentik_id` stays null until first login)
-        and then the usual seed.
+        A persona is considered present when its drama number has a `users` row with
+        `first_name` set. If the stored `demo_seed_fixture_hash` no longer matches the
+        fixture on disk, the account is re-seeded (full reset) so a persona edit lands on
+        the next deploy instead of requiring a manual `demo_cli --reset`. Otherwise it is
+        left alone — we do not want to overwrite live demo state on every deploy. Missing
+        accounts get a `users` row (`authentik_id` stays null until first login) and then
+        the usual seed.
         """
         self.db.execute(text("SELECT pg_advisory_lock(:k)"), {"k": _ENSURE_LOCK_KEY})
         try:
@@ -180,9 +196,13 @@ class DemoSeedService:
             for persona in self.list_personas():
                 slug = persona["slug"]
                 phone = persona["phone_number"]
+                fixture_hash = self._fixture_hash(slug)
                 user = self.db.query(Users).filter(Users.phone_number == phone).first()
                 if user is not None and user.first_name is not None:
-                    results.append({"persona": slug, "phone_number": phone, "status": "already_present"})
+                    if user.demo_seed_fixture_hash == fixture_hash:
+                        results.append({"persona": slug, "phone_number": phone, "status": "already_present"})
+                        continue
+                    results.append({"status": "reseeded", **self.seed(user.id, slug, reset=True)})
                     continue
                 if user is None:
                     user = self._insert_persona_user(phone)
@@ -316,6 +336,8 @@ class DemoSeedService:
                 raise DemoSeedError(f"Persona {slug!r} sets unknown `users` column {key!r}.")
             setattr(db_user, key, _coerce_to_column(column, value))
             applied.append(key)
+
+        db_user.demo_seed_fixture_hash = self._fixture_hash(slug)
 
         if not db_user.district:
             db_user.district = sync_berlin_district(

@@ -401,6 +401,7 @@ class Users(Base):
     wohngeld_payment_to_applicant: Mapped[Optional[bool]] = mapped_column(Boolean)
     consents_to_bank_statement_retention: Mapped[Optional[bool]] = mapped_column(Boolean)
     consents_to_registry_verification: Mapped[Optional[bool]] = mapped_column(Boolean)
+    demo_seed_fixture_hash: Mapped[Optional[str]] = mapped_column(String(64))
 
     conversations: Mapped[list["Conversations"]] = relationship(
         "Conversations", back_populates="fk_user", cascade="all, delete-orphan"
