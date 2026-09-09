@@ -10,6 +10,7 @@ import {
 } from "../../schemas/benefitCheck.schema";
 import type { PartialBenefitCheckAnswers } from "../../schemas/benefitCheck.schema";
 import {
+	assessAdvanceMaintenance,
 	assessChildSupplement,
 	assessHousingBenefit,
 	assessSgbIiBasicIncome,
@@ -444,6 +445,78 @@ describe("assessChildSupplement", () => {
 
 	it("advises a check when answers are missing", () => {
 		const result = assessChildSupplement({}, TODAY);
+		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
+		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
+	});
+});
+
+describe("assessAdvanceMaintenance", () => {
+	it("is likely for case C", () => {
+		const result = assessAdvanceMaintenance(CASE_C, TODAY);
+		expect(result.benefit).toBe(BenefitId.ADVANCE_MAINTENANCE);
+		expect(result.status).toBe(BenefitStatus.LIKELY_YES);
+		expect(result.reasons).toContain(ReasonCode.CHILD_SUPPORT_INCOMPLETE);
+	});
+
+	it("does not apply to a couple", () => {
+		const result = assessAdvanceMaintenance(
+			{
+				...CASE_C,
+				household: {
+					composition: HouseholdComposition.COUPLE_WITH_CHILDREN,
+					children: [{ dateOfBirth: "2020-02-11" }],
+				},
+			},
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
+		expect(result.reasons).toEqual([ReasonCode.NOT_SINGLE_PARENT]);
+	});
+
+	it("does not apply without a minor child", () => {
+		const result = assessAdvanceMaintenance(
+			{
+				...CASE_C,
+				household: {
+					composition: HouseholdComposition.SINGLE_PARENT,
+					children: [{ dateOfBirth: "2005-01-01" }],
+				},
+			},
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
+		expect(result.reasons).toEqual([ReasonCode.NO_MINOR_CHILDREN]);
+	});
+
+	it("is unlikely when the child receives full support", () => {
+		const result = assessAdvanceMaintenance(
+			{
+				...CASE_C,
+				childSupport: { receivesFullSupport: true, monthsWithoutSupport: 0 },
+			},
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.LIKELY_NO);
+		expect(result.reasons).toEqual([ReasonCode.CHILD_RECEIVES_FULL_SUPPORT]);
+	});
+
+	/**
+	 * The domain spec §6.6 folds a missing `unterhalt` object into "eher_nein":
+	 *
+	 *   if not a.unterhalt or a.unterhalt.erhaeltVollenUnterhalt: -> eher_nein
+	 *
+	 * An unanswered question is not the same as "the child does receive support", so the
+	 * two cases are split here.
+	 */
+	it("advises a check when the support question is unanswered", () => {
+		const { childSupport: _dropped, ...withoutSupport } = CASE_C;
+		const result = assessAdvanceMaintenance(withoutSupport, TODAY);
+		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
+		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
+	});
+
+	it("advises a check when answers are missing entirely", () => {
+		const result = assessAdvanceMaintenance({}, TODAY);
 		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
 		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
 	});

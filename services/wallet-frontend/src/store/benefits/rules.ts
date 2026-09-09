@@ -1,6 +1,7 @@
 import {
 	BenefitId,
 	BenefitStatus,
+	HouseholdComposition,
 	ReasonCode,
 	WorkCapacity,
 } from "../../schemas/benefitCheck.schema";
@@ -20,6 +21,7 @@ import {
 	hasReachedRetirementAge,
 	householdStandardNeeds,
 	isCouple,
+	minorChildren,
 	residenceRequirementMet,
 	totalNeeds,
 } from "./derive";
@@ -384,5 +386,54 @@ export const assessChildSupplement = (
 			ReasonCode.KIZ_MIN_INCOME_MET,
 			ReasonCode.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA,
 		],
+	};
+};
+
+/**
+ * Domain spec §6.6, with the missing-data rule applied. The spec writes
+ *
+ *   if not a.unterhalt or a.unterhalt.erhaeltVollenUnterhalt: -> eher_nein
+ *
+ * which treats an unanswered question as if the child were receiving support. The two are
+ * split here: absent data yields CHECK_ADVISED, an actual "yes" yields LIKELY_NO.
+ */
+export const assessAdvanceMaintenance = (
+	answers: PartialBenefitCheckAnswers,
+	today: string,
+): BenefitAssessment => {
+	const benefit = BenefitId.ADVANCE_MAINTENANCE;
+
+	if (answers.household === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+	if (answers.household.composition !== HouseholdComposition.SINGLE_PARENT) {
+		return {
+			benefit,
+			status: BenefitStatus.NOT_APPLICABLE,
+			reasons: [ReasonCode.NOT_SINGLE_PARENT],
+		};
+	}
+	if (minorChildren(answers.household, today).length === 0) {
+		return {
+			benefit,
+			status: BenefitStatus.NOT_APPLICABLE,
+			reasons: [ReasonCode.NO_MINOR_CHILDREN],
+		};
+	}
+	if (answers.childSupport === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+	if (answers.childSupport.receivesFullSupport) {
+		return {
+			benefit,
+			status: BenefitStatus.LIKELY_NO,
+			reasons: [ReasonCode.CHILD_RECEIVES_FULL_SUPPORT],
+		};
+	}
+
+	return {
+		benefit,
+		status: BenefitStatus.LIKELY_YES,
+		reasons: [ReasonCode.CHILD_SUPPORT_INCOMPLETE],
 	};
 };
