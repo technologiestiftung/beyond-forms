@@ -741,7 +741,8 @@ options = [
   "Ja"
 ]
 option_labels = { "Nein" = "Nein Nein", "Ja" = "Ja Ja" }
-value = "{{ has_applied_for_asylum_benefits == true ? 'Ja' : 'Nein' }}"
+# office-only, never the filler's to answer.
+value = ""
 
 ["p3_personenziffer_2_mögliche_ausschlussgründe_für_die_grundsicherung"]
 type = "radio"
@@ -751,7 +752,8 @@ options = [
   "Ja"
 ]
 option_labels = { "Nein" = "Nein", "Ja" = "Ja" }
-value = "{{ partner && partner.has_applied_for_asylum_benefits == true ? 'Ja' : (partner && partner.has_applied_for_asylum_benefits == false ? 'Nein' : '') }}"
+# office-only, never the filler's to answer.
+value = ""
 
 ["p3_geldinstitut"]
 type = "string"
@@ -761,7 +763,7 @@ value = "{{ bank_name ? bank_name : '' }}"
 ["p3_bankleitzahl"]
 type = "string"
 description = "Bankleitzahl"
-value = ""
+value = "{{ blz ? blz : '' }}"
 
 ["p3_kontonummer"]
 type = "string"
@@ -827,7 +829,7 @@ value = "{{ accomodation_type == 'Rental Apartment' ? '0' : accomodation_type ==
 ["p3_name_und_anschrift_des_vermieters"]
 type = "string"
 description = "Name und Anschrift des Vermieters"
-value = "{{ landlord_name ? landlord_name : '' }}"
+value = "{{ landlord_name ? landlord_name : '' }}{{ landlord_name && landlord_address ? ', ' : '' }}{{ landlord_address ? landlord_address : '' }}"
 
 ["p3_haupt-_oder_untermiete"]
 type = "radio"
@@ -852,7 +854,7 @@ value = "{{ related_to_landlord == true ? 'Ja' : '' }}"
 ["p3_name_des_hauptmieters"]
 type = "string"
 description = "Name des Hauptmieters"
-value = "{{ landlord_name ? landlord_name : '' }}"
+value = "{{ tenancy_status == 'Subtenant' && main_tenant_name ? main_tenant_name : '' }}"
 
 ["p3_miete_insgesamt_in_euro_pro_monat"]
 type = "string"
@@ -1209,12 +1211,12 @@ value = "{{ partner && partner.income.Pension ? partner.income.Pension : '' }}"
 ["p5_bewilligungsstelle,_sozialhilfeleistungen"]
 type = "string"
 description = "Bewilligungsstelle, Sozialhilfeleistungen"
-value = "{{ previous_benefits_authority ? previous_benefits_authority : '' }}"
+value = "{{ income_office['Social Assistance'] ? income_office['Social Assistance'] : '' }}"
 
 ["p5_geschäftszeichen,_rentenabrechnungsnummer,_aus_sozialhilfeleistungen"]
 type = "string"
 description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Sozialhilfeleistungen"
-value = "{{ previous_benefits_ref_no ? previous_benefits_ref_no : '' }}"
+value = "{{ income_reference['Social Assistance'] ? income_reference['Social Assistance'] : '' }}"
 
 ["p5_personenziffer_1,_sozialhilfeleistungen"]
 type = "string"
@@ -2099,7 +2101,7 @@ value = "{{ partner && partner.assets['Motor Vehicle'] ? partner.assets['Motor V
 ["p8_baujahr"]
 type = "string"
 description = "Baujahr"
-value = ""
+value = "{{ vehicle_year ? vehicle_year : '' }}"
 
 ["p8_halter"]
 type = "string"
@@ -2119,7 +2121,7 @@ value = "{{ partner && partner.asset_descriptions['Motor Vehicle'] ? partner.ass
 ["p8_fabrikat"]
 type = "string"
 description = "Fabrikat"
-value = ""
+value = "{{ vehicle_make ? vehicle_make : '' }}"
 
 ["p8_hauseigentum_oder_grundbesitz"]
 type = "radio"

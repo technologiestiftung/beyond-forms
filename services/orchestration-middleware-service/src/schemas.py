@@ -217,6 +217,8 @@ class UserProfileValidationSchema(BaseModel):
     sublet_rent_income: Optional[decimal.Decimal] = None
     rent_paid_until: Optional[date] = None
     landlord_name: Optional[str] = None
+    landlord_address: Optional[str] = None
+    main_tenant_name: Optional[str] = None
     heating_type: Optional[str] = None
     free_housing_right_holder: Optional[str] = None
     hot_water_costs: Optional[decimal.Decimal] = None
@@ -380,6 +382,10 @@ class UserInformationUpdateSchema(BaseModel):
     sublet_rent_income: Optional[decimal.Decimal] = Field(None, description="Rent income from subletting")
     rent_paid_until: Optional[date] = Field(None, description="Rent paid until date")
     landlord_name: Optional[str] = Field(None, description="Landlord name")
+    landlord_address: Optional[str] = Field(None, description="Landlord address")
+    main_tenant_name: Optional[str] = Field(
+        None, description="Name of the main tenant, when the applicant is a subtenant"
+    )
     heating_type: Optional[str] = Field(None, description="Heating system type")
     free_housing_right_holder: Optional[str] = Field(None, description="Name of housing right provider")
     is_subsidized_housing: Optional[bool] = Field(None, description="Whether the housing is publicly subsidized")
@@ -565,6 +571,8 @@ class UserInformationUpdateSchema(BaseModel):
     city: Optional[str] = Field(None, description="City")
     state: Optional[str] = Field(None, description="State or federal state")
     license_plate: Optional[str] = Field(None, max_length=20, description="Vehicle license plate")
+    vehicle_make: Optional[str] = Field(None, description="Vehicle make/model (Fabrikat)")
+    vehicle_year: Optional[str] = Field(None, max_length=4, description="Vehicle year built (Baujahr)")
 
 
 class ChatMessageResponseSchema(BaseModel):

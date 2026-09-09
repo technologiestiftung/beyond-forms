@@ -17,6 +17,17 @@ PARTNER_TYPES = frozenset(
 RETIREMENT_AGE = 67
 
 
+def _blz_from_iban(iban: Any) -> Any:
+    """The Bankleitzahl is positions 5-12 of a German IBAN - the form asks for it
+    separately even though it is fully implied by the IBAN the user already gave."""
+    if not isinstance(iban, str):
+        return None
+    cleaned = iban.replace(" ", "")
+    if cleaned[:2] != "DE" or len(cleaned) != 22:
+        return None
+    return cleaned[4:12]
+
+
 def row_to_dict(row: Any) -> Dict[str, Any]:
     """A mapped row as {column_name: value}, the shape the JEXL context is built from."""
     return {column.name: getattr(row, column.name) for column in row.__table__.columns}
@@ -142,6 +153,7 @@ def derived_context(
     money_entries = list(money_entries)
     return {
         "today": datetime.date.today(),
+        "blz": _blz_from_iban(user_row.get("iban")),
         **age_context(user_row.get("date_of_birth")),
         **label_context(user_row),
         **money_context(money_entries, None),
