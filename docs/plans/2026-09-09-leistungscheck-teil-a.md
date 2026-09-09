@@ -586,7 +586,7 @@ export const hasReachedRetirementAge = (
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/store/benefits/derive.test.ts`
-Expected: PASS — 10 tests
+Expected: PASS — 9 tests
 
 - [ ] **Step 5: Commit**
 
@@ -726,7 +726,7 @@ export const assetsVsAllowance = (
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/store/benefits/derive.test.ts`
-Expected: PASS — 16 tests
+Expected: PASS — 15 tests (kumulativ in derive.test.ts)
 
 - [ ] **Step 5: Commit**
 
@@ -1004,7 +1004,7 @@ export const residenceRequirementMet = (
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/store/benefits/derive.test.ts`
-Expected: PASS — 30 tests
+Expected: PASS — 27 tests (kumulativ in derive.test.ts)
 
 - [ ] **Step 5: Commit**
 
@@ -1501,7 +1501,7 @@ export const assessSgbXiiOldAgeReducedCapacity = (
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/store/benefits/rules.test.ts`
-Expected: PASS — 16 tests
+Expected: PASS — 16 tests (kumulativ in rules.test.ts)
 
 - [ ] **Step 5: Commit**
 
@@ -1693,7 +1693,7 @@ export const assessSgbXiiSubsistenceAid = (
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/store/benefits/rules.test.ts`
-Expected: PASS — 22 tests
+Expected: PASS — 22 tests (kumulativ in rules.test.ts)
 
 - [ ] **Step 5: Commit**
 
@@ -1863,7 +1863,7 @@ export const assessHousingBenefit = (
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/store/benefits/rules.test.ts`
-Expected: PASS — 27 tests
+Expected: PASS — 27 tests (kumulativ in rules.test.ts)
 
 - [ ] **Step 5: Commit**
 
@@ -2100,7 +2100,7 @@ export const assessChildSupplement = (
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/store/benefits/rules.test.ts`
-Expected: PASS — 35 tests
+Expected: PASS — 35 tests (kumulativ in rules.test.ts)
 
 - [ ] **Step 5: Commit**
 
@@ -2288,7 +2288,7 @@ export const assessAdvanceMaintenance = (
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/store/benefits/rules.test.ts`
-Expected: PASS — 41 tests
+Expected: PASS — 41 tests (kumulativ in rules.test.ts)
 
 - [ ] **Step 5: Commit**
 
@@ -2709,7 +2709,7 @@ Expected: PASS — 5 tests. Anders als bei den Tasks vorher ist hier kein roter 
 - [ ] **Step 3: Run the whole suite**
 
 Run: `npm test`
-Expected: `Tests  1 failed | 337 passed (338)` — der eine Fehlschlag ist der vorbestehende `ApplicationOverview.test.tsx`. Die genaue Zahl der grünen Tests kann abweichen, wenn frühere Tasks Tests ergänzt haben; entscheidend ist: **exakt ein roter Test, und zwar dieser.**
+Expected: `Tests  1 failed | 356 passed (357)` — der eine Fehlschlag ist der vorbestehende `ApplicationOverview.test.tsx`. Die genaue Zahl der grünen Tests kann abweichen, wenn frühere Tasks Tests ergänzt haben; entscheidend ist: **exakt ein roter Test, und zwar dieser.**
 
 - [ ] **Step 4: Typecheck and lint the new files**
 
@@ -2738,6 +2738,23 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 EOF
 )"
 ```
+
+---
+
+## Korrekturen aus der Umsetzung
+
+Zwei Fehler im Plan, die erst beim Ausführen aufgefallen sind:
+
+1. **Task 6, Test „applies below the retirement age when capacity is permanently reduced"**
+   erwartete `LIKELY_YES`, während Fall B's Vermögensband (5.000–15.000) bei 45 Jahren den
+   Freibetrag von 12.500 überspannt und korrekt `CHECK_ADVISED` liefert. Der Test prüft die
+   Zuständigkeit, nicht die Vermögensrechnung, und nutzt jetzt `UNDER_5000`. Fehler im Test,
+   nicht in der Implementierung.
+2. **`RETIREMENT_AGE_BY_BIRTH_YEAR` war als Funktion mit Konstanten-Namen geschrieben** und
+   verstieß gegen die `new-cap`-Lint-Regel. Umbenannt zu `retirementAgeForBirthYear`.
+
+Die Testzahlen in den Tasks waren teils zu hoch geschätzt und sind auf die tatsächlichen
+Werte korrigiert.
 
 ---
 
