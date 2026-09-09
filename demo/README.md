@@ -21,7 +21,8 @@ stop exercising the review and to-do paths, which is most of what there is to st
 
 When `DEMO_SEED_ENABLED=true` (the compose default, and every deployed environment),
 middleware startup inserts any persona whose drama number does not already have a
-profile. Existing profiles are left alone.
+profile, and re-seeds one whose fixture file (`demo/personas/<slug>.json`) has changed
+since it was last seeded. An unchanged, already-seeded profile is left alone.
 
 ```bash
 docker compose up -d                         # seeds Sabine, Helmut, Sandor on first boot
@@ -44,9 +45,10 @@ code works.
 
 Staging and production both have `DEMO_SEED_ENABLED=true`, so the first middleware
 revision that boots against an empty database creates Helmut, Sabine and Sandor.
-Later deploys skip them if those accounts already have a profile. Treat the three
-numbers as shared reference — log in as one of them to *read* the case, and take a
-drama number of your own (any unused suffix) if you need a private empty account.
+Later deploys leave an account alone unless its fixture file changed, in which case it
+gets re-seeded from scratch. Treat the three numbers as shared reference — log in as one
+of them to *read* the case, and take a drama number of your own (any unused suffix) if you
+need a private empty account.
 
 ```bash
 API=https://staging.bf.citylab-berlin.org/api            # middleware
@@ -66,8 +68,9 @@ curl -s $API/files -H "Authorization: Bearer $TOKEN" | jq
 ```
 
 The fixture *definitions* live in `demo/personas/` in the repo. The accounts behind
-those three numbers are live state and can drift once someone writes to them; a
-deploy will not reset them.
+those three numbers are live state and can drift once someone writes to them — a deploy
+will only reset an account back to its fixture if the fixture file itself changed;
+manual poking between fixture changes survives.
 
 ## Get a token
 
