@@ -2041,7 +2041,7 @@ value = "{{ asset_descriptions['Gifted Assets'] ? asset_descriptions['Gifted Ass
 ["p8_personenziffer_1,_verschenktes_vermögen"]
 type = "string"
 description = "Personenziffer 1, Verschenktes Vermögen "
-value = "{{ gave_away_assets_last_10_years == true ? '1' : '' }}"
+value = "{{ assets['Gifted Assets'] ? assets['Gifted Assets'] : '' }}"
 
 ["p8_personenziffer_2,_verschenktes_vermögen"]
 type = "string"
@@ -2091,7 +2091,7 @@ value = "{{ license_plate ? license_plate : '' }}"
 ["p8_personenziffer_1,_kraftfahrzeug"]
 type = "string"
 description = "Personenziffer 1, Kraftfahrzeug "
-value = "{{ license_plate ? '1' : '' }}"
+value = "{{ assets['Motor Vehicle'] ? assets['Motor Vehicle'] : '' }}"
 
 ["p8_personenziffer_2,_kraftfahrzeug"]
 type = "string"
