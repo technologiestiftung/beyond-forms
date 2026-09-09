@@ -14,6 +14,17 @@ import { BINARY_OPTIONS } from "../store/benefits/questionCatalogue";
 import { i18nKeys } from "../i18n/i18nKeys";
 import type { BenefitCheckAnswers } from "../schemas/benefitCheck.schema";
 
+/**
+ * QuestionCard works on option strings, so a boolean answer has to travel as YES/NO.
+ * Unanswered stays undefined — a false answer and no answer must not look the same.
+ */
+const toBinaryOption = (value: unknown): string | undefined => {
+	if (value === undefined) {
+		return undefined;
+	}
+	return value ? "YES" : "NO";
+};
+
 export const EligibilityFlow: React.FC = () => {
 	const { t } = useTranslation();
 	const answers = useBenefitCheckStore((s) => s.answers);
@@ -102,13 +113,7 @@ export const EligibilityFlow: React.FC = () => {
 						key={question.id}
 						{...header}
 						options={BINARY_OPTIONS}
-						value={
-							answers[question.field] === undefined
-								? undefined
-								: answers[question.field]
-									? "YES"
-									: "NO"
-						}
+						value={toBinaryOption(answers[question.field])}
 						onChange={(raw) => write((raw === "YES") as never)}
 						onNext={navigateNext}
 					/>

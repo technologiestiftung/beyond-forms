@@ -6,7 +6,7 @@ import * as Icons from "../components/ui/Icons";
 import { AppRoutes, getEligibilityRoute } from "../constants/routes";
 import { i18nKeys } from "../i18n/i18nKeys";
 
-import { useEligibilityStore } from "../store/useEligibilityStore";
+import { useBenefitCheckStore } from "../store/useBenefitCheckStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { PrimaryButton } from "../components/ui/PrimaryButton";
 import { IntroCarousel } from "../components/Eligibility/IntroCarousel";
@@ -15,7 +15,7 @@ import { SecondaryButton } from "../components/ui/SecondaryButton";
 export const EligibilityStart: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	const resetEligibility = useEligibilityStore((s) => s.resetForm);
+	const resetEligibility = useBenefitCheckStore((s) => s.resetForm);
 	const isAuthenticated = !!useAuthStore((s) => s.token);
 
 	React.useEffect(() => {
