@@ -8,13 +8,18 @@ import type {
 	BenefitAssessment,
 	PartialBenefitCheckAnswers,
 } from "../../schemas/benefitCheck.schema";
-import { RENT_BURDEN_THRESHOLD } from "../../config/benefitRules.config";
+import {
+	KIZ_MIN_GROSS_INCOME,
+	RENT_BURDEN_THRESHOLD,
+} from "../../config/benefitRules.config";
 import {
 	ageInYears,
 	assetAllowance,
 	assetsVsAllowance,
+	childrenUnder25,
 	hasReachedRetirementAge,
 	householdStandardNeeds,
+	isCouple,
 	residenceRequirementMet,
 	totalNeeds,
 } from "./derive";
@@ -322,5 +327,62 @@ export const assessHousingBenefit = (
 		benefit,
 		status: BenefitStatus.LIKELY_NO,
 		reasons: [ReasonCode.RENT_BURDEN_NORMAL],
+	};
+};
+
+/**
+ * Domain spec §6.5, with one correction: the spec requires ALL children to be under 25
+ *
+ *   hatKinder = kinder.length > 0 and alle(kinder, k -> k.alterJahre < 25)
+ *
+ * which drops a household containing both a 26-year-old and a 5-year-old, even though the
+ * younger child qualifies. "At least one child under 25" is used instead.
+ */
+export const assessChildSupplement = (
+	answers: PartialBenefitCheckAnswers,
+	today: string,
+): BenefitAssessment => {
+	const benefit = BenefitId.CHILD_SUPPLEMENT;
+
+	if (answers.household === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+	if (childrenUnder25(answers.household, today).length === 0) {
+		return {
+			benefit,
+			status: BenefitStatus.NOT_APPLICABLE,
+			reasons: [ReasonCode.NO_ELIGIBLE_CHILDREN],
+		};
+	}
+	if (answers.receivesBenefitsAlready) {
+		return {
+			benefit,
+			status: BenefitStatus.NOT_APPLICABLE,
+			reasons: [ReasonCode.BENEFITS_TAKE_PRECEDENCE],
+		};
+	}
+	if (answers.employment === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+
+	const minimum = isCouple(answers.household.composition)
+		? KIZ_MIN_GROSS_INCOME.couple
+		: KIZ_MIN_GROSS_INCOME.single;
+
+	if (answers.employment.monthlyGrossIncome < minimum) {
+		return {
+			benefit,
+			status: BenefitStatus.LIKELY_NO,
+			reasons: [ReasonCode.KIZ_MIN_INCOME_NOT_MET],
+		};
+	}
+
+	return {
+		benefit,
+		status: BenefitStatus.CHECK_ADVISED,
+		reasons: [
+			ReasonCode.KIZ_MIN_INCOME_MET,
+			ReasonCode.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA,
+		],
 	};
 };

@@ -10,6 +10,7 @@ import {
 } from "../../schemas/benefitCheck.schema";
 import type { PartialBenefitCheckAnswers } from "../../schemas/benefitCheck.schema";
 import {
+	assessChildSupplement,
 	assessHousingBenefit,
 	assessSgbIiBasicIncome,
 	assessSgbXiiOldAgeReducedCapacity,
@@ -325,6 +326,124 @@ describe("assessHousingBenefit", () => {
 
 	it("advises a check when answers are missing", () => {
 		const result = assessHousingBenefit({}, TODAY);
+		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
+		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
+	});
+});
+
+/** Single parent, one child of 6, gross 1400 — the domain spec's case C. */
+const CASE_C: PartialBenefitCheckAnswers = {
+	dateOfBirth: "1997-05-02",
+	workCapacity: WorkCapacity.FULL,
+	household: {
+		composition: HouseholdComposition.SINGLE_PARENT,
+		children: [{ dateOfBirth: "2020-02-11" }],
+	},
+	employment: { isEmployed: true, monthlyGrossIncome: 1400 },
+	monthlyNetHouseholdIncome: 1900,
+	monthlyWarmRent: 700,
+	assetsBand: AssetsBand.UNDER_5000,
+	receivesBenefitsAlready: false,
+	citizenship: Citizenship.DE_EU,
+	childSupport: { receivesFullSupport: false, monthsWithoutSupport: 8 },
+	livesInBerlin: true,
+};
+
+describe("assessChildSupplement", () => {
+	it("advises a check for case C", () => {
+		const result = assessChildSupplement(CASE_C, TODAY);
+		expect(result.benefit).toBe(BenefitId.CHILD_SUPPLEMENT);
+		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
+		expect(result.reasons).toContain(ReasonCode.KIZ_MIN_INCOME_MET);
+		expect(result.reasons).toContain(
+			ReasonCode.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA,
+		);
+	});
+
+	it("does not apply without children", () => {
+		const result = assessChildSupplement(
+			{
+				...CASE_C,
+				household: { composition: HouseholdComposition.SINGLE, children: [] },
+			},
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
+		expect(result.reasons).toEqual([ReasonCode.NO_ELIGIBLE_CHILDREN]);
+	});
+
+	/**
+	 * Corrects an error in the domain spec §6.5, which requires ALL children to be under
+	 * 25 and therefore drops a household that also has an older child.
+	 */
+	it("still applies when one child is over 25 and another is not", () => {
+		const result = assessChildSupplement(
+			{
+				...CASE_C,
+				household: {
+					composition: HouseholdComposition.SINGLE_PARENT,
+					children: [
+						{ dateOfBirth: "1999-01-01" }, // 27
+						{ dateOfBirth: "2021-01-01" }, // 5
+					],
+				},
+			},
+			TODAY,
+		);
+		expect(result.status).not.toBe(BenefitStatus.NOT_APPLICABLE);
+	});
+
+	it("does not apply when every child is 25 or older", () => {
+		const result = assessChildSupplement(
+			{
+				...CASE_C,
+				household: {
+					composition: HouseholdComposition.SINGLE_PARENT,
+					children: [{ dateOfBirth: "1999-01-01" }],
+				},
+			},
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
+	});
+
+	it("does not apply while other benefits are received", () => {
+		const result = assessChildSupplement(
+			{ ...CASE_C, receivesBenefitsAlready: true },
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
+		expect(result.reasons).toEqual([ReasonCode.BENEFITS_TAKE_PRECEDENCE]);
+	});
+
+	it("is unlikely below the minimum gross income for a single parent", () => {
+		const result = assessChildSupplement(
+			{
+				...CASE_C,
+				employment: { isEmployed: true, monthlyGrossIncome: 500 },
+			},
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.LIKELY_NO);
+		expect(result.reasons).toEqual([ReasonCode.KIZ_MIN_INCOME_NOT_MET]);
+	});
+
+	it("applies the higher minimum to couples", () => {
+		const couple: PartialBenefitCheckAnswers = {
+			...CASE_C,
+			household: {
+				composition: HouseholdComposition.COUPLE_WITH_CHILDREN,
+				children: [{ dateOfBirth: "2020-02-11" }],
+			},
+			employment: { isEmployed: true, monthlyGrossIncome: 700 },
+		};
+		expect(assessChildSupplement(couple, TODAY).status).toBe(
+			BenefitStatus.LIKELY_NO,
+		);
+	});
+
+	it("advises a check when answers are missing", () => {
+		const result = assessChildSupplement({}, TODAY);
 		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
 		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
 	});
