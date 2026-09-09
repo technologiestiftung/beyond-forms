@@ -68,59 +68,128 @@
 		"cta": "Check your entitlement now"
 	},
 	"questions": {
-		"nationality": {
-			"category": "Nationality and Residence Status",
-			"title": "Which of the following applies to you?",
-			"tip": "This is important because different laws apply depending on your residency status. If you are new in Germany or in asylum proceedings, there is a special support system.",
+		"household": {
+			"category": "Household",
+			"title": "Who lives in your household?",
+			"tip": "How many people live together changes the calculation. Children count too.",
 			"options": {
-				"GERMAN": "I have German citizenship.",
-				"EU_5_PLUS": "I am an EU citizen and have lived in Germany for at least 5 years.",
-				"RESIDENCE_PERMIT": "I have a valid residence permit for Germany.",
-				"NONE": "None of the above."
+				"SINGLE": "I live alone.",
+				"SINGLE_PARENT": "I am a single parent.",
+				"COUPLE_NO_CHILDREN": "We are a couple, without children in the household.",
+				"COUPLE_WITH_CHILDREN": "We are a couple, with children in the household."
 			}
 		},
-		"livesInGermany": {
-			"category": "Place of Residence",
+		"children": {
+			"category": "Children in the household",
+			"title": "When were your children born?",
+			"tip": "Your children's ages matter, because separate amounts apply to children. Some benefits only exist for children under 18 or under 25.",
+			"add": "Add a child",
+			"remove": "Remove child {{index}}",
+			"child_label": "Child {{index}}"
+		},
+		"birthdate": {
+			"category": "Date of birth",
+			"title": "When were you born?",
+			"tip": "Your age helps decide which benefits might be right for you. Different rules apply once you reach the statutory retirement age."
+		},
+		"germany": {
+			"category": "Place of residence",
 			"title": "Do you live in Germany?",
-			"tip": "You can only receive Basic Income Support if you live in Germany permanently.",
+			"tip": "The benefits Klaro checks only exist if you live in Germany permanently.",
 			"options": {
 				"YES": "Yes, I live in Germany.",
 				"NO": "No, I do not live in Germany."
 			}
 		},
-		"dateOfBirth": {
-			"category": "Date of Birth",
-			"title": "When were you born?",
-			"tip": "Basic Income Support may be an option for you if you:\n• have reached the standard retirement age or\n• are at least 18 years old and permanently fully unable to work."
-		},
-		"pension": {
-			"category": "Pension Status",
-			"title": "Do you receive a pension?",
-			"tip": "From the standard retirement age, Basic Income Support in old age may be an option for you. When you reach this age limit depends on your year of birth.",
+		"work-capacity": {
+			"category": "Ability to work",
+			"title": "Can you work at least three hours a day?",
+			"tip": "Three hours is a threshold in the law. It decides which office is responsible for you. This is not about whether you currently have a job.",
 			"options": {
-				"OLD_AGE": "I receive an old-age pension.",
-				"REDUCED_EARNING_CAPACITY": "I receive a pension because I am no longer able to work full-time (Reduced Earning Capacity).",
-				"NONE": "I do not receive a pension."
+				"FULL": "Yes, at least three hours a day.",
+				"TEMPORARILY_REDUCED": "Not at the moment, but perhaps again later.",
+				"PERMANENTLY_REDUCED": "No, not permanently."
 			}
 		},
-		"income": {
-			"category": "Income Assessment",
-			"title": "Which of the following applies to you?",
-			"tip": "Sometimes money is enough for food, but not for the rent. Then you might get housing benefit.",
+		"employment": {
+			"category": "Work",
+			"title": "Are you working at the moment?",
+			"tip": "If you live with a partner, their work counts as well.",
 			"options": {
-				"NOT_SUFFICIENT": "My current income is not sufficient to cover my needs.",
-				"SOON_INSUFFICIENT": "I am concerned that my income may soon be insufficient.",
-				"SUFFICIENT": "My income is sufficient. I can afford my expenses."
+				"YES": "Yes, I am working.",
+				"NO": "No, not at the moment."
 			}
 		},
-		"hasAssetsAboveThreshold": {
-			"category": "Assets check",
-			"title": "Approximately how much do you have in assets?",
-			"tip": "Don't worry, many people receive help despite savings. The limit in the first year is €10,000 for one person. This includes cash, valuable items, or your car, for example.",
+		"gross-income": {
+			"category": "Work",
+			"title": "How much is the gross monthly income?",
+			"tip": "Gross means the amount before tax and contributions. You can find it on your payslip. If you live with a partner, add both together.",
+			"unit": "Euro"
+		},
+		"net-income": {
+			"category": "Income",
+			"title": "How much money does your household have per month in total?",
+			"tip": "Add up everything that comes in each month: wages after deductions, pension, child benefit, maintenance, other benefits. An approximate amount is enough.",
+			"unit": "Euro"
+		},
+		"warm-rent": {
+			"category": "Housing",
+			"title": "How much is your rent per month, including bills?",
+			"tip": "That means rent plus service charges plus heating. You can find the amount in your tenancy agreement or on your bank statement.",
+			"unit": "Euro"
+		},
+		"assets": {
+			"category": "Savings",
+			"title": "How much money have you saved?",
+			"tip": "This means everything you have put aside: accounts, savings books, cash, securities. You are allowed to keep some of it — how much depends on your age. A rough estimate is enough.",
 			"options": {
-				"YES": "Yes, I have more than €10,000 in assets.",
-				"NO": "No, I have less than €10,000 in assets."
+				"UNDER_5000": "Less than 5,000 euros.",
+				"FROM_5000_TO_15000": "Between 5,000 and 15,000 euros.",
+				"FROM_15000_TO_25000": "Between 15,000 and 25,000 euros.",
+				"OVER_25000": "More than 25,000 euros."
 			}
+		},
+		"benefits": {
+			"category": "Benefits you already receive",
+			"title": "Are you already receiving a social benefit?",
+			"tip": "For example Grundsicherungsgeld, Grundsicherung im Alter or Hilfe zum Lebensunterhalt. Some benefits cannot be received at the same time.",
+			"options": {
+				"YES": "Yes, I already receive a benefit.",
+				"NO": "No, not at the moment."
+			}
+		},
+		"citizenship": {
+			"category": "Citizenship",
+			"title": "Do you hold German citizenship or that of an EU country?",
+			"tip": "Different laws apply depending on your citizenship and residence status.",
+			"options": {
+				"DE_EU": "Yes, German or from an EU country.",
+				"NON_EU": "No, from another country."
+			}
+		},
+		"residence-status": {
+			"category": "Residence",
+			"title": "Do you have secure residence status?",
+			"tip": "Secure means, for example: a settlement permit, an open-ended residence permit, or recognition as a refugee. If your asylum procedure is still running, a separate system applies — Klaro will point you to it at the end.",
+			"options": {
+				"YES": "Yes, I have secure residence status.",
+				"NO": "No, or I am not sure."
+			}
+		},
+		"child-support": {
+			"category": "Maintenance",
+			"title": "Does your child receive maintenance from the other parent?",
+			"tip": "If no maintenance or too little is paid, the state can step in. That is called Unterhaltsvorschuss.",
+			"options": {
+				"YES": "Yes, the full amount.",
+				"NO": "No, or only part of it."
+			}
+		},
+		"support-duration": {
+			"category": "Maintenance",
+			"title": "For how many months has the maintenance been missing?",
+			"tip": "An approximate number is enough. If you are not sure, estimate.",
+			"unit": "Months"
 		}
 	},
 	"outcome": {

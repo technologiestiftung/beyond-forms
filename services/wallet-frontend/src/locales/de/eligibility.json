@@ -68,59 +68,128 @@
 		"cta": "Jetzt Anspruch prüfen"
 	},
 	"questions": {
-		"nationality": {
-			"category": "Staatsangehörigkeit und Aufenthaltsstatus",
-			"title": "Was trifft auf Dich zu?",
-			"tip": "Das ist wichtig, weil je nach Aufenthaltsstatus unterschiedliche Gesetze gelten. Wenn Du neu in Deutschland bist oder Dich im Asylverfahren befindest, gibt es ein spezielles Unterstützungssystem.",
+		"household": {
+			"category": "Haushalt",
+			"title": "Wer lebt in Deinem Haushalt?",
+			"tip": "Wie viele Menschen zusammenleben, verändert die Berechnung. Kinder zählen mit.",
 			"options": {
-				"GERMAN": "Ich habe die deutsche Staatsangehörigkeit.",
-				"EU_5_PLUS": "Ich bin EU-Bürger:in und lebe seit mindestens 5 Jahren in Deutschland.",
-				"RESIDENCE_PERMIT": "Ich habe einen gültigen Aufenthaltstitel für Deutschland.",
-				"NONE": "Nichts trifft zu."
+				"SINGLE": "Ich lebe allein.",
+				"SINGLE_PARENT": "Ich bin alleinerziehend.",
+				"COUPLE_NO_CHILDREN": "Wir sind ein Paar, ohne Kinder im Haushalt.",
+				"COUPLE_WITH_CHILDREN": "Wir sind ein Paar, mit Kindern im Haushalt."
 			}
 		},
-		"livesInGermany": {
-			"category": "Wohnsitz und Aufenthalt",
+		"children": {
+			"category": "Kinder im Haushalt",
+			"title": "Wann sind Deine Kinder geboren?",
+			"tip": "Das Alter der Kinder ist wichtig, weil für Kinder eigene Beträge gelten. Manche Leistungen gibt es nur für Kinder unter 18 oder unter 25 Jahren.",
+			"add": "Kind hinzufügen",
+			"remove": "Kind {{index}} entfernen",
+			"child_label": "Kind {{index}}"
+		},
+		"birthdate": {
+			"category": "Geburtsdatum",
+			"title": "Wann bist Du geboren?",
+			"tip": "Dein Alter entscheidet mit, welche Leistungen für Dich infrage kommen. Ab der Regelaltersgrenze gelten andere Regeln als davor."
+		},
+		"germany": {
+			"category": "Wohnsitz",
 			"title": "Wohnst Du in Deutschland?",
-			"tip": "Grundsicherung kannst Du nur bekommen, wenn Du dauerhaft in Deutschland lebst.",
+			"tip": "Die Leistungen, die Klaro prüft, gibt es nur, wenn Du dauerhaft in Deutschland lebst.",
 			"options": {
 				"YES": "Ja, ich wohne in Deutschland.",
 				"NO": "Nein, ich wohne nicht in Deutschland."
 			}
 		},
-		"dateOfBirth": {
-			"category": "Geburtsdatum",
-			"title": "Wann bist Du geboren?",
-			"tip": "Grundsicherung kann für Dich infrage kommen, wenn Du:\n• die Regelaltersgrenze erreicht hast oder\n• mindestens 18 Jahre alt und dauerhaft voll erwerbsgemindert bist."
-		},
-		"pension": {
-			"category": "Rente",
-			"title": "Bekommst Du eine Rente?",
-			"tip": "Ab der Regelaltersgrenze kann Grundsicherung im Alter für Dich infrage kommen. Wann Du diese Altersgrenze erreichst, hängt von Deinem Geburtsjahr ab.",
+		"work-capacity": {
+			"category": "Arbeiten können",
+			"title": "Kannst Du mindestens drei Stunden am Tag arbeiten?",
+			"tip": "Drei Stunden sind eine Grenze im Gesetz. Danach richtet sich, welche Stelle für Dich zuständig ist. Es geht nicht darum, ob Du gerade eine Arbeit hast.",
 			"options": {
-				"OLD_AGE": "Ich bekomme eine Altersrente.",
-				"REDUCED_EARNING_CAPACITY": "Ich bekomme eine Erwerbsminderungsrente. Der Grund ist, dass ich  nicht mehr voll arbeiten kann.",
-				"NONE": "Ich bekomme keine Rente."
+				"FULL": "Ja, mindestens drei Stunden am Tag.",
+				"TEMPORARILY_REDUCED": "Im Moment nicht, aber vielleicht später wieder.",
+				"PERMANENTLY_REDUCED": "Nein, dauerhaft nicht."
 			}
 		},
-		"income": {
-			"category": "Einkommensprüfung",
-			"title": "Was trifft auf Dich zu?",
-			"tip": "Manchmal reicht das Geld für Essen, aber nicht für die Wohnung. Dann kannst Du vielleicht Wohngeld bekommen.",
+		"employment": {
+			"category": "Arbeit",
+			"title": "Arbeitest Du im Moment?",
+			"tip": "Wenn Du mit einem Partner oder einer Partnerin zusammenlebst, zählt dessen Arbeit auch dazu.",
 			"options": {
-				"NOT_SUFFICIENT": "Mein Einkommen reicht im Moment nicht aus.",
-				"SOON_INSUFFICIENT": "Ich mache mir Sorgen. Mein Einkommen reicht bald vielleicht nicht mehr aus.",
-				"SUFFICIENT": "Mein Einkommen reicht aus. Ich kann alles bezahlen."
+				"YES": "Ja, ich arbeite.",
+				"NO": "Nein, im Moment nicht."
 			}
 		},
-		"hasAssetsAboveThreshold": {
-			"category": "Vermögensprüfung",
-			"title": "Wie viel Vermögen hast Du ungefähr?",
-			"tip": "Keine Sorge, viele Menschen erhalten Hilfe trotz Ersparnissen. Im ersten Jahr liegt die Grenze jedoch bei 10.000 € für eine Person. Damit sind Bargeld, Wertgegenstände oder zum Beispiel Dein Auto gemeint.",
+		"gross-income": {
+			"category": "Arbeit",
+			"title": "Wie hoch ist das Bruttoeinkommen im Monat?",
+			"tip": "Brutto heißt: der Betrag vor Steuern und Abgaben. Du findest ihn auf der Lohnabrechnung. Lebst Du mit einem Partner oder einer Partnerin zusammen, rechne beides zusammen.",
+			"unit": "Euro"
+		},
+		"net-income": {
+			"category": "Einkommen",
+			"title": "Wie viel Geld hat Dein Haushalt im Monat insgesamt?",
+			"tip": "Zähle alles zusammen, was jeden Monat reinkommt: Lohn nach Abzügen, Rente, Kindergeld, Unterhalt, andere Leistungen. Ein ungefährer Betrag genügt.",
+			"unit": "Euro"
+		},
+		"warm-rent": {
+			"category": "Wohnen",
+			"title": "Wie hoch ist Deine Warmmiete im Monat?",
+			"tip": "Warmmiete heißt: Miete plus Nebenkosten plus Heizkosten. Der Betrag steht in Deinem Mietvertrag oder auf dem Kontoauszug.",
+			"unit": "Euro"
+		},
+		"assets": {
+			"category": "Ersparnisse",
+			"title": "Wie viel Geld hast Du gespart?",
+			"tip": "Gemeint ist alles, was Du zurückgelegt hast: Konto, Sparbuch, Bargeld, Wertpapiere. Einen Teil darfst Du behalten — wie viel, hängt von Deinem Alter ab. Eine grobe Schätzung genügt.",
 			"options": {
-				"YES": "Ich habe mehr als 10.000 € Vermögen.",
-				"NO": "Ich habe weniger als 10.000 € Vermögen."
+				"UNDER_5000": "Weniger als 5.000 Euro.",
+				"FROM_5000_TO_15000": "Zwischen 5.000 und 15.000 Euro.",
+				"FROM_15000_TO_25000": "Zwischen 15.000 und 25.000 Euro.",
+				"OVER_25000": "Mehr als 25.000 Euro."
 			}
+		},
+		"benefits": {
+			"category": "Laufende Leistungen",
+			"title": "Bekommst Du schon eine Sozialleistung?",
+			"tip": "Gemeint sind zum Beispiel Grundsicherungsgeld, Grundsicherung im Alter oder Hilfe zum Lebensunterhalt. Manche Leistungen kann man nicht gleichzeitig bekommen.",
+			"options": {
+				"YES": "Ja, ich bekomme schon eine Leistung.",
+				"NO": "Nein, im Moment nicht."
+			}
+		},
+		"citizenship": {
+			"category": "Staatsangehörigkeit",
+			"title": "Hast Du die deutsche Staatsangehörigkeit oder die eines EU-Landes?",
+			"tip": "Je nach Staatsangehörigkeit und Aufenthaltsstatus gelten unterschiedliche Gesetze.",
+			"options": {
+				"DE_EU": "Ja, deutsch oder aus einem EU-Land.",
+				"NON_EU": "Nein, aus einem anderen Land."
+			}
+		},
+		"residence-status": {
+			"category": "Aufenthalt",
+			"title": "Hast Du einen gesicherten Aufenthaltstitel?",
+			"tip": "Gesichert heißt zum Beispiel: Niederlassungserlaubnis, unbefristete Aufenthaltserlaubnis oder Anerkennung als Flüchtling. Bist Du noch im Asylverfahren, gibt es ein eigenes System — Klaro weist Dich am Ende darauf hin.",
+			"options": {
+				"YES": "Ja, ich habe einen gesicherten Aufenthaltstitel.",
+				"NO": "Nein, oder ich bin mir nicht sicher."
+			}
+		},
+		"child-support": {
+			"category": "Unterhalt",
+			"title": "Bekommt Dein Kind Unterhalt vom anderen Elternteil?",
+			"tip": "Wird kein oder zu wenig Unterhalt gezahlt, kann der Staat einspringen. Das heißt Unterhaltsvorschuss.",
+			"options": {
+				"YES": "Ja, den vollen Unterhalt.",
+				"NO": "Nein, oder nur einen Teil."
+			}
+		},
+		"support-duration": {
+			"category": "Unterhalt",
+			"title": "Seit wie vielen Monaten fehlt der Unterhalt?",
+			"tip": "Eine ungefähre Zahl genügt. Wenn Du es nicht genau weißt, schätze.",
+			"unit": "Monate"
 		}
 	},
 	"outcome": {
