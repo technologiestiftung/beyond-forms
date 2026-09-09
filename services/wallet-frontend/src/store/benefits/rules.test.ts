@@ -10,6 +10,7 @@ import {
 } from "../../schemas/benefitCheck.schema";
 import type { PartialBenefitCheckAnswers } from "../../schemas/benefitCheck.schema";
 import {
+	assessHousingBenefit,
 	assessSgbIiBasicIncome,
 	assessSgbXiiOldAgeReducedCapacity,
 	assessSgbXiiSubsistenceAid,
@@ -269,6 +270,61 @@ describe("assessSgbXiiSubsistenceAid", () => {
 
 	it("advises a check when answers are missing", () => {
 		const result = assessSgbXiiSubsistenceAid({}, TODAY);
+		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
+		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
+	});
+});
+
+describe("assessHousingBenefit", () => {
+	/** Income covers subsistence, rent burden 700/1900 = 0.37. */
+	const RENT_BURDENED: PartialBenefitCheckAnswers = {
+		dateOfBirth: "1994-01-15",
+		household: { composition: HouseholdComposition.SINGLE, children: [] },
+		monthlyNetHouseholdIncome: 1900,
+		monthlyWarmRent: 700,
+		receivesBenefitsAlready: false,
+		citizenship: Citizenship.DE_EU,
+	};
+
+	it("advises a check when income suffices but rent is heavy", () => {
+		const result = assessHousingBenefit(RENT_BURDENED, TODAY);
+		expect(result.benefit).toBe(BenefitId.HOUSING_BENEFIT);
+		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
+		expect(result.reasons).toContain(ReasonCode.RENT_BURDEN_HIGH);
+		expect(result.reasons).toContain(
+			ReasonCode.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA,
+		);
+	});
+
+	it("does not apply while other benefits are received", () => {
+		const result = assessHousingBenefit(
+			{ ...RENT_BURDENED, receivesBenefitsAlready: true },
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
+		expect(result.reasons).toEqual([ReasonCode.BENEFITS_TAKE_PRECEDENCE]);
+	});
+
+	it("is unlikely when income does not even cover subsistence", () => {
+		const result = assessHousingBenefit(
+			{ ...RENT_BURDENED, monthlyNetHouseholdIncome: 400 },
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.LIKELY_NO);
+		expect(result.reasons).toEqual([ReasonCode.INCOME_BELOW_SUBSISTENCE]);
+	});
+
+	it("is unlikely when the rent burden is unremarkable", () => {
+		const result = assessHousingBenefit(
+			{ ...RENT_BURDENED, monthlyWarmRent: 400 },
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.LIKELY_NO);
+		expect(result.reasons).toEqual([ReasonCode.RENT_BURDEN_NORMAL]);
+	});
+
+	it("advises a check when answers are missing", () => {
+		const result = assessHousingBenefit({}, TODAY);
 		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
 		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
 	});

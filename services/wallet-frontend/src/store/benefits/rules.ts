@@ -8,11 +8,13 @@ import type {
 	BenefitAssessment,
 	PartialBenefitCheckAnswers,
 } from "../../schemas/benefitCheck.schema";
+import { RENT_BURDEN_THRESHOLD } from "../../config/benefitRules.config";
 import {
 	ageInYears,
 	assetAllowance,
 	assetsVsAllowance,
 	hasReachedRetirementAge,
+	householdStandardNeeds,
 	residenceRequirementMet,
 	totalNeeds,
 } from "./derive";
@@ -264,5 +266,61 @@ export const assessSgbXiiSubsistenceAid = (
 		benefit,
 		status: BenefitStatus.CHECK_ADVISED,
 		reasons: [ReasonCode.CAPACITY_GAP_PRECONDITION_MET],
+	};
+};
+
+/**
+ * Domain spec §6.4. The rent-burden threshold is that document's own heuristic, not an
+ * official figure; the real decision needs the Wohngeld formula (§19 WoGG, Mietstufe 4
+ * for Berlin), which this pre-assessment does not implement.
+ */
+export const assessHousingBenefit = (
+	answers: PartialBenefitCheckAnswers,
+	today: string,
+): BenefitAssessment => {
+	const benefit = BenefitId.HOUSING_BENEFIT;
+
+	if (answers.receivesBenefitsAlready) {
+		return {
+			benefit,
+			status: BenefitStatus.NOT_APPLICABLE,
+			reasons: [ReasonCode.BENEFITS_TAKE_PRECEDENCE],
+		};
+	}
+
+	if (
+		answers.household === undefined ||
+		answers.monthlyWarmRent === undefined ||
+		answers.monthlyNetHouseholdIncome === undefined
+	) {
+		return { benefit, ...INSUFFICIENT };
+	}
+
+	const needsWithoutRent = householdStandardNeeds(answers.household, today);
+	if (answers.monthlyNetHouseholdIncome < needsWithoutRent) {
+		return {
+			benefit,
+			status: BenefitStatus.LIKELY_NO,
+			reasons: [ReasonCode.INCOME_BELOW_SUBSISTENCE],
+		};
+	}
+
+	const rentBurden =
+		answers.monthlyWarmRent / Math.max(answers.monthlyNetHouseholdIncome, 1);
+	if (rentBurden > RENT_BURDEN_THRESHOLD) {
+		return {
+			benefit,
+			status: BenefitStatus.CHECK_ADVISED,
+			reasons: [
+				ReasonCode.RENT_BURDEN_HIGH,
+				ReasonCode.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA,
+			],
+		};
+	}
+
+	return {
+		benefit,
+		status: BenefitStatus.LIKELY_NO,
+		reasons: [ReasonCode.RENT_BURDEN_NORMAL],
 	};
 };
