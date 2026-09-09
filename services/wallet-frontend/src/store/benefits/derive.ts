@@ -2,8 +2,17 @@ import {
 	ASSET_ALLOWANCE_BY_AGE,
 	ASSET_BAND_RANGE,
 	RETIREMENT_AGE_BY_BIRTH_YEAR,
+	STANDARD_NEEDS_BY_LEVEL,
 } from "../../config/benefitRules.config";
-import type { AssetsBand } from "../../schemas/benefitCheck.schema";
+import {
+	Citizenship,
+	HouseholdComposition,
+} from "../../schemas/benefitCheck.schema";
+import type {
+	AssetsBand,
+	Household,
+	PartialBenefitCheckAnswers,
+} from "../../schemas/benefitCheck.schema";
 
 /**
  * Whole months between two ISO dates. Deliberately string and integer arithmetic: passing
@@ -61,4 +70,81 @@ export const assetsVsAllowance = (
 		return "ABOVE";
 	}
 	return "SPANS";
+};
+
+export const isCouple = (composition: HouseholdComposition): boolean =>
+	composition === HouseholdComposition.COUPLE_NO_CHILDREN ||
+	composition === HouseholdComposition.COUPLE_WITH_CHILDREN;
+
+/**
+ * Which Regelbedarfsstufe a child falls into. The domain spec calls regelbedarf(haushalt)
+ * without defining the mapping; this is the design doc's §5 assignment and is on the
+ * verification checklist.
+ */
+const needsLevelForChildAge = (ageYears: number): 3 | 4 | 5 | 6 => {
+	if (ageYears <= 5) {
+		return 6;
+	}
+	if (ageYears <= 13) {
+		return 5;
+	}
+	if (ageYears <= 17) {
+		return 4;
+	}
+	return 3;
+};
+
+export const householdStandardNeeds = (
+	household: Household,
+	today: string,
+): number => {
+	const adults = isCouple(household.composition)
+		? 2 * STANDARD_NEEDS_BY_LEVEL[2]
+		: STANDARD_NEEDS_BY_LEVEL[1];
+	return household.children.reduce(
+		(sum, child) =>
+			sum +
+			STANDARD_NEEDS_BY_LEVEL[
+				needsLevelForChildAge(ageInYears(child.dateOfBirth, today))
+			],
+		adults,
+	);
+};
+
+export const totalNeeds = (
+	household: Household,
+	monthlyWarmRent: number,
+	today: string,
+): number => householdStandardNeeds(household, today) + monthlyWarmRent;
+
+export const minorChildren = (
+	household: Household,
+	today: string,
+): Array<{ dateOfBirth: string }> =>
+	household.children.filter(
+		(child) => ageInYears(child.dateOfBirth, today) < 18,
+	);
+
+export const childrenUnder25 = (
+	household: Household,
+	today: string,
+): Array<{ dateOfBirth: string }> =>
+	household.children.filter(
+		(child) => ageInYears(child.dateOfBirth, today) < 25,
+	);
+
+/**
+ * `undefined` means "not answered yet", which the rules turn into CHECK_ADVISED rather
+ * than a rejection. Never collapse it to `false`.
+ */
+export const residenceRequirementMet = (
+	answers: PartialBenefitCheckAnswers,
+): boolean | undefined => {
+	if (answers.citizenship === undefined) {
+		return undefined;
+	}
+	if (answers.citizenship === Citizenship.DE_EU) {
+		return true;
+	}
+	return answers.hasSecureResidenceStatus;
 };
