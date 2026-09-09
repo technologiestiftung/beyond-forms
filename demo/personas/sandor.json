@@ -61,9 +61,10 @@
     "free_housing_right_holder": null,
 
     "monthly_income": 290.00,
-    "income_sources": ["Asylbezug"],
+    "income_entries": [
+      { "income_type": "Asylum Seeker Benefits", "monthly_amount": 290.0 }
+    ],
     "has_assets": false,
-    "assets_types": [],
     "assets_description": null,
 
     "bank_name": "N26 Bank",

@@ -55,12 +55,12 @@
     "heating_type": "Zentralheizung",
     "free_housing_right_holder": null,
     "monthly_income": 650.0,
-    "income_sources": [
-      "pension"
+    "income_entries": [
+      { "income_type": "Pension", "monthly_amount": 650.0 }
     ],
     "has_assets": true,
-    "assets_types": [
-      "Liquid Assets"
+    "asset_entries": [
+      { "asset_type": "Savings and Cash" }
     ],
     "assets_description": null,
     "bank_name": "Sparkasse Musterstadt",

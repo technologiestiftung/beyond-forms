@@ -795,12 +795,12 @@ value = "{{ first_name ? first_name : '' }}"
 ["p5_mz1.3-et_einnahmehhm1art1"]
 type = "string"
 description = "1. Art der Einnahme bzw. keine Einahmen"
-value = "{{ income_sources ? ('pension' in income_sources ? 'Rente' : income_sources) : '' }}"
+value = "{{ income_list[0] ? income_list[0].income_type_de : '' }}"
 
 ["p5_mz1.3-et_einnahmehhm1art1brutto"]
 type = "string"
 description = "Brutto in EUR"
-value = "{{ documents.wage_slips && documents.wage_slips.gross_amount ? documents.wage_slips.gross_amount : (monthly_income ? monthly_income : '') }}"
+value = "{{ income_list[0] ? income_list[0].monthly_amount : '' }}"
 
 ["p5_mz1.3-et_einnahmehhm1art1turnus"]
 type = "string"

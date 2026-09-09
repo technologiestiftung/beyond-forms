@@ -152,7 +152,7 @@ Every generated expression is checked before it is written, and anything that fa
 
 - the identifier must be a real `users` column, a `derived_context` key, or a real `documents.<slug>.<field>`;
 - a `partner.…` / `household_members[i].…` field must exist on `associated_persons`, and an `income.…` / `expenses.…` / `assets.…` key must be a real enum value;
-- the expression must evaluate without raising against **two** stand-in contexts — one where every column is populated, one where every column is null and there is no partner, no household and no uploaded document. The second is what forces the guarded house style: `{{ 'Stocks' in assets_types ? … }}` and `{{ partner.first_name }}` both pass the first context and crash on the second.
+- the expression must evaluate without raising against **two** stand-in contexts — one where every column is populated, one where every column is null and there is no partner, no household and no uploaded document. The second is what forces the guarded house style: `{{ documents.pension_notice.monthly_amount }}` and `{{ partner.first_name }}` both pass the first context and crash on the second.
 
 ### The `derived_context` namespace
 

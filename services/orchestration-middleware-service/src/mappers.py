@@ -217,13 +217,23 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
         "landlord_address": {"street_name": "N/A", "house_number": "N/A", "city": "Berlin", "zip_code": "12101"},
     }
 
-    sources = []
-    has_old_age_pension = None
-    has_reduced_earnings_pension = None
-    if db_user.income_sources is not None and not isinstance(db_user.income_sources, Mock):
-        sources = db_user.income_sources
-        has_old_age_pension = "pension" in sources or "pension_retirement" in sources or "Altersrente" in sources
-        has_reduced_earnings_pension = "pension_reduced" in sources or "Erwerbsminderungsrente" in sources
+    income_rows: list = []
+    entries = getattr(db_user, "income_entries", None)
+    if entries is not None and not isinstance(entries, Mock):
+        income_rows = [row for row in entries if hasattr(row, "income_type")]
+
+    has_permanent_reduction = getattr(db_user, "has_permanent_reduction_in_earning_capacity", None)
+    if isinstance(has_permanent_reduction, Mock):
+        has_permanent_reduction = None
+    has_pension_row = any(
+        getattr(row.income_type, "value", row.income_type) == "Pension" for row in income_rows
+    )
+    if income_rows:
+        has_old_age_pension = has_pension_row and not has_permanent_reduction
+        has_reduced_earnings_pension = has_pension_row and bool(has_permanent_reduction)
+    else:
+        has_old_age_pension = None
+        has_reduced_earnings_pension = None
 
     income_val = None
     if db_user.monthly_income is not None and not isinstance(db_user.monthly_income, Mock):
@@ -232,10 +242,24 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
         except (ValueError, TypeError):
             pass
 
-    income_float = income_val if income_val is not None else 0.0
-    pension_income = income_float if (has_old_age_pension or has_reduced_earnings_pension) else 0.0
-    non_self_employed = income_float if "minor_employment" in sources else 0.0
-    social_benefits = income_float if "other_benefits" in sources else 0.0
+    def _line_total(line_names: set) -> float:
+        """The summed monthly amounts of the named income lines. A line recorded without
+        an amount still proves income of that type, so monthly_income stands in for it."""
+        rows = [row for row in income_rows if getattr(row.income_type, "value", row.income_type) in line_names]
+        if not rows:
+            return 0.0
+        total = sum(
+            float(row.monthly_amount)
+            for row in rows
+            if getattr(row, "monthly_amount", None) is not None and not isinstance(row.monthly_amount, Mock)
+        )
+        return total if total else (income_val or 0.0)
+
+    pension_income = _line_total({"Pension"})
+    non_self_employed = _line_total({"Employment"})
+    social_benefits = _line_total(
+        {"Social Assistance", "Basic Security Benefits", "Asylum Seeker Benefits", "Housing Benefit"}
+    )
 
     applicant_finances = {
         "non_self_employed_income": non_self_employed,
@@ -265,7 +289,7 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
 
     eligibility_check = {
         "lives_in_germany": is_resident if is_resident is not None else True,
-        "receives_old_age_pension": has_old_age_pension if sources else True,
+        "receives_old_age_pension": has_old_age_pension if income_rows else True,
         "receives_reduced_earnings_pension": has_reduced_earnings_pension
         if has_reduced_earnings_pension is not None
         else False,

@@ -82,8 +82,6 @@ def _dummy_value(column) -> Any:
         return 0
     if python_type in (datetime.date, datetime.datetime):
         return datetime.date(2024, 1, 1)
-    if python_type in (dict, list):
-        return ["dummy"]
     return "dummy"
 
 
@@ -180,10 +178,10 @@ def build_sparse_context() -> Dict[str, Any]:
     Users column null, no documents uploaded, no partner and nobody else in the household.
 
     A mapping checked only against fully-populated stand-ins passes while still holding
-    expressions that raise the moment real, sparse data arrives - `'Stocks' in
-    assets_types` (TypeError on a null list), or `documents.X.y` / `partner.first_name`
-    (AttributeError on None). Those are exactly the guards the house style requires, so
-    this second pass is what actually enforces them."""
+    expressions that raise the moment real, sparse data arrives - `documents.X.y` /
+    `partner.first_name` (AttributeError on None), or an unguarded income map key. Those
+    are exactly the guards the house style requires, so this second pass is what actually
+    enforces them."""
     models = _load("src.models", SERVICE_SRC / "models.py")
     _load("src.services", SERVICE_SRC / "services/__init__.py")
     form_context = _load("src.services.form_context", SERVICE_SRC / "services/form_context.py")

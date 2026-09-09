@@ -796,7 +796,6 @@ export type Database = {
           are_one_time_payments_expected: boolean | null
           assets_description: string | null
           assets_exceed_wohngeld_threshold: boolean | null
-          assets_types: Json | null
           authentik_id: string | null
           bank_name: string | null
           benefits_awaiting_decision_application_date: string | null
@@ -815,6 +814,7 @@ export type Database = {
           consents_to_registry_verification: boolean | null
           created_at: string
           date_of_birth: string | null
+          demo_seed_fixture_hash: string | null
           disability_application_pending: boolean | null
           disability_valid_until: string | null
           displaced_issued_by: string | null
@@ -866,7 +866,6 @@ export type Database = {
           iban: string | null
           id: string
           identification_numbers: string | null
-          income_sources: Json | null
           inpatient_facility_assigned_until: string | null
           inpatient_facility_last_residence: string | null
           inpatient_facility_move_in_date: string | null
@@ -957,7 +956,6 @@ export type Database = {
           are_one_time_payments_expected?: boolean | null
           assets_description?: string | null
           assets_exceed_wohngeld_threshold?: boolean | null
-          assets_types?: Json | null
           authentik_id?: string | null
           bank_name?: string | null
           benefits_awaiting_decision_application_date?: string | null
@@ -976,6 +974,7 @@ export type Database = {
           consents_to_registry_verification?: boolean | null
           created_at?: string
           date_of_birth?: string | null
+          demo_seed_fixture_hash?: string | null
           disability_application_pending?: boolean | null
           disability_valid_until?: string | null
           displaced_issued_by?: string | null
@@ -1027,7 +1026,6 @@ export type Database = {
           iban?: string | null
           id?: string
           identification_numbers?: string | null
-          income_sources?: Json | null
           inpatient_facility_assigned_until?: string | null
           inpatient_facility_last_residence?: string | null
           inpatient_facility_move_in_date?: string | null
@@ -1118,7 +1116,6 @@ export type Database = {
           are_one_time_payments_expected?: boolean | null
           assets_description?: string | null
           assets_exceed_wohngeld_threshold?: boolean | null
-          assets_types?: Json | null
           authentik_id?: string | null
           bank_name?: string | null
           benefits_awaiting_decision_application_date?: string | null
@@ -1137,6 +1134,7 @@ export type Database = {
           consents_to_registry_verification?: boolean | null
           created_at?: string
           date_of_birth?: string | null
+          demo_seed_fixture_hash?: string | null
           disability_application_pending?: boolean | null
           disability_valid_until?: string | null
           displaced_issued_by?: string | null
@@ -1188,7 +1186,6 @@ export type Database = {
           iban?: string | null
           id?: string
           identification_numbers?: string | null
-          income_sources?: Json | null
           inpatient_facility_assigned_until?: string | null
           inpatient_facility_last_residence?: string | null
           inpatient_facility_move_in_date?: string | null

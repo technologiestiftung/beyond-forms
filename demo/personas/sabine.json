@@ -66,9 +66,10 @@
     "free_housing_right_holder": null,
 
     "monthly_income": 245.00,
-    "income_sources": ["Erwerbsminderungsrente"],
+    "income_entries": [
+      { "income_type": "Pension", "monthly_amount": 245.0 }
+    ],
     "has_assets": false,
-    "assets_types": [],
     "assets_description": null,
 
     "bank_name": "Berliner Volksbank",

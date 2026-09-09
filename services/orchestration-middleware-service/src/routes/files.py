@@ -23,7 +23,15 @@ from sqlalchemy.orm import Session
 from google.cloud import storage, exceptions as gcloud_exceptions
 from src.constants import SLOT_ID_TO_DIS_TYPE
 from src.db import SessionLocal, get_db
-from src.models import DocumentStatusType, UploadedFiles, UserApplications, UserDocuments, Users
+from src.models import (
+    DocumentStatusType,
+    IncomeEntries,
+    IncomeTypeType,
+    UploadedFiles,
+    UserApplications,
+    UserDocuments,
+    Users,
+)
 from src.services.pubsub_service import publish_document_event
 from src.services.user_service import UserService, get_user_service
 from src.services.berlin_districts import sync_berlin_district
@@ -731,9 +739,21 @@ def verify_document(
     doc.status = DocumentStatusType.VERIFIED
 
     if slot_id == "pension_notice":
-        sources = set(user.income_sources or [])
-        sources.add("pension")
-        user.income_sources = list(sources)
+        # A verified Rentenbescheid proves the applicant has pension income, so make sure
+        # the applicant's 'Pension' row exists. The legacy income_sources list only ever
+        # recorded the category, so the amount stays NULL here - it is filled in later via
+        # chat/profile - and an existing row is left untouched.
+        has_pension_row = (
+            db.query(IncomeEntries.id)
+            .filter(
+                IncomeEntries.user_id == user.id,
+                IncomeEntries.person_id.is_(None),
+                IncomeEntries.income_type == IncomeTypeType.PENSION,
+            )
+            .first()
+        )
+        if not has_pension_row:
+            db.add(IncomeEntries(user_id=user.id, person_id=None, income_type=IncomeTypeType.PENSION))
 
     db.commit()
 

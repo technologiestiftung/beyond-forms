@@ -674,8 +674,8 @@ async def test_get_completeness_no_mapped_fields_returns_zero_total(form_service
 
 @pytest.mark.asyncio
 async def test_get_completeness_counts_application_form_data(form_service, mock_user):
-    _set_application_query(form_service, _mock_application({"income_sources": ["employment"]}))
-    mock_mapping = {"p1_income": "{{ income_sources }}"}
+    _set_application_query(form_service, _mock_application({"city": "Berlin"}))
+    mock_mapping = {"p1_city": "{{ city }}"}
 
     with patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")):
         filled, total = await form_service.get_completeness("test_form", mock_user)

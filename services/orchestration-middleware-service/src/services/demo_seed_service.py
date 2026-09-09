@@ -28,8 +28,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 import requests
-from sqlalchemy import ARRAY, Date, DateTime, Enum, Numeric, text
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Date, DateTime, Enum, Numeric, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -113,9 +112,6 @@ def _coerce_to_column(column, value: Any) -> Any:
 
     if isinstance(col_type, Numeric):
         return decimal.Decimal(str(value))
-
-    if isinstance(col_type, (JSONB, ARRAY)):
-        return value
 
     return value
 

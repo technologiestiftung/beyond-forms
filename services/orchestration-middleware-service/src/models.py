@@ -437,8 +437,6 @@ class Users(Base):
     monthly_income: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
     has_assets: Mapped[Optional[bool]] = mapped_column(Boolean)
     assets_description: Mapped[Optional[str]] = mapped_column(Text)
-    income_sources: Mapped[Optional[list[str]]] = mapped_column(JSONB)
-    assets_types: Mapped[Optional[list[str]]] = mapped_column(JSONB)
     has_costly_medical_nutrition: Mapped[Optional[bool]] = mapped_column(Boolean)
     is_care_dependent: Mapped[Optional[bool]] = mapped_column(Boolean)
     inpatient_facility_move_in_date: Mapped[Optional[datetime.date]] = mapped_column(Date)

@@ -235,8 +235,6 @@ class UserProfileValidationSchema(BaseModel):
     monthly_income: Optional[decimal.Decimal] = Field(None, ge=0)
     has_assets: Optional[bool] = None
     assets_description: Optional[str] = Field(None, max_length=1000)
-    income_sources: Optional[list[str]] = None
-    assets_types: Optional[list[str]] = None
     associated_persons: Optional[list[AssociatedPersonSchema]] = None
     income_entries: Optional[list[IncomeEntrySchema]] = None
     expense_entries: Optional[list[ExpenseEntrySchema]] = None
@@ -466,8 +464,6 @@ class UserInformationUpdateSchema(BaseModel):
     monthly_income: Optional[decimal.Decimal] = Field(None, ge=0, description="The user's monthly net income")
     has_assets: Optional[bool] = Field(None, description="Whether the user possesses assets, real estate, or valuables")
     assets_description: Optional[str] = Field(None, max_length=1000, description="A description of the user's assets")
-    income_sources: Optional[list[str]] = Field(None, description="List of the user's monthly income source categories")
-    assets_types: Optional[list[str]] = Field(None, description="List of the user's asset types")
     apartment_floor_location: Optional[str] = Field(
         None, description="Where in the building the flat is, as the form asks it (e.g. '2. OG links')"
     )
