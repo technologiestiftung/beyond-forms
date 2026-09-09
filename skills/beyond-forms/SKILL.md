@@ -162,7 +162,7 @@ Field `type` is one of `string`, `checkbox`, `radio`, `choice`. An unknown field
 
 ## Driving a demo account
 
-Three synthetic personas exist on staging, each in a deliberately different state. Their phone numbers are Bundesnetzagentur "drama numbers", so the SMS step is skipped and **any six-digit code works**. Middleware creates them on startup when `DEMO_SEED_ENABLED=true`, if they are not already in the database.
+Three synthetic personas exist on staging, each in a deliberately different state. Their phone numbers are Bundesnetzagentur "drama numbers", so the SMS step is skipped and **any six-digit code works**. Middleware creates them on startup when `DEMO_SEED_ENABLED=true`, if they are not already in the database or their fixture file changed since they were last seeded.
 
 Fixture definitions (profile, documents, research) live in `demo/personas/` in the repo — there is no HTTP listing.
 
@@ -316,10 +316,10 @@ curl -s "$API/openapi.json" | jq '.components.schemas.ChatRequest'
 4. **`validate-fields` maps by field name**, not by type, and rejects names it has no validator for. `/validate-field` is the one that takes an explicit `field_type`.
 5. **Sandor is deliberately not submittable.** The form demands a Rentenversicherungsnummer he cannot have. That is a documented finding about the form, not a broken fixture.
 6. **`milestone_level` caps at 2** even when everything is verified, and `can_submit` from `/application/{id}/status` is always `true`. Known limitations; do not read them as signals.
-7. **There is no demo seed HTTP API.** Personas are created on middleware startup when `DEMO_SEED_ENABLED=true`, and only if that drama number does not already have a profile. Fixture definitions live in `demo/personas/` in the repo.
+7. **There is no demo seed HTTP API.** Personas are created on middleware startup when `DEMO_SEED_ENABLED=true` — for a drama number with no profile yet, or whose fixture file has changed since it was last seeded. Fixture definitions live in `demo/personas/` in the repo.
 8. **Export URLs expire after 60 seconds.** Follow `signed_open_url` promptly or request a new one.
 9. **The rules file is JSONC and half of it is commented out.** `json.loads` fails on it outright, and the commented blocks are steps that are defined but not yet live — partner details, household members, accommodation, special needs. Only 4 of 10 sections are active. Do not present a commented-out step as a question the form asks.
-10. **A persona account is not guaranteed to hold persona data.** The fixtures describe what the first seed *writes*; a persona account may since have been written to by someone testing. A later deploy will not reset it. Read `demo/personas/<slug>.json` for the fixture; `GET $API/profile` for live state.
+10. **A persona account is not guaranteed to hold persona data.** The fixtures describe what the first seed *writes*; a persona account may since have been written to by someone testing. A later deploy only resets it back to the fixture if that fixture file changed since the last seed — otherwise manual drift survives. Read `demo/personas/<slug>.json` for the fixture; `GET $API/profile` for live state.
 
 
 ## Verification Checklist
