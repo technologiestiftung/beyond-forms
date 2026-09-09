@@ -878,11 +878,13 @@ export type Database = {
           is_subsidized_housing: boolean | null
           is_victim_of_national_socialist_persecution: boolean | null
           is_wohngeld_first_application: boolean | null
+          landlord_address: string | null
           landlord_name: string | null
           last_name: string | null
           legal_gender: Database["public"]["Enums"]["gender_type"] | null
           license_plate: string | null
           living_area: number | null
+          main_tenant_name: string | null
           marital_status:
             | Database["public"]["Enums"]["marital_status_type"]
             | null
@@ -940,6 +942,8 @@ export type Database = {
             | null
           tenancy_terminated_on: string | null
           updated_at: string
+          vehicle_make: string | null
+          vehicle_year: string | null
           wohngeld_payment_to_applicant: boolean | null
           work_scope_and_type: string | null
           zip_code: string | null
@@ -1038,11 +1042,13 @@ export type Database = {
           is_subsidized_housing?: boolean | null
           is_victim_of_national_socialist_persecution?: boolean | null
           is_wohngeld_first_application?: boolean | null
+          landlord_address?: string | null
           landlord_name?: string | null
           last_name?: string | null
           legal_gender?: Database["public"]["Enums"]["gender_type"] | null
           license_plate?: string | null
           living_area?: number | null
+          main_tenant_name?: string | null
           marital_status?:
             | Database["public"]["Enums"]["marital_status_type"]
             | null
@@ -1100,6 +1106,8 @@ export type Database = {
             | null
           tenancy_terminated_on?: string | null
           updated_at?: string
+          vehicle_make?: string | null
+          vehicle_year?: string | null
           wohngeld_payment_to_applicant?: boolean | null
           work_scope_and_type?: string | null
           zip_code?: string | null
@@ -1198,11 +1206,13 @@ export type Database = {
           is_subsidized_housing?: boolean | null
           is_victim_of_national_socialist_persecution?: boolean | null
           is_wohngeld_first_application?: boolean | null
+          landlord_address?: string | null
           landlord_name?: string | null
           last_name?: string | null
           legal_gender?: Database["public"]["Enums"]["gender_type"] | null
           license_plate?: string | null
           living_area?: number | null
+          main_tenant_name?: string | null
           marital_status?:
             | Database["public"]["Enums"]["marital_status_type"]
             | null
@@ -1260,6 +1270,8 @@ export type Database = {
             | null
           tenancy_terminated_on?: string | null
           updated_at?: string
+          vehicle_make?: string | null
+          vehicle_year?: string | null
           wohngeld_payment_to_applicant?: boolean | null
           work_scope_and_type?: string | null
           zip_code?: string | null
