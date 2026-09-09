@@ -133,7 +133,7 @@ describe("ApplicationOverview", () => {
 		expect(button).toBeInTheDocument();
 	});
 
-	it("renders both Öffnen and Herunterladen buttons and handles expiration recovery per new GCS signing rules", async () => {
+	it("renders the Herunterladen button and triggers download", async () => {
 		mockProfileState.milestoneLevel = 3;
 		useProfileStore.setState({ milestoneLevel: 3 });
 		renderComponent();
@@ -144,13 +144,20 @@ describe("ApplicationOverview", () => {
 			await screen.findByText("Antragsentwurf Vorschau"),
 		).toBeInTheDocument();
 
-		const openLink = screen.getByText("Öffnen");
-		expect(openLink).toBeInTheDocument();
-		expect(openLink).toHaveAttribute("target", "_blank");
-		expect(openLink).toHaveAttribute(
-			"href",
-			"https://storage.googleapis.com/open.pdf?disposition=inline",
+		const downloadButton = screen.getByTestId("download-pdf-button");
+		expect(downloadButton).toBeInTheDocument();
+
+		const hiddenAnchor = screen.getByTestId(
+			"download-pdf-anchor",
+		) as HTMLAnchorElement;
+		const clickSpy = vi.spyOn(hiddenAnchor, "click");
+
+		fireEvent.click(downloadButton);
+
+		expect(hiddenAnchor.getAttribute("href")).toContain(
+			"storage.googleapis.com/download.pdf",
 		);
+		expect(clickSpy).toHaveBeenCalled();
 	});
 
 	it("renders the LanguageSwitcher", () => {
