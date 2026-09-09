@@ -12,6 +12,7 @@ import type { PartialBenefitCheckAnswers } from "../../schemas/benefitCheck.sche
 import {
 	assessSgbIiBasicIncome,
 	assessSgbXiiOldAgeReducedCapacity,
+	assessSgbXiiSubsistenceAid,
 } from "./rules";
 
 const TODAY = "2026-09-09";
@@ -201,6 +202,73 @@ describe("assessSgbXiiOldAgeReducedCapacity", () => {
 
 	it("advises a check when answers are missing", () => {
 		const result = assessSgbXiiOldAgeReducedCapacity({}, TODAY);
+		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
+		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
+	});
+});
+
+/** Temporarily unable to work at 45 — the domain spec's case D. The case gives no rent,
+ *  so 500 is supplied here to make the needs test computable. */
+const CASE_D: PartialBenefitCheckAnswers = {
+	dateOfBirth: "1981-04-10",
+	workCapacity: WorkCapacity.TEMPORARILY_REDUCED,
+	household: { composition: HouseholdComposition.SINGLE, children: [] },
+	employment: { isEmployed: false, monthlyGrossIncome: 0 },
+	monthlyNetHouseholdIncome: 300,
+	monthlyWarmRent: 500,
+	assetsBand: AssetsBand.UNDER_5000,
+	receivesBenefitsAlready: false,
+	citizenship: Citizenship.DE_EU,
+	livesInBerlin: true,
+};
+
+describe("assessSgbXiiSubsistenceAid", () => {
+	it("is likely for case D", () => {
+		const result = assessSgbXiiSubsistenceAid(CASE_D, TODAY);
+		expect(result.benefit).toBe(BenefitId.SGB_XII_SUBSISTENCE_AID);
+		expect(result.status).toBe(BenefitStatus.LIKELY_YES);
+	});
+
+	it("does not apply to an applicant with full work capacity", () => {
+		const result = assessSgbXiiSubsistenceAid(
+			{ ...CASE_D, workCapacity: WorkCapacity.FULL },
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
+		expect(result.reasons).toEqual([ReasonCode.NOT_IN_CAPACITY_GAP]);
+	});
+
+	it("does not apply to a permanently reduced applicant", () => {
+		const result = assessSgbXiiSubsistenceAid(
+			{ ...CASE_D, workCapacity: WorkCapacity.PERMANENTLY_REDUCED },
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
+	});
+
+	it("does not apply once the retirement age is reached", () => {
+		const result = assessSgbXiiSubsistenceAid(
+			{ ...CASE_D, dateOfBirth: "1955-04-10" },
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
+	});
+
+	/**
+	 * The domain spec §6.3 has no "income covers needs" exit: once the applicant is in
+	 * the capacity gap, the fallthrough is "moeglich_pruefen", never "eher_nein".
+	 */
+	it("advises a check rather than rejecting when income covers the needs", () => {
+		const result = assessSgbXiiSubsistenceAid(
+			{ ...CASE_D, monthlyNetHouseholdIncome: 3000 },
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
+		expect(result.reasons).toContain(ReasonCode.CAPACITY_GAP_PRECONDITION_MET);
+	});
+
+	it("advises a check when answers are missing", () => {
+		const result = assessSgbXiiSubsistenceAid({}, TODAY);
 		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
 		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
 	});

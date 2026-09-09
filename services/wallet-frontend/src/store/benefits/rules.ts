@@ -190,3 +190,79 @@ export const assessSgbXiiOldAgeReducedCapacity = (
 	// asset allowance table than SGB II. Until that is answered, both share one table.
 	return { benefit, ...assessMeans(answers, today) };
 };
+
+/**
+ * Domain spec §6.3. Deliberately does NOT reuse `assessMeans`: once the applicant is in
+ * the capacity gap, the spec's fallthrough is "check advised", never a rejection, so this
+ * rule has no LIKELY_NO on the means test.
+ */
+export const assessSgbXiiSubsistenceAid = (
+	answers: PartialBenefitCheckAnswers,
+	today: string,
+): BenefitAssessment => {
+	const benefit = BenefitId.SGB_XII_SUBSISTENCE_AID;
+
+	if (answers.dateOfBirth === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+	if (hasReachedRetirementAge(answers.dateOfBirth, today)) {
+		return {
+			benefit,
+			status: BenefitStatus.NOT_APPLICABLE,
+			reasons: [ReasonCode.NOT_IN_CAPACITY_GAP],
+		};
+	}
+	if (answers.workCapacity === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+	if (answers.workCapacity !== WorkCapacity.TEMPORARILY_REDUCED) {
+		return {
+			benefit,
+			status: BenefitStatus.NOT_APPLICABLE,
+			reasons: [ReasonCode.NOT_IN_CAPACITY_GAP],
+		};
+	}
+
+	const residence = residenceRequirementMet(answers);
+	if (residence === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+	if (!residence) {
+		return {
+			benefit,
+			status: BenefitStatus.LIKELY_NO,
+			reasons: [ReasonCode.RESIDENCE_STATUS_UNCLEAR],
+		};
+	}
+
+	if (
+		answers.household === undefined ||
+		answers.monthlyWarmRent === undefined ||
+		answers.monthlyNetHouseholdIncome === undefined ||
+		answers.assetsBand === undefined
+	) {
+		return { benefit, ...INSUFFICIENT };
+	}
+
+	const needs = totalNeeds(answers.household, answers.monthlyWarmRent, today);
+	const allowance = assetAllowance(ageInYears(answers.dateOfBirth, today));
+	const assetsBelow =
+		assetsVsAllowance(answers.assetsBand, allowance) === "BELOW";
+
+	if (answers.monthlyNetHouseholdIncome < needs && assetsBelow) {
+		return {
+			benefit,
+			status: BenefitStatus.LIKELY_YES,
+			reasons: [
+				ReasonCode.INCOME_BELOW_NEEDS,
+				ReasonCode.ASSETS_BELOW_ALLOWANCE,
+			],
+		};
+	}
+
+	return {
+		benefit,
+		status: BenefitStatus.CHECK_ADVISED,
+		reasons: [ReasonCode.CAPACITY_GAP_PRECONDITION_MET],
+	};
+};
