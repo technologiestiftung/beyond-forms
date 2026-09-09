@@ -1,8 +1,8 @@
 import {
 	ASSET_ALLOWANCE_BY_AGE,
 	ASSET_BAND_RANGE,
-	RETIREMENT_AGE_BY_BIRTH_YEAR,
 	STANDARD_NEEDS_BY_LEVEL,
+	retirementAgeForBirthYear,
 } from "../../config/benefitRules.config";
 import {
 	Citizenship,
@@ -37,7 +37,7 @@ export const hasReachedRetirementAge = (
 	today: string,
 ): boolean => {
 	const birthYear = Number(dateOfBirth.slice(0, 4));
-	const { years, months } = RETIREMENT_AGE_BY_BIRTH_YEAR(birthYear);
+	const { years, months } = retirementAgeForBirthYear(birthYear);
 	return ageInMonths(dateOfBirth, today) >= years * 12 + months;
 };
 

@@ -44,7 +44,7 @@ export const STANDARD_NEEDS_BY_LEVEL: Record<1 | 2 | 3 | 4 | 5 | 6, number> = {
  * A flat 66.5 is wrong for almost every cohort, so the staggered table is
  * implemented instead. VERIFY against the statute before any real use.
  */
-export const RETIREMENT_AGE_BY_BIRTH_YEAR = (
+export const retirementAgeForBirthYear = (
 	birthYear: number,
 ): { years: number; months: number } => {
 	if (birthYear <= 1946) {
