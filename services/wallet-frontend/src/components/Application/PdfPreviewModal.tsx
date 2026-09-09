@@ -86,6 +86,7 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({
 					className="hidden"
 					aria-hidden="true"
 					tabIndex={-1}
+					data-testid="download-pdf-anchor"
 				/>
 			</div>
 		</div>
