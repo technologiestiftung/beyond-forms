@@ -1,63 +1,63 @@
 import React, { useEffect, useRef } from "react";
 import { Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-	ELIGIBILITY_TOTAL_STEPS,
-	useEligibilityStore,
-} from "../store/useEligibilityStore";
+import { useBenefitCheckStore } from "../store/useBenefitCheckStore";
 import { ProgressBar } from "../components/Eligibility/ProgressBar";
 import { QuestionCard } from "../components/Eligibility/QuestionCard";
 import { DateOfBirthCard } from "../components/Eligibility/DateOfBirthCard";
+import { NumberCard } from "../components/Eligibility/NumberCard";
+import { ChildrenCard } from "../components/Eligibility/ChildrenCard";
 import { StepLayout } from "../components/Layout/StepLayout";
-import { AppRoutes, getEligibilityRoute } from "../constants/routes";
-import { useEligibilityNavigation } from "../hooks/useEligibilityNavigation";
+import { getEligibilityRoute } from "../constants/routes";
+import { useBenefitCheckNavigation } from "../hooks/useBenefitCheckNavigation";
+import { BINARY_OPTIONS } from "../store/benefits/questionCatalogue";
 import { i18nKeys } from "../i18n/i18nKeys";
-import type { EligibilityCheck } from "../schemas/eligibility.schema";
+import type { BenefitCheckAnswers } from "../schemas/benefitCheck.schema";
 
 export const EligibilityFlow: React.FC = () => {
 	const { t } = useTranslation();
-	const answers = useEligibilityStore((s) => s.answers);
-	const setAnswer = useEligibilityStore((s) => s.setAnswer);
-	const clearAnswer = useEligibilityStore((s) => s.clearAnswer);
-	const validationError = useEligibilityStore((s) => s.validationError);
+	const answers = useBenefitCheckStore((s) => s.answers);
+	const setAnswer = useBenefitCheckStore((s) => s.setAnswer);
+	const clearAnswer = useBenefitCheckStore((s) => s.clearAnswer);
+	const validationError = useBenefitCheckStore((s) => s.validationError);
+	const maxDepthReached = useBenefitCheckStore((s) => s.maxDepthReached);
 	const {
-		currentQuestionNode,
-		currentIndexInPath,
-		validPath,
-		isTerminal,
+		question,
+		indexInPath,
+		path,
+		totalActive,
 		navigateNext,
 		navigateBack,
-	} = useEligibilityNavigation();
+	} = useBenefitCheckNavigation();
 
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		window.scrollTo(0, 0);
 		containerRef.current?.focus();
-	}, [currentQuestionNode?.id]);
+	}, [question?.id]);
 
-	if (
-		!currentQuestionNode ||
-		currentIndexInPath === -1 ||
-		currentQuestionNode.type === "result"
-	) {
-		if (isTerminal) {
-			return <Navigate to={AppRoutes.EligibilityResult} replace />;
-		}
-		return <Navigate to={getEligibilityRoute(validPath[0])} replace />;
+	// Unknown id, or a question the current answers skip. The path always ends on the
+	// first unanswered question, so that is where someone belongs — the old flow sent
+	// them back to question one, which threw away their place.
+	if (!question || indexInPath === -1) {
+		const open = path[path.length - 1];
+		return <Navigate to={getEligibilityRoute(open.id)} replace />;
 	}
 
-	const handleAnswerChange = <K extends keyof EligibilityCheck>(
-		key: K,
-		val: EligibilityCheck[K],
-	) => {
-		setAnswer(key, val);
+	const copy = (part: string) => t(`questions.${question.id}.${part}`);
+	const tipText = t(`questions.${question.id}.tip`, { defaultValue: "" });
+
+	const header = {
+		id: question.id,
+		question: copy("title"),
+		category: copy("category"),
+		tip: tipText || undefined,
 	};
 
-	const questionKey = currentQuestionNode.key;
-	if (!questionKey) {
-		return <Navigate to={getEligibilityRoute(validPath[0])} replace />;
-	}
+	const write = <K extends keyof BenefitCheckAnswers>(
+		value: BenefitCheckAnswers[K],
+	) => setAnswer(question.field as K, value);
 
 	return (
 		<div
@@ -72,8 +72,9 @@ export const EligibilityFlow: React.FC = () => {
 				colorVariant="blue"
 			>
 				<ProgressBar
-					current={currentIndexInPath + 1}
-					total={ELIGIBILITY_TOTAL_STEPS}
+					current={indexInPath + 1}
+					total={totalActive}
+					maxDepthReached={maxDepthReached}
 				/>
 
 				{validationError && (
@@ -85,38 +86,66 @@ export const EligibilityFlow: React.FC = () => {
 					</div>
 				)}
 
-				{currentQuestionNode.type === "date" ? (
-					<DateOfBirthCard
-						key={currentQuestionNode.id}
-						id={questionKey}
-						question={t(i18nKeys.eligibility.questionTitle(questionKey))}
-						category={t(i18nKeys.eligibility.questionCategory(questionKey))}
-						tip={t(i18nKeys.eligibility.questionTip(questionKey))}
-						value={answers[questionKey] as string | undefined}
-						onChange={(val) =>
-							handleAnswerChange(
-								questionKey,
-								val as EligibilityCheck[typeof questionKey],
-							)
-						}
-						onClear={() => clearAnswer(questionKey)}
+				{question.input === "choice" && (
+					<QuestionCard
+						key={question.id}
+						{...header}
+						options={question.options ?? []}
+						value={answers[question.field] as string | undefined}
+						onChange={(raw) => write(raw as never)}
 						onNext={navigateNext}
 					/>
-				) : (
+				)}
+
+				{question.input === "boolean" && (
 					<QuestionCard
-						key={currentQuestionNode.id}
-						id={questionKey}
-						question={t(i18nKeys.eligibility.questionTitle(questionKey))}
-						category={t(i18nKeys.eligibility.questionCategory(questionKey))}
-						tip={t(i18nKeys.eligibility.questionTip(questionKey))}
-						options={currentQuestionNode.options ?? []}
-						value={answers[questionKey] as string | undefined}
-						onChange={(val) =>
-							handleAnswerChange(
-								questionKey,
-								val as EligibilityCheck[typeof questionKey],
-							)
+						key={question.id}
+						{...header}
+						options={BINARY_OPTIONS}
+						value={
+							answers[question.field] === undefined
+								? undefined
+								: answers[question.field]
+									? "YES"
+									: "NO"
 						}
+						onChange={(raw) => write((raw === "YES") as never)}
+						onNext={navigateNext}
+					/>
+				)}
+
+				{question.input === "date" && (
+					<DateOfBirthCard
+						key={question.id}
+						{...header}
+						value={answers[question.field] as string | undefined}
+						onChange={(raw) => write(raw as never)}
+						onClear={() => clearAnswer(question.field)}
+						onNext={navigateNext}
+					/>
+				)}
+
+				{question.input === "number" && (
+					<NumberCard
+						key={question.id}
+						{...header}
+						unitLabel={copy("unit")}
+						value={answers[question.field] as number | undefined}
+						onChange={(raw) => write(raw as never)}
+						onClear={() => clearAnswer(question.field)}
+						onNext={navigateNext}
+					/>
+				)}
+
+				{question.input === "children" && (
+					<ChildrenCard
+						key={question.id}
+						{...header}
+						addLabel={copy("add")}
+						removeLabel={copy("remove")}
+						childLabel={copy("child_label")}
+						value={answers.children}
+						onChange={(raw) => write(raw as never)}
 						onNext={navigateNext}
 					/>
 				)}
