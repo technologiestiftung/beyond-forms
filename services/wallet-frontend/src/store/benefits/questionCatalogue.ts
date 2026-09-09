@@ -150,9 +150,18 @@ export const QUESTION_CATALOGUE: readonly BenefitQuestion[] = [
 		field: "monthsWithoutChildSupport",
 		input: "number",
 		unit: "MONTHS",
-		// Explicitly `=== true`, not `!== false`: the latter is true while the field is
-		// still undefined, which would skip the question before it has been asked and
-		// leave the progress denominator one short.
-		skipIf: (answers) => answers.childReceivesFullSupport === true,
+		/**
+		 * Two reasons to skip, and both are needed.
+		 *
+		 * `childless` covers a household that never sees the support question at all —
+		 * without it, a single person would be asked how long maintenance has been
+		 * missing.
+		 *
+		 * The support flag is compared with `=== true` rather than `!== false`, because
+		 * the latter is also true while the field is undefined and would skip the
+		 * question before it has been asked, leaving the progress denominator short.
+		 */
+		skipIf: (answers) =>
+			childless(answers) || answers.childReceivesFullSupport === true,
 	},
 ];
