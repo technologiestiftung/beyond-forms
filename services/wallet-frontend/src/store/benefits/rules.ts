@@ -18,6 +18,7 @@ import {
 	assetAllowance,
 	assetsVsAllowance,
 	childrenUnder25,
+	compositionImpliesChildren,
 	hasReachedRetirementAge,
 	householdStandardNeeds,
 	isCouple,
@@ -25,6 +26,7 @@ import {
 	residenceRequirementMet,
 	totalNeeds,
 } from "./derive";
+import type { Household } from "./derive";
 
 interface Verdict {
 	status: BenefitStatus;
@@ -51,7 +53,8 @@ const assessMeans = (
 ): Verdict => {
 	if (
 		answers.dateOfBirth === undefined ||
-		answers.household === undefined ||
+		answers.householdComposition === undefined ||
+		answers.children === undefined ||
 		answers.monthlyWarmRent === undefined ||
 		answers.monthlyNetHouseholdIncome === undefined ||
 		answers.assetsBand === undefined
@@ -59,7 +62,11 @@ const assessMeans = (
 		return INSUFFICIENT;
 	}
 
-	const needs = totalNeeds(answers.household, answers.monthlyWarmRent, today);
+	const household: Household = {
+		composition: answers.householdComposition,
+		children: answers.children,
+	};
+	const needs = totalNeeds(household, answers.monthlyWarmRent, today);
 	if (answers.monthlyNetHouseholdIncome >= needs) {
 		return {
 			status: BenefitStatus.LIKELY_NO,
@@ -245,7 +252,8 @@ export const assessSgbXiiSubsistenceAid = (
 	}
 
 	if (
-		answers.household === undefined ||
+		answers.householdComposition === undefined ||
+		answers.children === undefined ||
 		answers.monthlyWarmRent === undefined ||
 		answers.monthlyNetHouseholdIncome === undefined ||
 		answers.assetsBand === undefined
@@ -253,7 +261,11 @@ export const assessSgbXiiSubsistenceAid = (
 		return { benefit, ...INSUFFICIENT };
 	}
 
-	const needs = totalNeeds(answers.household, answers.monthlyWarmRent, today);
+	const household: Household = {
+		composition: answers.householdComposition,
+		children: answers.children,
+	};
+	const needs = totalNeeds(household, answers.monthlyWarmRent, today);
 	const allowance = assetAllowance(ageInYears(answers.dateOfBirth, today));
 	const assetsBelow =
 		assetsVsAllowance(answers.assetsBand, allowance) === "BELOW";
@@ -296,14 +308,19 @@ export const assessHousingBenefit = (
 	}
 
 	if (
-		answers.household === undefined ||
+		answers.householdComposition === undefined ||
+		answers.children === undefined ||
 		answers.monthlyWarmRent === undefined ||
 		answers.monthlyNetHouseholdIncome === undefined
 	) {
 		return { benefit, ...INSUFFICIENT };
 	}
 
-	const needsWithoutRent = householdStandardNeeds(answers.household, today);
+	const household: Household = {
+		composition: answers.householdComposition,
+		children: answers.children,
+	};
+	const needsWithoutRent = householdStandardNeeds(household, today);
 	if (answers.monthlyNetHouseholdIncome < needsWithoutRent) {
 		return {
 			benefit,
@@ -346,10 +363,22 @@ export const assessChildSupplement = (
 ): BenefitAssessment => {
 	const benefit = BenefitId.CHILD_SUPPLEMENT;
 
-	if (answers.household === undefined) {
+	if (answers.householdComposition === undefined) {
 		return { benefit, ...INSUFFICIENT };
 	}
-	if (childrenUnder25(answers.household, today).length === 0) {
+	// Three-stage on purpose: a childless composition is a definitive no, while an
+	// unanswered children list is only missing data and must not read as a rejection.
+	if (!compositionImpliesChildren(answers.householdComposition)) {
+		return {
+			benefit,
+			status: BenefitStatus.NOT_APPLICABLE,
+			reasons: [ReasonCode.NO_ELIGIBLE_CHILDREN],
+		};
+	}
+	if (answers.children === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+	if (childrenUnder25(answers.children, today).length === 0) {
 		return {
 			benefit,
 			status: BenefitStatus.NOT_APPLICABLE,
@@ -363,15 +392,15 @@ export const assessChildSupplement = (
 			reasons: [ReasonCode.BENEFITS_TAKE_PRECEDENCE],
 		};
 	}
-	if (answers.employment === undefined) {
+	if (answers.monthlyGrossIncome === undefined) {
 		return { benefit, ...INSUFFICIENT };
 	}
 
-	const minimum = isCouple(answers.household.composition)
+	const minimum = isCouple(answers.householdComposition)
 		? KIZ_MIN_GROSS_INCOME.couple
 		: KIZ_MIN_GROSS_INCOME.single;
 
-	if (answers.employment.monthlyGrossIncome < minimum) {
+	if (answers.monthlyGrossIncome < minimum) {
 		return {
 			benefit,
 			status: BenefitStatus.LIKELY_NO,
@@ -403,27 +432,30 @@ export const assessAdvanceMaintenance = (
 ): BenefitAssessment => {
 	const benefit = BenefitId.ADVANCE_MAINTENANCE;
 
-	if (answers.household === undefined) {
+	if (answers.householdComposition === undefined) {
 		return { benefit, ...INSUFFICIENT };
 	}
-	if (answers.household.composition !== HouseholdComposition.SINGLE_PARENT) {
+	if (answers.householdComposition !== HouseholdComposition.SINGLE_PARENT) {
 		return {
 			benefit,
 			status: BenefitStatus.NOT_APPLICABLE,
 			reasons: [ReasonCode.NOT_SINGLE_PARENT],
 		};
 	}
-	if (minorChildren(answers.household, today).length === 0) {
+	if (answers.children === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+	if (minorChildren(answers.children, today).length === 0) {
 		return {
 			benefit,
 			status: BenefitStatus.NOT_APPLICABLE,
 			reasons: [ReasonCode.NO_MINOR_CHILDREN],
 		};
 	}
-	if (answers.childSupport === undefined) {
+	if (answers.childReceivesFullSupport === undefined) {
 		return { benefit, ...INSUFFICIENT };
 	}
-	if (answers.childSupport.receivesFullSupport) {
+	if (answers.childReceivesFullSupport) {
 		return {
 			benefit,
 			status: BenefitStatus.LIKELY_NO,

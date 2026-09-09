@@ -84,43 +84,38 @@ export const BirthDateSchema = z
 	.refine((v) => v >= "1900-01-01", "Date must be on or after 1 January 1900")
 	.refine((v) => v <= todayIsoDate(), "Date of birth cannot be in the future");
 
-export const HouseholdSchema = z.object({
-	composition: HouseholdCompositionSchema,
-	children: z.array(z.object({ dateOfBirth: BirthDateSchema })),
-});
-
-export const EmploymentSchema = z.object({
-	isEmployed: z.boolean(),
-	monthlyGrossIncome: z.number().min(0),
-});
-
-export const ChildSupportSchema = z.object({
-	receivesFullSupport: z.boolean(),
-	monthsWithoutSupport: z.number().int().min(0),
-});
+export const ChildEntrySchema = z.object({ dateOfBirth: BirthDateSchema });
+export type ChildEntry = z.infer<typeof ChildEntrySchema>;
 
 /**
- * Flat on purpose: the questionnaire store validates one answer at a time via
- * `BenefitCheckAnswersSchema.shape[key]`, the way `useEligibilityStore` does today.
+ * Flat on purpose. Every question writes exactly one of these fields and every field has
+ * exactly one question, so the store can validate per field via
+ * `BenefitCheckAnswersSchema.shape[field]` and `Partial<>` expresses "answered so far".
+ *
+ * A nested shape does not survive a step-by-step questionnaire: with employment as an
+ * object, `{ isEmployed: true }` fails validation because the gross income is mandatory
+ * once the object exists.
  */
 export const BenefitCheckAnswersSchema = z.object({
-	livesInBerlin: z.boolean(),
+	householdComposition: HouseholdCompositionSchema,
+	children: z.array(ChildEntrySchema),
 	dateOfBirth: BirthDateSchema,
+	livesInGermany: z.boolean(),
 	workCapacity: WorkCapacitySchema,
-	household: HouseholdSchema,
-	employment: EmploymentSchema,
+	isEmployed: z.boolean(),
+	monthlyGrossIncome: z.number().min(0),
 	monthlyNetHouseholdIncome: z.number().min(0),
 	monthlyWarmRent: z.number().min(0),
 	assetsBand: AssetsBandSchema,
 	receivesBenefitsAlready: z.boolean(),
 	citizenship: CitizenshipSchema,
 	hasSecureResidenceStatus: z.boolean(),
-	childSupport: ChildSupportSchema,
+	childReceivesFullSupport: z.boolean(),
+	monthsWithoutChildSupport: z.number().int().min(0),
 });
 
 export type BenefitCheckAnswers = z.infer<typeof BenefitCheckAnswersSchema>;
 export type PartialBenefitCheckAnswers = Partial<BenefitCheckAnswers>;
-export type Household = z.infer<typeof HouseholdSchema>;
 
 export const BenefitId = {
 	/** Grundsicherungsgeld, SGB II (bis 30.6.2026: Bürgergeld) */

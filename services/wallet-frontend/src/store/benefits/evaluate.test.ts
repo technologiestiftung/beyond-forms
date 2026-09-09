@@ -16,18 +16,18 @@ const TODAY = "2026-09-09";
 const CASE_C: PartialBenefitCheckAnswers = {
 	dateOfBirth: "1997-05-02",
 	workCapacity: WorkCapacity.FULL,
-	household: {
-		composition: HouseholdComposition.SINGLE_PARENT,
-		children: [{ dateOfBirth: "2020-02-11" }],
-	},
-	employment: { isEmployed: true, monthlyGrossIncome: 1400 },
+	householdComposition: HouseholdComposition.SINGLE_PARENT,
+	children: [{ dateOfBirth: "2020-02-11" }],
+	isEmployed: true,
+	monthlyGrossIncome: 1400,
 	monthlyNetHouseholdIncome: 1900,
 	monthlyWarmRent: 700,
 	assetsBand: AssetsBand.UNDER_5000,
 	receivesBenefitsAlready: false,
 	citizenship: Citizenship.DE_EU,
-	childSupport: { receivesFullSupport: false, monthsWithoutSupport: 8 },
-	livesInBerlin: true,
+	childReceivesFullSupport: false,
+	monthsWithoutChildSupport: 8,
+	livesInGermany: true,
 };
 
 describe("evaluateBenefitCheck", () => {
@@ -76,7 +76,8 @@ describe("evaluateBenefitCheck", () => {
 		const result = evaluateBenefitCheck(
 			{
 				...CASE_C,
-				household: { composition: HouseholdComposition.SINGLE, children: [] },
+				householdComposition: HouseholdComposition.SINGLE,
+				children: [],
 			},
 			TODAY,
 		);

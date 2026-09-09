@@ -50,7 +50,7 @@ export const evaluateBenefitCheck = (
 	];
 
 	const hints: HintCode[] = [];
-	const hasChildren = (answers.household?.children.length ?? 0) > 0;
+	const hasChildren = (answers.children?.length ?? 0) > 0;
 	const baseBenefitLive = assessments.some(
 		(assessment) =>
 			BASE_BENEFITS.includes(assessment.benefit) && isLive(assessment),

@@ -24,14 +24,16 @@ const TODAY = "2026-09-09";
 const CASE_A: PartialBenefitCheckAnswers = {
 	dateOfBirth: "1994-01-15",
 	workCapacity: WorkCapacity.FULL,
-	household: { composition: HouseholdComposition.SINGLE, children: [] },
-	employment: { isEmployed: true, monthlyGrossIncome: 1400 },
+	householdComposition: HouseholdComposition.SINGLE,
+	children: [],
+	isEmployed: true,
+	monthlyGrossIncome: 1400,
 	monthlyNetHouseholdIncome: 1100,
 	monthlyWarmRent: 650,
 	assetsBand: AssetsBand.UNDER_5000,
 	receivesBenefitsAlready: false,
 	citizenship: Citizenship.DE_EU,
-	livesInBerlin: true,
+	livesInGermany: true,
 };
 
 describe("assessSgbIiBasicIncome", () => {
@@ -132,14 +134,16 @@ describe("assessSgbIiBasicIncome", () => {
 /** A 71-year-old on a small pension — the domain spec's case B. */
 const CASE_B: PartialBenefitCheckAnswers = {
 	dateOfBirth: "1955-03-20",
-	household: { composition: HouseholdComposition.SINGLE, children: [] },
-	employment: { isEmployed: false, monthlyGrossIncome: 0 },
+	householdComposition: HouseholdComposition.SINGLE,
+	children: [],
+	isEmployed: false,
+	monthlyGrossIncome: 0,
 	monthlyNetHouseholdIncome: 950,
 	monthlyWarmRent: 550,
 	assetsBand: AssetsBand.FROM_5000_TO_15000,
 	receivesBenefitsAlready: false,
 	citizenship: Citizenship.DE_EU,
-	livesInBerlin: true,
+	livesInGermany: true,
 };
 
 describe("assessSgbXiiOldAgeReducedCapacity", () => {
@@ -215,14 +219,16 @@ describe("assessSgbXiiOldAgeReducedCapacity", () => {
 const CASE_D: PartialBenefitCheckAnswers = {
 	dateOfBirth: "1981-04-10",
 	workCapacity: WorkCapacity.TEMPORARILY_REDUCED,
-	household: { composition: HouseholdComposition.SINGLE, children: [] },
-	employment: { isEmployed: false, monthlyGrossIncome: 0 },
+	householdComposition: HouseholdComposition.SINGLE,
+	children: [],
+	isEmployed: false,
+	monthlyGrossIncome: 0,
 	monthlyNetHouseholdIncome: 300,
 	monthlyWarmRent: 500,
 	assetsBand: AssetsBand.UNDER_5000,
 	receivesBenefitsAlready: false,
 	citizenship: Citizenship.DE_EU,
-	livesInBerlin: true,
+	livesInGermany: true,
 };
 
 describe("assessSgbXiiSubsistenceAid", () => {
@@ -281,7 +287,8 @@ describe("assessHousingBenefit", () => {
 	/** Income covers subsistence, rent burden 700/1900 = 0.37. */
 	const RENT_BURDENED: PartialBenefitCheckAnswers = {
 		dateOfBirth: "1994-01-15",
-		household: { composition: HouseholdComposition.SINGLE, children: [] },
+		householdComposition: HouseholdComposition.SINGLE,
+		children: [],
 		monthlyNetHouseholdIncome: 1900,
 		monthlyWarmRent: 700,
 		receivesBenefitsAlready: false,
@@ -336,18 +343,18 @@ describe("assessHousingBenefit", () => {
 const CASE_C: PartialBenefitCheckAnswers = {
 	dateOfBirth: "1997-05-02",
 	workCapacity: WorkCapacity.FULL,
-	household: {
-		composition: HouseholdComposition.SINGLE_PARENT,
-		children: [{ dateOfBirth: "2020-02-11" }],
-	},
-	employment: { isEmployed: true, monthlyGrossIncome: 1400 },
+	householdComposition: HouseholdComposition.SINGLE_PARENT,
+	children: [{ dateOfBirth: "2020-02-11" }],
+	isEmployed: true,
+	monthlyGrossIncome: 1400,
 	monthlyNetHouseholdIncome: 1900,
 	monthlyWarmRent: 700,
 	assetsBand: AssetsBand.UNDER_5000,
 	receivesBenefitsAlready: false,
 	citizenship: Citizenship.DE_EU,
-	childSupport: { receivesFullSupport: false, monthsWithoutSupport: 8 },
-	livesInBerlin: true,
+	childReceivesFullSupport: false,
+	monthsWithoutChildSupport: 8,
+	livesInGermany: true,
 };
 
 describe("assessChildSupplement", () => {
@@ -365,7 +372,8 @@ describe("assessChildSupplement", () => {
 		const result = assessChildSupplement(
 			{
 				...CASE_C,
-				household: { composition: HouseholdComposition.SINGLE, children: [] },
+				householdComposition: HouseholdComposition.SINGLE,
+				children: [],
 			},
 			TODAY,
 		);
@@ -381,13 +389,11 @@ describe("assessChildSupplement", () => {
 		const result = assessChildSupplement(
 			{
 				...CASE_C,
-				household: {
-					composition: HouseholdComposition.SINGLE_PARENT,
-					children: [
-						{ dateOfBirth: "1999-01-01" }, // 27
-						{ dateOfBirth: "2021-01-01" }, // 5
-					],
-				},
+				householdComposition: HouseholdComposition.SINGLE_PARENT,
+				children: [
+					{ dateOfBirth: "1999-01-01" }, // 27
+					{ dateOfBirth: "2021-01-01" }, // 5
+				],
 			},
 			TODAY,
 		);
@@ -398,10 +404,8 @@ describe("assessChildSupplement", () => {
 		const result = assessChildSupplement(
 			{
 				...CASE_C,
-				household: {
-					composition: HouseholdComposition.SINGLE_PARENT,
-					children: [{ dateOfBirth: "1999-01-01" }],
-				},
+				householdComposition: HouseholdComposition.SINGLE_PARENT,
+				children: [{ dateOfBirth: "1999-01-01" }],
 			},
 			TODAY,
 		);
@@ -421,7 +425,8 @@ describe("assessChildSupplement", () => {
 		const result = assessChildSupplement(
 			{
 				...CASE_C,
-				employment: { isEmployed: true, monthlyGrossIncome: 500 },
+				isEmployed: true,
+				monthlyGrossIncome: 500,
 			},
 			TODAY,
 		);
@@ -432,11 +437,10 @@ describe("assessChildSupplement", () => {
 	it("applies the higher minimum to couples", () => {
 		const couple: PartialBenefitCheckAnswers = {
 			...CASE_C,
-			household: {
-				composition: HouseholdComposition.COUPLE_WITH_CHILDREN,
-				children: [{ dateOfBirth: "2020-02-11" }],
-			},
-			employment: { isEmployed: true, monthlyGrossIncome: 700 },
+			householdComposition: HouseholdComposition.COUPLE_WITH_CHILDREN,
+			children: [{ dateOfBirth: "2020-02-11" }],
+			isEmployed: true,
+			monthlyGrossIncome: 700,
 		};
 		expect(assessChildSupplement(couple, TODAY).status).toBe(
 			BenefitStatus.LIKELY_NO,
@@ -462,10 +466,8 @@ describe("assessAdvanceMaintenance", () => {
 		const result = assessAdvanceMaintenance(
 			{
 				...CASE_C,
-				household: {
-					composition: HouseholdComposition.COUPLE_WITH_CHILDREN,
-					children: [{ dateOfBirth: "2020-02-11" }],
-				},
+				householdComposition: HouseholdComposition.COUPLE_WITH_CHILDREN,
+				children: [{ dateOfBirth: "2020-02-11" }],
 			},
 			TODAY,
 		);
@@ -477,10 +479,8 @@ describe("assessAdvanceMaintenance", () => {
 		const result = assessAdvanceMaintenance(
 			{
 				...CASE_C,
-				household: {
-					composition: HouseholdComposition.SINGLE_PARENT,
-					children: [{ dateOfBirth: "2005-01-01" }],
-				},
+				householdComposition: HouseholdComposition.SINGLE_PARENT,
+				children: [{ dateOfBirth: "2005-01-01" }],
 			},
 			TODAY,
 		);
@@ -492,7 +492,8 @@ describe("assessAdvanceMaintenance", () => {
 		const result = assessAdvanceMaintenance(
 			{
 				...CASE_C,
-				childSupport: { receivesFullSupport: true, monthsWithoutSupport: 0 },
+				childReceivesFullSupport: true,
+				monthsWithoutChildSupport: 0,
 			},
 			TODAY,
 		);
@@ -509,7 +510,7 @@ describe("assessAdvanceMaintenance", () => {
 	 * two cases are split here.
 	 */
 	it("advises a check when the support question is unanswered", () => {
-		const { childSupport: _dropped, ...withoutSupport } = CASE_C;
+		const { childReceivesFullSupport: _dropped, ...withoutSupport } = CASE_C;
 		const result = assessAdvanceMaintenance(withoutSupport, TODAY);
 		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
 		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
@@ -517,6 +518,31 @@ describe("assessAdvanceMaintenance", () => {
 
 	it("advises a check when answers are missing entirely", () => {
 		const result = assessAdvanceMaintenance({}, TODAY);
+		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
+		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
+	});
+});
+
+describe("children guards after flattening", () => {
+	it("child supplement is not applicable for a definitively childless household", () => {
+		const result = assessChildSupplement(
+			{ ...CASE_C, householdComposition: HouseholdComposition.SINGLE },
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
+		expect(result.reasons).toEqual([ReasonCode.NO_ELIGIBLE_CHILDREN]);
+	});
+
+	it("child supplement advises a check while the children list is unanswered", () => {
+		const { children: _dropped, ...withoutChildren } = CASE_C;
+		const result = assessChildSupplement(withoutChildren, TODAY);
+		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
+		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
+	});
+
+	it("advance maintenance advises a check while the children list is unanswered", () => {
+		const { children: _dropped, ...withoutChildren } = CASE_C;
+		const result = assessAdvanceMaintenance(withoutChildren, TODAY);
 		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
 		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
 	});

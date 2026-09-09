@@ -10,6 +10,7 @@ import {
 	assetAllowance,
 	assetsVsAllowance,
 	childrenUnder25,
+	compositionImpliesChildren,
 	hasReachedRetirementAge,
 	householdStandardNeeds,
 	isCouple,
@@ -158,22 +159,37 @@ describe("totalNeeds", () => {
 });
 
 describe("child filters", () => {
-	const household = {
-		composition: HouseholdComposition.SINGLE_PARENT,
-		children: [
-			{ dateOfBirth: "2020-01-01" }, // 6
-			{ dateOfBirth: "2008-09-09" }, // 18 exactly
-			{ dateOfBirth: "2008-09-10" }, // 17
-			{ dateOfBirth: "2001-09-09" }, // 25 exactly
-		],
-	};
+	const children = [
+		{ dateOfBirth: "2020-01-01" }, // 6
+		{ dateOfBirth: "2008-09-09" }, // 18 exactly
+		{ dateOfBirth: "2008-09-10" }, // 17
+		{ dateOfBirth: "2001-09-09" }, // 25 exactly
+	];
 
 	it("counts a child as a minor until the 18th birthday", () => {
-		expect(minorChildren(household, TODAY)).toHaveLength(2);
+		expect(minorChildren(children, TODAY)).toHaveLength(2);
 	});
 
 	it("excludes a child on their 25th birthday", () => {
-		expect(childrenUnder25(household, TODAY)).toHaveLength(3);
+		expect(childrenUnder25(children, TODAY)).toHaveLength(3);
+	});
+});
+
+describe("compositionImpliesChildren", () => {
+	it("is true for the two compositions that include children", () => {
+		expect(compositionImpliesChildren(HouseholdComposition.SINGLE_PARENT)).toBe(
+			true,
+		);
+		expect(
+			compositionImpliesChildren(HouseholdComposition.COUPLE_WITH_CHILDREN),
+		).toBe(true);
+	});
+
+	it("is false for the two that do not", () => {
+		expect(compositionImpliesChildren(HouseholdComposition.SINGLE)).toBe(false);
+		expect(
+			compositionImpliesChildren(HouseholdComposition.COUPLE_NO_CHILDREN),
+		).toBe(false);
 	});
 });
 

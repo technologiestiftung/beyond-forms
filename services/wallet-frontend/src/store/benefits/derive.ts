@@ -10,9 +10,19 @@ import {
 } from "../../schemas/benefitCheck.schema";
 import type {
 	AssetsBand,
-	Household,
+	ChildEntry,
 	PartialBenefitCheckAnswers,
 } from "../../schemas/benefitCheck.schema";
+
+/**
+ * The resolved household. The answer schema is flat so the questionnaire can fill it one
+ * field at a time; the needs calculation wants both parts together, and the rules build
+ * this once their guards have confirmed both are present.
+ */
+export interface Household {
+	composition: HouseholdComposition;
+	children: ChildEntry[];
+}
 
 /**
  * Whole months between two ISO dates. Deliberately string and integer arithmetic: passing
@@ -77,6 +87,17 @@ export const isCouple = (composition: HouseholdComposition): boolean =>
 	composition === HouseholdComposition.COUPLE_WITH_CHILDREN;
 
 /**
+ * Whether the chosen household composition means there are children at all. Used both by
+ * the questionnaire's skip condition for the children question and by the two rules that
+ * must tell "definitely no children" apart from "not answered yet".
+ */
+export const compositionImpliesChildren = (
+	composition: HouseholdComposition,
+): boolean =>
+	composition === HouseholdComposition.SINGLE_PARENT ||
+	composition === HouseholdComposition.COUPLE_WITH_CHILDREN;
+
+/**
  * Which Regelbedarfsstufe a child falls into. The domain spec calls regelbedarf(haushalt)
  * without defining the mapping; this is the design doc's §5 assignment and is on the
  * verification checklist.
@@ -118,20 +139,16 @@ export const totalNeeds = (
 ): number => householdStandardNeeds(household, today) + monthlyWarmRent;
 
 export const minorChildren = (
-	household: Household,
+	children: ChildEntry[],
 	today: string,
-): Array<{ dateOfBirth: string }> =>
-	household.children.filter(
-		(child) => ageInYears(child.dateOfBirth, today) < 18,
-	);
+): ChildEntry[] =>
+	children.filter((child) => ageInYears(child.dateOfBirth, today) < 18);
 
 export const childrenUnder25 = (
-	household: Household,
+	children: ChildEntry[],
 	today: string,
-): Array<{ dateOfBirth: string }> =>
-	household.children.filter(
-		(child) => ageInYears(child.dateOfBirth, today) < 25,
-	);
+): ChildEntry[] =>
+	children.filter((child) => ageInYears(child.dateOfBirth, today) < 25);
 
 /**
  * `undefined` means "not answered yet", which the rules turn into CHECK_ADVISED rather

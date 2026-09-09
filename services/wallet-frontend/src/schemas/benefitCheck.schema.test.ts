@@ -7,28 +7,31 @@ import {
 } from "./benefitCheck.schema";
 
 describe("BenefitCheckAnswersSchema", () => {
-	it("accepts a complete household with children", () => {
-		const result = BenefitCheckAnswersSchema.shape.household.safeParse({
-			composition: HouseholdComposition.SINGLE_PARENT,
-			children: [{ dateOfBirth: "2019-04-02" }],
-		});
+	it("accepts a list of children", () => {
+		const result = BenefitCheckAnswersSchema.shape.children.safeParse([
+			{ dateOfBirth: "2019-04-02" },
+		]);
 		expect(result.success).toBe(true);
 	});
 
 	it("accepts an empty children array", () => {
-		const result = BenefitCheckAnswersSchema.shape.household.safeParse({
-			composition: HouseholdComposition.SINGLE,
-			children: [],
-		});
+		const result = BenefitCheckAnswersSchema.shape.children.safeParse([]);
 		expect(result.success).toBe(true);
 	});
 
 	it("rejects a child born in the future", () => {
-		const result = BenefitCheckAnswersSchema.shape.household.safeParse({
-			composition: HouseholdComposition.SINGLE_PARENT,
-			children: [{ dateOfBirth: "2999-01-01" }],
-		});
+		const result = BenefitCheckAnswersSchema.shape.children.safeParse([
+			{ dateOfBirth: "2999-01-01" },
+		]);
 		expect(result.success).toBe(false);
+	});
+
+	it("accepts a household composition on its own", () => {
+		const result =
+			BenefitCheckAnswersSchema.shape.householdComposition.safeParse(
+				HouseholdComposition.SINGLE_PARENT,
+			);
+		expect(result.success).toBe(true);
 	});
 
 	it("rejects a calendar-invalid date of birth", () => {
@@ -44,10 +47,8 @@ describe("BenefitCheckAnswersSchema", () => {
 	});
 
 	it("rejects a negative gross income", () => {
-		const result = BenefitCheckAnswersSchema.shape.employment.safeParse({
-			isEmployed: true,
-			monthlyGrossIncome: -1,
-		});
+		const result =
+			BenefitCheckAnswersSchema.shape.monthlyGrossIncome.safeParse(-1);
 		expect(result.success).toBe(false);
 	});
 

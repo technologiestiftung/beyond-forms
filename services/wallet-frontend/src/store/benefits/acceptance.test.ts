@@ -39,14 +39,16 @@ describe("domain spec §9 acceptance cases", () => {
 		const caseA: PartialBenefitCheckAnswers = {
 			dateOfBirth: "1994-01-15", // 32
 			workCapacity: WorkCapacity.FULL,
-			household: { composition: HouseholdComposition.SINGLE, children: [] },
-			employment: { isEmployed: true, monthlyGrossIncome: 1400 },
+			householdComposition: HouseholdComposition.SINGLE,
+			children: [],
+			isEmployed: true,
+			monthlyGrossIncome: 1400,
 			monthlyNetHouseholdIncome: 1100,
 			monthlyWarmRent: 650,
 			assetsBand: AssetsBand.UNDER_5000,
 			receivesBenefitsAlready: false,
 			citizenship: Citizenship.DE_EU,
-			livesInBerlin: true,
+			livesInGermany: true,
 		};
 		expect(statusOf(caseA, BenefitId.SGB_II_BASIC_INCOME)).toBe(
 			BenefitStatus.LIKELY_YES,
@@ -56,14 +58,16 @@ describe("domain spec §9 acceptance cases", () => {
 	it("case B: pensioner on a small pension — SGB XII likely, SGB II not applicable", () => {
 		const caseB: PartialBenefitCheckAnswers = {
 			dateOfBirth: "1955-03-20", // 71
-			household: { composition: HouseholdComposition.SINGLE, children: [] },
-			employment: { isEmployed: false, monthlyGrossIncome: 0 },
+			householdComposition: HouseholdComposition.SINGLE,
+			children: [],
+			isEmployed: false,
+			monthlyGrossIncome: 0,
 			monthlyNetHouseholdIncome: 950,
 			monthlyWarmRent: 550,
 			assetsBand: AssetsBand.FROM_5000_TO_15000, // 8000
 			receivesBenefitsAlready: false,
 			citizenship: Citizenship.DE_EU,
-			livesInBerlin: true,
+			livesInGermany: true,
 		};
 		expect(statusOf(caseB, BenefitId.SGB_XII_OLD_AGE_REDUCED_CAPACITY)).toBe(
 			BenefitStatus.LIKELY_YES,
@@ -77,18 +81,18 @@ describe("domain spec §9 acceptance cases", () => {
 		const caseC: PartialBenefitCheckAnswers = {
 			dateOfBirth: "1997-05-02", // 29
 			workCapacity: WorkCapacity.FULL,
-			household: {
-				composition: HouseholdComposition.SINGLE_PARENT,
-				children: [{ dateOfBirth: "2020-02-11" }], // 6
-			},
-			employment: { isEmployed: true, monthlyGrossIncome: 1400 },
+			householdComposition: HouseholdComposition.SINGLE_PARENT,
+			children: [{ dateOfBirth: "2020-02-11" }],
+			isEmployed: true,
+			monthlyGrossIncome: 1400,
 			monthlyNetHouseholdIncome: 1900,
 			monthlyWarmRent: 700,
 			assetsBand: AssetsBand.UNDER_5000,
 			receivesBenefitsAlready: false,
 			citizenship: Citizenship.DE_EU,
-			childSupport: { receivesFullSupport: false, monthsWithoutSupport: 8 },
-			livesInBerlin: true,
+			childReceivesFullSupport: false,
+			monthsWithoutChildSupport: 8,
+			livesInGermany: true,
 		};
 		expect(statusOf(caseC, BenefitId.ADVANCE_MAINTENANCE)).toBe(
 			BenefitStatus.LIKELY_YES,
@@ -102,14 +106,16 @@ describe("domain spec §9 acceptance cases", () => {
 		const caseD: PartialBenefitCheckAnswers = {
 			dateOfBirth: "1981-04-10", // 45
 			workCapacity: WorkCapacity.TEMPORARILY_REDUCED,
-			household: { composition: HouseholdComposition.SINGLE, children: [] },
-			employment: { isEmployed: false, monthlyGrossIncome: 0 },
+			householdComposition: HouseholdComposition.SINGLE,
+			children: [],
+			isEmployed: false,
+			monthlyGrossIncome: 0,
 			monthlyNetHouseholdIncome: 300,
 			monthlyWarmRent: 500, // not given by the domain spec; supplied for the needs test
 			assetsBand: AssetsBand.UNDER_5000,
 			receivesBenefitsAlready: false,
 			citizenship: Citizenship.DE_EU,
-			livesInBerlin: true,
+			livesInGermany: true,
 		};
 		expect(statusOf(caseD, BenefitId.SGB_XII_SUBSISTENCE_AID)).toBe(
 			BenefitStatus.LIKELY_YES,
@@ -126,14 +132,16 @@ describe("domain spec §9 acceptance cases", () => {
 		const caseE: PartialBenefitCheckAnswers = {
 			dateOfBirth: "1988-01-15", // 38 -> allowance 10000
 			workCapacity: WorkCapacity.FULL,
-			household: { composition: HouseholdComposition.SINGLE, children: [] },
-			employment: { isEmployed: true, monthlyGrossIncome: 1200 },
+			householdComposition: HouseholdComposition.SINGLE,
+			children: [],
+			isEmployed: true,
+			monthlyGrossIncome: 1200,
 			monthlyNetHouseholdIncome: 1000,
 			monthlyWarmRent: 600,
 			assetsBand: AssetsBand.FROM_5000_TO_15000,
 			receivesBenefitsAlready: false,
 			citizenship: Citizenship.DE_EU,
-			livesInBerlin: true,
+			livesInGermany: true,
 		};
 		expect(statusOf(caseE, BenefitId.SGB_II_BASIC_INCOME)).toBe(
 			BenefitStatus.CHECK_ADVISED,
