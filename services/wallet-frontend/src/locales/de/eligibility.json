@@ -209,5 +209,61 @@
 			"cta": "Sozialamt finden"
 		},
 		"start_over": "Von vorne anfangen"
+	},
+	"result": {
+		"title": "Deine Ersteinschätzung",
+		"cta": "Konto erstellen und weitermachen",
+		"disclaimer": "Das ist eine automatische Ersteinschätzung ohne Rechtsverbindlichkeit. Sie ersetzt keine Beratung durch Jobcenter, Sozialamt oder eine unabhängige Sozialberatung.",
+		"referral": {
+			"title": "Im Moment passt keine der geprüften Leistungen",
+			"description": "Das heißt nicht, dass es keine Unterstützung für Dich gibt. Das Sozialamt in Deinem Bezirk kann Dir sagen, was für Deine Situation infrage kommt.",
+			"link": "Sozialamt in Deinem Bezirk finden"
+		},
+		"benefit": {
+			"SGB_II_BASIC_INCOME": "Grundsicherungsgeld",
+			"SGB_XII_OLD_AGE_REDUCED_CAPACITY": "Grundsicherung im Alter und bei Erwerbsminderung",
+			"SGB_XII_SUBSISTENCE_AID": "Hilfe zum Lebensunterhalt",
+			"HOUSING_BENEFIT": "Wohngeld",
+			"CHILD_SUPPLEMENT": "Kinderzuschlag",
+			"ADVANCE_MAINTENANCE": "Unterhaltsvorschuss"
+		},
+		"status": {
+			"LIKELY_YES": "Das lohnt sich",
+			"CHECK_ADVISED": "Das solltest Du prüfen lassen",
+			"LIKELY_NO": "Trifft bei Dir vermutlich nicht zu",
+			"NOT_APPLICABLE": "Betrifft Deine Situation nicht"
+		},
+		"reason": {
+			"INSUFFICIENT_DATA": "Dazu fehlen noch Angaben.",
+			"RETIREMENT_AGE_REACHED": "Du hast die Regelaltersgrenze erreicht.",
+			"RETIREMENT_AGE_NOT_REACHED": "Du hast die Regelaltersgrenze noch nicht erreicht.",
+			"WORK_CAPACITY_NOT_FULL": "Du kannst nicht mindestens drei Stunden am Tag arbeiten.",
+			"NOT_IN_CAPACITY_GAP": "Diese Leistung gilt nur, wenn Du vorübergehend nicht arbeiten kannst.",
+			"RESIDENCE_STATUS_UNCLEAR": "Dein Aufenthaltsstatus muss im Einzelfall geprüft werden.",
+			"ALREADY_RECEIVING_BENEFITS": "Du bekommst laut Deinen Angaben schon eine vergleichbare Leistung.",
+			"BENEFITS_TAKE_PRECEDENCE": "Wer schon eine Grundsicherung bekommt, kann diese Leistung meist nicht zusätzlich bekommen.",
+			"INCOME_BELOW_NEEDS": "Dein Einkommen deckt den geschätzten Bedarf nicht.",
+			"INCOME_COVERS_NEEDS": "Dein Einkommen deckt den geschätzten Bedarf.",
+			"INCOME_BELOW_SUBSISTENCE": "Dein Einkommen reicht nicht einmal ohne Miete zum Leben. Dann kommt eher eine Grundsicherung infrage.",
+			"ASSETS_BELOW_ALLOWANCE": "Deine Ersparnisse liegen unter dem Freibetrag.",
+			"ASSETS_SPAN_ALLOWANCE": "Deine Ersparnisse liegen im Bereich des Freibetrags. Der genaue Betrag entscheidet.",
+			"ASSETS_ABOVE_ALLOWANCE": "Deine Ersparnisse liegen über dem Freibetrag.",
+			"RENT_BURDEN_HIGH": "Deine Miete ist im Verhältnis zu Deinem Einkommen hoch.",
+			"RENT_BURDEN_NORMAL": "Deine Miete ist im Verhältnis zu Deinem Einkommen unauffällig.",
+			"NO_ELIGIBLE_CHILDREN": "In Deinem Haushalt leben keine Kinder, für die diese Leistung gilt.",
+			"KIZ_MIN_INCOME_MET": "Dein Bruttoeinkommen erreicht die Mindestgrenze.",
+			"KIZ_MIN_INCOME_NOT_MET": "Dein Bruttoeinkommen erreicht die Mindestgrenze nicht. Dann kommt eher Grundsicherungsgeld für die Kinder infrage.",
+			"NOT_SINGLE_PARENT": "Diese Leistung gibt es nur für Alleinerziehende.",
+			"NO_MINOR_CHILDREN": "In Deinem Haushalt lebt kein Kind unter 18 Jahren.",
+			"CHILD_RECEIVES_FULL_SUPPORT": "Dein Kind bekommt den vollen Unterhalt.",
+			"CHILD_SUPPORT_INCOMPLETE": "Dein Kind bekommt keinen oder zu wenig Unterhalt.",
+			"EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA": "Wie viel es genau wäre, kann nur die zuständige Stelle berechnen.",
+			"CAPACITY_GAP_PRECONDITION_MET": "Die Grundvoraussetzung ist erfüllt. Einkommen und Ersparnisse muss die zuständige Stelle prüfen."
+		},
+		"hint": {
+			"EDUCATION_PARTICIPATION_PACKAGE": "Bildungs- und Teilhabepaket: Wenn Du eine dieser Leistungen bekommst, haben Deine Kinder meist automatisch Anspruch auf Zuschüsse für Schule, Sport und Musik.",
+			"CHILD_BENEFIT_PREREQUISITE": "Kindergeld ist Voraussetzung für den Kinderzuschlag. Falls Du es noch nicht beantragt hast, fang dort an.",
+			"ASYLUM_BENEFITS_REFERRAL": "Ist Dein Aufenthalt noch nicht gesichert, gelten für Dich möglicherweise Asylbewerberleistungen statt der hier geprüften. Eine Beratungsstelle kann Dir sagen, was für Dich gilt."
+		}
 	}
 }

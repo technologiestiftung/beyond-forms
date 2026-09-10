@@ -209,5 +209,61 @@
 			"cta": "Find your Social Services Office"
 		},
 		"start_over": "Start over"
+	},
+	"result": {
+		"title": "Your initial assessment",
+		"cta": "Create an account and continue",
+		"disclaimer": "This is an automated initial assessment with no legal force. It does not replace advice from a Jobcenter, a Sozialamt or an independent advice service.",
+		"referral": {
+			"title": "None of the benefits checked here fit at the moment",
+			"description": "That does not mean there is no support for you. The Sozialamt in your district can tell you what might apply to your situation.",
+			"link": "Find the Sozialamt in your district"
+		},
+		"benefit": {
+			"SGB_II_BASIC_INCOME": "Grundsicherungsgeld",
+			"SGB_XII_OLD_AGE_REDUCED_CAPACITY": "Grundsicherung in old age and on reduced earning capacity",
+			"SGB_XII_SUBSISTENCE_AID": "Hilfe zum Lebensunterhalt",
+			"HOUSING_BENEFIT": "Wohngeld (housing benefit)",
+			"CHILD_SUPPLEMENT": "Kinderzuschlag (child supplement)",
+			"ADVANCE_MAINTENANCE": "Unterhaltsvorschuss (advance maintenance)"
+		},
+		"status": {
+			"LIKELY_YES": "Worth applying for",
+			"CHECK_ADVISED": "Worth having checked",
+			"LIKELY_NO": "Probably does not apply to you",
+			"NOT_APPLICABLE": "Does not concern your situation"
+		},
+		"reason": {
+			"INSUFFICIENT_DATA": "Some answers are still missing for this.",
+			"RETIREMENT_AGE_REACHED": "You have reached the statutory retirement age.",
+			"RETIREMENT_AGE_NOT_REACHED": "You have not yet reached the statutory retirement age.",
+			"WORK_CAPACITY_NOT_FULL": "You cannot work at least three hours a day.",
+			"NOT_IN_CAPACITY_GAP": "This benefit only applies if you are temporarily unable to work.",
+			"RESIDENCE_STATUS_UNCLEAR": "Your residence status needs to be assessed individually.",
+			"ALREADY_RECEIVING_BENEFITS": "According to your answers you already receive a comparable benefit.",
+			"BENEFITS_TAKE_PRECEDENCE": "If you already receive a Grundsicherung, you usually cannot receive this benefit on top.",
+			"INCOME_BELOW_NEEDS": "Your income does not cover the estimated need.",
+			"INCOME_COVERS_NEEDS": "Your income covers the estimated need.",
+			"INCOME_BELOW_SUBSISTENCE": "Your income is not enough to live on even before rent. A Grundsicherung is the more likely fit.",
+			"ASSETS_BELOW_ALLOWANCE": "Your savings are below the allowance.",
+			"ASSETS_SPAN_ALLOWANCE": "Your savings are around the allowance. The exact amount decides.",
+			"ASSETS_ABOVE_ALLOWANCE": "Your savings are above the allowance.",
+			"RENT_BURDEN_HIGH": "Your rent is high relative to your income.",
+			"RENT_BURDEN_NORMAL": "Your rent is unremarkable relative to your income.",
+			"NO_ELIGIBLE_CHILDREN": "There are no children in your household this benefit applies to.",
+			"KIZ_MIN_INCOME_MET": "Your gross income reaches the minimum threshold.",
+			"KIZ_MIN_INCOME_NOT_MET": "Your gross income does not reach the minimum threshold. Grundsicherungsgeld for the children is the more likely fit.",
+			"NOT_SINGLE_PARENT": "This benefit exists only for single parents.",
+			"NO_MINOR_CHILDREN": "There is no child under 18 in your household.",
+			"CHILD_RECEIVES_FULL_SUPPORT": "Your child receives full maintenance.",
+			"CHILD_SUPPORT_INCOMPLETE": "Your child receives no maintenance, or too little.",
+			"EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA": "Only the responsible office can work out the exact amount.",
+			"CAPACITY_GAP_PRECONDITION_MET": "The basic precondition is met. The responsible office has to assess income and savings."
+		},
+		"hint": {
+			"EDUCATION_PARTICIPATION_PACKAGE": "Bildungs- und Teilhabepaket: if you receive one of these benefits, your children are usually automatically entitled to support for school, sport and music.",
+			"CHILD_BENEFIT_PREREQUISITE": "Kindergeld is a prerequisite for the Kinderzuschlag. If you have not applied for it yet, start there.",
+			"ASYLUM_BENEFITS_REFERRAL": "If your residence is not yet secure, Asylbewerberleistungen may apply to you rather than the benefits checked here. An advice service can tell you what applies."
+		}
 	}
 }
