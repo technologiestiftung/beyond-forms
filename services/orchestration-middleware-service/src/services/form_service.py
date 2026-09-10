@@ -262,10 +262,13 @@ class FormService:
     def _build_base_context(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], Optional[UserApplications]]:
         """
         Builds the JEXL context from `Users` columns merged with the matching
-        application's `form_data`. Falls back to the user's most recently updated
-        application when no row has this exact `form_type` — older accounts were
-        written with form_type="grundsicherung" while exports ask for
-        "antrag_grundsicherung".
+        application's `form_data`. When no row has this exact `form_type`:
+        for "antrag_grundsicherung_im_alter" specifically, first checks the legacy
+        form_type="grundsicherung" (older accounts were written under that name)
+        before falling back further, so a newer, unrelated application can't shadow
+        the legacy Grundsicherung data. Otherwise (or if that legacy lookup also
+        misses), falls back to the user's most recently updated application of any
+        form_type.
 
         Does not include the `documents` namespace; `fill_form` layers that on top
         using the returned application, since it's the only caller that needs it.
@@ -294,6 +297,22 @@ class FormService:
                 .order_by(UserApplications.updated_at.desc())
                 .first()
             )
+            if application is None and form_type == "antrag_grundsicherung_im_alter":
+                application = (
+                    self.db.query(UserApplications)
+                    .filter(
+                        UserApplications.fk_user_id == user.id,
+                        UserApplications.form_type == "grundsicherung",
+                    )
+                    .order_by(UserApplications.updated_at.desc())
+                    .first()
+                )
+                if application:
+                    logger.info(
+                        "No application with form_type=%r; found legacy form_type='grundsicherung' application %s",
+                        form_type,
+                        application.application_id,
+                    )
             if application is None:
                 application = (
                     self.db.query(UserApplications)

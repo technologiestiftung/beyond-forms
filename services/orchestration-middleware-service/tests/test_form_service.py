@@ -436,7 +436,7 @@ async def test_fill_form_resolves_dis_type_from_a_slot_id_document(form_service,
     Documents are stored under frontend slot ids (`id_card`), but the TOML mappings
     reference document-intelligence registry names (`documents.identity_document.*`).
     The two vocabularies overlap on `pension_notice` alone, so before the dual-key
-    registration every `documents.*` reference in antrag_grundsicherung.toml resolved
+    registration every `documents.*` reference in antrag_grundsicherung_im_alter.toml resolved
     to nothing.
     """
     _set_application_query(form_service, _mock_application({}))
@@ -452,7 +452,7 @@ async def test_fill_form_resolves_dis_type_from_a_slot_id_document(form_service,
         patch("httpx.AsyncClient.post") as mock_post,
     ):
         mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
-        await form_service.fill_form("antrag_grundsicherung", mock_user)
+        await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
 
         assert mock_post.call_args.kwargs["json"]["field_values"]["p1_id_valid"] == "2030-05-19"
 
@@ -473,7 +473,7 @@ async def test_fill_form_still_resolves_the_stored_slot_id(form_service, mock_us
         patch("httpx.AsyncClient.post") as mock_post,
     ):
         mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
-        await form_service.fill_form("antrag_grundsicherung", mock_user)
+        await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
 
         assert mock_post.call_args.kwargs["json"]["field_values"]["p1_authority"] == "Bezirksamt Mitte"
 
@@ -482,7 +482,7 @@ async def test_fill_form_still_resolves_the_stored_slot_id(form_service, mock_us
 async def test_fill_form_falls_back_when_form_type_does_not_match(form_service, mock_user):
     """
     `get_or_create_user_application` used to write form_type="grundsicherung" while
-    exports are requested as "antrag_grundsicherung". Legacy rows still exist, so
+    exports are requested as "antrag_grundsicherung_im_alter". Legacy rows still exist, so
     the exact match can miss and we fall back to the most recently updated application.
     """
     application = _mock_application({"cost_of_rent": decimal.Decimal("1200.00")})
@@ -498,9 +498,55 @@ async def test_fill_form_falls_back_when_form_type_does_not_match(form_service, 
         patch("httpx.AsyncClient.post") as mock_post,
     ):
         mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
-        await form_service.fill_form("antrag_grundsicherung", mock_user)
+        await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
 
         assert mock_post.call_args.kwargs["json"]["field_values"]["p1_cost_of_rent"] == "1200.00"
+
+
+def _application_query_side_effect(by_form_type: dict, generic_result):
+    """Routes `.query(UserApplications).filter(...)` by the `form_type` literal in the
+    filter's second condition (absent for the generic, form_type-agnostic fallback query),
+    so a test can tell the legacy-form_type lookup apart from the generic fallback even
+    though both go through the same mocked `db.query(...)` chain."""
+
+    def filter_side_effect(*args):
+        query = MagicMock()
+        if len(args) >= 2:
+            result = by_form_type.get(args[1].right.value)
+        else:
+            result = generic_result
+        query.order_by.return_value.first.return_value = result
+        return query
+
+    return filter_side_effect
+
+
+@pytest.mark.asyncio
+async def test_fill_form_prefers_legacy_grundsicherung_over_newer_unrelated_application(form_service, mock_user):
+    """
+    The generic fallback (most recently updated application of any form_type) used to run
+    even for antrag_grundsicherung_im_alter, so a newer, unrelated application (e.g. a
+    freshly started antrag_kinderzuschlag) could shadow a legacy form_type="grundsicherung"
+    row's data. The legacy form_type must be checked first for this form.
+    """
+    legacy_app = _mock_application({"cost_of_rent": decimal.Decimal("500.00")})
+    newer_unrelated_app = _mock_application({"cost_of_rent": decimal.Decimal("999.00")})
+    form_service.db.query.return_value.filter.side_effect = _application_query_side_effect(
+        by_form_type={"grundsicherung": legacy_app},
+        generic_result=newer_unrelated_app,
+    )
+    _set_documents_query(form_service, [])
+
+    mock_mapping = {"p1_cost_of_rent": "{{ cost_of_rent }}"}
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch("httpx.AsyncClient.post") as mock_post,
+    ):
+        mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
+        await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
+
+        assert mock_post.call_args.kwargs["json"]["field_values"]["p1_cost_of_rent"] == "500.00"
 
 
 def test_document_refs_in_the_grundsicherung_mapping_resolve_in_the_registry():
@@ -515,7 +561,7 @@ def test_document_refs_in_the_grundsicherung_mapping_resolve_in_the_registry():
 
     from beyondforms.document_schemas.document_registry import document_registry
 
-    mapping_path = Path(__file__).resolve().parents[3] / "forms" / "mappings" / "antrag_grundsicherung.toml"
+    mapping_path = Path(__file__).resolve().parents[3] / "forms" / "mappings" / "antrag_grundsicherung_im_alter.toml"
     if not mapping_path.is_file():
         pytest.skip(f"{mapping_path} not available")
 
@@ -578,7 +624,7 @@ async def test_fill_form_interpolates_dates_in_german_format(form_service, mock_
         patch("httpx.AsyncClient.post") as mock_post,
     ):
         mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
-        await form_service.fill_form("antrag_grundsicherung", mock_user)
+        await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
 
         assert mock_post.call_args.kwargs["json"]["field_values"]["p1_period"] == "01.10.2019 bis unbefristet"
 
@@ -597,7 +643,7 @@ async def test_fill_form_survives_an_unevaluable_mapping_entry(form_service, moc
         patch("httpx.AsyncClient.post") as mock_post,
     ):
         mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
-        await form_service.fill_form("antrag_grundsicherung", mock_user)
+        await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
 
         field_values = mock_post.call_args.kwargs["json"]["field_values"]
         assert field_values["p1_broken"] == ""

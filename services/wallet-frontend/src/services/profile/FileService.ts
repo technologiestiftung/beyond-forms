@@ -78,9 +78,38 @@ export class FileService {
 		}
 	}
 
+	/**
+	 * Gets or creates the caller's generic (not-yet-form-specific) application, so an
+	 * uploaded document can be attached to something the citizen actually owns rather
+	 * than a hardcoded, unrelated form.
+	 */
+	async ensureApplication(): Promise<string | null> {
+		if (env.VITE_USE_MOCKS || env.VITE_USE_MOCK_AUTH) {
+			return "mock-application-id";
+		}
+
+		try {
+			const response = await authenticatedFetch(
+				`${env.VITE_API_URL}/application/ensure`,
+				{
+					method: "POST",
+					credentials: "include",
+				},
+			);
+			if (!response.ok) {
+				return null;
+			}
+			const data = await response.json();
+			return data.application_id ?? null;
+		} catch (_e) {
+			return null;
+		}
+	}
+
 	async uploadFile(
 		files: File | File[],
 		type: z.infer<typeof DocumentTypeEnum>,
+		applicationId: string,
 		signal?: AbortSignal,
 	): Promise<FileUploadResponse> {
 		if (env.VITE_USE_MOCKS || env.VITE_USE_MOCK_AUTH) {
@@ -96,6 +125,7 @@ export class FileService {
 			if (files.length === 1) {
 				formData.append("file", files[0]);
 				formData.append("document_type", type);
+				formData.append("application_id", applicationId);
 			} else {
 				// Check if any is a PDF, if so, we can't stitch
 				const hasPdf = files.some(
@@ -114,11 +144,13 @@ export class FileService {
 					formData.append("files", f);
 				});
 				formData.append("document_type", type);
+				formData.append("application_id", applicationId);
 				url = `${env.VITE_API_URL}/upload-stitched`;
 			}
 		} else {
 			formData.append("file", files);
 			formData.append("document_type", type);
+			formData.append("application_id", applicationId);
 		}
 
 		try {
@@ -154,6 +186,7 @@ export class FileService {
 
 	async bulkUploadFiles(
 		items: { file: File; type: z.infer<typeof DocumentTypeEnum> }[],
+		applicationId: string,
 	): Promise<FileUploadResponse[]> {
 		if (env.VITE_USE_MOCKS || env.VITE_USE_MOCK_AUTH) {
 			const { mockFileService } = await import("./MockFileService");
@@ -165,6 +198,7 @@ export class FileService {
 			formData.append("files", file);
 			formData.append("document_types", type);
 		}
+		formData.append("application_id", applicationId);
 
 		try {
 			const response = await authenticatedFetch(

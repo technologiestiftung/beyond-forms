@@ -97,7 +97,7 @@ DOC=$(curl -s $API/files -H "$AUTH" | jq -r '.[0].document_id')
 curl -s $API/api/v1/documents/$DOC/extractions -H "$AUTH" | jq   # raw_data as the review UI sees it
 curl -s $API/api/v1/documents/$DOC/file -H "$AUTH" -o document.pdf
 
-curl -s $API/export/antrag_grundsicherung -H "$AUTH" | jq   # filled PDF, signed URL
+curl -s $API/export/antrag_grundsicherung_im_alter -H "$AUTH" | jq   # filled PDF, signed URL
 
 curl -s -X POST $API/chat -H "$AUTH" -H 'Content-Type: application/json' \
   -d '{"content":"Wie hoch ist meine Miete laut meinem Profil?"}' | jq -r .content
@@ -171,7 +171,7 @@ requires `pension_insurance_provider` and `pension_insurance_number` uncondition
 neither — the form demands a Rentenversicherungsnummer that cannot exist. Sabine and Helmut
 both come back submittable, so this is specific to his case, not a seeding failure.
 
-**The middleware only fills the main `antrag_grundsicherung` form.** 
+**The middleware only fills the main `antrag_grundsicherung_im_alter` form.** 
 `schemas/pdfs/` has the real attachments:
 Anlage 1 (Unterhalt/maintenance), Anlage 2 (Ausländer/Asylbewerber),
 Anlage 3 (Grundvermögen/real estate assets), Anlage 6 (Mietschulden/rent arrears). 
