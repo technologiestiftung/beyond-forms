@@ -14,7 +14,6 @@ import { ApplicationCard } from "./ApplicationCard";
 import { SimpleApplicationCard } from "./SimpleApplicationCard";
 import profileIllustration from "../../assets/illustrations/profile.svg";
 import { DEFAULT_LOCALE } from "../../constants/locale";
-import { DashboardTutorials } from "./DashboardTutorials";
 
 function applicationCardStatusForMilestone(
 	milestoneLevel?: number,
@@ -38,16 +37,6 @@ export const DashboardView: React.FC = () => {
 		isError: isProfileError,
 		refetch,
 	} = useProfile();
-	const {
-		tutorials,
-		isLoading: isTutorialsLoading,
-		fetchTutorials,
-	} = useTutorialStore();
-
-	useEffect(() => {
-		void fetchTutorials();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
 
 	const [hasCompletedOnboarding] = React.useState(() => {
 		if (typeof window === "undefined") {
@@ -73,7 +62,7 @@ export const DashboardView: React.FC = () => {
 		}
 	}, [milestoneLevel, setMilestoneLevel]);
 
-	if (isProfileLoading || isTutorialsLoading) {
+	if (isProfileLoading) {
 		return <DashboardSkeleton />;
 	}
 
