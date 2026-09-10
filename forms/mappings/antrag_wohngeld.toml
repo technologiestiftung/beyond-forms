@@ -1215,7 +1215,7 @@ value = "{{ professional_expenses == 0 ? true : '' }}"
 ["p7_mz1.3-cb_freibwerbja"]
 type = "checkbox"
 description = "Ja "
-value = false
+value = "{{ professional_expenses ? true : false }}"
 
 ["p7_mz1.3-et_freibwerbhhm1familienname"]
 type = "string"
@@ -1385,7 +1385,7 @@ value = "{{ documents.alimony_proof ? documents.alimony_proof.recipient_name : '
 ["p7_mz1.3-et__freibunterhhhm1fürvorname"]
 type = "string"
 description = "Vorname(n)"
-value = "{{ household_members[0] && household_members[0].first_name ? household_members[0].first_name : '' }}"
+value = ""
 
 ["p8_mz1.3-da_unterhhhm1fürgeburtsdatum"]
 type = "string"
@@ -1420,12 +1420,12 @@ value = ""
 ["p8_mz1.3-et__freibunterhfürhhm2fürfamilienname"]
 type = "string"
 description = "Familienname"
-value = "{{ household_members[1] && household_members[1].last_name ? household_members[1].last_name : '' }}"
+value = "{{ documents.alimony_proof ? documents.alimony_proof.recipient_name : '' }}"
 
 ["p8_mz1.3-et__freibunterhfürhhm2fürvorname"]
 type = "string"
 description = "Vorname(n)"
-value = "{{ household_members[1] && household_members[1].first_name ? household_members[1].first_name : '' }}"
+value = ""
 
 ["p8_mz1.3-da_unterhfürhhm2geburtsdatum"]
 type = "string"
