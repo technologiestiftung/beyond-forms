@@ -74,7 +74,7 @@ Always use `uv run` to execute benchmark evaluation runs from the project reposi
 ```bash
 uv run forms/scripts/llm-eval/evaluate.py \
   --models gemini-3.5-flash \
-  --form antrag_grunsicherung \
+  --form antrag_grundsicherung_im_alter \
   --prompt rich_schema \
   --chunk-size 100
 ```
@@ -86,7 +86,7 @@ To benchmark Gemini against Gemma side-by-side:
 ```bash
 uv run forms/scripts/llm-eval/evaluate.py \
   --models gemini-3.5-flash litert-community/gemma-4-E2B-it-litert-lm \
-  --form antrag_grunsicherung \
+  --form antrag_grundsicherung_im_alter \
   --prompt rich_schema \
   --chunk-size 100
 ```
@@ -98,7 +98,7 @@ To ensure that expressions are functionally equivalent and not just getting fals
 ```bash
 uv run forms/scripts/llm-eval/evaluate.py \
   --models gemini-3.5-flash \
-  --form antrag_grunsicherung \
+  --form antrag_grundsicherung_im_alter \
   --chunk-size 100
 ```
 
