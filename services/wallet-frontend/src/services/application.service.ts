@@ -7,6 +7,8 @@ import {
 import type { PartialBenefitCheckAnswers } from "../schemas/benefitCheck.schema";
 import { authenticatedFetch } from "../utils/apiClient";
 import { env } from "../config/env.config";
+import { mergeChildren } from "./associatedPersons";
+import type { AssociatedPersonRow } from "./associatedPersons";
 
 export interface SyncResponse {
 	success: boolean;
@@ -40,8 +42,9 @@ const ABILITY_TO_WORK_BY_CAPACITY: Record<WorkCapacity, string> = {
  * exist separately and a warm rent cannot be split back into them without inventing
  * numbers.
  *
- * TEIL C: children are not turned into associated_persons here. The endpoint replaces
- * that collection wholesale, so it needs a deliberate merge rule.
+ * Children are deliberately absent from this function. They need the profile's current
+ * collection to merge against, which makes the step asynchronous; syncGuestData handles
+ * it so this mapper stays pure and directly testable.
  */
 export const mapEligibilityToProfilePayload = (
 	answers: PartialBenefitCheckAnswers,
@@ -100,6 +103,40 @@ export const mapEligibilityToProfilePayload = (
 	return payload;
 };
 
+/**
+ * Reads the profile's current `associated_persons`.
+ *
+ * A raw GET rather than profileService.getProfile(): the frontend Profile type has no
+ * associatedPersons field, so mapProfileToFrontend drops the collection. Extending
+ * ProfileSchema was rejected — mapProfileToBackend flattens every section into the
+ * payload, so any profile save would then replace the collection, and a stale frontend
+ * copy could silently wipe someone's household.
+ *
+ * Returns null when the profile cannot be read, which the caller treats as "leave the
+ * children out" rather than "there are none".
+ */
+const readAssociatedPersons = async (): Promise<
+	AssociatedPersonRow[] | null
+> => {
+	try {
+		const response = await authenticatedFetch(`${env.VITE_API_URL}/profile`, {
+			method: "GET",
+			credentials: "include",
+		});
+		if (!response.ok) {
+			return null;
+		}
+		const data = (await response.json()) as {
+			associated_persons?: unknown;
+		};
+		return Array.isArray(data.associated_persons)
+			? (data.associated_persons as AssociatedPersonRow[])
+			: [];
+	} catch {
+		return null;
+	}
+};
+
 export const applicationService = {
 	async syncGuestData(
 		answers: PartialBenefitCheckAnswers,
@@ -110,6 +147,20 @@ export const applicationService = {
 		const payload = mapEligibilityToProfilePayload(answers);
 		if (Object.keys(payload).length === 0) {
 			return { success: true };
+		}
+
+		/**
+		 * Only with at least one child. The questionnaire writes `children: []` by itself
+		 * for a childless household, so merging on an empty list would let the answer
+		 * "I live alone" delete children already recorded in the profile.
+		 */
+		if (answers.children !== undefined && answers.children.length > 0) {
+			const existing = await readAssociatedPersons();
+			if (existing !== null) {
+				payload.associated_persons = mergeChildren(existing, answers.children);
+			}
+			// GAP: the read failed. The children are left out and everything else is
+			// still sent, so the worst case is the state before this merge existed.
 		}
 
 		try {
