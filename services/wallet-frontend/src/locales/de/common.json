@@ -15,7 +15,9 @@
 	"nav": {
 		"dashboard": "Anträge",
 		"chat": "Chat",
-		"my_account": "Profil"
+		"my_account": "Profil",
+		"logged_in": "Angemeldet",
+		"logout": "Abmelden"
 	},
 	"save_next": "Speichern und weiter",
 	"save_close": "Speichern und schließen",

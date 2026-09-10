@@ -7,6 +7,7 @@ import { PageContainer } from "../../components/Layout/PageContainer";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useProfileStore } from "../../store/useProfileStore";
 import { profileService } from "../../services/profile";
+import { useLogout, clearSessionAndStorage } from "../../hooks/useLogout";
 
 export const SettingsView: React.FC = () => {
 	const navigate = useNavigate();
@@ -15,6 +16,7 @@ export const SettingsView: React.FC = () => {
 	const logout = useAuthStore((s) => s.logout);
 	const phoneNumber = useAuthStore((s) => s.phoneNumber);
 	const resetProfileStore = useProfileStore((s) => s.reset);
+	const handleLogout = useLogout();
 
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -22,32 +24,6 @@ export const SettingsView: React.FC = () => {
 
 	const handleCancelOrBack = () => {
 		navigate(AppRoutes.Profile);
-	};
-
-	const clearSessionAndStorage = () => {
-		const keysToPurge = [
-			"beyond-forms-profile-ui",
-			"beyond-forms-preferences",
-			"beyond-forms-chat",
-			"beyond-forms-tutorial-session",
-			"beyond-forms-auth-session",
-			"beyond-forms-wallet-session",
-		];
-		keysToPurge.forEach((key) => {
-			localStorage.removeItem(key);
-			sessionStorage.removeItem(key);
-		});
-	};
-
-	const handleDeepLogout = async () => {
-		try {
-			resetProfileStore();
-			await logout();
-		} catch (e) {
-			console.error("Deep logout failed:", e);
-		}
-		clearSessionAndStorage();
-		navigate(AppRoutes.Home);
 	};
 
 	const handleDeepDeleteAccount = async () => {
@@ -125,8 +101,8 @@ export const SettingsView: React.FC = () => {
 			<div className="flex flex-col gap-3 w-full max-w-md">
 				<button
 					type="button"
-					onClick={handleDeepLogout}
-					className="w-full h-14 bg-white border border-slate-200 text-slate-800 font-bold text-base rounded-2xl shadow-sm flex items-center px-5 justify-between hover:bg-slate-50 active:scale-98 focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all"
+					onClick={() => void handleLogout()}
+					className="w-full h-14 bg-white border border-slate-200 text-slate-800 font-bold text-base rounded-2xl shadow-sm flex items-center px-5 justify-between hover:bg-slate-50 active:scale-98 focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all lg:hidden"
 				>
 					<div className="flex items-center space-x-3">
 						<LogOut className="w-5 h-5 text-slate-500" />
