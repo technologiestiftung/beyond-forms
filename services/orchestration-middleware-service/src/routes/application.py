@@ -76,6 +76,7 @@ async def evaluate_wizard_endpoint(
 @router.post("/ensure")
 def ensure_application(
     current_user: AuthUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
     user_service: UserService = Depends(get_user_service),
 ):
     """
@@ -85,6 +86,7 @@ def ensure_application(
     """
     internal_user_id = user_service.get_internal_user_id(current_user.user_name)
     _, application_id = user_service.get_or_create_user_application(internal_user_id, GENERIC_DOCUMENTS_FORM_TYPE)
+    db.commit()
     return {"application_id": str(application_id)}
 
 
