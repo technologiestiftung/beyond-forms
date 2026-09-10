@@ -1,8 +1,8 @@
 ALTER TABLE users
-    ADD COLUMN monthly_expenses_total money_nonneg;
+    ADD COLUMN IF NOT EXISTS monthly_expenses_total money_nonneg;
 
 ALTER TABLE associated_persons
-    ADD COLUMN monthly_expenses_total money_nonneg;
+    ADD COLUMN IF NOT EXISTS monthly_expenses_total money_nonneg;
 
 
 CREATE OR REPLACE FUNCTION recompute_monthly_expenses_total(p_user_id UUID, p_person_id UUID)
@@ -12,6 +12,7 @@ BEGIN
         IF p_user_id IS NULL THEN
             RETURN;
         END IF;
+        PERFORM 1 FROM users WHERE id = p_user_id FOR NO KEY UPDATE;
         UPDATE users AS u
         SET monthly_expenses_total = totals.sum_amount
         FROM (
