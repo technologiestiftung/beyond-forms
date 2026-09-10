@@ -220,7 +220,11 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
     income_rows: list = []
     entries = getattr(db_user, "income_entries", None)
     if entries is not None and not isinstance(entries, Mock):
-        income_rows = [row for row in entries if hasattr(row, "income_type")]
+        income_rows = [
+            row
+            for row in entries
+            if hasattr(row, "income_type") and getattr(row, "person_id", None) is None
+        ]
 
     has_permanent_reduction = getattr(db_user, "has_permanent_reduction_in_earning_capacity", None)
     if isinstance(has_permanent_reduction, Mock):
