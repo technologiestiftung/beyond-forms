@@ -43,7 +43,7 @@ fi
     echo ""
 
     echo "$RESPONSE" | jq -c '.fields[]' | while read -r field; do
-        ID=$(echo "$field" | jq -r '.id')
+        ID_TOML=$(echo "$field" | jq '.id')
         TYPE=$(echo "$field" | jq -r '.type')
         DESC_TOML=$(echo "$field" | jq '.description')
         OPTIONS_TOML=$(echo "$field" | jq '.options')
@@ -57,7 +57,7 @@ fi
             DEFAULT_VAL="false"
         fi
 
-        echo "[\"$ID\"]"
+        echo "[$ID_TOML]"
         echo "type = \"$TYPE\""
         if [ "$DESC_TOML" != "null" ]; then
             echo "description = $DESC_TOML"
