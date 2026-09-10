@@ -7,7 +7,8 @@ import { useProfileStore } from "../../store/useProfileStore";
 const { mockProfileReturn } = vi.hoisted(() => ({
 	mockProfileReturn: {
 		profileData: { personalData: { firstName: "Jane" } } as
-			{ personalData: { firstName: string } } | undefined,
+			| { personalData: { firstName: string } }
+			| undefined,
 		milestoneLevel: 0,
 		isLoading: false,
 		isError: false,
@@ -93,9 +94,9 @@ describe("DashboardView", () => {
 				"Starte mit Deinem Antrag. Klaro zeigt Dir Schritt-für-Schritt, was wichtig ist.",
 			),
 		).toBeInTheDocument();
-		expect(
-			screen.getByRole("button", { name: "Fortfahren" }),
-		).toBeInTheDocument();
+		expect(screen.getByTestId("lets-go-button")).toHaveTextContent(
+			"Antrag generieren",
+		);
 		expect(screen.getByTestId("language-switcher")).toBeInTheDocument();
 
 		expect(
@@ -106,7 +107,7 @@ describe("DashboardView", () => {
 		).toBeInTheDocument();
 		expect(
 			screen.getAllByRole("button", { name: "Antrag generieren" }),
-		).toHaveLength(2);
+		).toHaveLength(3);
 	});
 
 	it("renders anonymous greeting when firstName is empty or whitespace", async () => {

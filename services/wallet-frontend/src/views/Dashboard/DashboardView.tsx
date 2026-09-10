@@ -6,15 +6,12 @@ import {
 	MAX_MILESTONE_LEVEL,
 	useProfileStore,
 } from "../../store/useProfileStore";
-import { useTutorialStore } from "../../store/useTutorialStore";
 import { DashboardSkeleton } from "./DashboardSkeleton";
 import { PageContainer } from "../../components/Layout/PageContainer";
 import { PrimaryButton } from "../../components/ui/PrimaryButton";
 import { ApplicationCard } from "./ApplicationCard";
 import { SimpleApplicationCard } from "./SimpleApplicationCard";
 import profileIllustration from "../../assets/illustrations/profile.svg";
-import { DEFAULT_LOCALE } from "../../constants/locale";
-import { DashboardTutorials } from "./DashboardTutorials";
 
 function applicationCardStatusForMilestone(
 	milestoneLevel?: number,
@@ -29,7 +26,7 @@ function applicationCardStatusForMilestone(
 }
 
 export const DashboardView: React.FC = () => {
-	const { i18n, t } = useTranslation("dashboard");
+	const { t } = useTranslation("dashboard");
 
 	const {
 		profileData,
@@ -38,16 +35,6 @@ export const DashboardView: React.FC = () => {
 		isError: isProfileError,
 		refetch,
 	} = useProfile();
-	const {
-		tutorials,
-		isLoading: isTutorialsLoading,
-		fetchTutorials,
-	} = useTutorialStore();
-
-	useEffect(() => {
-		void fetchTutorials();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
 
 	const [hasCompletedOnboarding] = React.useState(() => {
 		if (typeof window === "undefined") {
@@ -73,7 +60,7 @@ export const DashboardView: React.FC = () => {
 		}
 	}, [milestoneLevel, setMilestoneLevel]);
 
-	if (isProfileLoading || isTutorialsLoading) {
+	if (isProfileLoading) {
 		return <DashboardSkeleton />;
 	}
 
@@ -98,7 +85,6 @@ export const DashboardView: React.FC = () => {
 		);
 	}
 
-	const activeLanguage = i18n.language || DEFAULT_LOCALE;
 	const trimmedFirstName = profileData?.personalData?.firstName?.trim() ?? "";
 
 	const greetingHeadline = trimmedFirstName
@@ -108,18 +94,22 @@ export const DashboardView: React.FC = () => {
 	return (
 		<PageContainer
 			bgColor="brand-bg"
-			topBarProps={{ showLanguageSwitcher: true }}
+			topBarProps={{
+				showLanguageSwitcher: true,
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
+			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
 		>
-			<div className="flex flex-col items-start max-w-md w-full min-w-0 gap-6">
-				<div className="flex flex-col items-start gap-4 w-full min-w-0">
+			<div className="flex flex-col items-start max-w-md w-full min-w-0 gap-6 lg:max-w-none lg:gap-8">
+				<div className="flex flex-col items-start gap-4 w-full min-w-0 lg:gap-6">
 					<div className="flex flex-row items-center gap-4 w-full min-w-0">
 						<img
 							src={profileIllustration}
 							alt=""
-							className="size-11 shrink-0 rounded-full bg-white"
+							className="size-11 shrink-0 rounded-full bg-white lg:size-13"
 							aria-hidden
 						/>
-						<h1 className="text-h1 font-bold text-brand-black min-w-0 wrap-break-word">
+						<h1 className="text-h1 font-bold text-brand-black min-w-0 wrap-break-word lg:text-[32px] lg:leading-10">
 							{greetingHeadline}
 						</h1>
 					</div>
@@ -129,36 +119,33 @@ export const DashboardView: React.FC = () => {
 					</p>
 				</div>
 
-				<ApplicationCard status={appCardStatus} level={milestoneLevel} />
+				<div className="flex flex-col gap-6 w-full min-w-0 lg:grid lg:grid-cols-[repeat(auto-fit,minmax(288px,1fr))] lg:gap-5">
+					<ApplicationCard status={appCardStatus} level={milestoneLevel} />
 
-				<SimpleApplicationCard
-					title={t(
-						"sections.applications.parking_permit.title",
-						"Bewohnerparkausweis",
-					)}
-					description={t(
-						"sections.applications.parking_permit.description",
-						"Beantrage Deinen Bewohnerparkausweis direkt mit Deinen hinterlegten Angaben.",
-					)}
-					formType="antrag_bewohnerparkausweis"
-				/>
+					<SimpleApplicationCard
+						title={t(
+							"sections.applications.parking_permit.title",
+							"Bewohnerparkausweis",
+						)}
+						description={t(
+							"sections.applications.parking_permit.description",
+							"Beantrage Deinen Bewohnerparkausweis direkt mit Deinen hinterlegten Angaben.",
+						)}
+						formType="antrag_bewohnerparkausweis"
+					/>
 
-				<SimpleApplicationCard
-					title={t(
-						"sections.applications.housing_allowance.title",
-						"Wohngeld",
-					)}
-					description={t(
-						"sections.applications.housing_allowance.description",
-						"Beantrage Wohngeld für Deine Miete direkt mit Deinen hinterlegten Angaben.",
-					)}
-					formType="antrag_wohngeld"
-				/>
-
-				<DashboardTutorials
-					tutorials={tutorials}
-					activeLanguage={activeLanguage}
-				/>
+					<SimpleApplicationCard
+						title={t(
+							"sections.applications.housing_allowance.title",
+							"Wohngeld",
+						)}
+						description={t(
+							"sections.applications.housing_allowance.description",
+							"Beantrage Wohngeld für Deine Miete direkt mit Deinen hinterlegten Angaben.",
+						)}
+						formType="antrag_wohngeld"
+					/>
+				</div>
 
 				{/*
 				Commented out for now as we don't have an emergency info panel yet

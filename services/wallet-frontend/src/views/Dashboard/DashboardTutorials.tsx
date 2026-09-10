@@ -28,7 +28,7 @@ export const DashboardTutorials: React.FC<DashboardTutorialsProps> = ({
 	const { t } = useTranslation("dashboard");
 
 	return (
-		<div className="grid grid-cols-1 xs:grid-cols-2 gap-4 w-full text-white">
+		<div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 w-full text-white">
 			{tutorials.filter(isTutorialValid).map((tutorial) => {
 				const isCompleted = tutorial.progress?.status === "completed";
 				const titleText =

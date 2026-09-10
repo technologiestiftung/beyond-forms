@@ -96,7 +96,7 @@ export const MainNavigation: React.FC = () => {
 					<NavItem
 						to={dashboardPath}
 						testId="applications-link"
-						icon={<Icons.WalletIcon className="size-full" />}
+						icon={<Icons.LayersIcon className="size-full" />}
 						label={dashboardLabel}
 						isActive={dashboardActive}
 						showNotificationDot={hasNotifications}
