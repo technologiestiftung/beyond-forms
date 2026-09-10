@@ -48,7 +48,7 @@ AcroForm IDs extracted directly from PDF binary stores frequently contain PDFDoc
 
 ### Model choice for `generate_mapping.py` (2026-09-09)
 
-Each candidate filled all 409 fields of `antrag_grundsicherung.toml` from scratch, same prompt (`rich_schema_documents`), same schema context including the `derived_context` namespace. "Agreement" is how many of the 111 values the reviewed mapping already held the model reproduced or wrote an equivalent of, evaluated across both profiles in `profiles/`. "Crashes" counts expressions that raise on either the populated or the empty stand-in context.
+Each candidate filled all 409 fields of `antrag_grundsicherung_im_alter.toml` from scratch, same prompt (`rich_schema_documents`), same schema context including the `derived_context` namespace. "Agreement" is how many of the 111 values the reviewed mapping already held the model reproduced or wrote an equivalent of, evaluated across both profiles in `profiles/`. "Crashes" counts expressions that raise on either the populated or the empty stand-in context.
 
 | Model                    | Fields mapped | Agreement (of 111) | Reaches person namespace | Crashing expressions |
 | :----------------------- | ------------: | -----------------: | -----------------------: | -------------------: |
@@ -123,8 +123,8 @@ uv run forms/scripts/llm-eval/evaluate.py \
 `evaluate.py`'s schema context always includes the `documents` namespace (OCR fields per document type) unless `--no-documents` is passed, which reproduces the exact schema shape behind the recorded 86.3% figure above. To A/B whether adding the `documents` namespace helps or hurts a given prompt/model:
 
 ```bash
-uv run forms/scripts/llm-eval/evaluate.py --form antrag_grundsicherung --prompt rich_schema_documents --models gemini-3.5-flash
-uv run forms/scripts/llm-eval/evaluate.py --form antrag_grundsicherung --prompt rich_schema_documents --models gemini-3.5-flash --no-documents
+uv run forms/scripts/llm-eval/evaluate.py --form antrag_grundsicherung_im_alter --prompt rich_schema_documents --models gemini-3.5-flash
+uv run forms/scripts/llm-eval/evaluate.py --form antrag_grundsicherung_im_alter --prompt rich_schema_documents --models gemini-3.5-flash --no-documents
 ```
 
 ---

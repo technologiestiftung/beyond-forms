@@ -98,7 +98,7 @@ async function fetchGrundsicherungExport(): Promise<ExportUrls> {
 	}
 
 	const response = await authenticatedFetch(
-		`${env.VITE_API_URL}/export/antrag_grundsicherung`,
+		`${env.VITE_API_URL}/export/antrag_grundsicherung_im_alter`,
 	);
 	if (!response.ok) {
 		throw new Error(`Failed to generate PDF: ${response.statusText}`);
@@ -490,7 +490,7 @@ export const ApplicationOverview: React.FC = () => {
 					}}
 					pdfUrl={pdfUrl}
 					downloadUrl={exportUrls?.signed_download_url ?? null}
-					downloadFilename="antrag_grundsicherung.pdf"
+					downloadFilename="antrag_grundsicherung_im_alter.pdf"
 					downloadButtonTestId="download-pdf-button"
 					onDownloadSuccess={() => {
 						setShowPreviewModal(false);

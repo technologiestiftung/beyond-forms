@@ -135,9 +135,9 @@ def test_resolve_choice_value_maps_unicode_to_pdf_literal_option():
 
 
 def test_fill_grunsicherung_bezirksamt_sets_option_index():
-    pdf_path = os.path.join(os.path.dirname(__file__), "../../../../forms/pdfs/antrag_grundsicherung.pdf")
+    pdf_path = os.path.join(os.path.dirname(__file__), "../../../../forms/pdfs/antrag_grundsicherung_im_alter.pdf")
     if not os.path.exists(pdf_path):
-        pytest.skip("antrag_grundsicherung.pdf not available")
+        pytest.skip("antrag_grundsicherung_im_alter.pdf not available")
 
     with open(pdf_path, "rb") as f:
         pdf_bytes = f.read()

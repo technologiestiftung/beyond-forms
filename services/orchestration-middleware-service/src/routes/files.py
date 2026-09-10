@@ -151,7 +151,7 @@ def save_file_to_database(
     # form the documents flow is built around. Other form_types are created
     # explicitly (seed, or a future per-form start).
     _, application_id = user_service.get_or_create_user_application(
-        internal_user_id, form_type="antrag_grundsicherung"
+        internal_user_id, form_type="antrag_grundsicherung_im_alter"
     )
 
     new_doc = UserDocuments(

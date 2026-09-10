@@ -178,7 +178,7 @@ class BeyondFormsCitizen(HttpUser):
         Calls the authentic GET /export/{form_type} route, validating that the
         LRU FormAssetCacheManager handles concurrent fills without filesystem stampedes.
         """
-        form_type = "antrag_grundsicherung"
+        form_type = "antrag_grundsicherung_im_alter"
         with self.client.get(f"/export/{form_type}", headers=self.headers, catch_response=True) as response:
             if response.status_code != 200:
                 response.failure(

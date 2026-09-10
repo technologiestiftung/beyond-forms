@@ -68,12 +68,12 @@ def test_get_or_create_user_application_creates_with_the_requested_form_type():
     user_id = uuid.uuid4()
     db.query.return_value.filter.return_value.first.return_value = None
 
-    _, application_id = UserService(db).get_or_create_user_application(user_id, "antrag_grundsicherung")
+    _, application_id = UserService(db).get_or_create_user_application(user_id, "antrag_grundsicherung_im_alter")
 
     db.add.assert_called_once()
     created = db.add.call_args.args[0]
     assert isinstance(created, UserApplications)
     assert created.fk_user_id == user_id
-    assert created.form_type == "antrag_grundsicherung"
+    assert created.form_type == "antrag_grundsicherung_im_alter"
     assert created.application_id == application_id
     db.flush.assert_called_once()

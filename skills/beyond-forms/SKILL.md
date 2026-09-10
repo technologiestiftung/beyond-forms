@@ -77,7 +77,7 @@ These are the only documents safe to upload — invented people, committed to a 
 
 ```bash
 BF=https://raw.githubusercontent.com/technologiestiftung/beyond-forms/main
-curl -sLO "$BF/forms/pdfs/antrag_grundsicherung.pdf"                # the official 24-page application
+curl -sLO "$BF/forms/pdfs/antrag_grundsicherung_im_alter.pdf"                # the official 24-page application
 curl -sL -o rentenbescheid.pdf \
   "$BF/demo/exports/helmut/documents/verified_pension_notice_Rentenbescheid_Helmut_Klar.pdf"
 curl -sL -o mietvertrag.pdf \
@@ -143,7 +143,7 @@ Failures come back as HTTP 422 with a `validation_errors` array naming the field
 Both endpoints take the PDF base64-encoded inside JSON. Write the base64 to a file and pass it with `jq --rawfile`.
 
 ```bash
-base64 < antrag_grundsicherung.pdf | tr -d '\n' > form.b64
+base64 < antrag_grundsicherung_im_alter.pdf | tr -d '\n' > form.b64
 
 # 1. What fields does it have? (this form: 409)
 jq -n --rawfile p form.b64 '{pdf_base64:$p}' > req.json
@@ -200,7 +200,7 @@ Then read the record (Helmut is already filled in):
 ```bash
 curl -s "$API/profile" -H "$H" | jq                       # the whole profile
 curl -s "$API/files" -H "$H" | jq -c '[.[]|{document_type,status}]'
-curl -s "$API/export/antrag_grundsicherung" -H "$H" | jq  # filled PDF as a signed URL (60s)
+curl -s "$API/export/antrag_grundsicherung_im_alter" -H "$H" | jq  # filled PDF as a signed URL (60s)
 
 DOC=$(curl -s "$API/files" -H "$H" | jq -r '.[0].document_id')
 curl -s "$API/api/v1/documents/$DOC/extractions" -H "$H" | jq
@@ -293,11 +293,11 @@ curl -s -X POST "$API/profile" -H "$H" -H 'Content-Type: application/json' \
        "zip_code":"12345","city":"Berlin","rent_total":999.42}'
 
 curl -s "$API/profile" -H "$H" | jq                        # confirm what was stored
-URL=$(curl -s "$API/export/antrag_grundsicherung" -H "$H" | jq -r .signed_open_url)
+URL=$(curl -s "$API/export/antrag_grundsicherung_im_alter" -H "$H" | jq -r .signed_open_url)
 curl -sL "$URL" -o antrag.pdf                              # the filled 24-page application
 ```
 
-Values reach the PDF through `forms/mappings/antrag_grundsicherung.toml` in the repo, which maps each AcroForm field to a JEXL expression over the profile — e.g. `value = "{{ first_name }} {{ last_name }}"`. Read it when you need to know which profile key drives a given box on the form, or why one stayed blank. A profile carrying only the fields above fills roughly 57 of the form's 409 fields; the rest need the rest of the profile.
+Values reach the PDF through `forms/mappings/antrag_grundsicherung_im_alter.toml` in the repo, which maps each AcroForm field to a JEXL expression over the profile — e.g. `value = "{{ first_name }} {{ last_name }}"`. Read it when you need to know which profile key drives a given box on the form, or why one stayed blank. A profile carrying only the fields above fills roughly 57 of the form's 409 fields; the rest need the rest of the profile.
 
 ## Everything else
 

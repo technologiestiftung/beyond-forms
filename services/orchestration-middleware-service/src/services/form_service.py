@@ -265,7 +265,7 @@ class FormService:
         application's `form_data`. Falls back to the user's most recently updated
         application when no row has this exact `form_type` — older accounts were
         written with form_type="grundsicherung" while exports ask for
-        "antrag_grundsicherung".
+        "antrag_grundsicherung_im_alter".
 
         Does not include the `documents` namespace; `fill_form` layers that on top
         using the returned application, since it's the only caller that needs it.

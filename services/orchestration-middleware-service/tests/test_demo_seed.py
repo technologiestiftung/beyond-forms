@@ -157,9 +157,9 @@ def test_list_personas_returns_the_whole_file(service):
 
     assert helmut["profile"]["monthly_income"] == 650.00
     assert helmut["profile"]["iban"] == "DE65940594210000123456"
-    assert helmut["applications"][0]["form_type"] == "antrag_grundsicherung"
+    assert helmut["applications"][0]["form_type"] == "antrag_grundsicherung_im_alter"
     assert {a["form_type"] for a in helmut["applications"]} == {
-        "antrag_grundsicherung",
+        "antrag_grundsicherung_im_alter",
         "antrag_wohngeld",
         "antrag_bewohnerparkausweis",
     }
@@ -275,7 +275,7 @@ def test_seed_gives_each_applications_entry_its_own_row():
     persona = {
         "profile": {},
         "applications": [
-            {"form_type": "antrag_grundsicherung", "status": "in_progress", "form_data": {}},
+            {"form_type": "antrag_grundsicherung_im_alter", "status": "in_progress", "form_data": {}},
             {
                 "form_type": "antrag_wohngeld",
                 "status": "in_progress",
@@ -301,7 +301,7 @@ def test_seed_gives_each_applications_entry_its_own_row():
         service.seed(internal_user_id, "helmut", reset=False)
 
     assert [form_type for form_type, _ in created] == [
-        "antrag_grundsicherung",
+        "antrag_grundsicherung_im_alter",
         "antrag_wohngeld",
         "antrag_bewohnerparkausweis",
     ]
