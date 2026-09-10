@@ -9,11 +9,14 @@ from sqlalchemy.orm import Session
 
 from src.db import get_db
 from src.models import Users as DbUser, UserApplications as DbApplication, UserDocuments, DocumentStatusType
+from src.services.user_service import UserService, get_user_service
 from src.utils import get_google_id_token
 
 logger = logging.getLogger(__name__)
 
 ENDPOINT_RULES_ENGINE = os.environ.get("ENDPOINT_RULES_ENGINE", "http://rules-engine:8080")
+
+GENERIC_DOCUMENTS_FORM_TYPE = "profile_documents"
 
 
 MVP_SECTIONS = [
@@ -68,6 +71,21 @@ async def evaluate_wizard_endpoint(
     except Exception as e:
         logger.exception("Error calling downstream rules engine evaluate:")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/ensure")
+def ensure_application(
+    current_user: AuthUser = Depends(require_authenticated_user),
+    user_service: UserService = Depends(get_user_service),
+):
+    """
+    Gets or creates the caller's generic (not-yet-form-specific) application, returning its
+    id so the frontend can attach subsequently uploaded documents to it before the citizen
+    has picked or started a specific form.
+    """
+    internal_user_id = user_service.get_internal_user_id(current_user.user_name)
+    _, application_id = user_service.get_or_create_user_application(internal_user_id, GENERIC_DOCUMENTS_FORM_TYPE)
+    return {"application_id": str(application_id)}
 
 
 @router.get("/{application_id}/status")

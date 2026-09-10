@@ -119,62 +119,62 @@ value = "{{ documents.bank_details && documents.bank_details.account_holder ? do
 ["p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile1[0].zelle1[0]"]
 type = "string"
 description = "Name und Vorname des Kinder, für das Kinderzuschlag beantragt wird."
-value = "{{ household_members[0] ? household_members[0].last_name + ', ' + household_members[0].first_name : '' }}"
+value = "{{ household_children[0] ? household_children[0].last_name + ', ' + household_children[0].first_name : '' }}"
 
 ["p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile1[0].zelle2[0]"]
 type = "string"
 description = "Geburtsdatum des Kinder, für das Kinderzuschlag beantragt wird."
-value = "{{ household_members[0] && household_members[0].date_of_birth ? household_members[0].date_of_birth : '' }}"
+value = "{{ household_children[0] && household_children[0].date_of_birth ? household_children[0].date_of_birth : '' }}"
 
 ["p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile2[0].zelle1[0]"]
 type = "string"
 description = "Zelle1"
-value = "{{ household_members[1] ? household_members[1].last_name + ', ' + household_members[1].first_name : '' }}"
+value = "{{ household_children[1] ? household_children[1].last_name + ', ' + household_children[1].first_name : '' }}"
 
 ["p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile2[0].zelle2[0]"]
 type = "string"
 description = "Geburtsdatum des Kinder, für das Kinderzuschlag beantragt wird."
-value = "{{ household_members[1] && household_members[1].date_of_birth ? household_members[1].date_of_birth : '' }}"
+value = "{{ household_children[1] && household_children[1].date_of_birth ? household_children[1].date_of_birth : '' }}"
 
 ["p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile3[0].zelle1[0]"]
 type = "string"
 description = "Name und Vorname des Kinder, für das Kinderzuschlag beantragt wird."
-value = "{{ household_members[2] ? household_members[2].last_name + ', ' + household_members[2].first_name : '' }}"
+value = "{{ household_children[2] ? household_children[2].last_name + ', ' + household_children[2].first_name : '' }}"
 
 ["p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile3[0].zelle2[0]"]
 type = "string"
 description = "Geburtsdatum des Kinder, für das Kinderzuschlag beantragt wird."
-value = "{{ household_members[2] && household_members[2].date_of_birth ? household_members[2].date_of_birth : '' }}"
+value = "{{ household_children[2] && household_children[2].date_of_birth ? household_children[2].date_of_birth : '' }}"
 
 ["p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile4[0].zelle1[0]"]
 type = "string"
 description = "Name und Vorname des Kinder, für das Kinderzuschlag beantragt wird."
-value = "{{ household_members[3] ? household_members[3].last_name + ', ' + household_members[3].first_name : '' }}"
+value = "{{ household_children[3] ? household_children[3].last_name + ', ' + household_children[3].first_name : '' }}"
 
 ["p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile4[0].zelle2[0]"]
 type = "string"
 description = "Geburtsdatum des Kinder, für das Kinderzuschlag beantragt wird."
-value = "{{ household_members[3] && household_members[3].date_of_birth ? household_members[3].date_of_birth : '' }}"
+value = "{{ household_children[3] && household_children[3].date_of_birth ? household_children[3].date_of_birth : '' }}"
 
 ["p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile5[0].zelle1[0]"]
 type = "string"
 description = "Name und Vorname des Kinder, für das Kinderzuschlag beantragt wird."
-value = "{{ household_members[4] ? household_members[4].last_name + ', ' + household_members[4].first_name : '' }}"
+value = "{{ household_children[4] ? household_children[4].last_name + ', ' + household_children[4].first_name : '' }}"
 
 ["p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile5[0].zelle2[0]"]
 type = "string"
 description = "Geburtsdatum des Kinder, für das Kinderzuschlag beantragt wird."
-value = "{{ household_members[4] && household_members[4].date_of_birth ? household_members[4].date_of_birth : '' }}"
+value = "{{ household_children[4] && household_children[4].date_of_birth ? household_children[4].date_of_birth : '' }}"
 
 ["p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile6[0].zelle1[0]"]
 type = "string"
 description = "Name und Vorname des Kinder, für das Kinderzuschlag beantragt wird."
-value = "{{ household_members[5] ? household_members[5].last_name + ', ' + household_members[5].first_name : '' }}"
+value = "{{ household_children[5] ? household_children[5].last_name + ', ' + household_children[5].first_name : '' }}"
 
 ["p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile6[0].zelle2[0]"]
 type = "string"
 description = "Geburtsdatum des Kinder, für das Kinderzuschlag beantragt wird."
-value = "{{ household_members[5] && household_members[5].date_of_birth ? household_members[5].date_of_birth : '' }}"
+value = "{{ household_children[5] && household_children[5].date_of_birth ? household_children[5].date_of_birth : '' }}"
 
 ["p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile1[0].zelle1[0]"]
 type = "string"

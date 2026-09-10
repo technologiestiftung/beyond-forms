@@ -57,11 +57,16 @@ def person_context(people: List[AssociatedPersons], money_entries: Iterable[Any]
         people.append(person)
     partners = [person for person in people if person["association_type"] in PARTNER_TYPES]
     household = [person for person in people if person["lives_in_household"]]
+    household_children = [
+        person for person in household if person["association_type"] == AssociationType.CHILD
+    ]
     return {
         "associated_persons": people,
         "household_members": household,
+        "household_children": household_children,
         # pyjexl 0.3 has no length function.
         "household_members_count": len(household),
+        "household_children_count": len(household_children),
         "associated_persons_count": len(people),
         "partner": partners[0] if partners else None,
     }

@@ -124,7 +124,7 @@ value = ""
 ["p2_chbxrvnrvorhanden"]
 type = "checkbox"
 description = "20 - Option 1 von 3 - Machen Sie Angaben zu Ihrer Rentenversicherungsnummer/Sozialversicherungsnummer. - Diese ist vorhanden."
-value = "{{ pension_insurance_no ? true : false }}"
+value = "{{ documents.health_insurance_proof && documents.health_insurance_proof.pension_insurance_number ? true : documents.pension_notice && documents.pension_notice.pension_insurance_number ? true : (pension_insurance_no ? true : false) }}"
 
 ["p2_txtfrvnr"]
 type = "string"
