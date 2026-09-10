@@ -299,10 +299,7 @@ describe("assessHousingBenefit", () => {
 		const result = assessHousingBenefit(RENT_BURDENED, TODAY);
 		expect(result.benefit).toBe(BenefitId.HOUSING_BENEFIT);
 		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
-		expect(result.reasons).toContain(ReasonCode.RENT_BURDEN_HIGH);
-		expect(result.reasons).toContain(
-			ReasonCode.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA,
-		);
+		expect(result.reasons).toEqual([ReasonCode.RENT_BURDEN_HIGH]);
 	});
 
 	it("does not apply while other benefits are received", () => {
@@ -362,10 +359,7 @@ describe("assessChildSupplement", () => {
 		const result = assessChildSupplement(CASE_C, TODAY);
 		expect(result.benefit).toBe(BenefitId.CHILD_SUPPLEMENT);
 		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
-		expect(result.reasons).toContain(ReasonCode.KIZ_MIN_INCOME_MET);
-		expect(result.reasons).toContain(
-			ReasonCode.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA,
-		);
+		expect(result.reasons).toEqual([ReasonCode.KIZ_MIN_INCOME_MET]);
 	});
 
 	it("does not apply without children", () => {

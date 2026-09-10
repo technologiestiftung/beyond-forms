@@ -10,7 +10,9 @@
 
 Der bestehende Eligibility-Check prüft ausschließlich Grundsicherung und liefert ein einzelnes
 Ergebnis (`ELIGIBLE` / `NOT_ELIGIBLE` / `SOZIALAMT`). Er wird durch eine Ersteinschätzung
-ersetzt, die **sechs Sozialleistungen unabhängig voneinander** bewertet.
+ersetzt, die **sechs Sozialleistungen unabhängig voneinander** bewertet. (Seit dem
+Nachtrag vom 2026-09-10 kommt das Bildungs- und Teilhabepaket als abgeleitete siebte
+Leistung hinzu, siehe §7.)
 
 Teil A liefert davon die **reine Logik**: Antwortmodell, Rechtskonstanten, Ableitungsfunktionen,
 sechs Entscheidungsfunktionen, Aggregation. Alles sind pure Funktionen ohne React, ohne
@@ -365,11 +367,33 @@ Hilfsfunktion aus §5 streicht.
 `src/store/benefits/evaluate.ts` ruft alle sechs Funktionen in fester Reihenfolge auf und
 ergänzt die Hinweise aus Fachspec §7:
 
-- `EDUCATION_PARTICIPATION_PACKAGE` — Kinder im Haushalt und mindestens eine der fünf
-  Basisleistungen auf `LIKELY_YES` oder `CHECK_ADVISED`
 - `CHILD_BENEFIT_PREREQUISITE` — Kinder im Haushalt
 - `ASYLUM_BENEFITS_REFERRAL` — `citizenship === "NON_EU"` und
   `hasSecureResidenceStatus === false`
+
+**Nachtrag 2026-09-10:** Das Bildungs- und Teilhabepaket war ursprünglich der Hinweis
+`EDUCATION_PARTICIPATION_PACKAGE` unter der Liste. Als Fließtext ganz unten stand es an
+der unpassendsten Stelle der Seite — es ist eine Leistung wie die anderen, keine Fußnote.
+Es ist jetzt die siebte `BenefitId` und wird in `evaluate.ts` aus den Verdikten der fünf
+Basisleistungen abgeleitet, weil es keine eigene Prüfung hat, sondern an ihnen hängt:
+
+| Lage | Status | Begründung |
+|---|---|---|
+| `children` unbeantwortet | `CHECK_ADVISED` | `INSUFFICIENT_DATA` |
+| keine Kinder | `NOT_APPLICABLE` | `NO_ELIGIBLE_CHILDREN` |
+| bezieht bereits Leistungen | `LIKELY_YES` | `EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT` |
+| eine Basisleistung `LIKELY_YES` | `LIKELY_YES` | `EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT` |
+| eine Basisleistung `CHECK_ADVISED` | `CHECK_ADVISED` | `EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT` |
+| sonst | `LIKELY_NO` | `EDUCATION_PACKAGE_NEEDS_BASE_BENEFIT` |
+
+Die dritte Zeile ist die nicht offensichtliche: `receivesBenefitsAlready` setzt alle fünf
+Basisbewertungen auf `NOT_APPLICABLE`, das Paket fiele sonst auf `LIKELY_NO` — genau
+verkehrt herum, denn wer eine Grundsicherung bezieht, hat es kraft Gesetzes.
+
+Im selben Zug ist `EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA` ersatzlos entfallen. „Wie viel es
+genau wäre, kann nur die zuständige Stelle berechnen" widerspricht dem Versprechen der
+App, dass man den Anspruch hier prüfen kann. An seiner Stelle steht auf jeder
+`CHECK_ADVISED`-Karte der Button „Jetzt Anspruch prüfen".
 
 Der Disclaimer der Fachspec §7 ist **kein** Feld des Ergebnisses, sondern ein i18n-Key, den
 die Ergebnisansicht unabhängig vom Rechenergebnis immer rendert. Er darf nicht davon

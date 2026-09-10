@@ -6,10 +6,24 @@ import {
 	Citizenship,
 	HintCode,
 	HouseholdComposition,
+	ReasonCode,
 	WorkCapacity,
 } from "../../schemas/benefitCheck.schema";
-import type { PartialBenefitCheckAnswers } from "../../schemas/benefitCheck.schema";
+import type {
+	BenefitCheckResult,
+	PartialBenefitCheckAnswers,
+} from "../../schemas/benefitCheck.schema";
 import { evaluateBenefitCheck } from "./evaluate";
+
+const educationPackage = (result: BenefitCheckResult) => {
+	const assessment = result.assessments.find(
+		(a) => a.benefit === BenefitId.EDUCATION_PARTICIPATION_PACKAGE,
+	);
+	if (assessment === undefined) {
+		throw new Error("the education package is missing from the result");
+	}
+	return assessment;
+};
 
 const TODAY = "2026-09-09";
 
@@ -31,7 +45,7 @@ const CASE_C: PartialBenefitCheckAnswers = {
 };
 
 describe("evaluateBenefitCheck", () => {
-	it("always returns all six benefits in a stable order", () => {
+	it("always returns all seven benefits in a stable order", () => {
 		const result = evaluateBenefitCheck({}, TODAY);
 		expect(result.assessments.map((a) => a.benefit)).toEqual([
 			BenefitId.SGB_II_BASIC_INCOME,
@@ -40,6 +54,7 @@ describe("evaluateBenefitCheck", () => {
 			BenefitId.HOUSING_BENEFIT,
 			BenefitId.CHILD_SUPPLEMENT,
 			BenefitId.ADVANCE_MAINTENANCE,
+			BenefitId.EDUCATION_PARTICIPATION_PACKAGE,
 		]);
 	});
 
@@ -62,9 +77,46 @@ describe("evaluateBenefitCheck", () => {
 		expect(live.map((a) => a.benefit)).toContain(BenefitId.HOUSING_BENEFIT);
 	});
 
-	it("hints at the education package when a base benefit is live and children are present", () => {
+	it("carries the education package along when a base benefit is live", () => {
 		const result = evaluateBenefitCheck(CASE_C, TODAY);
-		expect(result.hints).toContain(HintCode.EDUCATION_PARTICIPATION_PACKAGE);
+		expect(educationPackage(result)).toMatchObject({
+			status: BenefitStatus.CHECK_ADVISED,
+			reasons: [ReasonCode.EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT],
+		});
+	});
+
+	it("is as confident about the education package as the strongest base benefit", () => {
+		// Nothing coming in, no savings: SGB II lands on LIKELY_YES, so the package does too.
+		const result = evaluateBenefitCheck(
+			{
+				...CASE_C,
+				isEmployed: false,
+				monthlyGrossIncome: 0,
+				monthlyNetHouseholdIncome: 0,
+			},
+			TODAY,
+		);
+		expect(educationPackage(result).status).toBe(BenefitStatus.LIKELY_YES);
+	});
+
+	it("rules the education package out when no base benefit carries it", () => {
+		const result = evaluateBenefitCheck(
+			{
+				...CASE_C,
+				// Gross below the Kinderzuschlag minimum kills that one; the comfortable
+				// net income and the savings kill the other four.
+				isEmployed: false,
+				monthlyGrossIncome: 0,
+				monthlyNetHouseholdIncome: 4200,
+				monthlyWarmRent: 500,
+				assetsBand: AssetsBand.OVER_25000,
+			},
+			TODAY,
+		);
+		expect(educationPackage(result)).toMatchObject({
+			status: BenefitStatus.LIKELY_NO,
+			reasons: [ReasonCode.EDUCATION_PACKAGE_NEEDS_BASE_BENEFIT],
+		});
 	});
 
 	it("hints at Kindergeld whenever children are present", () => {
@@ -82,9 +134,29 @@ describe("evaluateBenefitCheck", () => {
 			TODAY,
 		);
 		expect(result.hints).not.toContain(HintCode.CHILD_BENEFIT_PREREQUISITE);
-		expect(result.hints).not.toContain(
-			HintCode.EDUCATION_PARTICIPATION_PACKAGE,
+	});
+
+	it("grants the education package to a household already on benefits", () => {
+		const result = evaluateBenefitCheck(
+			{ ...CASE_C, receivesBenefitsAlready: true },
+			TODAY,
 		);
+		expect(educationPackage(result).status).toBe(BenefitStatus.LIKELY_YES);
+	});
+
+	it("sets the education package aside when there are no children", () => {
+		const result = evaluateBenefitCheck(
+			{
+				...CASE_C,
+				householdComposition: HouseholdComposition.SINGLE,
+				children: [],
+			},
+			TODAY,
+		);
+		expect(educationPackage(result)).toMatchObject({
+			status: BenefitStatus.NOT_APPLICABLE,
+			reasons: [ReasonCode.NO_ELIGIBLE_CHILDREN],
+		});
 	});
 
 	it("refers to asylum benefits when the residence status is not secure", () => {

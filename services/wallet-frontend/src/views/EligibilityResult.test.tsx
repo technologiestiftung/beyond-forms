@@ -79,6 +79,7 @@ describe("EligibilityResult", () => {
 			// CHECK_ADVISED, in the engine's own order because the sort is stable
 			`assessment-${BenefitId.HOUSING_BENEFIT}`,
 			`assessment-${BenefitId.CHILD_SUPPLEMENT}`,
+			`assessment-${BenefitId.EDUCATION_PARTICIPATION_PACKAGE}`,
 			// LIKELY_NO
 			`assessment-${BenefitId.SGB_II_BASIC_INCOME}`,
 		]);
@@ -109,14 +110,17 @@ describe("EligibilityResult", () => {
 		).toBeInTheDocument();
 	});
 
-	it("offers an apply button on the likely benefit only", () => {
+	it("offers an action on the decided benefits but not on the rejected one", () => {
 		seed(CASE_C);
 		renderResult();
 		expect(
 			screen.getByTestId(`apply-${BenefitId.ADVANCE_MAINTENANCE}`),
-		).toBeInTheDocument();
+		).toHaveTextContent("result.apply");
 		expect(
-			screen.queryByTestId(`apply-${BenefitId.HOUSING_BENEFIT}`),
+			screen.getByTestId(`apply-${BenefitId.HOUSING_BENEFIT}`),
+		).toHaveTextContent("result.check_now");
+		expect(
+			screen.queryByTestId(`apply-${BenefitId.SGB_II_BASIC_INCOME}`),
 		).toBeNull();
 	});
 

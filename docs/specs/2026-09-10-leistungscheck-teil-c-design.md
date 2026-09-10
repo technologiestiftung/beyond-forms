@@ -31,6 +31,17 @@ das Ergebnis wird lesbar, und die Antworten landen im Profil.
 
 ## 2. Ergebnisansicht
 
+**Nachtrag 2026-09-10:** Die flache Liste unten ist überholt. Die Seite sortiert jetzt
+nach Status — `LIKELY_YES`, `CHECK_ADVISED`, `LIKELY_NO` —, der Sort ist stabil, innerhalb
+einer Gruppe bleibt die Reihenfolge der Engine. `NOT_APPLICABLE` liegt hinter einem
+Aufklapper („N Leistungen betreffen Deine Situation nicht"). Die Begründungen sind
+eingeklappt und öffnen sich per Antippen der Karte, nicht per Hover: auf dem Telefon, für
+das die Ansicht ausgelegt ist, gäbe es sonst keinen Weg zu ihnen. Status trägt ein Symbol
+(Haken / Fragezeichen / X). `LIKELY_YES` bekommt „Jetzt beantragen", `CHECK_ADVISED`
+„Jetzt Anspruch prüfen"; beide Ziele sind noch Platzhalter. Es sind sieben Karten, nicht
+sechs — das Bildungs- und Teilhabepaket ist vom Hinweis zur Leistung geworden
+(Teil-A-Design §7).
+
 Flache Liste, feste Reihenfolge. Die Engine liefert die sechs Bewertungen bereits in
 stabiler Ordnung (`BenefitId`), die Ansicht rendert sie unverändert durch. Kein
 Umsortieren nach Status.

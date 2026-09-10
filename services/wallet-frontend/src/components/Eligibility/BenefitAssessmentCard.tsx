@@ -37,6 +37,16 @@ const STATUS_TONE: Record<BenefitStatus, string> = {
 	[BenefitStatus.NOT_APPLICABLE]: "text-brand-grey",
 };
 
+/**
+ * Green leads to the application, yellow to the check inside the app — being able to
+ * check is what Klaro promises, so an uncertain verdict offers that rather than telling
+ * people only an authority could work it out.
+ */
+const ACTION_LABEL_KEY: Partial<Record<BenefitStatus, string>> = {
+	[BenefitStatus.LIKELY_YES]: "result.apply",
+	[BenefitStatus.CHECK_ADVISED]: "result.check_now",
+};
+
 export const BenefitAssessmentCard: React.FC<BenefitAssessmentCardProps> = ({
 	assessment,
 	applyPath,
@@ -47,7 +57,7 @@ export const BenefitAssessmentCard: React.FC<BenefitAssessmentCardProps> = ({
 
 	const Icon = STATUS_ICON[assessment.status];
 	const isMuted = assessment.status === BenefitStatus.NOT_APPLICABLE;
-	const canApply = assessment.status === BenefitStatus.LIKELY_YES;
+	const actionKey = ACTION_LABEL_KEY[assessment.status];
 	const hasReasons = assessment.reasons.length > 0;
 
 	const header = (
@@ -124,16 +134,16 @@ export const BenefitAssessmentCard: React.FC<BenefitAssessmentCardProps> = ({
 			 *
 			 * TODO: the link is a placeholder. It sends people to account creation, which
 			 * is a real next step but not benefit-specific; later this should deep-link to
-			 * the application for this benefit.
+			 * the check or the application for this benefit.
 			 */}
-			{canApply && (
+			{actionKey && (
 				<div className="px-4 pb-4">
 					<Link
 						to={applyPath}
 						data-testid={`apply-${assessment.benefit}`}
 						className="inline-block rounded-full bg-primary-blue-500 px-4 py-2 text-sm font-bold text-white"
 					>
-						{t("result.apply")}
+						{t(actionKey)}
 					</Link>
 				</div>
 			)}

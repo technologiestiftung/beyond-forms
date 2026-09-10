@@ -335,10 +335,7 @@ export const assessHousingBenefit = (
 		return {
 			benefit,
 			status: BenefitStatus.CHECK_ADVISED,
-			reasons: [
-				ReasonCode.RENT_BURDEN_HIGH,
-				ReasonCode.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA,
-			],
+			reasons: [ReasonCode.RENT_BURDEN_HIGH],
 		};
 	}
 
@@ -411,10 +408,7 @@ export const assessChildSupplement = (
 	return {
 		benefit,
 		status: BenefitStatus.CHECK_ADVISED,
-		reasons: [
-			ReasonCode.KIZ_MIN_INCOME_MET,
-			ReasonCode.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA,
-		],
+		reasons: [ReasonCode.KIZ_MIN_INCOME_MET],
 	};
 };
 

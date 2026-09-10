@@ -3,6 +3,7 @@ import {
 	BenefitStatus,
 	Citizenship,
 	HintCode,
+	ReasonCode,
 } from "../../schemas/benefitCheck.schema";
 import type {
 	BenefitAssessment,
@@ -27,9 +28,65 @@ const BASE_BENEFITS: readonly BenefitId[] = [
 	BenefitId.CHILD_SUPPLEMENT,
 ];
 
-const isLive = (assessment: BenefitAssessment): boolean =>
-	assessment.status === BenefitStatus.LIKELY_YES ||
-	assessment.status === BenefitStatus.CHECK_ADVISED;
+/**
+ * The Bildungs- und Teilhabepaket has no test of its own. It rides on one of the five
+ * base benefits, so its verdict is read off theirs: as confident as the strongest base
+ * verdict, never more. It used to be a hint below the list, which buried it — as a card
+ * it sorts in among the benefits it depends on.
+ */
+const assessEducationPackage = (
+	answers: PartialBenefitCheckAnswers,
+	assessments: readonly BenefitAssessment[],
+): BenefitAssessment => {
+	const benefit = BenefitId.EDUCATION_PARTICIPATION_PACKAGE;
+	const base = assessments.filter((assessment) =>
+		BASE_BENEFITS.includes(assessment.benefit),
+	);
+
+	if (answers.children === undefined) {
+		return {
+			benefit,
+			status: BenefitStatus.CHECK_ADVISED,
+			reasons: [ReasonCode.INSUFFICIENT_DATA],
+		};
+	}
+	if (answers.children.length === 0) {
+		return {
+			benefit,
+			status: BenefitStatus.NOT_APPLICABLE,
+			reasons: [ReasonCode.NO_ELIGIBLE_CHILDREN],
+		};
+	}
+	// Someone who already draws a Grundsicherung has the package by operation of law. The
+	// five base assessments all step aside for that answer, so without this branch the
+	// package would fall through to LIKELY_NO — the opposite of the truth.
+	if (answers.receivesBenefitsAlready === true) {
+		return {
+			benefit,
+			status: BenefitStatus.LIKELY_YES,
+			reasons: [ReasonCode.EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT],
+		};
+	}
+	if (base.some((a) => a.status === BenefitStatus.LIKELY_YES)) {
+		return {
+			benefit,
+			status: BenefitStatus.LIKELY_YES,
+			reasons: [ReasonCode.EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT],
+		};
+	}
+	if (base.some((a) => a.status === BenefitStatus.CHECK_ADVISED)) {
+		return {
+			benefit,
+			status: BenefitStatus.CHECK_ADVISED,
+			reasons: [ReasonCode.EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT],
+		};
+	}
+	return {
+		benefit,
+		status: BenefitStatus.LIKELY_NO,
+		reasons: [ReasonCode.EDUCATION_PACKAGE_NEEDS_BASE_BENEFIT],
+	};
+};
 
 /**
  * Domain spec §7. The disclaimer is deliberately NOT part of this result: it is an i18n
@@ -48,17 +105,11 @@ export const evaluateBenefitCheck = (
 		assessChildSupplement(answers, today),
 		assessAdvanceMaintenance(answers, today),
 	];
+	assessments.push(assessEducationPackage(answers, assessments));
 
 	const hints: HintCode[] = [];
 	const hasChildren = (answers.children?.length ?? 0) > 0;
-	const baseBenefitLive = assessments.some(
-		(assessment) =>
-			BASE_BENEFITS.includes(assessment.benefit) && isLive(assessment),
-	);
 
-	if (hasChildren && baseBenefitLive) {
-		hints.push(HintCode.EDUCATION_PARTICIPATION_PACKAGE);
-	}
 	if (hasChildren) {
 		hints.push(HintCode.CHILD_BENEFIT_PREREQUISITE);
 	}

@@ -130,6 +130,13 @@ export const BenefitId = {
 	CHILD_SUPPLEMENT: "CHILD_SUPPLEMENT",
 	/** Unterhaltsvorschuss, UVG */
 	ADVANCE_MAINTENANCE: "ADVANCE_MAINTENANCE",
+	/**
+	 * Bildungs- und Teilhabepaket, §28 SGB II / §34 SGB XII. Unlike the six above it has
+	 * no test of its own: it follows from one of the base benefits, so `evaluate` derives
+	 * it from their verdicts. Listed last so the stable sort keeps it below the benefit
+	 * that carries it.
+	 */
+	EDUCATION_PARTICIPATION_PACKAGE: "EDUCATION_PARTICIPATION_PACKAGE",
 } as const;
 export type BenefitId = (typeof BenefitId)[keyof typeof BenefitId];
 
@@ -165,13 +172,14 @@ export const ReasonCode = {
 	NO_MINOR_CHILDREN: "NO_MINOR_CHILDREN",
 	CHILD_RECEIVES_FULL_SUPPORT: "CHILD_RECEIVES_FULL_SUPPORT",
 	CHILD_SUPPORT_INCOMPLETE: "CHILD_SUPPORT_INCOMPLETE",
-	EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA: "EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA",
+	EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT:
+		"EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT",
+	EDUCATION_PACKAGE_NEEDS_BASE_BENEFIT: "EDUCATION_PACKAGE_NEEDS_BASE_BENEFIT",
 	CAPACITY_GAP_PRECONDITION_MET: "CAPACITY_GAP_PRECONDITION_MET",
 } as const;
 export type ReasonCode = (typeof ReasonCode)[keyof typeof ReasonCode];
 
 export const HintCode = {
-	EDUCATION_PARTICIPATION_PACKAGE: "EDUCATION_PARTICIPATION_PACKAGE",
 	CHILD_BENEFIT_PREREQUISITE: "CHILD_BENEFIT_PREREQUISITE",
 	ASYLUM_BENEFITS_REFERRAL: "ASYLUM_BENEFITS_REFERRAL",
 } as const;
@@ -184,7 +192,7 @@ export interface BenefitAssessment {
 }
 
 export interface BenefitCheckResult {
-	/** Always all six, in the order of `BenefitId`. */
+	/** Always all seven, in the order of `BenefitId`. */
 	assessments: BenefitAssessment[];
 	hints: HintCode[];
 }

@@ -38,7 +38,7 @@ describe("BenefitAssessmentCard", () => {
 			status: BenefitStatus.CHECK_ADVISED,
 			reasons: [
 				ReasonCode.RENT_BURDEN_HIGH,
-				ReasonCode.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA,
+				ReasonCode.EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT,
 			],
 		});
 		expect(screen.queryByText("result.reason.RENT_BURDEN_HIGH")).toBeNull();
@@ -49,7 +49,7 @@ describe("BenefitAssessmentCard", () => {
 			screen.getByText("result.reason.RENT_BURDEN_HIGH"),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText("result.reason.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA"),
+			screen.getByText("result.reason.EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT"),
 		).toBeInTheDocument();
 	});
 
@@ -103,21 +103,30 @@ describe("BenefitAssessmentCard", () => {
 		).toHaveAttribute("data-muted", "true");
 	});
 
-	it("offers an apply button only for a likely benefit", () => {
+	it("sends a likely benefit to the application", () => {
 		renderCard({
 			benefit: BenefitId.ADVANCE_MAINTENANCE,
 			status: BenefitStatus.LIKELY_YES,
 			reasons: [ReasonCode.CHILD_SUPPORT_INCOMPLETE],
 		});
-		expect(screen.getByTestId("apply-ADVANCE_MAINTENANCE")).toHaveAttribute(
-			"href",
-			APPLY_PATH,
-		);
+		const action = screen.getByTestId("apply-ADVANCE_MAINTENANCE");
+		expect(action).toHaveAttribute("href", APPLY_PATH);
+		expect(action).toHaveTextContent("result.apply");
 	});
 
-	it("offers no apply button for the other statuses", () => {
+	it("offers an uncertain benefit the check instead", () => {
+		renderCard({
+			benefit: BenefitId.HOUSING_BENEFIT,
+			status: BenefitStatus.CHECK_ADVISED,
+			reasons: [ReasonCode.RENT_BURDEN_HIGH],
+		});
+		const action = screen.getByTestId("apply-HOUSING_BENEFIT");
+		expect(action).toHaveAttribute("href", APPLY_PATH);
+		expect(action).toHaveTextContent("result.check_now");
+	});
+
+	it("offers no action for the two statuses that lead nowhere", () => {
 		for (const status of [
-			BenefitStatus.CHECK_ADVISED,
 			BenefitStatus.LIKELY_NO,
 			BenefitStatus.NOT_APPLICABLE,
 		]) {

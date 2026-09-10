@@ -215,6 +215,7 @@
 		"cta": "Create an account and continue",
 		"disclaimer": "This is an automated initial assessment with no legal force. It does not replace advice from a Jobcenter, a Sozialamt or an independent advice service.",
 		"apply": "Apply now",
+		"check_now": "Check your entitlement now",
 		"not_applicable_group_one": "1 benefit does not concern your situation",
 		"not_applicable_group_other": "{{count}} benefits do not concern your situation",
 		"referral": {
@@ -228,7 +229,8 @@
 			"SGB_XII_SUBSISTENCE_AID": "Hilfe zum Lebensunterhalt",
 			"HOUSING_BENEFIT": "Wohngeld (housing benefit)",
 			"CHILD_SUPPLEMENT": "Kinderzuschlag (child supplement)",
-			"ADVANCE_MAINTENANCE": "Unterhaltsvorschuss (advance maintenance)"
+			"ADVANCE_MAINTENANCE": "Unterhaltsvorschuss (advance maintenance)",
+			"EDUCATION_PARTICIPATION_PACKAGE": "Bildungs- und Teilhabepaket (education and participation package)"
 		},
 		"status": {
 			"LIKELY_YES": "Worth applying for",
@@ -260,11 +262,11 @@
 			"NO_MINOR_CHILDREN": "There is no child under 18 in your household.",
 			"CHILD_RECEIVES_FULL_SUPPORT": "Your child receives full maintenance.",
 			"CHILD_SUPPORT_INCOMPLETE": "Your child receives no maintenance, or too little.",
-			"EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA": "Only the responsible office can work out the exact amount.",
+			"EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT": "If you receive one of the basic benefits checked here, your children are usually automatically entitled to support for school, sport and music.",
+			"EDUCATION_PACKAGE_NEEDS_BASE_BENEFIT": "The package requires that you receive Grundsicherungsgeld, Wohngeld, Kinderzuschlag or Sozialhilfe.",
 			"CAPACITY_GAP_PRECONDITION_MET": "The basic precondition is met. The responsible office has to assess income and savings."
 		},
 		"hint": {
-			"EDUCATION_PARTICIPATION_PACKAGE": "Bildungs- und Teilhabepaket: if you receive one of these benefits, your children are usually automatically entitled to support for school, sport and music.",
 			"CHILD_BENEFIT_PREREQUISITE": "Kindergeld is a prerequisite for the Kinderzuschlag. If you have not applied for it yet, start there.",
 			"ASYLUM_BENEFITS_REFERRAL": "If your residence is not yet secure, Asylbewerberleistungen may apply to you rather than the benefits checked here. An advice service can tell you what applies."
 		}

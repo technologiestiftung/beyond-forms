@@ -215,6 +215,7 @@
 		"cta": "Konto erstellen und weitermachen",
 		"disclaimer": "Das ist eine automatische Ersteinschätzung ohne Rechtsverbindlichkeit. Sie ersetzt keine Beratung durch Jobcenter, Sozialamt oder eine unabhängige Sozialberatung.",
 		"apply": "Jetzt beantragen",
+		"check_now": "Jetzt Anspruch prüfen",
 		"not_applicable_group_one": "1 Leistung betrifft Deine Situation nicht",
 		"not_applicable_group_other": "{{count}} Leistungen betreffen Deine Situation nicht",
 		"referral": {
@@ -228,7 +229,8 @@
 			"SGB_XII_SUBSISTENCE_AID": "Hilfe zum Lebensunterhalt",
 			"HOUSING_BENEFIT": "Wohngeld",
 			"CHILD_SUPPLEMENT": "Kinderzuschlag",
-			"ADVANCE_MAINTENANCE": "Unterhaltsvorschuss"
+			"ADVANCE_MAINTENANCE": "Unterhaltsvorschuss",
+			"EDUCATION_PARTICIPATION_PACKAGE": "Bildungs- und Teilhabepaket"
 		},
 		"status": {
 			"LIKELY_YES": "Das lohnt sich",
@@ -260,11 +262,11 @@
 			"NO_MINOR_CHILDREN": "In Deinem Haushalt lebt kein Kind unter 18 Jahren.",
 			"CHILD_RECEIVES_FULL_SUPPORT": "Dein Kind bekommt den vollen Unterhalt.",
 			"CHILD_SUPPORT_INCOMPLETE": "Dein Kind bekommt keinen oder zu wenig Unterhalt.",
-			"EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA": "Wie viel es genau wäre, kann nur die zuständige Stelle berechnen.",
+			"EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT": "Wenn Du eine der hier geprüften Grundleistungen bekommst, haben Deine Kinder meist automatisch Anspruch auf Zuschüsse für Schule, Sport und Musik.",
+			"EDUCATION_PACKAGE_NEEDS_BASE_BENEFIT": "Das Paket setzt voraus, dass Du Grundsicherungsgeld, Wohngeld, Kinderzuschlag oder Sozialhilfe bekommst.",
 			"CAPACITY_GAP_PRECONDITION_MET": "Die Grundvoraussetzung ist erfüllt. Einkommen und Ersparnisse muss die zuständige Stelle prüfen."
 		},
 		"hint": {
-			"EDUCATION_PARTICIPATION_PACKAGE": "Bildungs- und Teilhabepaket: Wenn Du eine dieser Leistungen bekommst, haben Deine Kinder meist automatisch Anspruch auf Zuschüsse für Schule, Sport und Musik.",
 			"CHILD_BENEFIT_PREREQUISITE": "Kindergeld ist Voraussetzung für den Kinderzuschlag. Falls Du es noch nicht beantragt hast, fang dort an.",
 			"ASYLUM_BENEFITS_REFERRAL": "Ist Dein Aufenthalt noch nicht gesichert, gelten für Dich möglicherweise Asylbewerberleistungen statt der hier geprüften. Eine Beratungsstelle kann Dir sagen, was für Dich gilt."
 		}
