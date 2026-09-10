@@ -1,66 +1,99 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StepLayout } from "../components/Layout/StepLayout";
+import { BenefitAssessmentCard } from "../components/Eligibility/BenefitAssessmentCard";
 import { useBenefitCheckStore } from "../store/useBenefitCheckStore";
 import { evaluateBenefitCheck } from "../store/benefits/evaluate";
-import { i18nKeys } from "../i18n/i18nKeys";
+import { BenefitStatus } from "../schemas/benefitCheck.schema";
+import { AppRoutes, URL_PARAMS } from "../constants/routes";
+import { EXTERNAL_LINKS } from "../config/externalLinks";
 
 /**
- * TEIL C: placeholder. Renders the six assessments raw so the flow can be walked end to
- * end and the engine's output inspected. The designed view — status wording, hints,
- * disclaimer, translated reason codes — is part C's job.
+ * ProtectedRoute forwards an unauthenticated visitor to Auth and keeps the query string,
+ * so this is what makes AuthView run the guest sync. Changing the target silently turns
+ * the transfer off.
  */
+const CONTINUE_PATH = `${AppRoutes.Profile}?${URL_PARAMS.ORIGIN}=${URL_PARAMS.ORIGIN_ELIGIBILITY}`;
+
 export const EligibilityResult: React.FC = () => {
 	const { t } = useTranslation();
 	const answers = useBenefitCheckStore((s) => s.answers);
+	// Input-side clock only; the engine takes `today` as an argument so it stays testable.
 	const today = new Date().toLocaleDateString("sv-SE");
 	const result = evaluateBenefitCheck(answers, today);
+
+	const nothingMatches = !result.assessments.some(
+		(assessment) =>
+			assessment.status === BenefitStatus.LIKELY_YES ||
+			assessment.status === BenefitStatus.CHECK_ADVISED,
+	);
 
 	return (
 		<StepLayout>
 			<div className="w-full font-sans flex flex-col gap-6">
-				<p
-					className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"
-					role="note"
-					data-testid="provisional-notice"
-				>
-					Vorläufige Ansicht. Die gestaltete Ergebnisseite folgt in Teil C.
-				</p>
-
-				<h1 className="text-xl font-bold text-brand-black">
-					{t(i18nKeys.eligibility.title)}
+				<h1 className="text-h1 font-bold text-brand-black leading-tight">
+					{t("result.title")}
 				</h1>
 
-				<ul className="flex flex-col gap-4 list-none p-0 m-0">
+				<ul className="flex flex-col gap-3 list-none p-0 m-0">
 					{result.assessments.map((assessment) => (
-						<li
+						<BenefitAssessmentCard
 							key={assessment.benefit}
-							data-testid={`assessment-${assessment.benefit}`}
-							className="rounded-xl border border-brand-border/40 p-4"
-						>
-							<p className="font-bold text-brand-black">
-								{assessment.benefit}
-							</p>
-							<p className="text-base text-brand-grey">{assessment.status}</p>
-							<p className="text-sm text-brand-grey">
-								{assessment.reasons.join(", ")}
-							</p>
-						</li>
+							assessment={assessment}
+						/>
 					))}
 				</ul>
 
+				{nothingMatches && (
+					<div
+						data-testid="result-referral"
+						className="rounded-xl border border-brand-border-subtle bg-brand-bg p-4"
+					>
+						<p className="font-semibold text-brand-black">
+							{t("result.referral.title")}
+						</p>
+						<p className="mt-1 text-base text-brand-grey">
+							{t("result.referral.description")}
+						</p>
+						<a
+							href={EXTERNAL_LINKS.SOZIALAMT}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="mt-2 inline-block text-base font-medium text-primary-blue-400 underline"
+						>
+							{t("result.referral.link")}
+						</a>
+					</div>
+				)}
+
 				{result.hints.length > 0 && (
 					<ul
+						data-testid="result-hints"
 						className="flex flex-col gap-2 list-none p-0 m-0"
-						data-testid="hints"
 					>
 						{result.hints.map((hint) => (
 							<li key={hint} className="text-sm text-brand-grey">
-								{hint}
+								{t(`result.hint.${hint}`)}
 							</li>
 						))}
 					</ul>
 				)}
+
+				<Link
+					to={CONTINUE_PATH}
+					data-testid="result-cta"
+					className="w-full rounded-full bg-primary-blue-500 px-6 py-3 text-center font-bold text-white"
+				>
+					{t("result.cta")}
+				</Link>
+
+				<p
+					data-testid="result-disclaimer"
+					className="text-xs text-brand-grey leading-relaxed"
+				>
+					{t("result.disclaimer")}
+				</p>
 			</div>
 		</StepLayout>
 	);
