@@ -242,24 +242,49 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
         except (ValueError, TypeError):
             pass
 
-    def _line_total(line_names: set) -> float:
-        """The summed monthly amounts of the named income lines. A line recorded without
-        an amount still proves income of that type, so monthly_income stands in for it."""
-        rows = [row for row in income_rows if getattr(row.income_type, "value", row.income_type) in line_names]
-        if not rows:
-            return 0.0
-        total = sum(
+    _INCOME_CATEGORY_LINES = {
+        "pension_income": {"Pension"},
+        "non_self_employed_income": {"Employment"},
+        "social_benefits_income": {
+            "Social Assistance",
+            "Basic Security Benefits",
+            "Asylum Seeker Benefits",
+            "Housing Benefit",
+        },
+    }
+
+    def _rows_for(line_names: set) -> list:
+        return [row for row in income_rows if getattr(row.income_type, "value", row.income_type) in line_names]
+
+    def _explicit_total(rows: list) -> float:
+        return sum(
             float(row.monthly_amount)
             for row in rows
             if getattr(row, "monthly_amount", None) is not None and not isinstance(row.monthly_amount, Mock)
         )
-        return total if total else (income_val or 0.0)
 
-    pension_income = _line_total({"Pension"})
-    non_self_employed = _line_total({"Employment"})
-    social_benefits = _line_total(
-        {"Social Assistance", "Basic Security Benefits", "Asylum Seeker Benefits", "Housing Benefit"}
-    )
+    _category_rows = {name: _rows_for(lines) for name, lines in _INCOME_CATEGORY_LINES.items()}
+    _category_totals = {name: _explicit_total(rows) for name, rows in _category_rows.items()}
+    _amountless_categories = {
+        name for name, rows in _category_rows.items() if rows and not _category_totals[name]
+    }
+
+    def _line_total(name: str) -> float:
+        """The summed monthly amounts of the named income lines. A line recorded without
+        an amount still proves income of that type, so monthly_income stands in for it -
+        but only when it is the sole category left needing a stand-in value."""
+        if not _category_rows[name]:
+            return 0.0
+        total = _category_totals[name]
+        if total:
+            return total
+        if len(_amountless_categories) == 1:
+            return income_val or 0.0
+        return 0.0
+
+    pension_income = _line_total("pension_income")
+    non_self_employed = _line_total("non_self_employed_income")
+    social_benefits = _line_total("social_benefits_income")
 
     applicant_finances = {
         "non_self_employed_income": non_self_employed,

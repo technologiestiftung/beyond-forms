@@ -136,6 +136,33 @@ RELATION_WRITERS = {
 RELATION_KEYS = frozenset(RELATION_WRITERS)
 RELATION_WRITE_ORDER = tuple(RELATION_WRITERS)
 
+_MERGEABLE_MONEY_GRIDS: dict[str, tuple[type[BaseModel], str]] = {
+    "income_entries": (IncomeEntrySchema, "income_type"),
+    "expense_entries": (ExpenseEntrySchema, "expense_type"),
+    "asset_entries": (AssetEntrySchema, "asset_type"),
+}
+
+
+def _reconcile_money_grid_items(user_row: DbUser, key: str, items: object) -> object:
+    spec = _MERGEABLE_MONEY_GRIDS.get(key)
+    if spec is None or not isinstance(items, list):
+        return items
+    schema, type_field = spec
+
+    merged: dict[tuple, dict] = {}
+    for row in getattr(user_row, key):
+        dumped = schema.model_validate(row).model_dump(mode="json")
+        merged[(dumped["person_sort_order"], dumped[type_field])] = dumped
+
+    for item in items:
+        try:
+            dumped = schema.model_validate(item).model_dump(mode="json")
+        except ValidationError:
+            return items
+        merged[(dumped["person_sort_order"], dumped[type_field])] = dumped
+
+    return list(merged.values())
+
 
 def ordered_profile_items(payload: Mapping[str, Any]) -> list[tuple[str, Any]]:
     """`payload` as (key, value) pairs with the relationship keys moved to the end in
@@ -153,7 +180,7 @@ def apply_profile_key(user_row: DbUser, key: str, value: object) -> bool:
     writer = RELATION_WRITERS.get(key)
     if writer is None:
         return False
-    writer(user_row, value)
+    writer(user_row, _reconcile_money_grid_items(user_row, key, value))
     return True
 
 

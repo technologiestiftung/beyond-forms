@@ -19,6 +19,7 @@ from beyondforms.auth import require_authenticated_user
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, BackgroundTasks
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 from google.cloud import storage, exceptions as gcloud_exceptions
 from src.constants import SLOT_ID_TO_DIS_TYPE
@@ -740,20 +741,39 @@ def verify_document(
 
     if slot_id == "pension_notice":
         # A verified Rentenbescheid proves the applicant has pension income, so make sure
-        # the applicant's 'Pension' row exists. The legacy income_sources list only ever
-        # recorded the category, so the amount stays NULL here - it is filled in later via
-        # chat/profile - and an existing row is left untouched.
-        has_pension_row = (
-            db.query(IncomeEntries.id)
-            .filter(
+        # the applicant's 'Pension' row exists, carrying the verified amount when one was
+        # confirmed. on_conflict_do_nothing targets the partial unique index on
+        # (user_id, income_type) WHERE person_id IS NULL, so this can't race a concurrent
+        # verification into a duplicate row the way a separate pre-check + insert could.
+        verified_amount = None
+        if payload.verified_fields and "monthly_amount" in payload.verified_fields:
+            try:
+                verified_amount = decimal.Decimal(str(local_raw_data["monthly_amount"]))
+            except (decimal.InvalidOperation, KeyError, TypeError, ValueError):
+                verified_amount = None
+
+        insert_stmt = (
+            pg_insert(IncomeEntries)
+            .values(
+                user_id=user.id,
+                person_id=None,
+                income_type=IncomeTypeType.PENSION,
+                monthly_amount=verified_amount,
+            )
+            .on_conflict_do_nothing(
+                index_elements=[IncomeEntries.user_id, IncomeEntries.income_type],
+                index_where=IncomeEntries.person_id.is_(None),
+            )
+        )
+        db.execute(insert_stmt)
+
+        if verified_amount is not None:
+            db.query(IncomeEntries).filter(
                 IncomeEntries.user_id == user.id,
                 IncomeEntries.person_id.is_(None),
                 IncomeEntries.income_type == IncomeTypeType.PENSION,
-            )
-            .first()
-        )
-        if not has_pension_row:
-            db.add(IncomeEntries(user_id=user.id, person_id=None, income_type=IncomeTypeType.PENSION))
+                IncomeEntries.monthly_amount.is_(None),
+            ).update({"monthly_amount": verified_amount})
 
     db.commit()
 
