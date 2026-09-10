@@ -3,7 +3,7 @@ forms/scripts/extract_to_mapping.sh, using an LLM grounded in the live Users/doc
 schema. Fields with no plausible data source are left blank.
 
 Usage:
-    uv run forms/scripts/llm-eval/generate_mapping.py --form antrag_bewohnerparkausweis
+    uv run forms/scripts/llm-eval/generate_mapping.py --form forms/mappings/antrag_bewohnerparkausweis.toml
 """
 
 import argparse
@@ -20,12 +20,21 @@ sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 from schema_context import build_schema_context, StrictDict, dummy_value
 from evaluate import (
     load_boilerplate,
+    normalize_field_id,
     resolve_jexl_value,
     run_llm_chunk,
     run_self_correction,
 )
 
 _DOCUMENT_REF_RE = re.compile(r"documents\.([a-zA-Z_][a-zA-Z0-9_]*)(?:\.([a-zA-Z_][a-zA-Z0-9_]*))?")
+_PERSON_REF_RE = re.compile(
+    r"(?:partner|(?:household_members|associated_persons)\s*\[\s*\d+\s*\])\.([a-zA-Z_][a-zA-Z0-9_]*)"
+)
+_MAP_REF_RE = re.compile(
+    r"(?:(?:partner|(?:household_members|associated_persons)\s*\[\s*\d+\s*\])\.)?"
+    r"(income|income_office|income_reference|expenses|expense_notes|assets|asset_descriptions)"
+    r'''(?:\.([a-zA-Z_][a-zA-Z0-9_]*)|\[\s*'([^']*)'\s*\]|\[\s*"([^"]*)"\s*\])'''
+)
 _HEADER_RE = re.compile(r"^\[(.+)\]\s*$")
 
 _HEADER_BLOCK_START = "# !! AI-DRAFTED MAPPING - NEEDS HUMAN REVIEW BEFORE USE !!"
@@ -35,12 +44,33 @@ class MappingValidator:
     """No LLM, no DB: checks a generated JEXL expression against the parsed schema
     context alone. Anything that fails is reset to a blank value rather than shipped."""
 
-    def __init__(self, user_columns: Dict[str, Any], documents: Dict[str, Any]):
-        self.user_columns = user_columns
-        self.documents = documents
+    def __init__(self, schema_context: Dict[str, Any]):
+        self.user_columns = schema_context["user_columns"]
+        self.documents = schema_context["documents"]
+        derived = schema_context.get("derived_context") or {"person_fields": {}, "keys": {}}
+        # A person object carries the money grids too, so `partner.income` is as valid a
+        # reference as `partner.first_name`.
+        self.person_fields = set(derived["person_fields"]) | set(derived.get("person_money_keys", ()))
+        self.map_keys = {
+            key: set(info["allowed_keys"]) for key, info in derived["keys"].items() if "allowed_keys" in info
+        }
         self._jexl = JEXL()
-        self._dummy_ctx = StrictDict({name: dummy_value(info) for name, info in user_columns.items()})
-        self._dummy_ctx["documents"] = {}
+        populated = StrictDict({name: dummy_value(info) for name, info in self.user_columns.items()})
+        empty = StrictDict({name: None for name in self.user_columns})
+        for context in (populated, empty):
+            context["documents"] = {}
+            for key, info in derived["keys"].items():
+                if info["type"] == "Person or null":
+                    context[key] = None
+                elif info["type"].startswith("List["):
+                    context[key] = []
+                elif info["type"].startswith("Map["):
+                    context[key] = {}
+                elif context is empty:
+                    context[key] = None if key != "today" else datetime.date.today()
+                else:
+                    context[key] = dummy_value(info)
+        self._contexts = {"populated": populated, "empty": empty}
 
     def check(self, expr: str) -> Tuple[bool, Optional[str]]:
         if not isinstance(expr, str) or not expr.strip():
@@ -53,9 +83,22 @@ class MappingValidator:
             if field is not None and field not in self.documents[slug]["fields"]:
                 return False, f"unknown field '{field}' on document type '{slug}'"
 
-        _, syntax_ok, err_msg = resolve_jexl_value(expr, self._dummy_ctx, self._jexl)
-        if not syntax_ok:
-            return False, err_msg
+        for match in _PERSON_REF_RE.finditer(expr):
+            field = match.group(1)
+            if field not in self.person_fields:
+                return False, f"unknown field '{field}' on a person (associated_persons) object"
+
+        for match in _MAP_REF_RE.finditer(expr):
+            map_name = match.group(1)
+            key = match.group(2) or match.group(3) or match.group(4)
+            allowed = self.map_keys.get(map_name)
+            if allowed is not None and key not in allowed:
+                return False, f"'{key}' is not a valid {map_name} type"
+
+        for label, context in self._contexts.items():
+            _, syntax_ok, err_msg = resolve_jexl_value(expr, context, self._jexl)
+            if not syntax_ok:
+                return False, f"{err_msg} ({label} profile)"
 
         return True, None
 
@@ -115,8 +158,10 @@ def generate_values(
             print(f"  Error processing chunk {i + 1}-{min(i + chunk_size, len(items))}: {e}", file=sys.stderr)
             continue
 
-        for fid, expr in chunk_result.items():
-            if fid not in chunk_items:
+        by_normalized_id = {normalize_field_id(fid): fid for fid in chunk_items}
+        for returned_fid, expr in chunk_result.items():
+            fid = by_normalized_id.get(normalize_field_id(returned_fid))
+            if fid is None:
                 continue
             norm_expr = expr.strip() if isinstance(expr, str) else expr
 
@@ -188,12 +233,12 @@ def render_toml_in_place(
     with open(toml_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
-    # Strip a pre-existing header block (idempotent re-run) before reinserting one.
+    # Strip a pre-existing header block (idempotent re-run) before reinserting one. Only
+    # the lines this function itself writes are dropped: consuming every leading comment
+    # would silently delete a human-written file-level note on the next re-run.
     if lines and lines[0].startswith(_HEADER_BLOCK_START):
-        end = 0
-        while end < len(lines) and lines[end].startswith("#"):
-            end += 1
-        while end < len(lines) and lines[end].strip() == "":
+        end = 1
+        while end < len(lines) and lines[end].startswith(("# Generated by", "# Values below are")):
             end += 1
         lines = lines[end:]
 
@@ -266,7 +311,7 @@ def main() -> None:
         "live Users/documents schema. Fields with no plausible data source are left blank."
     )
     parser.add_argument("--form", required=True, help="Path to the form mapping to fill")
-    parser.add_argument("--model", default="gemini-3.5-flash-lite", help="LLM model name")
+    parser.add_argument("--model", default="gemini-3.7-flash", help="LLM model name")
     parser.add_argument("--prompt", default="rich_schema_documents", help="Prompt template file name")
     parser.add_argument("--chunk-size", type=int, default=100, help="Fields submitted per LLM request chunk")
     parser.add_argument(
@@ -290,8 +335,8 @@ def main() -> None:
 
     boilerplate = load_boilerplate(toml_path)
     current_values = load_current_values(toml_path)
-    schema_context = build_schema_context(project_root, include_documents=True)
-    validator = MappingValidator(schema_context["user_columns"], schema_context["documents"])
+    schema_context = build_schema_context(project_root, include_documents=True, include_derived=True)
+    validator = MappingValidator(schema_context)
 
     if args.overwrite_existing:
         to_generate = boilerplate

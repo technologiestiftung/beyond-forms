@@ -19,11 +19,20 @@ from beyondforms.auth import require_authenticated_user
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, BackgroundTasks
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 from google.cloud import storage, exceptions as gcloud_exceptions
 from src.constants import SLOT_ID_TO_DIS_TYPE
 from src.db import SessionLocal, get_db
-from src.models import DocumentStatusType, UploadedFiles, UserApplications, UserDocuments, Users
+from src.models import (
+    DocumentStatusType,
+    IncomeEntries,
+    IncomeTypeType,
+    UploadedFiles,
+    UserApplications,
+    UserDocuments,
+    Users,
+)
 from src.services.pubsub_service import publish_document_event
 from src.services.user_service import UserService, get_user_service
 from src.services.berlin_districts import sync_berlin_district
@@ -731,9 +740,40 @@ def verify_document(
     doc.status = DocumentStatusType.VERIFIED
 
     if slot_id == "pension_notice":
-        sources = set(user.income_sources or [])
-        sources.add("pension")
-        user.income_sources = list(sources)
+        # A verified Rentenbescheid proves the applicant has pension income, so make sure
+        # the applicant's 'Pension' row exists, carrying the verified amount when one was
+        # confirmed. on_conflict_do_nothing targets the partial unique index on
+        # (user_id, income_type) WHERE person_id IS NULL, so this can't race a concurrent
+        # verification into a duplicate row the way a separate pre-check + insert could.
+        verified_amount = None
+        if payload.verified_fields and "monthly_amount" in payload.verified_fields:
+            try:
+                verified_amount = decimal.Decimal(str(local_raw_data["monthly_amount"]))
+            except (decimal.InvalidOperation, KeyError, TypeError, ValueError):
+                verified_amount = None
+
+        insert_stmt = (
+            pg_insert(IncomeEntries)
+            .values(
+                user_id=user.id,
+                person_id=None,
+                income_type=IncomeTypeType.PENSION,
+                monthly_amount=verified_amount,
+            )
+            .on_conflict_do_nothing(
+                index_elements=[IncomeEntries.user_id, IncomeEntries.income_type],
+                index_where=IncomeEntries.person_id.is_(None),
+            )
+        )
+        db.execute(insert_stmt)
+
+        if verified_amount is not None:
+            db.query(IncomeEntries).filter(
+                IncomeEntries.user_id == user.id,
+                IncomeEntries.person_id.is_(None),
+                IncomeEntries.income_type == IncomeTypeType.PENSION,
+                IncomeEntries.monthly_amount.is_(None),
+            ).update({"monthly_amount": verified_amount})
 
     db.commit()
 

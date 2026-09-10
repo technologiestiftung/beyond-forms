@@ -1,3 +1,4 @@
+import decimal
 import uuid
 import pytest
 from unittest.mock import MagicMock, patch, Mock
@@ -7,7 +8,7 @@ from sqlalchemy.orm import Session
 from beyondforms.auth import User as AuthUser, get_current_user, require_authenticated_user
 from src.db import get_db
 from src.main import app
-from src.models import Users as DbUser, UserDocuments as DbDocument
+from src.models import Users as DbUser, UserDocuments as DbDocument, IncomeEntries, IncomeTypeType
 
 client = TestClient(app)
 
@@ -477,18 +478,21 @@ def test_verify_document_maps_tenancy_status_boolean(mock_post, mock_db):
 
 
 @patch("requests.post")
-def test_verify_document_pension_notice_adds_income_source(mock_post, mock_db):
+def test_verify_document_pension_notice_persists_verified_amount(mock_post, mock_db):
     document_id = uuid.uuid4()
     mock_user = MagicMock(spec=DbUser)
-    mock_user.income_sources = ["salary"]
+    mock_user.id = uuid.uuid4()
 
     mock_doc = MagicMock(spec=DbDocument)
     mock_doc.document_id = document_id
     mock_doc.document_type = "pension_notice"
     mock_doc.raw_data = {"monthly_amount": "650.00"}
 
+    query_mocks = {}
+
     def db_query_side_effect(model):
         query_mock = MagicMock()
+        query_mocks[model] = query_mock
         if model is DbDocument:
             query_mock.filter.return_value.first.return_value = mock_doc
         elif model is DbUser:
@@ -513,5 +517,63 @@ def test_verify_document_pension_notice_adds_income_source(mock_post, mock_db):
 
     response = client.post(f"/api/v1/documents/{document_id}/verify", json=payload)
     assert response.status_code == 200
-    assert "pension" in mock_user.income_sources
-    assert "salary" in mock_user.income_sources
+
+    mock_db.execute.assert_called_once()
+    insert_stmt = mock_db.execute.call_args[0][0]
+    bound_values = insert_stmt.compile().params
+    assert bound_values["user_id"] == mock_user.id
+    assert bound_values["person_id"] is None
+    assert bound_values["income_type"] == IncomeTypeType.PENSION
+    assert bound_values["monthly_amount"] == decimal.Decimal("650.00")
+
+    income_query_mock = query_mocks[IncomeEntries]
+    income_query_mock.filter.return_value.update.assert_called_once_with(
+        {"monthly_amount": decimal.Decimal("650.00")}
+    )
+
+
+@patch("requests.post")
+def test_verify_document_pension_notice_without_verified_amount_only_ensures_row(mock_post, mock_db):
+    document_id = uuid.uuid4()
+    mock_user = MagicMock(spec=DbUser)
+    mock_user.id = uuid.uuid4()
+
+    mock_doc = MagicMock(spec=DbDocument)
+    mock_doc.document_id = document_id
+    mock_doc.document_type = "pension_notice"
+    mock_doc.raw_data = {"monthly_amount": "650.00"}
+
+    query_mocks = {}
+
+    def db_query_side_effect(model):
+        query_mock = MagicMock()
+        query_mocks[model] = query_mock
+        if model is DbDocument:
+            query_mock.filter.return_value.first.return_value = mock_doc
+        elif model is DbUser:
+            query_mock.filter.return_value.first.return_value = mock_user
+        return query_mock
+
+    mock_db.query.side_effect = db_query_side_effect
+
+    mock_resp = Mock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "status": "success",
+        "profile_sync": {"monthly_income": 650.0},
+    }
+    mock_post.return_value = mock_resp
+
+    payload = {
+        "document_type": "pension_notice",
+        "corrected_data": {"monthly_amount": "650.00"},
+        "verified_fields": [],
+    }
+
+    response = client.post(f"/api/v1/documents/{document_id}/verify", json=payload)
+    assert response.status_code == 200
+
+    mock_db.execute.assert_called_once()
+    insert_stmt = mock_db.execute.call_args[0][0]
+    assert insert_stmt.compile().params["monthly_amount"] is None
+    assert IncomeEntries not in query_mocks

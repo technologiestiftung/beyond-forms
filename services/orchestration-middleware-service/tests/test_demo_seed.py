@@ -66,10 +66,6 @@ def test_coerce_numeric_column_yields_exact_decimal():
     assert _coerce_to_column(USER_COLUMNS["rent_total"], 780.00) == decimal.Decimal("780.00")
 
 
-def test_coerce_jsonb_column_passes_lists_through():
-    assert _coerce_to_column(USER_COLUMNS["income_sources"], ["pension"]) == ["pension"]
-
-
 def test_coerce_none_stays_none():
     assert _coerce_to_column(USER_COLUMNS["married_since"], None) is None
 

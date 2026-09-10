@@ -23,6 +23,7 @@ from src.services.user_service import (
     UserService,
     apply_profile_key,
     get_user_service,
+    ordered_profile_items,
 )
 from src.services.conversation_service import ConversationService, get_conversation_service
 from src.services.rag_service import search_knowledge_base
@@ -132,7 +133,7 @@ def _update_user_data_sync(updates: dict, current_user: AuthUser, db: Session, u
         return {"error": "Row not found in table 'users' for user."}
 
     try:
-        for key, value in updates_by_table.items():
+        for key, value in ordered_profile_items(updates_by_table):
             try:
                 if not apply_profile_key(user_row, key, value):
                     setattr(user_row, key, value)

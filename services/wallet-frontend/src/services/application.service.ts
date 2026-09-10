@@ -42,9 +42,9 @@ export const mapEligibilityToProfilePayload = (
 
 	if (answers.pension) {
 		if (answers.pension === PensionStatus.OLD_AGE) {
-			payload.income_sources = ["Altersrente"];
+			payload.income_entries = [{ income_type: "Pension" }];
 		} else if (answers.pension === PensionStatus.REDUCED_EARNING_CAPACITY) {
-			payload.income_sources = ["Erwerbsminderungsrente"];
+			payload.income_entries = [{ income_type: "Pension" }];
 			payload.ability_to_work = "Permanently disabled";
 			payload.has_permanent_reduction_in_earning_capacity = true;
 		}
