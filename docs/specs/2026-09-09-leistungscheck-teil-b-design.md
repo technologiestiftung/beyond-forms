@@ -117,9 +117,27 @@ dort wird entsprechend erweitert.
 Eine neue Hilfsfunktion `compositionImpliesChildren(composition): boolean` bedient beide
 Stellen und zugleich die Skip-Bedingung der Kinderfrage (§4) — eine Wahrheit, ein Ort.
 
-**Wichtig:** Wird eine Frage übersprungen, wird **nichts** geschrieben. Es gibt keinen
-Automatismus, der `children: []` setzt. Die Unterscheidung „definitiv keine Kinder"
-(aus der Komposition) gegen „noch nicht beantwortet" (`undefined`) bleibt damit intakt.
+**Grundregel:** Wird eine Frage übersprungen, wird **nichts** geschrieben. `undefined`
+heißt „noch nicht beantwortet", nicht „keine" — die Regeln antworten darauf mit
+`INSUFFICIENT_DATA` und nie mit einer Ablehnung.
+
+**Zwei Ausnahmen**, bei denen die vorherige Antwort die übersprungene vollständig
+bestimmt und ein Feld sonst dauerhaft unbeantwortet bliebe, das die Regeln brauchen:
+
+| Übersprungen | Nachgetragen | Weil |
+|---|---|---|
+| `children` bei kinderloser Haushaltsform | `children: []` | Jeder Bedarfstest liest `children`; ohne Eintrag bliebe ein Alleinlebender dauerhaft auf `INSUFFICIENT_DATA` |
+| `work-capacity` bei Brutto über der Schwelle | `workCapacity: FULL` | Drei der sechs Regeln lesen das Feld (§4a) |
+
+Beide werden von `useBenefitCheckNavigation` beim Weiterblättern gesetzt.
+
+Bei `work-capacity` gilt das **nur** für den Einkommens-Skip. Wird die Frage wegen
+erreichter Regelaltersgrenze übersprungen, bleibt das Feld leer — dort ist die
+Arbeitsfähigkeit wirklich unbekannt.
+
+Wichtig bleibt dabei die Unterscheidung „definitiv keine Kinder" (aus der Komposition
+ableitbar) gegen „noch nicht beantwortet". Die Wächter in Kinderzuschlag und
+Unterhaltsvorschuss prüfen deshalb zuerst die Komposition und erst danach `children`.
 
 ---
 
@@ -170,9 +188,9 @@ Komponenten (§7).
 | 2 | `children` | `children` | children | `!compositionImpliesChildren(composition)` |
 | 3 | `birthdate` | `dateOfBirth` | date | — |
 | 4 | `germany` | `livesInGermany` | boolean | — |
-| 5 | `work-capacity` | `workCapacity` | choice | `hasReachedRetirementAge(dateOfBirth, today)` |
-| 6 | `employment` | `isEmployed` | boolean | — |
-| 7 | `gross-income` | `monthlyGrossIncome` | number (EUR) | `isEmployed === false` |
+| 5 | `employment` | `isEmployed` | boolean | — |
+| 6 | `gross-income` | `monthlyGrossIncome` | number (EUR) | `isEmployed === false` |
+| 7 | `work-capacity` | `workCapacity` | choice | Regelaltersgrenze erreicht **oder** beschäftigt mit Brutto über der Schwelle (§4a) |
 | 8 | `net-income` | `monthlyNetHouseholdIncome` | number (EUR) | — |
 | 9 | `warm-rent` | `monthlyWarmRent` | number (EUR) | — |
 | 10 | `assets` | `assetsBand` | choice | — |
@@ -180,7 +198,7 @@ Komponenten (§7).
 | 12 | `citizenship` | `citizenship` | choice | — |
 | 13 | `residence-status` | `hasSecureResidenceStatus` | boolean | `citizenship === "DE_EU"` |
 | 14 | `child-support` | `childReceivesFullSupport` | boolean | `!compositionImpliesChildren(composition)` |
-| 15 | `support-duration` | `monthsWithoutChildSupport` | number (MONTHS) | `childReceivesFullSupport !== false` |
+| 15 | `support-duration` | `monthsWithoutChildSupport` | number (MONTHS) | kinderloser Haushalt **oder** `childReceivesFullSupport === true` |
 
 Neun Fragen kommen immer, sechs sind überspringbar. **Minimum 9 Schirme, Maximum 15.**
 
@@ -188,6 +206,35 @@ Die Fachspec zählt „höchstens 10", zählt dabei aber eine Doppelfrage als ei
 ist es dieselbe Menge Fragen, nur auf mehr Schirme verteilt — eine Idee pro Schirm, weil die
 Zielgruppe laut den Persona-Dokumenten (`demo/research/01_sabine.md`) ausdrücklich unter
 kognitiver Last steht.
+
+### 4a. Die Arbeitsfähigkeit bei höherem Einkommen
+
+Wer deutlich über Mindestlohn verdient, arbeitet fast sicher mindestens die drei Stunden
+am Tag, nach denen die Frage sucht. Ab einem Bruttoeinkommen über
+`WORK_CAPACITY_SKIP_GROSS_INCOME` (1.000 €, in `benefitRules.config.ts`) entfällt sie
+deshalb, und die Navigation trägt `workCapacity: FULL` nach.
+
+**Die Schwelle ist der Zweck, nicht die Abkürzung.** Eine Werkstatt für behinderte
+Menschen zahlt in der Größenordnung von 220 € im Monat, und diese Beschäftigten gelten
+nach meinem Verständnis von §43 SGB VI als voll erwerbsgemindert bezogen auf den
+allgemeinen Arbeitsmarkt — genau das qualifiziert für SGB XII Kap. 4. Eine Ableitung
+allein aus „ich arbeite" würde ihnen die für sie richtige Leistung als „betrifft Deine
+Situation nicht" anzeigen. Unterhalb der Schwelle wird deshalb weiter gefragt.
+
+Der verbleibende Fehlerfall ist eng: ein hoher Stundensatz bei unter drei Stunden
+täglich. Solche Menschen scheitern meist ohnehin an der Bedarfsprüfung.
+
+Bei erreichter Regelaltersgrenze wird die Frage ebenfalls übersprungen, aber **ohne**
+Ableitung: dort ist die Arbeitsfähigkeit wirklich unbekannt, und die SGB-XII-Regel hängt
+am Alter statt an diesem Feld.
+
+Die Herleitung der 1.000 € (3 h × 5 Tage × 4,33 Wochen × Mindestlohn ≈ 835 €, aufgerundet)
+steht im Kommentar der Konstante. Sie ist **unverifiziert** und gehört auf die Liste aus
+Teil A §11, ebenso wie die Annahme zum Werkstatt-Status.
+
+**Reihenfolge:** die Frage steht deshalb hinter `gross-income` statt an fünfter Stelle —
+eine Skip-Bedingung darf nur früher erhobene Felder lesen. Nebeneffekt: die Arbeitsfragen
+stehen jetzt beieinander.
 
 ### Regel für `skipIf`
 
@@ -372,9 +419,11 @@ Erwartung: die Suite bleibt bei genau einem roten Test, dem vorbestehenden
 | 4 | Fortschritt mit dynamischem Nenner, Balken monoton | Vorgabe Auftraggeber |
 | 5 | Staatsangehörigkeit immer fragen; `deutetAufAnspruchHin` entfällt | **Abweichung Fachspec §4/§5** |
 | 6 | Keine Früh-Ausstiege mehr | Folge des Sechs-Leistungs-Modells |
-| 7 | Übersprungene Fragen schreiben nichts; `undefined` ≠ „keine" | Ergänzung |
+| 7 | Übersprungene Fragen schreiben nichts, mit zwei benannten Ausnahmen (§2) | Ergänzung |
 | 8 | Store-`version` auf 9 | Ergänzung, verhindert Einlaufen alter Sessions |
 | 9 | `type="text"` + `inputMode="decimal"` statt `type="number"` | Ergänzung |
+| 10 | Arbeitsfähigkeit entfällt über einer Einkommensschwelle, `FULL` wird abgeleitet (§4a) | Vorgabe Auftraggeber, 2026-09-10 |
+| 11 | `work-capacity` steht hinter `gross-income` statt an fünfter Stelle | Folge von 10 |
 
 Punkt 1 ist die wichtigste: er berührt Code, der in Teil A bereits abgenommen und getestet
 ist. Der Umbau ist mechanisch, und die Abnahmefälle der Fachspec §9 sind der Nachweis, dass

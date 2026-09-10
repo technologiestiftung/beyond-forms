@@ -10,6 +10,14 @@
 
 **Spec:** `docs/specs/2026-09-09-leistungscheck-teil-b-design.md`
 
+> **Nachtrag 2026-09-10 — dieser Plan ist ein Ausführungsprotokoll, kein aktueller Stand.**
+> Nach der Umsetzung kam eine Änderung dazu, die hier bewusst nicht eingearbeitet ist:
+> die Frage nach der Arbeitsfähigkeit entfällt zusätzlich bei einem Bruttoeinkommen über
+> `WORK_CAPACITY_SKIP_GROSS_INCOME`, wird dann als `FULL` abgeleitet, und steht im Katalog
+> hinter `gross-income` statt an fünfter Stelle. Die Code-Blöcke unten zeigen den Stand
+> zum Zeitpunkt der Ausführung. Maßgeblich ist
+> `docs/specs/2026-09-09-leistungscheck-teil-b-design.md` §4a.
+
 ## Global Constraints
 
 - **Arbeitsverzeichnis für alle Kommandos:** `services/wallet-frontend`

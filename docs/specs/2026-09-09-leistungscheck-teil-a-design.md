@@ -319,11 +319,16 @@ Die bleiben `NOT_APPLICABLE`. Fehlt die strukturelle Antwort selbst, gilt wieder
 
 ### Reihenfolge-Invariante
 
-`workCapacity` wird nur erhoben, wenn die Regelaltersgrenze noch nicht erreicht ist
-(Fachspec §4, `skipIf` bei F3). §6.1 und §6.3 lesen das Feld erst *nach* einem Zweig, der
-bei erreichter Regelaltersgrenze zurückkehrt — das Feld ist dort also gesetzt. Diese
-Invariante ist im Code zu kommentieren, weil sie bei einer Änderung der Fragenreihenfolge
-still bricht.
+`workCapacity` wird nicht erhoben, wenn die Regelaltersgrenze erreicht ist (Fachspec §4,
+`skipIf` bei F3). §6.1 und §6.3 lesen das Feld erst *nach* einem Zweig, der bei erreichter
+Regelaltersgrenze zurückkehrt — das Feld ist dort also gesetzt. Diese Invariante ist im
+Code zu kommentieren, weil sie bei einer Änderung der Fragenreihenfolge still bricht.
+
+**Nachtrag 2026-09-10:** Teil B §4a hat einen zweiten Skip ergänzt — die Frage entfällt
+auch bei einem Bruttoeinkommen über der Schwelle. Für die Regeln ändert das nichts, weil
+die Navigation dort `workCapacity: FULL` nachträgt; das Feld ist also weiterhin gesetzt,
+sobald die Frage hinter einem der Beteiligten liegt. Beim Regelaltersgrenzen-Skip wird
+weiterhin nichts nachgetragen, und genau darauf stützt sich die Invariante oben.
 
 ### Korrektur eines Fehlers in Fachspec §6.5
 
