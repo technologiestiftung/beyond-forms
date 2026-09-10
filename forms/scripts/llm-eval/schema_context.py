@@ -5,7 +5,8 @@ import os
 import sys
 import types
 import typing
-from typing import Any, Dict, Tuple
+import uuid
+from typing import Any, Dict, Optional, Tuple
 
 _MODULE_CACHE: Dict[str, Any] = {}
 
@@ -459,6 +460,73 @@ def build_derived_context(project_root: str, include_field_descriptions: bool = 
     return {"person_fields": fields, "keys": keys, "person_money_keys": sorted(_MONEY_KEYS)}
 
 
+def _decimal_or_none(value: Any) -> Optional[decimal.Decimal]:
+    return decimal.Decimal(str(value)) if value is not None else None
+
+
+def _money_rows_for_person(models, person_id: Any, data: Dict[str, Any]) -> list:
+    """Money-grid rows for one evaluation profile (person_id=None for the applicant), read
+    straight off the profile's own `income_entries`/`expense_entries`/
+    `asset_entries`/`benefit_claim_entries` lists - their row fields already match the
+    ORM column names."""
+    rows: list = []
+
+    incomes = data.get("income_entries") or []
+    for entry in incomes:
+        rows.append(
+            models.IncomeEntries(
+                person_id=person_id,
+                income_type=models.IncomeTypeType(entry["income_type"]),
+                monthly_amount=_decimal_or_none(entry.get("monthly_amount")),
+                awarding_office=entry.get("awarding_office"),
+                reference_no=entry.get("reference_no"),
+            )
+        )
+    if not incomes:
+        scalar = data.get("monthly_income") if person_id is None else data.get("monthly_pension_income")
+        if scalar:
+            rows.append(
+                models.IncomeEntries(
+                    person_id=person_id, income_type=models.IncomeTypeType.PENSION, monthly_amount=_decimal_or_none(scalar)
+                )
+            )
+
+    for entry in data.get("expense_entries") or []:
+        rows.append(
+            models.ExpenseEntries(
+                person_id=person_id,
+                expense_type=models.ExpenseTypeType(entry["expense_type"]),
+                monthly_amount=_decimal_or_none(entry.get("monthly_amount")),
+                note=entry.get("note"),
+            )
+        )
+
+    for entry in data.get("asset_entries") or []:
+        rows.append(
+            models.AssetEntries(
+                person_id=person_id,
+                asset_type=models.AssetTypeType(entry["asset_type"]),
+                amount=_decimal_or_none(entry.get("amount")),
+                description=entry.get("description"),
+            )
+        )
+
+    for index, entry in enumerate(data.get("benefit_claim_entries") or []):
+        rows.append(
+            models.BenefitClaimEntries(
+                person_id=person_id,
+                claim_kind=models.BenefitClaimKindType(entry["claim_kind"]),
+                sort_order=entry.get("sort_order", index),
+                benefit_type=entry.get("benefit_type"),
+                event_date=datetime.date.fromisoformat(entry["event_date"]) if entry.get("event_date") else None,
+                amount=_decimal_or_none(entry.get("amount")),
+                office_reference=entry.get("office_reference"),
+            )
+        )
+
+    return rows
+
+
 def profile_derived_context(project_root: str, profile: Dict[str, Any]) -> Dict[str, Any]:
     """The derived context keys for one evaluation profile, computed by the very same
     form_context code the service runs, from the profile's own `associated_persons` list
@@ -472,19 +540,23 @@ def profile_derived_context(project_root: str, profile: Dict[str, Any]) -> Dict[
     person_names = {column.name for column in models.AssociatedPersons.__table__.columns}
 
     people = []
+    money_entries = _money_rows_for_person(models, None, profile)
     for index, row in enumerate(profile.get("associated_persons") or []):
         kwargs = {name: value for name, value in row.items() if name in person_names}
         kwargs.setdefault("lives_in_household", True)
         kwargs.setdefault("sort_order", index)
+        kwargs.setdefault("id", uuid.uuid4())
         for date_field in ("date_of_birth",):
             if isinstance(kwargs.get(date_field), str):
                 kwargs[date_field] = datetime.date.fromisoformat(kwargs[date_field])
-        people.append(models.AssociatedPersons(**kwargs))
+        person = models.AssociatedPersons(**kwargs)
+        people.append(person)
+        money_entries.extend(_money_rows_for_person(models, person.id, row))
 
     user_row = dict(profile)
     if isinstance(user_row.get("date_of_birth"), str):
         user_row["date_of_birth"] = datetime.date.fromisoformat(user_row["date_of_birth"])
-    return form_context.derived_context(user_row, people)
+    return form_context.derived_context(user_row, people, money_entries)
 
 
 def build_schema_context(

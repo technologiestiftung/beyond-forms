@@ -25,7 +25,8 @@ def load_profile(profile_path: str, project_root: str | None = None) -> Dict[str
         print(f"Error: Evaluation profile not found at {profile_path}", file=sys.stderr)
         sys.exit(1)
     with open(profile_path, "r", encoding="utf-8") as f:
-        profile = json.load(f)
+        raw = json.load(f)
+    profile = raw["profile"] if "profile" in raw else raw
     # Every JEXL profile must carry a `documents` key: pyjexl 0.3 has no safe-nav
     # operator, and `documents.X ? documents.X.y : ...` raises AttributeError (not just
     # evaluates falsy) when `documents` is absent entirely from the context.
@@ -457,13 +458,6 @@ def main():
         "--models", nargs="+", default=["gemini-3.7-flash"], help="List of LLM model names to execute & benchmark"
     )
     parser.add_argument("--prompt", default="rich_schema", help="Prompt template file name (without .txt suffix)")
-    parser.add_argument("--profile", help="Path to a single evaluation citizen profile JSON file")
-    parser.add_argument("--profiles", nargs="+", help="Explicit list of paths to evaluation citizen profile JSON files")
-    parser.add_argument(
-        "--profile-dir",
-        default="forms/scripts/llm-eval/profiles",
-        help="Directory containing citizen profile JSON files to discover and evaluate in parallel",
-    )
     parser.add_argument(
         "--chunk-size", type=int, default=100, help="Number of boilerplate fields to submit per LLM request chunk"
     )
@@ -510,7 +504,7 @@ def main():
 
     if not test_profiles:
         print(
-            "Error: No evaluation citizen profiles found! Please check your --profile, --profiles, or --profile-dir paths.",
+            "Error: No evaluation citizen profiles found!",
             file=sys.stderr,
         )
         sys.exit(1)

@@ -12,8 +12,6 @@ forms/scripts/llm-eval/
 ├── schema_context.py          # Users columns + documents namespace -> schema context
 ├── evaluate.py                # Benchmark runner script (compares LLM output against a hand-written baseline)
 ├── generate_mapping.py        # Production tool: fills in blank `value`s in a real mapping TOML
-├── profiles/                  # Decoupled mock testing citizen profiles
-│   └── helmut_klar.json       # Helmut Klar MVP use-case concrete data values
 ├── prompts/                   # Prompt templates
 │   ├── zero_shot.txt          # Strategy A: Baseline mapping prompt
 │   ├── few_shot.txt           # Strategy B: Prompt with diverse concrete mapping examples
@@ -90,19 +88,17 @@ uv run forms/scripts/llm-eval/evaluate.py \
   --models gemini-3.5-flash litert-community/gemma-4-E2B-it-litert-lm \
   --form antrag_grunsicherung \
   --prompt rich_schema \
-  --profile-dir forms/scripts/llm-eval/profiles \
   --chunk-size 100
 ```
 
 ### 3. Mitigating Single-Profile Bias (Parallel Multi-Profile Auditing)
 
-To ensure that expressions are functionally equivalent and not just getting false-positive matches on a single persona's attributes, the harness natively scans a directory of citizens (`--profile-dir`) or an explicit list of JSON profiles (`--profiles`) and evaluates candidates in parallel using high-performance thread pools:
+To ensure that expressions are functionally equivalent and not just getting false-positive matches on a single persona's attributes and evaluates candidates in parallel using high-performance thread pools:
 
 ```bash
 uv run forms/scripts/llm-eval/evaluate.py \
   --models gemini-3.5-flash \
   --form antrag_grunsicherung \
-  --profile-dir forms/scripts/llm-eval/profiles \
   --chunk-size 100
 ```
 
