@@ -276,6 +276,22 @@ class UserService:
 
         return user.id
 
+    def get_user_application(self, internal_user_id: str, application_id: uuid.UUID) -> UserApplications:
+        """Fetches an application by id, scoped to the given user. Raises 404 if it does not
+        exist or belongs to someone else, so a caller cannot attach a document to another
+        user's application by guessing an id (IDOR prevention)."""
+        application = (
+            self.db.query(UserApplications)
+            .filter(
+                UserApplications.application_id == application_id,
+                UserApplications.fk_user_id == internal_user_id,
+            )
+            .first()
+        )
+        if application is None:
+            raise HTTPException(status_code=404, detail="Application not found")
+        return application
+
     def get_or_create_user_application(self, internal_user_id: str, form_type: str) -> tuple[str, str]:
         """
         Finds the user's application for `form_type`, or creates one.

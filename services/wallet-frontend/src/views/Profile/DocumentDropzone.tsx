@@ -440,9 +440,17 @@ export const DocumentDropzone: React.FC = () => {
 			const parsedType = DocumentTypeEnum.safeParse(rawType);
 			const targetType = parsedType.success ? parsedType.data : defaultType;
 
+			const applicationId = await fileService.ensureApplication();
+			if (!applicationId) {
+				setStatus("ERROR");
+				setErrorMessage(t("errors.upload_failed", "Upload failed"));
+				return;
+			}
+
 			const response = await fileService.uploadFile(
 				files,
 				targetType,
+				applicationId,
 				controller.signal,
 			);
 

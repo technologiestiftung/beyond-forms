@@ -389,7 +389,11 @@ def test_upload_file_success(mock_storage_client, mock_publish_event, mock_user_
     file_content = b"test file content"
     file = io.BytesIO(file_content)
 
-    response = client.post("/upload", files={"file": ("test.png", file, "image/png")})
+    response = client.post(
+        "/upload",
+        files={"file": ("test.png", file, "image/png")},
+        data={"application_id": str(uuid.uuid4())},
+    )
 
     assert response.status_code == 200
     data = response.json()

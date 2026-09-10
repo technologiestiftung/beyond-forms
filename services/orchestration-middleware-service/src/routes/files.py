@@ -142,22 +142,20 @@ def save_file_to_database(
     user_service: UserService,
     internal_user_id: str,
     document_type: Optional[str],
+    application_id: uuid.UUID,
 ):
     new_uploaded_file = UploadedFiles(name=file.filename, bucket_name=GCS_BUCKET_NAME, object_name=unique_filename)
     db.add(new_uploaded_file)
     db.flush()
 
-    # Profile-document uploads hang off the Grundsicherung application — the
-    # form the documents flow is built around. Other form_types are created
-    # explicitly (seed, or a future per-form start).
-    _, application_id = user_service.get_or_create_user_application(
-        internal_user_id, form_type="antrag_grundsicherung_im_alter"
-    )
+    # Validates the application belongs to this user (IDOR prevention) - raises 404
+    # otherwise, so a document can never be attached to an application by guessing an id.
+    application = user_service.get_user_application(internal_user_id, application_id)
 
     new_doc = UserDocuments(
         document_id=uuid.uuid4(),
         fk_user_id=internal_user_id,
-        fk_application_id=application_id,
+        fk_application_id=application.application_id,
         fk_file_id=new_uploaded_file.id,
         document_type=document_type if document_type else "tbd",
         status=DocumentStatusType.PROCESSING,
@@ -181,6 +179,7 @@ def publish_document_event_to_pubsub(
 def _upload_file_impl(
     file: UploadFile,
     document_type: Optional[str],
+    application_id: uuid.UUID,
     db: Session,
     current_user: AuthUser,
     user_service: UserService,
@@ -195,7 +194,7 @@ def _upload_file_impl(
     publish_error = None
     try:
         new_uploaded_file, new_user_document = save_file_to_database(
-            file, db, unique_filename, user_service, internal_user_id, document_type
+            file, db, unique_filename, user_service, internal_user_id, document_type, application_id
         )
         db.commit()
     except HTTPException:
@@ -239,13 +238,15 @@ def _upload_file_impl(
     }
 
 
-async def upload_one_file_async(file: UploadFile, document_type: Optional[str], current_user: AuthUser):
+async def upload_one_file_async(
+    file: UploadFile, document_type: Optional[str], application_id: uuid.UUID, current_user: AuthUser
+):
     db = SessionLocal()
     try:
         user_service = UserService(db)
         storage_client = get_storage_client()
         return await asyncio.to_thread(
-            _upload_file_impl, file, document_type, db, current_user, user_service, storage_client
+            _upload_file_impl, file, document_type, application_id, db, current_user, user_service, storage_client
         )
     finally:
         db.close()
@@ -265,6 +266,7 @@ def upload_file(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     document_type: Optional[str] = Form(None),
+    application_id: uuid.UUID = Form(...),
     db: Session = Depends(get_db),
     current_user: AuthUser = Depends(require_authenticated_user),
     user_service: UserService = Depends(get_user_service),
@@ -275,7 +277,9 @@ def upload_file(
     """
     file_size = get_file_size(file)
     validate_file_size(file_size)
-    return _upload_file_impl(file, document_type, db, current_user, user_service, storage_client, background_tasks)
+    return _upload_file_impl(
+        file, document_type, application_id, db, current_user, user_service, storage_client, background_tasks
+    )
 
 
 @router.post("/upload-stitched", response_model=UploadedFileResponse)
@@ -283,6 +287,7 @@ def upload_stitched_files(
     background_tasks: BackgroundTasks,
     files: List[UploadFile] = File(...),
     document_type: Optional[str] = Form(None),
+    application_id: uuid.UUID = Form(...),
     db: Session = Depends(get_db),
     current_user: AuthUser = Depends(require_authenticated_user),
     user_service: UserService = Depends(get_user_service),
@@ -371,7 +376,14 @@ def upload_stitched_files(
         )
 
         return _upload_file_impl(
-            stitched_upload_file, document_type, db, current_user, user_service, storage_client, background_tasks
+            stitched_upload_file,
+            document_type,
+            application_id,
+            db,
+            current_user,
+            user_service,
+            storage_client,
+            background_tasks,
         )
 
     except Exception as e:
@@ -385,6 +397,7 @@ def upload_stitched_files(
 async def bulk_upload_files(
     files: List[UploadFile] = File(...),
     document_types: List[str] = Form(...),
+    application_id: uuid.UUID = Form(...),
     current_user: AuthUser = Depends(require_authenticated_user),
     db: Session = Depends(get_db),
     user_service: UserService = Depends(get_user_service),
@@ -403,7 +416,7 @@ async def bulk_upload_files(
         )
 
     results = await asyncio.gather(
-        *[upload_one_file_async(f, dt, current_user) for f, dt in zip(files, document_types)],
+        *[upload_one_file_async(f, dt, application_id, current_user) for f, dt in zip(files, document_types)],
         return_exceptions=True,
     )
 

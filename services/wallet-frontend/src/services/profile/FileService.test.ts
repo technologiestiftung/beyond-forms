@@ -124,7 +124,7 @@ describe("FileService", () => {
 				]),
 		} as Response);
 
-		const result = await service.bulkUploadFiles(mockBulkItems);
+		const result = await service.bulkUploadFiles(mockBulkItems, "app-1");
 
 		expect(fetch).toHaveBeenCalledWith(
 			`${env.VITE_API_URL}/bulk-upload`,
@@ -168,7 +168,7 @@ describe("FileService", () => {
 				]),
 		} as Response);
 
-		const result = await service.bulkUploadFiles(mockBulkItems);
+		const result = await service.bulkUploadFiles(mockBulkItems, "app-1");
 
 		expect(result).toHaveLength(2);
 		expect(result[0].success).toBe(true);
@@ -178,7 +178,7 @@ describe("FileService", () => {
 	it("bulkUploadFiles should return an array of failed uploads", async () => {
 		vi.mocked(fetch).mockResolvedValue({ ok: false, status: 500 } as Response);
 
-		const result = await service.bulkUploadFiles(mockBulkItems);
+		const result = await service.bulkUploadFiles(mockBulkItems, "app-1");
 		expect(result).toHaveLength(2);
 		expect(result[0]).toEqual({ success: false, message: "Upload failed" });
 		expect(result[1]).toEqual({ success: false, message: "Upload failed" });
@@ -187,7 +187,7 @@ describe("FileService", () => {
 	it("bulkUploadFiles should return an array of failed uploads on network error", async () => {
 		vi.mocked(fetch).mockRejectedValue(new Error("Network error"));
 
-		const result = await service.bulkUploadFiles(mockBulkItems);
+		const result = await service.bulkUploadFiles(mockBulkItems, "app-1");
 		expect(result).toHaveLength(2);
 		expect(result[0]).toEqual({ success: false, message: "Network error" });
 		expect(result[1]).toEqual({ success: false, message: "Network error" });
