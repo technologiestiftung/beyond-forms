@@ -8,6 +8,7 @@ import type {
 	BenefitCheckAnswers,
 	PartialBenefitCheckAnswers,
 } from "../../schemas/benefitCheck.schema";
+import { WORK_CAPACITY_SKIP_GROSS_INCOME } from "../../config/benefitRules.config";
 import { compositionImpliesChildren, hasReachedRetirementAge } from "./derive";
 
 export type QuestionInput =
@@ -69,19 +70,6 @@ export const QUESTION_CATALOGUE: readonly BenefitQuestion[] = [
 		input: "boolean",
 	},
 	{
-		id: "work-capacity",
-		field: "workCapacity",
-		input: "choice",
-		options: [
-			WorkCapacity.FULL,
-			WorkCapacity.TEMPORARILY_REDUCED,
-			WorkCapacity.PERMANENTLY_REDUCED,
-		],
-		skipIf: (answers, today) =>
-			answers.dateOfBirth !== undefined &&
-			hasReachedRetirementAge(answers.dateOfBirth, today),
-	},
-	{
 		id: "employment",
 		field: "isEmployed",
 		input: "boolean",
@@ -92,6 +80,37 @@ export const QUESTION_CATALOGUE: readonly BenefitQuestion[] = [
 		input: "number",
 		unit: "EUR",
 		skipIf: (answers) => answers.isEmployed === false,
+	},
+	{
+		id: "work-capacity",
+		field: "workCapacity",
+		input: "choice",
+		options: [
+			WorkCapacity.FULL,
+			WorkCapacity.TEMPORARILY_REDUCED,
+			WorkCapacity.PERMANENTLY_REDUCED,
+		],
+		/**
+		 * Two reasons to skip.
+		 *
+		 * Past the retirement age the answer no longer routes anything — the SGB XII
+		 * rule keys off the age instead.
+		 *
+		 * Above the income threshold, working under three hours a day would be unusual,
+		 * so the answer is taken as FULL. Below it the question stays: Werkstatt pay
+		 * sits far under the threshold, and those workers are precisely the people the
+		 * SGB XII assessment must not miss.
+		 *
+		 * `useBenefitCheckNavigation` records `workCapacity: FULL` for the income skip.
+		 * Three of the six rules read the field, so leaving it undefined would strand
+		 * them all on INSUFFICIENT_DATA.
+		 */
+		skipIf: (answers, today) =>
+			(answers.dateOfBirth !== undefined &&
+				hasReachedRetirementAge(answers.dateOfBirth, today)) ||
+			(answers.isEmployed === true &&
+				answers.monthlyGrossIncome !== undefined &&
+				answers.monthlyGrossIncome > WORK_CAPACITY_SKIP_GROSS_INCOME),
 	},
 	{
 		id: "net-income",

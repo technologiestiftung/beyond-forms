@@ -108,3 +108,49 @@ describe("QUESTION_CATALOGUE", () => {
 		}
 	});
 });
+
+describe("work capacity skip by income", () => {
+	const workCapacity = QUESTION_CATALOGUE.find((q) => q.id === "work-capacity");
+
+	it("is skipped for someone earning comfortably above the threshold", () => {
+		expect(
+			workCapacity?.skipIf?.({ isEmployed: true, monthlyGrossIncome: 2400 }, TODAY),
+		).toBe(true);
+	});
+
+	/**
+	 * The reason the threshold exists. A Werkstatt für behinderte Menschen pays on the
+	 * order of 220 EUR a month, and those workers are typically fully unable to work on
+	 * the general labour market — exactly what SGB XII Kap. 4 is for. They must keep
+	 * being asked.
+	 */
+	it("still asks someone on Werkstatt pay", () => {
+		expect(
+			workCapacity?.skipIf?.({ isEmployed: true, monthlyGrossIncome: 220 }, TODAY),
+		).toBe(false);
+	});
+
+	it("still asks at the threshold itself", () => {
+		expect(
+			workCapacity?.skipIf?.({ isEmployed: true, monthlyGrossIncome: 1000 }, TODAY),
+		).toBe(false);
+	});
+
+	it("does not skip on income alone when there is no job", () => {
+		expect(
+			workCapacity?.skipIf?.(
+				{ isEmployed: false, monthlyGrossIncome: 2400 },
+				TODAY,
+			),
+		).toBe(false);
+	});
+
+	it("still skips past the retirement age regardless of income", () => {
+		expect(
+			workCapacity?.skipIf?.(
+				{ dateOfBirth: "1950-01-01", isEmployed: false },
+				TODAY,
+			),
+		).toBe(true);
+	});
+});

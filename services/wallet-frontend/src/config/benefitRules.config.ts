@@ -89,6 +89,25 @@ export const KIZ_MIN_GROSS_INCOME = {
 } as const;
 
 /**
+ * Gross monthly income above which the questionnaire stops asking whether someone can
+ * work at least three hours a day, and assumes they can.
+ *
+ * Three hours a day comes to roughly 835 EUR a month at the statutory minimum wage
+ * (3 h × 5 days × 4.33 weeks × ~12.82 EUR). Above 1000 EUR a person would have to earn
+ * well over the minimum wage to be working less than that, which is rare — and someone
+ * in that position would usually fail the means test anyway.
+ *
+ * The threshold exists for the case BELOW it. A Werkstatt für behinderte Menschen pays
+ * on the order of 220 EUR a month, and those workers are, to my understanding, counted
+ * as fully unable to work on the general labour market (§43 SGB VI) — which is exactly
+ * what qualifies them for SGB XII Kap. 4. They must keep being asked.
+ *
+ * FROM MODEL KNOWLEDGE, and a product decision rather than a legal figure. UNVERIFIED:
+ * the minimum wage changes yearly, and the Werkstatt reasoning needs checking.
+ */
+export const WORK_CAPACITY_SKIP_GROSS_INCOME = 1000;
+
+/**
  * Rent-to-income ratio above which Wohngeld is worth checking.
  *
  * This is NOT an official figure. The domain spec §6.4 declares it a heuristic of its

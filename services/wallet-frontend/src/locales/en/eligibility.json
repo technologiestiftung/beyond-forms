@@ -104,7 +104,7 @@
 		"work-capacity": {
 			"category": "Ability to work",
 			"title": "Can you work at least three hours a day?",
-			"tip": "Three hours is a threshold in the law. It decides which office is responsible for you. This is not about whether you currently have a job.",
+			"tip": "Three hours is a threshold in the law. It decides which office is responsible for you. We ask even if you are working: some people work in a sheltered workshop, for example, and still count as having reduced earning capacity.",
 			"options": {
 				"FULL": "Yes, at least three hours a day.",
 				"TEMPORARILY_REDUCED": "Not at the moment, but perhaps again later.",

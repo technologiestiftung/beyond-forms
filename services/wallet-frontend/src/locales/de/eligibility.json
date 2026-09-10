@@ -104,7 +104,7 @@
 		"work-capacity": {
 			"category": "Arbeiten können",
 			"title": "Kannst Du mindestens drei Stunden am Tag arbeiten?",
-			"tip": "Drei Stunden sind eine Grenze im Gesetz. Danach richtet sich, welche Stelle für Dich zuständig ist. Es geht nicht darum, ob Du gerade eine Arbeit hast.",
+			"tip": "Drei Stunden sind eine Grenze im Gesetz. Danach richtet sich, welche Stelle für Dich zuständig ist. Wir fragen das auch, wenn Du arbeitest: Manche Menschen arbeiten zum Beispiel in einer Werkstatt und gelten trotzdem als erwerbsgemindert.",
 			"options": {
 				"FULL": "Ja, mindestens drei Stunden am Tag.",
 				"TEMPORARILY_REDUCED": "Im Moment nicht, aber vielleicht später wieder.",

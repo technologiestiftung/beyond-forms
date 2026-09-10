@@ -63,6 +63,8 @@ describe("getValidPath", () => {
 			livesInGermany: true,
 			workCapacity: WorkCapacity.FULL,
 			isEmployed: true,
+			// Above WORK_CAPACITY_SKIP_GROSS_INCOME, so the work-capacity question is
+			// skipped for this person and the path is ten rather than eleven.
 			monthlyGrossIncome: 1400,
 			monthlyNetHouseholdIncome: 1100,
 			monthlyWarmRent: 650,
@@ -70,7 +72,31 @@ describe("getValidPath", () => {
 			receivesBenefitsAlready: false,
 			citizenship: Citizenship.DE_EU,
 		};
-		expect(getValidPath(complete, TODAY)).toHaveLength(11);
+		expect(getValidPath(complete, TODAY).map((q) => q.id)).toEqual([
+			"household",
+			"birthdate",
+			"germany",
+			"employment",
+			"gross-income",
+			"net-income",
+			"warm-rent",
+			"assets",
+			"benefits",
+			"citizenship",
+		]);
+	});
+
+	it("keeps the work-capacity question for someone on a very low wage", () => {
+		const werkstatt: PartialBenefitCheckAnswers = {
+			householdComposition: HouseholdComposition.SINGLE,
+			dateOfBirth: "1994-01-15",
+			livesInGermany: true,
+			isEmployed: true,
+			monthlyGrossIncome: 220,
+		};
+		expect(getValidPath(werkstatt, TODAY).map((q) => q.id)).toContain(
+			"work-capacity",
+		);
 	});
 
 	it("treats an empty children list as answered", () => {
