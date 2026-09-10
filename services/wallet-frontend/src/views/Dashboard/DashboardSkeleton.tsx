@@ -17,7 +17,7 @@ export const DashboardSkeleton: React.FC = () => {
 			<div className="flex flex-col items-start max-w-md w-full min-w-0 gap-6 lg:max-w-none lg:gap-8">
 				<div className="flex flex-col items-start gap-4 w-full min-w-0 lg:gap-6">
 					<div className="flex flex-row items-center gap-4 w-full min-w-0">
-						<div className="size-11 shrink-0 rounded-full bg-white ring-1 ring-slate-200 lg:size-13" />
+						<div className="size-11 shrink-0 rounded-full bg-white ring-1 ring-slate-200 lg:size-14" />
 						<div className="h-9 flex-1 max-w-[220px] rounded-lg bg-slate-200/90 lg:h-10" />
 					</div>
 					<div className="h-5 w-full rounded-md bg-slate-200/80" />

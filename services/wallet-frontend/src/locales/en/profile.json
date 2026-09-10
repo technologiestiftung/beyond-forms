@@ -105,6 +105,7 @@
 		}
 	},
 	"welcome": "Hello {{name}}!",
+	"subtitle": "Here you manage your details, documents and settings. Klaro reuses them for all applications.",
 	"actions": {
 		"logout": "Logout from Klaro",
 		"delete_account": "Delete my Klaro Account"
@@ -134,10 +135,16 @@
 	"status": {
 		"complete": "Complete",
 		"partial": "Partially complete",
-		"missing": "Still missing"
+		"missing": "Still missing",
+		"processing": "Being checked"
 	},
 	"personal": {
 		"title": "Personal Data",
+		"subtitle": "Your details are reused for all applications. You can change them at any time.",
+		"categories": {
+			"nav_label": "Categories",
+			"progress": "{{completed}} of {{total}} categories complete"
+		},
 		"edit_title": "Edit Personal Data",
 		"view_desc": "Here you can view and edit your personal data.",
 		"groups": {
@@ -252,7 +259,8 @@
 		},
 		"errors": {
 			"update_failed": "Update failed",
-			"system_error": "A system error occurred"
+			"system_error": "A system error occurred",
+			"validation_failed": "Please check the highlighted entries."
 		},
 		"displacedStatus": {
 			"Expellee (Resettler)": "Expellee / resettler",
@@ -334,7 +342,8 @@
 		"save_and_continue": "Save and continue",
 		"remove_file": "Remove",
 		"download": "Download",
-		"edit_field": "Edit {{field}}"
+		"edit_field": "Edit {{field}}",
+		"open": "Open"
 	},
 	"success": {
 		"headline": "Data Accepted",

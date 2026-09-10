@@ -105,6 +105,7 @@
 		}
 	},
 	"welcome": "Hallo {{name}}!",
+	"subtitle": "Hier verwaltest Du Deine Angaben, Dokumente und Einstellungen. Klaro übernimmt sie für alle Anträge.",
 	"actions": {
 		"logout": "Bei Klaro ausloggen",
 		"delete_account": "Mein Klaro Konto löschen"
@@ -134,10 +135,16 @@
 	"status": {
 		"complete": "Vollständig",
 		"partial": "Teilweise vollständig",
-		"missing": "Fehlt noch"
+		"missing": "Fehlt noch",
+		"processing": "Wird geprüft"
 	},
 	"personal": {
 		"title": "Persönliche Daten",
+		"subtitle": "Deine Angaben werden für alle Anträge übernommen. Du kannst sie jederzeit ändern.",
+		"categories": {
+			"nav_label": "Kategorien",
+			"progress": "{{completed}} von {{total}} Kategorien vollständig"
+		},
 		"edit_title": "Persönliche Angaben bearbeiten",
 		"view_desc": "Hier kannst Du Deine persönlichen Daten einsehen und bearbeiten.",
 		"groups": {
@@ -252,7 +259,8 @@
 		},
 		"errors": {
 			"update_failed": "Aktualisierung fehlgeschlagen",
-			"system_error": "Ein Systemfehler ist aufgetreten"
+			"system_error": "Ein Systemfehler ist aufgetreten",
+			"validation_failed": "Bitte prüfe die markierten Angaben."
 		},
 		"displacedStatus": {
 			"Expellee (Resettler)": "Vertriebene(r) / Spätaussiedler",
@@ -334,7 +342,8 @@
 		"save_and_continue": "Speichern und weiter",
 		"remove_file": "Entfernen",
 		"download": "Herunterladen",
-		"edit_field": "{{field}} bearbeiten"
+		"edit_field": "{{field}} bearbeiten",
+		"open": "Öffnen"
 	},
 	"success": {
 		"headline": "Daten übernommen",

@@ -8,6 +8,7 @@ interface PageContainerProps {
 	withPadding?: boolean;
 	topBarProps?: TopBarProps;
 	contentClassName?: string;
+	className?: string;
 }
 
 const MAX_WIDTH_MAP = {
@@ -29,6 +30,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
 	withPadding = true,
 	topBarProps,
 	contentClassName = "",
+	className = "",
 }) => {
 	const maxWidthClass = MAX_WIDTH_MAP[maxWidth];
 
@@ -37,6 +39,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
 			className={`
 				w-full min-h-full flex flex-col items-center shrink-0
 				${`bg-${bgColor}`}
+				${className}
 			`}
 		>
 			{topBarProps && <TopBar {...topBarProps} />}

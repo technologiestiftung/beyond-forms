@@ -268,6 +268,11 @@ testWithAuthenticatedUser.describe(
 				await page.goto("/profile/personal/edit");
 				await expect(page.getByTestId("field-firstName-input")).toBeVisible();
 
+				const addressNav = page.getByTestId("category-nav-address");
+				if (await addressNav.isVisible()) {
+					await addressNav.click();
+				}
+
 				const zipInput = page.getByTestId("field-zipCode-input");
 				await zipInput.fill("123456789012345");
 				await zipInput.blur();

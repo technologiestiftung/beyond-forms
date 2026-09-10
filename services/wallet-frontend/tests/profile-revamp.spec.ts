@@ -92,7 +92,11 @@ test.describe("Automated E2E Integration & Accessibility Audits - Profile Revamp
 		// Verify saving status toast popup maps correctly
 		await expect(page.locator("role=status")).toBeVisible();
 
-		// Verify other sections are visible on the same page
+		// Desktop reveals one category at a time via the sidebar; mobile stacks them all
+		const addressNav = page.getByTestId("category-nav-address");
+		if (await addressNav.isVisible()) {
+			await addressNav.click();
+		}
 		await expect(page.locator("label", { hasText: "Straße" })).toBeVisible();
 
 		// Click Save and Close button

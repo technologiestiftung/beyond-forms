@@ -28,6 +28,14 @@ test.describe("Accessibility Audits - Profile Workspace", () => {
 		// Navigate to Personal Data Edit
 		await page.getByTestId("section-personal").click();
 
+		await expect(page.getByTestId("field-firstName-input")).toBeVisible();
+
+		// Desktop reveals one category at a time via the sidebar
+		const addressNav = page.getByTestId("category-nav-address");
+		if (await addressNav.isVisible()) {
+			await addressNav.click();
+		}
+
 		// Trigger validation error by entering an invalid ZIP code length
 		const zipInput = page.getByTestId("field-zipCode-input");
 		await zipInput.fill("123456789012345");

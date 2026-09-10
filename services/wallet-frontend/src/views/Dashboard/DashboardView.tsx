@@ -11,7 +11,7 @@ import { PageContainer } from "../../components/Layout/PageContainer";
 import { PrimaryButton } from "../../components/ui/PrimaryButton";
 import { ApplicationCard } from "./ApplicationCard";
 import { SimpleApplicationCard } from "./SimpleApplicationCard";
-import profileIllustration from "../../assets/illustrations/profile.svg";
+import { GreetingHeader } from "../../components/Layout/GreetingHeader";
 
 function applicationCardStatusForMilestone(
 	milestoneLevel?: number,
@@ -101,23 +101,10 @@ export const DashboardView: React.FC = () => {
 			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
 		>
 			<div className="flex flex-col items-start max-w-md w-full min-w-0 gap-6 lg:max-w-none lg:gap-8">
-				<div className="flex flex-col items-start gap-4 w-full min-w-0 lg:gap-6">
-					<div className="flex flex-row items-center gap-4 w-full min-w-0">
-						<img
-							src={profileIllustration}
-							alt=""
-							className="size-11 shrink-0 rounded-full bg-white lg:size-13"
-							aria-hidden
-						/>
-						<h1 className="text-h1 font-bold text-brand-black min-w-0 wrap-break-word lg:text-[32px] lg:leading-10">
-							{greetingHeadline}
-						</h1>
-					</div>
-
-					<p className="text-brand-black text-body-lg wrap-break-word">
-						{t("onboarding.checklist.intro")}
-					</p>
-				</div>
+				<GreetingHeader
+					title={greetingHeadline}
+					subtitle={t("onboarding.checklist.intro")}
+				/>
 
 				<div className="flex flex-col gap-6 w-full min-w-0 lg:grid lg:grid-cols-[repeat(auto-fit,minmax(288px,1fr))] lg:gap-5">
 					<ApplicationCard status={appCardStatus} level={milestoneLevel} />
