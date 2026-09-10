@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { EligibilityResult } from "./EligibilityResult";
 import { useBenefitCheckStore } from "../store/useBenefitCheckStore";
@@ -67,20 +67,57 @@ describe("EligibilityResult", () => {
 
 	// Read the ids with getAttribute, not element.dataset — jsdom does not populate
 	// dataset for a hyphenated attribute set through React the way a browser does.
-	it("renders one card per benefit, in the engine's order", () => {
+	it("sorts the listed benefits likely, then check, then unlikely", () => {
 		seed(CASE_C);
 		renderResult();
 		const ids = screen
 			.getAllByTestId(/^assessment-/)
 			.map((card) => card.getAttribute("data-testid"));
 		expect(ids).toEqual([
-			`assessment-${BenefitId.SGB_II_BASIC_INCOME}`,
-			`assessment-${BenefitId.SGB_XII_OLD_AGE_REDUCED_CAPACITY}`,
-			`assessment-${BenefitId.SGB_XII_SUBSISTENCE_AID}`,
+			// LIKELY_YES
+			`assessment-${BenefitId.ADVANCE_MAINTENANCE}`,
+			// CHECK_ADVISED, in the engine's own order because the sort is stable
 			`assessment-${BenefitId.HOUSING_BENEFIT}`,
 			`assessment-${BenefitId.CHILD_SUPPLEMENT}`,
-			`assessment-${BenefitId.ADVANCE_MAINTENANCE}`,
+			// LIKELY_NO
+			`assessment-${BenefitId.SGB_II_BASIC_INCOME}`,
 		]);
+	});
+
+	it("keeps the benefits that do not concern the applicant out of the main list", () => {
+		seed(CASE_C);
+		renderResult();
+		const ids = screen
+			.getAllByTestId(/^assessment-/)
+			.map((card) => card.getAttribute("data-testid"));
+		expect(ids).not.toContain(
+			`assessment-${BenefitId.SGB_XII_OLD_AGE_REDUCED_CAPACITY}`,
+		);
+		expect(screen.getByTestId("not-applicable-toggle")).toBeInTheDocument();
+		expect(screen.queryByTestId("not-applicable-list")).toBeNull();
+	});
+
+	it("reveals them on request", () => {
+		seed(CASE_C);
+		renderResult();
+		fireEvent.click(screen.getByTestId("not-applicable-toggle"));
+		expect(screen.getByTestId("not-applicable-list")).toBeInTheDocument();
+		expect(
+			screen.getByTestId(
+				`assessment-${BenefitId.SGB_XII_OLD_AGE_REDUCED_CAPACITY}`,
+			),
+		).toBeInTheDocument();
+	});
+
+	it("offers an apply button on the likely benefit only", () => {
+		seed(CASE_C);
+		renderResult();
+		expect(
+			screen.getByTestId(`apply-${BenefitId.ADVANCE_MAINTENANCE}`),
+		).toBeInTheDocument();
+		expect(
+			screen.queryByTestId(`apply-${BenefitId.HOUSING_BENEFIT}`),
+		).toBeNull();
 	});
 
 	it("always renders the disclaimer", () => {

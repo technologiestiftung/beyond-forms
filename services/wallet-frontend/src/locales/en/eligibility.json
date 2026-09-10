@@ -214,6 +214,9 @@
 		"title": "Your initial assessment",
 		"cta": "Create an account and continue",
 		"disclaimer": "This is an automated initial assessment with no legal force. It does not replace advice from a Jobcenter, a Sozialamt or an independent advice service.",
+		"apply": "Apply now",
+		"not_applicable_group_one": "1 benefit does not concern your situation",
+		"not_applicable_group_other": "{{count}} benefits do not concern your situation",
 		"referral": {
 			"title": "None of the benefits checked here fit at the moment",
 			"description": "That does not mean there is no support for you. The Sozialamt in your district can tell you what might apply to your situation.",

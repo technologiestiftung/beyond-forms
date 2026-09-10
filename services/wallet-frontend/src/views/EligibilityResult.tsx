@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useId, useState } from "react";
 import { Link } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { StepLayout } from "../components/Layout/StepLayout";
 import { BenefitAssessmentCard } from "../components/Eligibility/BenefitAssessmentCard";
@@ -16,9 +17,23 @@ import { EXTERNAL_LINKS } from "../config/externalLinks";
  */
 const CONTINUE_PATH = `${AppRoutes.Profile}?${URL_PARAMS.ORIGIN}=${URL_PARAMS.ORIGIN_ELIGIBILITY}`;
 
+/**
+ * Display order. NOT_APPLICABLE ranks last and is then split off entirely: those are
+ * category mismatches, not rejections, and the domain spec §8 asks that they not read
+ * like one.
+ */
+const STATUS_RANK: Record<BenefitStatus, number> = {
+	[BenefitStatus.LIKELY_YES]: 0,
+	[BenefitStatus.CHECK_ADVISED]: 1,
+	[BenefitStatus.LIKELY_NO]: 2,
+	[BenefitStatus.NOT_APPLICABLE]: 3,
+};
+
 export const EligibilityResult: React.FC = () => {
 	const { t } = useTranslation();
 	const answers = useBenefitCheckStore((s) => s.answers);
+	const [showNotApplicable, setShowNotApplicable] = useState(false);
+	const notApplicableId = useId();
 	// Input-side clock only; the engine takes `today` as an argument so it stays testable.
 	const today = new Date().toLocaleDateString("sv-SE");
 	const result = evaluateBenefitCheck(answers, today);
@@ -29,6 +44,20 @@ export const EligibilityResult: React.FC = () => {
 			assessment.status === BenefitStatus.CHECK_ADVISED,
 	);
 
+	/**
+	 * Sort is stable in every engine this ships to, so benefits of the same status keep
+	 * the order the engine produced them in — the list stays reproducible.
+	 */
+	const ranked = [...result.assessments].sort(
+		(a, b) => STATUS_RANK[a.status] - STATUS_RANK[b.status],
+	);
+	const listed = ranked.filter(
+		(assessment) => assessment.status !== BenefitStatus.NOT_APPLICABLE,
+	);
+	const notApplicable = ranked.filter(
+		(assessment) => assessment.status === BenefitStatus.NOT_APPLICABLE,
+	);
+
 	return (
 		<StepLayout>
 			<div className="w-full font-sans flex flex-col gap-6">
@@ -37,13 +66,52 @@ export const EligibilityResult: React.FC = () => {
 				</h1>
 
 				<ul className="flex flex-col gap-3 list-none p-0 m-0">
-					{result.assessments.map((assessment) => (
+					{listed.map((assessment) => (
 						<BenefitAssessmentCard
 							key={assessment.benefit}
 							assessment={assessment}
+							applyPath={CONTINUE_PATH}
 						/>
 					))}
 				</ul>
+
+				{notApplicable.length > 0 && (
+					<div>
+						<button
+							type="button"
+							aria-expanded={showNotApplicable}
+							aria-controls={notApplicableId}
+							onClick={() => setShowNotApplicable((open) => !open)}
+							data-testid="not-applicable-toggle"
+							className="flex w-full items-center gap-2 py-2 text-left text-sm text-brand-grey"
+						>
+							<ChevronDown
+								aria-hidden="true"
+								className={`size-4 shrink-0 transition-transform ${
+									showNotApplicable ? "rotate-180" : ""
+								}`}
+							/>
+							{t("result.not_applicable_group", {
+								count: notApplicable.length,
+							})}
+						</button>
+						{showNotApplicable && (
+							<ul
+								id={notApplicableId}
+								data-testid="not-applicable-list"
+								className="mt-2 flex flex-col gap-3 list-none p-0"
+							>
+								{notApplicable.map((assessment) => (
+									<BenefitAssessmentCard
+										key={assessment.benefit}
+										assessment={assessment}
+										applyPath={CONTINUE_PATH}
+									/>
+								))}
+							</ul>
+						)}
+					</div>
+				)}
 
 				{nothingMatches && (
 					<div

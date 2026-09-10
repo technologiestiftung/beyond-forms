@@ -214,6 +214,9 @@
 		"title": "Deine Ersteinschätzung",
 		"cta": "Konto erstellen und weitermachen",
 		"disclaimer": "Das ist eine automatische Ersteinschätzung ohne Rechtsverbindlichkeit. Sie ersetzt keine Beratung durch Jobcenter, Sozialamt oder eine unabhängige Sozialberatung.",
+		"apply": "Jetzt beantragen",
+		"not_applicable_group_one": "1 Leistung betrifft Deine Situation nicht",
+		"not_applicable_group_other": "{{count}} Leistungen betreffen Deine Situation nicht",
 		"referral": {
 			"title": "Im Moment passt keine der geprüften Leistungen",
 			"description": "Das heißt nicht, dass es keine Unterstützung für Dich gibt. Das Sozialamt in Deinem Bezirk kann Dir sagen, was für Deine Situation infrage kommt.",

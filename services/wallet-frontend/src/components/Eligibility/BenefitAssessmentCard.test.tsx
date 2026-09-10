@@ -1,31 +1,50 @@
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { BenefitAssessmentCard } from "./BenefitAssessmentCard";
 import {
 	BenefitId,
 	BenefitStatus,
 	ReasonCode,
 } from "../../schemas/benefitCheck.schema";
+import type { BenefitAssessment } from "../../schemas/benefitCheck.schema";
+
+const APPLY_PATH = "/profile?origin=eligibility";
+
+const renderCard = (assessment: BenefitAssessment) =>
+	render(
+		<MemoryRouter>
+			<BenefitAssessmentCard assessment={assessment} applyPath={APPLY_PATH} />
+		</MemoryRouter>,
+	);
 
 describe("BenefitAssessmentCard", () => {
-	it("names the benefit, the status and every reason", () => {
-		render(
-			<BenefitAssessmentCard
-				assessment={{
-					benefit: BenefitId.HOUSING_BENEFIT,
-					status: BenefitStatus.CHECK_ADVISED,
-					reasons: [
-						ReasonCode.RENT_BURDEN_HIGH,
-						ReasonCode.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA,
-					],
-				}}
-			/>,
-		);
+	it("names the benefit and the status", () => {
+		renderCard({
+			benefit: BenefitId.HOUSING_BENEFIT,
+			status: BenefitStatus.CHECK_ADVISED,
+			reasons: [ReasonCode.RENT_BURDEN_HIGH],
+		});
 		// The global i18n mock returns keys, so these assert the lookups happen.
 		expect(
 			screen.getByText("result.benefit.HOUSING_BENEFIT"),
 		).toBeInTheDocument();
 		expect(screen.getByText("result.status.CHECK_ADVISED")).toBeInTheDocument();
+	});
+
+	it("keeps the reasons hidden until the card is opened", () => {
+		renderCard({
+			benefit: BenefitId.HOUSING_BENEFIT,
+			status: BenefitStatus.CHECK_ADVISED,
+			reasons: [
+				ReasonCode.RENT_BURDEN_HIGH,
+				ReasonCode.EXACT_AMOUNT_NEEDS_OFFICIAL_FORMULA,
+			],
+		});
+		expect(screen.queryByText("result.reason.RENT_BURDEN_HIGH")).toBeNull();
+
+		fireEvent.click(screen.getByTestId("toggle-HOUSING_BENEFIT"));
+
 		expect(
 			screen.getByText("result.reason.RENT_BURDEN_HIGH"),
 		).toBeInTheDocument();
@@ -34,80 +53,81 @@ describe("BenefitAssessmentCard", () => {
 		).toBeInTheDocument();
 	});
 
-	it("marks a likely benefit with an icon", () => {
-		render(
-			<BenefitAssessmentCard
-				assessment={{
-					benefit: BenefitId.ADVANCE_MAINTENANCE,
-					status: BenefitStatus.LIKELY_YES,
-					reasons: [ReasonCode.CHILD_SUPPORT_INCOMPLETE],
-				}}
-			/>,
-		);
-		expect(screen.getByTestId("status-icon")).toBeInTheDocument();
+	it("reports its open state so a screen reader can follow", () => {
+		renderCard({
+			benefit: BenefitId.HOUSING_BENEFIT,
+			status: BenefitStatus.CHECK_ADVISED,
+			reasons: [ReasonCode.RENT_BURDEN_HIGH],
+		});
+		const toggle = screen.getByTestId("toggle-HOUSING_BENEFIT");
+		expect(toggle).toHaveAttribute("aria-expanded", "false");
+		fireEvent.click(toggle);
+		expect(toggle).toHaveAttribute("aria-expanded", "true");
 	});
 
-	it("gives no icon to any other status", () => {
+	it("offers no toggle when there is nothing to reveal", () => {
+		renderCard({
+			benefit: BenefitId.CHILD_SUPPLEMENT,
+			status: BenefitStatus.LIKELY_NO,
+			reasons: [],
+		});
+		expect(screen.queryByTestId("toggle-CHILD_SUPPLEMENT")).toBeNull();
+		expect(screen.getByText("result.status.LIKELY_NO")).toBeInTheDocument();
+	});
+
+	it("gives the three decided statuses an icon", () => {
 		for (const status of [
+			BenefitStatus.LIKELY_YES,
 			BenefitStatus.CHECK_ADVISED,
 			BenefitStatus.LIKELY_NO,
-			BenefitStatus.NOT_APPLICABLE,
 		]) {
-			const { unmount } = render(
-				<BenefitAssessmentCard
-					assessment={{
-						benefit: BenefitId.HOUSING_BENEFIT,
-						status,
-						reasons: [],
-					}}
-				/>,
-			);
-			expect(screen.queryByTestId("status-icon"), status).toBeNull();
+			const { unmount } = renderCard({
+				benefit: BenefitId.HOUSING_BENEFIT,
+				status,
+				reasons: [],
+			});
+			expect(screen.getByTestId("status-icon"), status).toBeInTheDocument();
 			unmount();
 		}
 	});
 
-	it("mutes a benefit that does not concern the applicant", () => {
-		render(
-			<BenefitAssessmentCard
-				assessment={{
-					benefit: BenefitId.SGB_XII_SUBSISTENCE_AID,
-					status: BenefitStatus.NOT_APPLICABLE,
-					reasons: [ReasonCode.NOT_IN_CAPACITY_GAP],
-				}}
-			/>,
-		);
+	it("gives no icon to a benefit that does not concern the applicant", () => {
+		renderCard({
+			benefit: BenefitId.SGB_XII_SUBSISTENCE_AID,
+			status: BenefitStatus.NOT_APPLICABLE,
+			reasons: [ReasonCode.NOT_IN_CAPACITY_GAP],
+		});
+		expect(screen.queryByTestId("status-icon")).toBeNull();
 		expect(
 			screen.getByTestId("assessment-SGB_XII_SUBSISTENCE_AID"),
 		).toHaveAttribute("data-muted", "true");
 	});
 
-	it("does not mute the other statuses", () => {
-		render(
-			<BenefitAssessmentCard
-				assessment={{
-					benefit: BenefitId.SGB_II_BASIC_INCOME,
-					status: BenefitStatus.LIKELY_NO,
-					reasons: [ReasonCode.INCOME_COVERS_NEEDS],
-				}}
-			/>,
-		);
-		expect(screen.getByTestId("assessment-SGB_II_BASIC_INCOME")).toHaveAttribute(
-			"data-muted",
-			"false",
+	it("offers an apply button only for a likely benefit", () => {
+		renderCard({
+			benefit: BenefitId.ADVANCE_MAINTENANCE,
+			status: BenefitStatus.LIKELY_YES,
+			reasons: [ReasonCode.CHILD_SUPPORT_INCOMPLETE],
+		});
+		expect(screen.getByTestId("apply-ADVANCE_MAINTENANCE")).toHaveAttribute(
+			"href",
+			APPLY_PATH,
 		);
 	});
 
-	it("still names the status when there are no reasons", () => {
-		render(
-			<BenefitAssessmentCard
-				assessment={{
-					benefit: BenefitId.CHILD_SUPPLEMENT,
-					status: BenefitStatus.LIKELY_NO,
-					reasons: [],
-				}}
-			/>,
-		);
-		expect(screen.getByText("result.status.LIKELY_NO")).toBeInTheDocument();
+	it("offers no apply button for the other statuses", () => {
+		for (const status of [
+			BenefitStatus.CHECK_ADVISED,
+			BenefitStatus.LIKELY_NO,
+			BenefitStatus.NOT_APPLICABLE,
+		]) {
+			const { unmount } = renderCard({
+				benefit: BenefitId.HOUSING_BENEFIT,
+				status,
+				reasons: [],
+			});
+			expect(screen.queryByTestId("apply-HOUSING_BENEFIT"), status).toBeNull();
+			unmount();
+		}
 	});
 });
