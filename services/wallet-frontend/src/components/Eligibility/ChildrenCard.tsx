@@ -22,6 +22,18 @@ interface ChildrenCardProps {
 const withIndex = (template: string, index: number): string =>
 	template.replace("{{index}}", String(index + 1));
 
+const EARLIEST_BIRTHDATE = "1900-01-01";
+
+/**
+ * ISO dates compare correctly as plain strings, and "" fails the lower bound, so this
+ * one expression separates "ready to hand upward" from empty and out-of-range alike.
+ *
+ * The range is checked here rather than through `input.validity`, because the row keeps
+ * whatever the user typed and validity only describes the DOM node it came from.
+ */
+const isUsable = (dateOfBirth: string, maxDate: string): boolean =>
+	dateOfBirth >= EARLIEST_BIRTHDATE && dateOfBirth <= maxDate;
+
 export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 	id,
 	question,
@@ -50,15 +62,17 @@ export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 
 	const publish = (next: string[]) => {
 		setRows(next);
-		// Empty rows are dropped, so an accidentally added row does not become data.
+		// Empty and half-typed rows are dropped, so neither an accidentally added row nor
+		// a date still being typed becomes data.
 		onChange(
 			next
-				.filter((dateOfBirth) => dateOfBirth !== "")
+				.filter((dateOfBirth) => isUsable(dateOfBirth, maxDate))
 				.map((dateOfBirth) => ({ dateOfBirth })),
 		);
 	};
 
-	const isComplete = rows.length > 0 && rows.every((row) => row !== "");
+	const isComplete =
+		rows.length > 0 && rows.every((row) => isUsable(row, maxDate));
 
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
@@ -123,13 +137,18 @@ export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 									aria-describedby={tip ? `${id}-tip` : undefined}
 									data-testid={`child-date-${index}`}
 									value={dateOfBirth}
-									min="1900-01-01"
+									min={EARLIEST_BIRTHDATE}
 									max={maxDate}
+									/*
+									 * The row mirrors the field verbatim. Writing a corrected value
+									 * back mid-typing makes React reset the node, and a date input
+									 * loses its day and month segments when that happens: typing the
+									 * first digit of the year completes the value as year 0001,
+									 * below `min`, and the whole entry would vanish.
+									 */
 									onChange={(event) => {
 										const next = [...rows];
-										next[index] = event.target.validity.valid
-											? event.target.value
-											: "";
+										next[index] = event.target.value;
 										publish(next);
 									}}
 									className="h-12 flex-1 px-3 rounded-xl border-2 border-brand-border/30 text-base text-brand-black bg-white focus:outline-none focus:border-brand-primary"
