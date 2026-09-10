@@ -119,21 +119,8 @@ describe("evaluateBenefitCheck", () => {
 		});
 	});
 
-	it("hints at Kindergeld whenever children are present", () => {
-		const result = evaluateBenefitCheck(CASE_C, TODAY);
-		expect(result.hints).toContain(HintCode.CHILD_BENEFIT_PREREQUISITE);
-	});
-
-	it("omits child hints when there are no children", () => {
-		const result = evaluateBenefitCheck(
-			{
-				...CASE_C,
-				householdComposition: HouseholdComposition.SINGLE,
-				children: [],
-			},
-			TODAY,
-		);
-		expect(result.hints).not.toContain(HintCode.CHILD_BENEFIT_PREREQUISITE);
+	it("leaves the hint list empty when nothing calls for one", () => {
+		expect(evaluateBenefitCheck(CASE_C, TODAY).hints).toEqual([]);
 	});
 
 	it("grants the education package to a household already on benefits", () => {

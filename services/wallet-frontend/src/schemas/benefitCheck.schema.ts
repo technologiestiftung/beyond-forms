@@ -180,7 +180,6 @@ export const ReasonCode = {
 export type ReasonCode = (typeof ReasonCode)[keyof typeof ReasonCode];
 
 export const HintCode = {
-	CHILD_BENEFIT_PREREQUISITE: "CHILD_BENEFIT_PREREQUISITE",
 	ASYLUM_BENEFITS_REFERRAL: "ASYLUM_BENEFITS_REFERRAL",
 } as const;
 export type HintCode = (typeof HintCode)[keyof typeof HintCode];

@@ -4,6 +4,12 @@ import { i18nKeys } from "../../i18n/i18nKeys";
 import { PrimaryButton } from "../ui/PrimaryButton";
 import { Info, Plus, X } from "lucide-react";
 import type { ChildEntry } from "../../schemas/benefitCheck.schema";
+import {
+	EARLIEST_BIRTHDATE,
+	dateRangeErrorKey,
+	isUsableDate,
+	todayIso,
+} from "./dateRange";
 
 interface ChildrenCardProps {
 	id: string;
@@ -21,18 +27,6 @@ interface ChildrenCardProps {
 
 const withIndex = (template: string, index: number): string =>
 	template.replace("{{index}}", String(index + 1));
-
-const EARLIEST_BIRTHDATE = "1900-01-01";
-
-/**
- * ISO dates compare correctly as plain strings, and "" fails the lower bound, so this
- * one expression separates "ready to hand upward" from empty and out-of-range alike.
- *
- * The range is checked here rather than through `input.validity`, because the row keeps
- * whatever the user typed and validity only describes the DOM node it came from.
- */
-const isUsable = (dateOfBirth: string, maxDate: string): boolean =>
-	dateOfBirth >= EARLIEST_BIRTHDATE && dateOfBirth <= maxDate;
 
 export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 	id,
@@ -54,11 +48,14 @@ export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 		value && value.length > 0 ? value.map((child) => child.dateOfBirth) : [""],
 	);
 
+	// Which row the cursor is in, so its message can wait until the row is left.
+	const [focusedRow, setFocusedRow] = useState<number | null>(null);
+
 	useEffect(() => {
 		legendRef.current?.focus();
 	}, [id]);
 
-	const maxDate = useMemo(() => new Date().toLocaleDateString("sv-SE"), []);
+	const maxDate = useMemo(() => todayIso(), []);
 
 	const publish = (next: string[]) => {
 		setRows(next);
@@ -66,13 +63,13 @@ export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 		// a date still being typed becomes data.
 		onChange(
 			next
-				.filter((dateOfBirth) => isUsable(dateOfBirth, maxDate))
+				.filter((dateOfBirth) => isUsableDate(dateOfBirth, maxDate))
 				.map((dateOfBirth) => ({ dateOfBirth })),
 		);
 	};
 
 	const isComplete =
-		rows.length > 0 && rows.every((row) => isUsable(row, maxDate));
+		rows.length > 0 && rows.every((row) => isUsableDate(row, maxDate));
 
 	const handleSubmit = (event: React.FormEvent) => {
 		event.preventDefault();
@@ -122,53 +119,82 @@ export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 				</legend>
 
 				<ul className="flex flex-col gap-4 w-full list-none p-0 m-0">
-					{rows.map((dateOfBirth, index) => (
-						<li key={index} className="flex flex-col gap-2">
-							<label
-								htmlFor={`${id}-child-${index}`}
-								className="text-base text-brand-black"
-							>
-								{withIndex(childLabel, index)}
-							</label>
-							<div className="flex items-center gap-2">
-								<input
-									id={`${id}-child-${index}`}
-									type="date"
-									aria-describedby={tip ? `${id}-tip` : undefined}
-									data-testid={`child-date-${index}`}
-									value={dateOfBirth}
-									min={EARLIEST_BIRTHDATE}
-									max={maxDate}
-									/*
-									 * The row mirrors the field verbatim. Writing a corrected value
-									 * back mid-typing makes React reset the node, and a date input
-									 * loses its day and month segments when that happens: typing the
-									 * first digit of the year completes the value as year 0001,
-									 * below `min`, and the whole entry would vanish.
-									 */
-									onChange={(event) => {
-										const next = [...rows];
-										next[index] = event.target.value;
-										publish(next);
-									}}
-									className="h-12 flex-1 px-3 rounded-xl border-2 border-brand-border/30 text-base text-brand-black bg-white focus:outline-none focus:border-brand-primary"
-								/>
-								{rows.length > 1 && (
-									<button
-										type="button"
-										aria-label={withIndex(removeLabel, index)}
-										data-testid={`remove-child-${index}`}
-										onClick={() =>
-											publish(rows.filter((_, position) => position !== index))
-										}
-										className="size-12 shrink-0 rounded-xl border-2 border-brand-border/30 flex items-center justify-center text-brand-grey"
+					{rows.map((dateOfBirth, index) => {
+						const errorKey =
+							focusedRow === index
+								? undefined
+								: dateRangeErrorKey(dateOfBirth, maxDate);
+						const errorId = `${id}-child-${index}-error`;
+						const describedBy =
+							[tip ? `${id}-tip` : null, errorKey ? errorId : null]
+								.filter(Boolean)
+								.join(" ") || undefined;
+
+						return (
+							<li key={index} className="flex flex-col gap-2">
+								<label
+									htmlFor={`${id}-child-${index}`}
+									className="text-base text-brand-black"
+								>
+									{withIndex(childLabel, index)}
+								</label>
+								<div className="flex items-center gap-2">
+									<input
+										id={`${id}-child-${index}`}
+										type="date"
+										aria-describedby={describedBy}
+										aria-invalid={errorKey !== undefined}
+										data-testid={`child-date-${index}`}
+										value={dateOfBirth}
+										min={EARLIEST_BIRTHDATE}
+										max={maxDate}
+										onFocus={() => setFocusedRow(index)}
+										onBlur={() => setFocusedRow(null)}
+										/*
+										 * The row mirrors the field verbatim. Writing a corrected
+										 * value back mid-typing makes React reset the node, and a
+										 * date input loses its day and month segments when that
+										 * happens: typing the first digit of the year completes the
+										 * value as year 0001, below `min`, and the entry vanishes.
+										 */
+										onChange={(event) => {
+											const next = [...rows];
+											next[index] = event.target.value;
+											publish(next);
+										}}
+										className={`h-12 flex-1 px-3 rounded-xl border-2 text-base text-brand-black bg-white focus:outline-none focus:border-brand-primary ${
+											errorKey ? "border-red-400" : "border-brand-border/30"
+										}`}
+									/>
+									{rows.length > 1 && (
+										<button
+											type="button"
+											aria-label={withIndex(removeLabel, index)}
+											data-testid={`remove-child-${index}`}
+											onClick={() =>
+												publish(
+													rows.filter((_, position) => position !== index),
+												)
+											}
+											className="size-12 shrink-0 rounded-xl border-2 border-brand-border/30 flex items-center justify-center text-brand-grey"
+										>
+											<X className="size-5" aria-hidden="true" />
+										</button>
+									)}
+								</div>
+								{errorKey && (
+									<p
+										id={errorId}
+										role="alert"
+										data-testid={`date-error-${index}`}
+										className="text-sm text-red-700"
 									>
-										<X className="size-5" aria-hidden="true" />
-									</button>
+										{t(errorKey)}
+									</p>
 								)}
-							</div>
-						</li>
-					))}
+							</li>
+						);
+					})}
 				</ul>
 
 				<button

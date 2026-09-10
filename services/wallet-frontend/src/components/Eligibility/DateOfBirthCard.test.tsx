@@ -9,7 +9,70 @@ vi.mock("react-i18next", () => ({
 	}),
 }));
 
+const baseProps = {
+	id: "dateOfBirth",
+	question: "Wann bist du geboren?",
+	category: "Geburtsdatum",
+	onChange: vi.fn(),
+	onClear: vi.fn(),
+	onNext: vi.fn(),
+};
+
 describe("DateOfBirthCard", () => {
+	it("says nothing about a date while the field still has focus", () => {
+		render(<DateOfBirthCard {...baseProps} />);
+		const input = screen.getByTestId("dob-date-input");
+		fireEvent.focus(input);
+		fireEvent.change(input, { target: { value: "0001-02-11" } });
+		expect(screen.queryByTestId("date-error")).toBeNull();
+	});
+
+	it("names a year before 1900 once the field is left", () => {
+		render(<DateOfBirthCard {...baseProps} />);
+		const input = screen.getByTestId("dob-date-input");
+		fireEvent.focus(input);
+		fireEvent.change(input, { target: { value: "0001-02-11" } });
+		fireEvent.blur(input);
+		expect(screen.getByTestId("date-error")).toHaveTextContent(
+			"date_error.too_early",
+		);
+		expect(input).toHaveAttribute("aria-invalid", "true");
+	});
+
+	it("names a date in the future once the field is left", () => {
+		render(<DateOfBirthCard {...baseProps} />);
+		const input = screen.getByTestId("dob-date-input");
+		fireEvent.change(input, { target: { value: "2099-02-11" } });
+		fireEvent.blur(input);
+		expect(screen.getByTestId("date-error")).toHaveTextContent(
+			"date_error.future",
+		);
+	});
+
+	it("drops the message once the date is corrected", () => {
+		render(<DateOfBirthCard {...baseProps} />);
+		const input = screen.getByTestId("dob-date-input");
+		fireEvent.change(input, { target: { value: "2099-02-11" } });
+		fireEvent.blur(input);
+		expect(screen.getByTestId("date-error")).toBeInTheDocument();
+		fireEvent.change(input, { target: { value: "1997-05-02" } });
+		expect(screen.queryByTestId("date-error")).toBeNull();
+	});
+
+	it("says nothing about an empty field", () => {
+		render(<DateOfBirthCard {...baseProps} />);
+		fireEvent.blur(screen.getByTestId("dob-date-input"));
+		expect(screen.queryByTestId("date-error")).toBeNull();
+	});
+
+	it("keeps the next button disabled on an out-of-range date", () => {
+		render(<DateOfBirthCard {...baseProps} />);
+		fireEvent.change(screen.getByTestId("dob-date-input"), {
+			target: { value: "2099-02-11" },
+		});
+		expect(screen.getByTestId("next-button")).toBeDisabled();
+	});
+
 	it("maintains a stable flex-grow and justify-between container structure to prevent button jump", () => {
 		const onChangeMock = vi.fn();
 		const onClearMock = vi.fn();

@@ -108,11 +108,7 @@ export const evaluateBenefitCheck = (
 	assessments.push(assessEducationPackage(answers, assessments));
 
 	const hints: HintCode[] = [];
-	const hasChildren = (answers.children?.length ?? 0) > 0;
 
-	if (hasChildren) {
-		hints.push(HintCode.CHILD_BENEFIT_PREREQUISITE);
-	}
 	if (
 		answers.citizenship === Citizenship.NON_EU &&
 		answers.hasSecureResidenceStatus === false

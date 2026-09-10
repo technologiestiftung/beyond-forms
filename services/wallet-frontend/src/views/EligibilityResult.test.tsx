@@ -136,9 +136,20 @@ describe("EligibilityResult", () => {
 	});
 
 	it("shows the hints the engine produced", () => {
-		seed(CASE_C);
+		// The asylum referral is the only hint left, so it is what this has to trigger.
+		seed({
+			...CASE_C,
+			citizenship: Citizenship.NON_EU,
+			hasSecureResidenceStatus: false,
+		});
 		renderResult();
 		expect(screen.getByTestId("result-hints")).toBeInTheDocument();
+	});
+
+	it("omits the hint list for a case that raises none", () => {
+		seed(CASE_C);
+		renderResult();
+		expect(screen.queryByTestId("result-hints")).toBeNull();
 	});
 
 	it("omits the hint list when there are none", () => {

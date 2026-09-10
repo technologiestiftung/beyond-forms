@@ -101,6 +101,71 @@ describe("ChildrenCard", () => {
 		expect(screen.getByTestId("next-button")).toBeDisabled();
 	});
 
+	/**
+	 * The message waits for blur. Typing a year walks through 0002, 0020, 0202 before it
+	 * reaches 2020 — three out-of-range values in a row — and a message that appears and
+	 * vanishes with every keystroke is worse than none.
+	 */
+	it("says nothing about a date while the field still has focus", () => {
+		render(<ChildrenCard {...baseProps} />);
+		const input = screen.getByTestId("child-date-0");
+		fireEvent.focus(input);
+		fireEvent.change(input, { target: { value: "0001-02-11" } });
+		expect(screen.queryByTestId("date-error-0")).toBeNull();
+	});
+
+	it("names a year before 1900 once the field is left", () => {
+		render(<ChildrenCard {...baseProps} />);
+		const input = screen.getByTestId("child-date-0");
+		fireEvent.focus(input);
+		fireEvent.change(input, { target: { value: "0001-02-11" } });
+		fireEvent.blur(input);
+		expect(screen.getByTestId("date-error-0")).toHaveTextContent(
+			"date_error.too_early",
+		);
+		expect(input).toHaveAttribute("aria-invalid", "true");
+	});
+
+	it("names a date in the future once the field is left", () => {
+		render(<ChildrenCard {...baseProps} />);
+		const input = screen.getByTestId("child-date-0");
+		fireEvent.focus(input);
+		fireEvent.change(input, { target: { value: "2099-02-11" } });
+		fireEvent.blur(input);
+		expect(screen.getByTestId("date-error-0")).toHaveTextContent(
+			"date_error.future",
+		);
+	});
+
+	it("drops the message once the date is corrected", () => {
+		render(<ChildrenCard {...baseProps} />);
+		const input = screen.getByTestId("child-date-0");
+		fireEvent.change(input, { target: { value: "2099-02-11" } });
+		fireEvent.blur(input);
+		expect(screen.getByTestId("date-error-0")).toBeInTheDocument();
+		fireEvent.change(input, { target: { value: "2019-04-02" } });
+		expect(screen.queryByTestId("date-error-0")).toBeNull();
+		expect(input).toHaveAttribute("aria-invalid", "false");
+	});
+
+	it("says nothing about an empty field", () => {
+		render(<ChildrenCard {...baseProps} />);
+		fireEvent.blur(screen.getByTestId("child-date-0"));
+		expect(screen.queryByTestId("date-error-0")).toBeNull();
+	});
+
+	it("complains only about the row that is wrong", () => {
+		render(
+			<ChildrenCard {...baseProps} value={[{ dateOfBirth: "2019-04-02" }]} />,
+		);
+		fireEvent.click(screen.getByTestId("add-child"));
+		const second = screen.getByTestId("child-date-1");
+		fireEvent.change(second, { target: { value: "2099-02-11" } });
+		fireEvent.blur(second);
+		expect(screen.queryByTestId("date-error-0")).toBeNull();
+		expect(screen.getByTestId("date-error-1")).toBeInTheDocument();
+	});
+
 	it("renders the rows it is given", () => {
 		render(
 			<ChildrenCard

@@ -10,6 +10,10 @@
 	"language_switcher_toggle_open": "Sprachauswahl öffnen",
 	"language_switcher_toggle_close": "Sprachauswahl schließen",
 	"language_selection_region": "Sprachauswahl",
+	"date_error": {
+		"too_early": "Bitte gib ein Jahr ab 1900 ein.",
+		"future": "Das Datum darf nicht in der Zukunft liegen."
+	},
 	"application_title": "Anspruch prüfen",
 	"aria": {
 		"welcome": "Willkommen auf der Startseite",
@@ -267,7 +271,6 @@
 			"CAPACITY_GAP_PRECONDITION_MET": "Die Grundvoraussetzung ist erfüllt. Einkommen und Ersparnisse muss die zuständige Stelle prüfen."
 		},
 		"hint": {
-			"CHILD_BENEFIT_PREREQUISITE": "Kindergeld ist Voraussetzung für den Kinderzuschlag. Falls Du es noch nicht beantragt hast, fang dort an.",
 			"ASYLUM_BENEFITS_REFERRAL": "Ist Dein Aufenthalt noch nicht gesichert, gelten für Dich möglicherweise Asylbewerberleistungen statt der hier geprüften. Eine Beratungsstelle kann Dir sagen, was für Dich gilt."
 		}
 	}

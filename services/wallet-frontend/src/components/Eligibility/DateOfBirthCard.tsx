@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { i18nKeys } from "../../i18n/i18nKeys";
 import { PrimaryButton } from "../ui/PrimaryButton";
 import { Info } from "lucide-react";
+import { EARLIEST_BIRTHDATE, dateRangeErrorKey, todayIso } from "./dateRange";
 
 interface DateOfBirthCardProps {
 	id: string;
@@ -29,6 +30,10 @@ export const DateOfBirthCard: React.FC<DateOfBirthCardProps> = ({
 	const labelRef = useRef<HTMLLabelElement>(null);
 	const [draft, setDraft] = useState(value ?? "");
 	const [prevValue, setPrevValue] = useState(value);
+	// Held so the message can wait until the field is left: typing a year walks through
+	// 0002, 0020, 0202 before it reaches 2020, and a message flashing three times is
+	// worse than none.
+	const [isFocused, setIsFocused] = useState(false);
 
 	if (value !== prevValue) {
 		setPrevValue(value);
@@ -41,9 +46,14 @@ export const DateOfBirthCard: React.FC<DateOfBirthCardProps> = ({
 		labelRef.current?.focus();
 	}, [id]);
 
-	const maxDate = useMemo(() => {
-		return new Date().toISOString().slice(0, 10);
-	}, []);
+	const maxDate = useMemo(() => todayIso(), []);
+
+	const errorKey = isFocused ? undefined : dateRangeErrorKey(draft, maxDate);
+	const errorId = `${id}-error`;
+	const describedBy =
+		[tip ? `${id}-tip` : null, errorKey ? errorId : null]
+			.filter(Boolean)
+			.join(" ") || undefined;
 
 	const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const input = event.target;
@@ -111,14 +121,29 @@ export const DateOfBirthCard: React.FC<DateOfBirthCardProps> = ({
 						id={`${id}-dob`}
 						type="date"
 						aria-labelledby={`${id}-legend`}
-						aria-describedby={tip ? `${id}-tip` : undefined}
+						aria-describedby={describedBy}
+						aria-invalid={errorKey !== undefined}
 						data-testid="dob-date-input"
 						value={draft}
 						onChange={handleDateChange}
-						min="1900-01-01"
+						onFocus={() => setIsFocused(true)}
+						onBlur={() => setIsFocused(false)}
+						min={EARLIEST_BIRTHDATE}
 						max={maxDate}
-						className="h-12 w-full px-3 rounded-xl border-2 border-brand-border/30 text-base text-brand-black bg-white focus:outline-none focus:border-brand-primary"
+						className={`h-12 w-full px-3 rounded-xl border-2 text-base text-brand-black bg-white focus:outline-none focus:border-brand-primary ${
+							errorKey ? "border-red-400" : "border-brand-border/30"
+						}`}
 					/>
+					{errorKey && (
+						<p
+							id={errorId}
+							role="alert"
+							data-testid="date-error"
+							className="mt-2 text-sm text-red-700"
+						>
+							{t(errorKey)}
+						</p>
+					)}
 				</div>
 			</fieldset>
 

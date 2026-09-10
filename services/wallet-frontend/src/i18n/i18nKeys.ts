@@ -37,5 +37,7 @@ export const i18nKeys = {
 		outcomeTitle: (key: string) => `outcome.${key}.title`,
 		outcomeDesc: (key: string) => `outcome.${key}.description`,
 		outcomeCTA: (key: string) => `outcome.${key}.cta`,
+		dateTooEarly: "date_error.too_early",
+		dateInFuture: "date_error.future",
 	},
 } as const;
