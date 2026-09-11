@@ -104,14 +104,14 @@ export const IntroCarousel: React.FC = () => {
 
 	return (
 		<section
-			className="w-full mb-8 bg-primary-blue-100 rounded-xl p-6 shadow-sm"
+			className="w-full mb-8 bg-primary-blue-100 rounded-xl lg:rounded-2xl p-6 lg:p-8 shadow-sm"
 			role="region"
 			aria-roledescription="carousel"
 			aria-labelledby="intro-carousel-heading"
 		>
 			<h2
 				id="intro-carousel-heading"
-				className="text-brand-black text-h1 font-bold leading-tight w-full mb-6"
+				className="text-brand-black text-h1 lg:text-[32px] lg:leading-10 font-bold leading-tight w-full mb-6 lg:mb-8"
 			>
 				{sectionTitle}
 			</h2>
@@ -142,27 +142,27 @@ export const IntroCarousel: React.FC = () => {
 							aria-roledescription="slide"
 							aria-label={slideAria}
 							data-testid={`intro-carousel-slide-${step}`}
-							className="flex min-w-full shrink-0 snap-center justify-center px-1"
+							className="flex w-full min-w-full shrink-0 snap-center justify-center px-1 lg:px-2"
 						>
 							<button
 								type="button"
 								onClick={advanceToNextSlide}
 								aria-label={t(i18nKeys.start.introCards.tapAdvance)}
-								className="flex min-h-[450px] h-auto w-full max-w-[297px] cursor-pointer flex-col gap-6 rounded-xl bg-primary-blue-100 p-6 text-left transition-opacity hover:opacity-95 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-blue-500"
+								className="flex min-h-[450px] h-auto w-full max-w-[297px] cursor-pointer flex-col gap-6 rounded-xl bg-primary-blue-100 p-6 text-left transition-opacity hover:opacity-95 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-blue-500 lg:min-h-0 lg:max-w-none lg:flex-row lg:items-center lg:gap-12 lg:rounded-2xl lg:bg-white lg:p-10 lg:shadow-cards lg:transition-shadow lg:hover:opacity-100 lg:hover:shadow-lg"
 							>
-								<div className="relative flex min-h-[170px] w-full shrink-0 items-center justify-center overflow-visible">
+								<div className="relative flex min-h-[170px] w-full shrink-0 items-center justify-center overflow-visible lg:min-h-[260px] lg:w-[340px]">
 									<div
-										className="absolute size-[150px] rounded-full bg-white "
+										className="absolute size-[150px] rounded-full bg-white lg:size-[220px]"
 										aria-hidden
 									/>
 									<img
 										src={ILLUSTRATIONS[i]}
 										alt=""
-										className="relative z-10 max-h-[190px] aspect-square max-w-[190px] object-contain"
+										className="relative z-10 max-h-[190px] aspect-square max-w-[190px] object-contain lg:max-h-[260px] lg:max-w-[260px]"
 										draggable={false}
 									/>
 								</div>
-								<div className="flex flex-col gap-3 text-left">
+								<div className="flex min-w-0 flex-col gap-3 text-left lg:flex-1 lg:gap-4">
 									<h3 className="text-brand-black text-h1 font-bold leading-tight">
 										{title}
 									</h3>
@@ -177,7 +177,7 @@ export const IntroCarousel: React.FC = () => {
 			</div>
 
 			<div
-				className="mt-6 flex w-full items-center justify-center gap-2.5"
+				className="mt-6 flex w-full items-center justify-center gap-2.5 lg:mt-8"
 				role="group"
 				aria-label={sectionTitle}
 			>
