@@ -96,7 +96,7 @@ export const DocumentsOverview: React.FC = () => {
 						type="button"
 						onClick={() => navigate(AppRoutes.Profile)}
 						aria-label={t("common.back", "Zurück")}
-						className="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-all"
+						className="w-10 h-10 bg-white hover:bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-all"
 					>
 						<X className="w-5 h-5 text-slate-700" />
 					</button>

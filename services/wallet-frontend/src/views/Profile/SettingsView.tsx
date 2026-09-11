@@ -63,7 +63,7 @@ export const SettingsView: React.FC = () => {
 						type="button"
 						onClick={handleCancelOrBack}
 						aria-label={t("common.close", "Schließen")}
-						className="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm focus:outline-none focus:ring-4 focus:ring-slate-100 active:scale-90 transition-all"
+						className="w-10 h-10 bg-white hover:bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center shadow-sm focus:outline-none focus:ring-4 focus:ring-slate-100 active:scale-90 transition-all"
 					>
 						<X className="w-5 h-5 text-slate-700" />
 					</button>
