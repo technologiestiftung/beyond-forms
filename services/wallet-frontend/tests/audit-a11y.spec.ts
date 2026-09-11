@@ -295,10 +295,10 @@ testWithAuthenticatedUser.describe(
 					.filter({ visible: true })
 					.first();
 				await chatToggle.click();
-				await expect(page.locator('[role="dialog"]')).toBeVisible();
+				await expect(page.getByTestId("chat-panel")).toBeVisible();
 				await expect(page.getByTestId("chat-input")).toBeVisible();
 
-				await assertNoViolationsIn(page, '[role="dialog"]');
+				await assertNoViolationsIn(page, '[data-testid="chat-panel"]');
 			},
 		);
 	},

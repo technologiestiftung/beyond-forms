@@ -69,6 +69,11 @@ const DashboardView = lazyWithRetry(() =>
 		default: m.DashboardView,
 	})),
 );
+const ChatView = lazyWithRetry(() =>
+	import("../views/Chat/ChatView").then((m) => ({
+		default: m.ChatView,
+	})),
+);
 const ApplicationOverview = lazyWithRetry(() =>
 	import("../views/Application/ApplicationOverview").then((m) => ({
 		default: m.ApplicationOverview,
@@ -223,6 +228,15 @@ export const routeConfig: RouteDescriptor[] = [
 	{
 		path: AppRoutes.Dashboard,
 		component: DashboardView,
+		metadata: {
+			showNav: true,
+			layout: "dashboard",
+			requiresAuth: true,
+		},
+	},
+	{
+		path: AppRoutes.Chat,
+		component: ChatView,
 		metadata: {
 			showNav: true,
 			layout: "dashboard",

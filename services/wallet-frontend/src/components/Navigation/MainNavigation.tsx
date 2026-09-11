@@ -114,10 +114,9 @@ export const MainNavigation: React.FC = () => {
 						isActive={profileActive}
 					/>
 					<SidebarNavItem
-						onClick={toggleChat}
+						to={AppRoutes.Chat}
 						icon={<Icons.ChatIcon className="size-full" />}
 						label={chatLabel}
-						isActive={isChatOpen}
 						testId="nav-chat-sidebar"
 					/>
 				</div>
