@@ -125,7 +125,8 @@
 		},
 		"documents": {
 			"title": "Meine Dokumente",
-			"desc": "Dokumente für Anträge und andere Services"
+			"desc": "Dokumente für Anträge und andere Services",
+			"subtitle": "Lade Deine Dokumente einmal hoch. Klaro verwendet sie dann für alle passenden Anträge."
 		},
 		"settings": {
 			"title": "Einstellungen",

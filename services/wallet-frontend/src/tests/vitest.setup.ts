@@ -1,6 +1,7 @@
 import { vi } from "vitest";
 vi.stubEnv("VITE_USE_MOCK_AUTH", "true");
 import "@testing-library/jest-dom";
+import { installMatchMediaMock } from "./viewport";
 
 /**
  * Polyfill for window and browser storage to support testing
@@ -39,8 +40,8 @@ Object.defineProperty(window, "localStorage", { value: new StorageMock() });
 Object.defineProperty(window, "sessionStorage", { value: new StorageMock() });
 
 window.scrollTo = vi.fn();
-vi.stubEnv("VITE_USE_MOCK_AUTH", "true");
-vi.stubEnv("VITE_USE_MOCKS", "true");
+
+installMatchMediaMock();
 
 // Global mock for react-i18next
 vi.mock("react-i18next", () => ({

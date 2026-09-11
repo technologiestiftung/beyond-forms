@@ -125,7 +125,8 @@
 		},
 		"documents": {
 			"title": "My Documents",
-			"desc": "Documents for applications and other services"
+			"desc": "Documents for applications and other services",
+			"subtitle": "Upload your documents once. Klaro then uses them for all matching applications."
 		},
 		"settings": {
 			"title": "Settings",

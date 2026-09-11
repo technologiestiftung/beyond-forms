@@ -14,6 +14,7 @@ import { PrimaryButton } from "../../components/ui/PrimaryButton";
 import type { CombinedWizardFormValues } from "./personalData/types";
 import {
 	getProfileFormDefaults,
+	getSavedProfileFields,
 	FIELD_SECTION,
 	BANK_FIELDS,
 } from "./personalData/formDefaults";
@@ -67,7 +68,7 @@ export const PersonalDataEdit: React.FC = () => {
 	// Derived from saved data rather than live form state, so the dots move
 	// once a field's blur autosave has round-tripped.
 	const categoryStatuses = getCategoryStatuses(
-		getProfileFormDefaults(profileData),
+		getSavedProfileFields(profileData),
 	);
 
 	const handleCategorySelect = (categoryId: string) => {
@@ -146,7 +147,10 @@ export const PersonalDataEdit: React.FC = () => {
 		errors: FieldErrors<CombinedWizardFormValues>,
 	) => {
 		setSaveError(
-			t("personal.errors.validation_failed", "Bitte prüfe die markierten Angaben."),
+			t(
+				"personal.errors.validation_failed",
+				"Bitte prüfe die markierten Angaben.",
+			),
 		);
 
 		const firstField = Object.keys(errors)[0];

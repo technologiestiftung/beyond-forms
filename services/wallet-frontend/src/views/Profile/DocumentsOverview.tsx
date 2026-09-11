@@ -1,31 +1,20 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-	ShieldAlert,
-	Coins,
-	Home,
-	FileCheck,
-	ChevronRight,
-	X,
-} from "lucide-react";
+import { ShieldAlert, ChevronRight, X } from "lucide-react";
 import { PageContainer } from "../../components/Layout/PageContainer";
 import { AppRoutes } from "../../constants/routes";
 import { DocumentStatusList } from "../../components/Application/DocumentStatusList";
 import { useProfile } from "../../hooks/useProfile";
+import { useIsDesktop } from "../../hooks/useIsDesktop";
 import { Origins } from "../../constants/origin";
+import { APPLICATION_DOCUMENT_GROUPS } from "../../config/applicationConfig";
+import { DocumentsWorkspace } from "./documents/DocumentsWorkspace";
 import {
-	APPLICATION_DOCUMENT_GROUPS,
-	REQUIRED_DOCUMENT_SLOTS,
-} from "../../config/applicationConfig";
-import { doesDocumentMatchSlot } from "../../utils/profile";
-
-const CATEGORY_ICONS: Record<string, React.ElementType> = {
-	identity: ShieldAlert,
-	income: Coins,
-	housing: Home,
-	declarations: FileCheck,
-};
+	DOCUMENT_CATEGORY_ICONS,
+	getCategoryDocumentCounts,
+	EMPTY_CATEGORY_COUNT,
+} from "./documents/categories";
 
 export const DocumentsOverview: React.FC = () => {
 	const { t } = useTranslation(["profile", "application"]);
@@ -33,18 +22,14 @@ export const DocumentsOverview: React.FC = () => {
 	const { documents, isLoading, isError, refetch } = useProfile({
 		refetchOnMount: "always",
 	});
-	const documentCounts = useMemo(() => {
-		const counts: Record<string, number> = {};
-		APPLICATION_DOCUMENT_GROUPS.forEach((category) => {
-			const categorySlots = REQUIRED_DOCUMENT_SLOTS.filter((s) =>
-				category.slotIds.includes(s.id),
-			);
-			counts[category.id] = (documents || []).filter((d) =>
-				categorySlots.some((slot) => doesDocumentMatchSlot(d, slot)),
-			).length;
-		});
-		return counts;
-	}, [documents]);
+	const isDesktop = useIsDesktop();
+	const [activeCategoryId, setActiveCategoryId] = useState(
+		APPLICATION_DOCUMENT_GROUPS[0].id,
+	);
+	const documentCounts = useMemo(
+		() => getCategoryDocumentCounts(documents || []),
+		[documents],
+	);
 
 	if (isLoading) {
 		return (
@@ -91,6 +76,7 @@ export const DocumentsOverview: React.FC = () => {
 			topBarProps={{
 				onBack: () => navigate(AppRoutes.Profile),
 				showLanguageSwitcher: true,
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
 				rightElement: (
 					<button
 						type="button"
@@ -102,75 +88,105 @@ export const DocumentsOverview: React.FC = () => {
 					</button>
 				),
 			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-8 lg:flex lg:flex-col lg:flex-1 lg:min-h-0 lg:overflow-hidden"
+			className="lg:h-full lg:min-h-0 lg:overflow-hidden"
 		>
-			<div className="w-full max-w-md flex flex-col items-center px-2 gap-6	">
-				<h1 className="text-h1 font-bold text-brand-black">
-					{t("sections.documents.title", "Meine Dokumente")}
-				</h1>
-				<div className="w-full flex flex-col gap-4 mt-2">
-					{APPLICATION_DOCUMENT_GROUPS.map((category) => {
-						const CategoryIcon = CATEGORY_ICONS[category.id] || ShieldAlert;
-						const matchedCount = documentCounts[category.id] || 0;
-
-						return (
-							<button
-								key={category.id}
-								type="button"
-								onClick={() =>
-									navigate(
-										AppRoutes.ProfileDocumentsCategory.replace(
-											":categoryId",
-											category.id,
-										),
-									)
-								}
-								className="w-full bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex items-start gap-4 text-left hover:bg-slate-50/50 hover:border-slate-200 active:scale-98 transition-all group"
-							>
-								{/* Topic Icon Container */}
-								<div className="size-11 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-600 shrink-0 group-hover:bg-white transition-all">
-									<CategoryIcon className="size-5.5" />
-								</div>
-
-								{/* Text info details */}
-								<div className="flex flex-col gap-1 min-w-0 flex-1">
-									<span className="text-body-lg font-extrabold text-slate-900 leading-snug">
-										{t(category.titleKey, {
-											ns: "application",
-											defaultValue: category.defaultTitle,
-										})}
-									</span>
-									<span className="text-xs text-brand-grey truncate leading-normal">
-										{t(category.descriptionKey, {
-											ns: "application",
-											defaultValue: category.defaultDescription,
-										})}
-									</span>
-									<span className="text-[10px] font-bold text-primary-blue-500 tracking-wide uppercase mt-1">
-										{t("docs.selected_documents", {
-											ns: "application",
-											count: matchedCount,
-											defaultValue: `Ausgewählte Dokumente: ${matchedCount}`,
-										})}
-									</span>
-								</div>
-
-								{/* Chevron link */}
-								<div className="self-center shrink-0 text-slate-300 group-hover:text-slate-500 transition-colors">
-									<ChevronRight className="size-5 stroke-[2.5]" />
-								</div>
-							</button>
-						);
-					})}
+			<div className="w-full max-w-md mx-auto flex flex-col items-center px-2 gap-6 lg:max-w-none lg:items-start lg:px-0 lg:flex-1 lg:min-h-0">
+				<div className="w-full flex flex-col gap-2 lg:gap-3 lg:shrink-0">
+					<h1 className="text-h1 font-bold text-brand-black text-center lg:text-left lg:text-[32px] lg:leading-10">
+						{t("sections.documents.title", "Meine Dokumente")}
+					</h1>
+					<p className="hidden lg:block text-body-lg text-brand-grey">
+						{t(
+							"sections.documents.subtitle",
+							"Lade Deine Dokumente einmal hoch. Klaro verwendet sie dann für alle passenden Anträge.",
+						)}
+					</p>
 				</div>
 
-				<div className="w-full mt-2">
-					<DocumentStatusList
+				{isDesktop ? (
+					<DocumentsWorkspace
+						activeCategoryId={activeCategoryId}
 						documents={documents || []}
-						showUnassigned={true}
-						slotIds={[]}
-						origin={Origins.HUB}
-					/>
-				</div>
+						onSelectCategory={setActiveCategoryId}
+					>
+						<DocumentStatusList
+							documents={documents || []}
+							showUnassigned={true}
+							slotIds={[]}
+							origin={Origins.HUB}
+						/>
+					</DocumentsWorkspace>
+				) : (
+					<div
+						data-testid="documents-category-list"
+						className="w-full flex flex-col gap-4 mt-2"
+					>
+						{APPLICATION_DOCUMENT_GROUPS.map((category) => {
+							const CategoryIcon =
+								DOCUMENT_CATEGORY_ICONS[category.id] || ShieldAlert;
+							const { documentCount } =
+								documentCounts[category.id] ?? EMPTY_CATEGORY_COUNT;
+
+							return (
+								<button
+									key={category.id}
+									type="button"
+									onClick={() =>
+										navigate(
+											AppRoutes.ProfileDocumentsCategory.replace(
+												":categoryId",
+												category.id,
+											),
+										)
+									}
+									className="w-full bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex items-start gap-4 text-left hover:bg-slate-50/50 hover:border-slate-200 active:scale-98 transition-all group"
+								>
+									<div className="size-11 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-600 shrink-0 group-hover:bg-white transition-all">
+										<CategoryIcon className="size-5.5" />
+									</div>
+
+									<div className="flex flex-col gap-1 min-w-0 flex-1">
+										<span className="text-body-lg font-extrabold text-slate-900 leading-snug">
+											{t(category.titleKey, {
+												ns: "application",
+												defaultValue: category.defaultTitle,
+											})}
+										</span>
+										<span className="text-xs text-brand-grey truncate leading-normal">
+											{t(category.descriptionKey, {
+												ns: "application",
+												defaultValue: category.defaultDescription,
+											})}
+										</span>
+										<span className="text-[10px] font-bold text-primary-blue-500 tracking-wide uppercase mt-1">
+											{t("docs.selected_documents", {
+												ns: "application",
+												count: documentCount,
+												defaultValue: `Ausgewählte Dokumente: ${documentCount}`,
+											})}
+										</span>
+									</div>
+
+									<div className="self-center shrink-0 text-slate-300 group-hover:text-slate-500 transition-colors">
+										<ChevronRight className="size-5 stroke-[2.5]" />
+									</div>
+								</button>
+							);
+						})}
+					</div>
+				)}
+
+				{!isDesktop && (
+					<div className="w-full mt-2">
+						<DocumentStatusList
+							documents={documents || []}
+							showUnassigned={true}
+							slotIds={[]}
+							origin={Origins.HUB}
+						/>
+					</div>
+				)}
 			</div>
 		</PageContainer>
 	);

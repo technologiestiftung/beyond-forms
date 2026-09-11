@@ -8,10 +8,8 @@ import { AppRoutes } from "../../constants/routes";
 import { useProfile } from "../../hooks/useProfile";
 import { PageContainer } from "../../components/Layout/PageContainer";
 import type { PersonalData } from "../../schemas/profile.schema";
-import {
-	getActiveDocumentSlots,
-	doesDocumentMatchSlot,
-} from "../../utils/profile";
+import { doesDocumentMatchSlot } from "../../utils/profile";
+import { REQUIRED_DOCUMENT_SLOTS } from "../../config/applicationConfig";
 import { GreetingHeader } from "../../components/Layout/GreetingHeader";
 
 const STATUS_LABEL: Record<SectionStatus, [string, string]> = {
@@ -35,15 +33,16 @@ export const ProfileHub: React.FC = () => {
 			return "PROCESSING";
 		}
 
-		const slots = getActiveDocumentSlots(profileData ?? {});
-		const covered = slots.filter((slot) =>
+		// The same slots the documents page lists, so the card cannot read
+		// "Vollständig" over a page of empty ones.
+		const covered = REQUIRED_DOCUMENT_SLOTS.filter((slot) =>
 			documents.some((doc) => doesDocumentMatchSlot(doc, slot)),
 		).length;
 
 		if (covered === 0) {
 			return "MISSING";
 		}
-		return covered === slots.length ? "COMPLETE" : "PARTIAL";
+		return covered === REQUIRED_DOCUMENT_SLOTS.length ? "COMPLETE" : "PARTIAL";
 	};
 
 	const getPersonalStatus = (): SectionStatus => {

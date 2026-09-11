@@ -160,13 +160,26 @@ test.describe("Automated E2E Integration & Accessibility Audits - Profile Revamp
 	}) => {
 		// Navigate to documents list dashboard component layout
 		await page.getByTestId("section-documents").click();
-		await expect(page.locator("text=Meine Dokumente")).toBeVisible();
+		// The hub card carries the same label, so wait for the page heading itself.
+		await expect(
+			page.getByRole("heading", { level: 1, name: /Meine Dokumente/i }),
+		).toBeVisible({ timeout: 15000 });
 
-		// Click one of the categories
-		await page
-			.locator("button", { hasText: "Identität und persönliche Dokumente" })
-			.click();
-		await expect(page.url()).toContain("/profile/documents/category/identity");
+		// Desktop selects categories in place; mobile opens a page per category.
+		const workspace = page.getByTestId("documents-workspace");
+		const isDesktop = await workspace.isVisible();
+
+		if (isDesktop) {
+			await page.getByTestId("document-category-nav-identity").click();
+		} else {
+			await page
+				.getByTestId("documents-category-list")
+				.getByRole("button", { name: /Identität und persönliche Dokumente/ })
+				.click();
+			await expect(page.url()).toContain(
+				"/profile/documents/category/identity",
+			);
+		}
 
 		// Strengthen assertions: verify category title and slot details are loaded
 		await expect(
@@ -178,7 +191,13 @@ test.describe("Automated E2E Integration & Accessibility Audits - Profile Revamp
 		await expect(page.getByTestId("slot-title-registration")).toBeVisible();
 
 		// Click "Dokument hinzufügen" inside the category view
-		await page.locator("button", { hasText: "Dokument hinzufügen" }).click();
+		await page
+			.getByRole("button", { name: "Dokument hinzufügen", exact: true })
+			.click();
 		await expect(page.url()).toContain("/profile/personal/upload");
+
+		if (isDesktop) {
+			await expect(page.getByTestId("document-flow-dialog")).toBeVisible();
+		}
 	});
 });

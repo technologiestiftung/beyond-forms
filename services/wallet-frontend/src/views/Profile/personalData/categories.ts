@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import type { SectionProps, CombinedWizardFormValues } from "./types";
+import type { SectionProps } from "./types";
 import {
 	IdentitySection,
 	StatusSection,
@@ -144,13 +144,13 @@ export function isFieldFilled(value: unknown): boolean {
 }
 
 export function getCategoryStatuses(
-	values: CombinedWizardFormValues,
+	values: Record<string, unknown>,
 ): Record<string, CategoryStatus> {
 	const statuses: Record<string, CategoryStatus> = {};
 
 	for (const category of PROFILE_CATEGORIES) {
 		const filledCount = category.completionFields.filter((field) =>
-			isFieldFilled((values as Record<string, unknown>)[field]),
+			isFieldFilled(values[field]),
 		).length;
 
 		if (filledCount === category.completionFields.length) {

@@ -6,8 +6,35 @@ import type { CombinedWizardFormValues } from "./types";
  * NaN, so optional numeric fields don't fail validation until a value is
  * actually entered.
  */
-export const emptyStringToUndefinedNumber = (value: string): number | undefined =>
-	value === "" ? undefined : Number(value);
+export const emptyStringToUndefinedNumber = (
+	value: string,
+): number | undefined => (value === "" ? undefined : Number(value));
+
+/**
+ * Flattens what is actually saved, without the placeholder values the selects
+ * below need, so an untouched profile does not read as partially filled.
+ */
+export function getSavedProfileFields(
+	profileData: Profile | null | undefined,
+): Record<string, unknown> {
+	if (!profileData) {
+		return {};
+	}
+
+	const financial = profileData.financial || {};
+
+	return {
+		...profileData.personalData,
+		...profileData.address,
+		...profileData.contact,
+		...profileData.vehicle,
+		...financial,
+		...financial.bankDetails,
+		...profileData.household,
+		...profileData.housing,
+		...profileData.health,
+	};
+}
 
 export function getProfileFormDefaults(
 	profileData: Profile | null | undefined,
@@ -141,4 +168,9 @@ export const FIELD_SECTION: Record<string, keyof Profile> = {
 };
 
 /** Bank fields nest under financial.bankDetails rather than sitting flat on financial. */
-export const BANK_FIELDS = new Set(["bankName", "accountHolder", "iban", "bic"]);
+export const BANK_FIELDS = new Set([
+	"bankName",
+	"accountHolder",
+	"iban",
+	"bic",
+]);

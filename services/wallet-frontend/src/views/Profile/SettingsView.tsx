@@ -53,11 +53,6 @@ export const SettingsView: React.FC = () => {
 		<PageContainer
 			topBarProps={{
 				onBack: () => handleCancelOrBack(),
-				middleElement: (
-					<span className="text-sm font-extrabold text-slate-800 tracking-wide uppercase truncate">
-						{t("settings.title", "Einstellungen")}
-					</span>
-				),
 				rightElement: (
 					<button
 						type="button"

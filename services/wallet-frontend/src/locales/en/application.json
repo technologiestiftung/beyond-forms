@@ -119,13 +119,15 @@
 			"identity": "Identity and personal documents",
 			"income": "Income and finances",
 			"housing": "Housing and housing costs",
-			"declarations": "Applications and declarations"
+			"declarations": "Applications and declarations",
+			"health": "Health and care"
 		},
 		"group_descriptions": {
 			"identity": "ID Card, Passport, Certificate of registration, Health insurance",
 			"income": "Initial pension notice, Bank statements of the last 3 months, Income declaration...",
 			"housing": "Rental agreement, Utility bill, Heating cost proof...",
-			"declarations": "Obligation to cooperate, Privacy policy, Household members..."
+			"declarations": "Obligation to cooperate, Privacy policy, Household members...",
+			"health": "Care level notice, Care home contract, Care costs, Disability ID..."
 		},
 		"selected_documents": "Selected documents: {{count}}",
 		"add_document": "Add document",
@@ -172,7 +174,17 @@
 		"delete_aria": "Delete document",
 		"delete_title": "Delete document?",
 		"delete_confirm": "Do you really want to delete this document?",
-		"failed": "Error"
+		"failed": "Error",
+		"categories_nav_label": "Document categories",
+		"category_document_count_one": "1 document",
+		"category_document_count_other": "{{count}} documents",
+		"add_short": "Add",
+		"upload_dialog_aria": "Add document",
+		"add_slot_aria": "Add {{title}}",
+		"view_slot_aria": "View {{title}}",
+		"dropzone_title": "Drag a document here",
+		"dropzone_hint": "or upload a file from your computer.",
+		"review_slot_aria": "Review {{title}}"
 	},
 	"common": {
 		"delete": "Delete",

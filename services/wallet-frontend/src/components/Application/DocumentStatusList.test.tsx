@@ -50,6 +50,31 @@ describe("DocumentStatusList", () => {
 		},
 	];
 
+	it("offers review, not upload, for a row whose document still needs checking", () => {
+		render(
+			<MemoryRouter>
+				<DocumentStatusList
+					documents={[
+						{
+							id: "doc-9",
+							name: "Personalausweis",
+							type: "ID_CARD",
+							status: ProcessingStatusEnum.enum.READY_FOR_REVIEW,
+							uploadDate: new Date().toISOString(),
+						},
+					]}
+					slotIds={["id_card"]}
+					origin={Origins.HUB}
+					variant="row"
+				/>
+			</MemoryRouter>,
+		);
+
+		const row = screen.getByTestId("slot-btn-id_card");
+		expect(row).toHaveTextContent("Prüfen");
+		expect(row).not.toHaveTextContent("Hinzufügen");
+	});
+
 	it("displays required checklist slots for application wizard (WIZARD origin)", () => {
 		render(
 			<MemoryRouter>

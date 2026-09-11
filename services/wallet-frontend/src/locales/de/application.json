@@ -119,13 +119,15 @@
 			"identity": "Identität und persönliche Dokumente",
 			"income": "Einkommen und Finanzen",
 			"housing": "Wohnen und Wohnkosten",
-			"declarations": "Anträge und Erklärungen"
+			"declarations": "Anträge und Erklärungen",
+			"health": "Gesundheit und Pflege"
 		},
 		"group_descriptions": {
 			"identity": "Personalausweis, Reisepass, Meldebescheinigung, Krankenversicherung",
 			"income": "Erstrentenbescheid, Kontoauszüge der letzten 3 Monate, Einkommenserklärung...",
 			"housing": "Mietvertrag, Nebenkostenrechnung, Heizkostennachweis...",
-			"declarations": "Mitwirkungsverpflichtung, Datenschutzerklärung, Haushaltsangehörige..."
+			"declarations": "Mitwirkungsverpflichtung, Datenschutzerklärung, Haushaltsangehörige...",
+			"health": "Pflegegradbescheid, Heimvertrag, Heimkosten, Schwerbehindertenausweis..."
 		},
 		"selected_documents": "Ausgewählte Dokumente: {{count}}",
 		"add_document": "Dokument hinzufügen",
@@ -172,7 +174,17 @@
 		"delete_aria": "Dokument löschen",
 		"delete_title": "Dokument löschen?",
 		"delete_confirm": "Möchtest Du dieses Dokument wirklich löschen?",
-		"failed": "Fehler"
+		"failed": "Fehler",
+		"categories_nav_label": "Dokumentkategorien",
+		"category_document_count_one": "1 Dokument",
+		"category_document_count_other": "{{count}} Dokumente",
+		"add_short": "Hinzufügen",
+		"upload_dialog_aria": "Dokument hinzufügen",
+		"add_slot_aria": "{{title}} hinzufügen",
+		"view_slot_aria": "{{title}} ansehen",
+		"dropzone_title": "Dokument hierher ziehen",
+		"dropzone_hint": "oder wähle eine Datei von Deinem Computer aus.",
+		"review_slot_aria": "{{title}} prüfen"
 	},
 	"common": {
 		"delete": "Löschen",

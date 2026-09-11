@@ -24,6 +24,7 @@ import { Origins, type OriginType } from "../../constants/origin";
 
 import { useAuthStore } from "../../store/useAuthStore";
 import { useProfileStore } from "../../store/useProfileStore";
+import { usePendingUploadStore } from "../../store/usePendingUploadStore";
 import { useUIStore } from "../../store/useUIStore";
 import { useProfile } from "../../hooks/useProfile";
 import { useScrollToTop } from "../../utils/scroll";
@@ -65,6 +66,7 @@ export const DocumentDropzone: React.FC = () => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const addPageInputRef = useRef<HTMLInputElement>(null);
 	const { documents } = useProfile();
+	const pendingFile = usePendingUploadStore((state) => state.pendingFile);
 	const processingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
 		null,
 	);
@@ -369,6 +371,18 @@ export const DocumentDropzone: React.FC = () => {
 			setImagePreviewUrls([]);
 		}
 	};
+
+	// A file dropped on the documents view is handed over instead of re-picked.
+	React.useEffect(() => {
+		if (!pendingFile) {
+			return;
+		}
+		usePendingUploadStore.getState().takePendingFile();
+		setFiles([pendingFile]);
+		void handlePreviewFile(pendingFile, false);
+		setStatus("IDLE");
+		setErrorMessage(null);
+	}, [pendingFile]);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const selectedFile = e.target.files?.[0];

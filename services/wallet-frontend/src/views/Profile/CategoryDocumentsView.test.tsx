@@ -1,10 +1,11 @@
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { CategoryDocumentsView } from "./CategoryDocumentsView";
 import { BrowserRouter } from "react-router-dom";
 import { useProfile } from "../../hooks/useProfile";
 import { useProfileStore } from "../../store/useProfileStore";
+import { setDesktopViewport } from "../../tests/viewport";
 
 // Mock useParams and useNavigate
 const mockNavigate = vi.fn();
@@ -32,6 +33,7 @@ describe("CategoryDocumentsView", () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
+		setDesktopViewport(true);
 		useProfileStore.getState().reset();
 
 		(useProfile as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
@@ -44,6 +46,7 @@ describe("CategoryDocumentsView", () => {
 	});
 
 	it("renders category title, description, and handles back button correctly", () => {
+		setDesktopViewport(false);
 		renderWithRouter(<CategoryDocumentsView />);
 
 		expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
@@ -58,6 +61,21 @@ describe("CategoryDocumentsView", () => {
 		expect(backBtn).toBeInTheDocument();
 		fireEvent.click(backBtn);
 		expect(mockNavigate).toHaveBeenCalledWith("/profile/documents");
+	});
+
+	it("marks the category from the URL as active in the desktop sidebar and navigates when another is picked", () => {
+		renderWithRouter(<CategoryDocumentsView />);
+
+		const workspace = within(screen.getByTestId("documents-workspace"));
+		expect(
+			workspace.getByTestId("document-category-nav-identity"),
+		).toHaveAttribute("aria-current", "true");
+
+		fireEvent.click(workspace.getByTestId("document-category-nav-income"));
+		expect(mockNavigate).toHaveBeenCalledWith(
+			"/profile/documents/category/income",
+			{ replace: true },
+		);
 	});
 
 	it("displays loading indicator while fetching", () => {
