@@ -5,9 +5,9 @@ Ensure demo personas exist, or re-seed one account.
     docker compose exec orchestration-middleware-service python -m src.demo_cli +493023125102 helmut --reset
 
 `--ensure` is what middleware startup runs when DEMO_SEED_ENABLED=true: seed each
-persona whose drama number does not already have a profile. `--reset` rewrites one
-account. Authentik is not required — a users row is created with authentik_id null,
-and first login fills it.
+persona whose drama number does not already have a profile, and re-seed one whose fixture
+file has changed since it was last seeded. `--reset` rewrites one account. Authentik is
+not required — a users row is created with authentik_id null, and first login fills it.
 """
 
 import argparse

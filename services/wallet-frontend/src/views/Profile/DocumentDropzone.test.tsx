@@ -33,6 +33,7 @@ vi.mock("@tanstack/react-query", async () => {
 vi.mock("../../services/profile/FileService", () => ({
 	fileService: {
 		uploadFile: vi.fn(),
+		ensureApplication: vi.fn().mockResolvedValue("mock-application-id"),
 	},
 }));
 
@@ -278,6 +279,7 @@ describe("DocumentDropzone", () => {
 			async (
 				_files: File | File[],
 				_type: Parameters<typeof fileService.uploadFile>[1],
+				_applicationId: string,
 				signal?: AbortSignal,
 			) => {
 				capturedSignal = signal;
@@ -296,7 +298,7 @@ describe("DocumentDropzone", () => {
 
 		fireEvent.click(screen.getByTestId("upload-confirm-button"));
 
-		expect(fileService.uploadFile).toHaveBeenCalled();
+		await waitFor(() => expect(fileService.uploadFile).toHaveBeenCalled());
 		expect(capturedSignal).toBeDefined();
 		expect(capturedSignal?.aborted).toBe(false);
 

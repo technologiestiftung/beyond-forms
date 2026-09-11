@@ -16,7 +16,67 @@ from src.models import (
     TenancyStatusType,
     DisabilityMerkzeichenType,
     TutorialStatusType,
+    AssetTypeType,
+    BenefitClaimKindType,
+    CareLevelType,
+    ExpenseTypeType,
+    IncomeTypeType,
 )
+
+
+class _MoneyEntrySchema(BaseModel):
+    """The shared shape of a Grundsicherung money-grid row. `person_sort_order` says which
+    of the form's person columns the row belongs in - None means the applicant - so the
+    whole grid arrives as one flat list instead of being nested inside each person."""
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+    person_sort_order: Optional[int] = Field(
+        None,
+        description=(
+            "The sort_order of the associated person this row belongs to, or null for the "
+            "applicant's own row."
+        ),
+    )
+
+
+class IncomeEntrySchema(_MoneyEntrySchema):
+    income_type: IncomeTypeType = Field(description="Which income line of the form this row fills")
+    monthly_amount: Optional[decimal.Decimal] = Field(None, ge=0)
+    awarding_office: Optional[str] = Field(
+        None, max_length=255, description="Bewilligungsstelle - one per form row, shared by both person columns"
+    )
+    reference_no: Optional[str] = Field(
+        None, max_length=255, description="Geschäftszeichen or Rentenabrechnungsnummer for this income"
+    )
+
+
+class ExpenseEntrySchema(_MoneyEntrySchema):
+    expense_type: ExpenseTypeType = Field(description="Which expense line of the form this row fills")
+    monthly_amount: Optional[decimal.Decimal] = Field(None, ge=0)
+    note: Optional[str] = Field(None, max_length=255, description="Free text, e.g. 'Nähere Begründung zu Sonstiges'")
+
+
+class AssetEntrySchema(_MoneyEntrySchema):
+    asset_type: AssetTypeType = Field(description="Which asset line of the form this row fills")
+    amount: Optional[decimal.Decimal] = Field(None, ge=0)
+    description: Optional[str] = Field(
+        None, description="e.g. the kind of valuables, or the estimated value of a vehicle"
+    )
+
+
+class BenefitClaimEntrySchema(_MoneyEntrySchema):
+    claim_kind: BenefitClaimKindType = Field(
+        description="Whether this benefit is still being decided or is an expected one-time payment"
+    )
+    benefit_type: Optional[str] = Field(None, max_length=255, description="Art der Leistung, as free text")
+    event_date: Optional[date] = Field(
+        None, description="The application date for a pending claim, the expected date for a one-time payment"
+    )
+    amount: Optional[decimal.Decimal] = Field(None, ge=0)
+    office_reference: Optional[str] = Field(
+        None, max_length=255, description="Dienststelle und Geschäftszeichen of the deciding office"
+    )
 
 
 class AssociatedPersonSchema(BaseModel):
@@ -53,6 +113,51 @@ class AssociatedPersonSchema(BaseModel):
     monthly_pension_income: Optional[decimal.Decimal] = Field(None, ge=0)
     has_own_income: Optional[bool] = None
     is_alimony_obligated: Optional[bool] = None
+    is_german_citizen: Optional[bool] = None
+    id_document_issuing_authority: Optional[str] = Field(None, max_length=255)
+    id_document_valid_until: Optional[date] = None
+    has_guardian: Optional[bool] = None
+    has_custodian: Optional[bool] = None
+    displaced_status: Optional[DisplacedStatusType] = None
+    displaced_issued_on: Optional[date] = None
+    displaced_issued_by: Optional[str] = Field(None, max_length=255)
+    has_received_previous_benefits: Optional[bool] = None
+    previous_benefits_authority: Optional[str] = Field(None, max_length=255)
+    previous_benefits_period: Optional[str] = Field(None, max_length=255)
+    previous_benefits_ref_no: Optional[str] = Field(None, max_length=255)
+    has_disability_id: Optional[bool] = None
+    disability_valid_until: Optional[date] = None
+    merkzeichen: Optional[DisabilityMerkzeichenType] = None
+    disability_application_pending: Optional[bool] = None
+    social_security_type: Optional[SocialSecurityTypeType] = None
+    health_insurance_provider: Optional[str] = Field(None, max_length=255)
+    health_insurance_status: Optional[HealthInsuranceStatusType] = None
+    pension_insurance_provider: Optional[str] = Field(None, max_length=255)
+    pension_insurance_no: Optional[str] = Field(None, max_length=255)
+    is_care_dependent: Optional[bool] = None
+    care_level: Optional[CareLevelType] = None
+    has_inpatient_facility_accommodation: Optional[bool] = None
+    inpatient_facility_assigned_from: Optional[date] = None
+    inpatient_facility_assigned_until: Optional[date] = None
+    inpatient_facility_last_residence: Optional[str] = Field(None, max_length=255)
+    has_permanent_reduction_in_earning_capacity: Optional[bool] = None
+    reduced_work_capacity_is_permanent: Optional[bool] = None
+    reduced_work_capacity_start_date: Optional[date] = None
+    reduced_work_capacity_end_date: Optional[date] = None
+    reduced_work_capacity_reason: Optional[str] = None
+    can_work_at_least_3h_daily: Optional[bool] = Field(
+        None, description="Whether this person can work at least three hours a day on the open labour market"
+    )
+    work_scope_and_type: Optional[str] = Field(None, max_length=255)
+    employer_name: Optional[str] = Field(None, max_length=255)
+    is_student_or_trainee: Optional[bool] = None
+    education_or_study_subject: Optional[str] = Field(None, max_length=255)
+    employment_office_customer_number: Optional[str] = Field(None, max_length=255)
+    commute_distance_km: Optional[decimal.Decimal] = Field(None, ge=0)
+    has_applied_for_sgb2_benefits: Optional[bool] = None
+    has_applied_for_asylum_benefits: Optional[bool] = None
+    has_child_with_substantial_income: Optional[bool] = None
+    have_parents_substantial_joint_income: Optional[bool] = None
 
     @field_validator("date_of_birth")
     @classmethod
@@ -112,6 +217,8 @@ class UserProfileValidationSchema(BaseModel):
     sublet_rent_income: Optional[decimal.Decimal] = None
     rent_paid_until: Optional[date] = None
     landlord_name: Optional[str] = None
+    landlord_address: Optional[str] = None
+    main_tenant_name: Optional[str] = None
     heating_type: Optional[str] = None
     free_housing_right_holder: Optional[str] = None
     hot_water_costs: Optional[decimal.Decimal] = None
@@ -130,13 +237,33 @@ class UserProfileValidationSchema(BaseModel):
     monthly_income: Optional[decimal.Decimal] = Field(None, ge=0)
     has_assets: Optional[bool] = None
     assets_description: Optional[str] = Field(None, max_length=1000)
-    income_sources: Optional[list[str]] = None
-    assets_types: Optional[list[str]] = None
     associated_persons: Optional[list[AssociatedPersonSchema]] = None
+    income_entries: Optional[list[IncomeEntrySchema]] = None
+    expense_entries: Optional[list[ExpenseEntrySchema]] = None
+    asset_entries: Optional[list[AssetEntrySchema]] = None
+    benefit_claim_entries: Optional[list[BenefitClaimEntrySchema]] = None
     is_student_or_trainee: Optional[bool] = None
     professional_expenses: Optional[decimal.Decimal] = None
     has_childcare_expenses: Optional[bool] = None
     is_victim_of_national_socialist_persecution: Optional[bool] = None
+    apartment_floor_location: Optional[str] = None
+    resident_in_berlin_since: Optional[date] = None
+    resident_in_district_since: Optional[date] = None
+    previous_address: Optional[str] = None
+    rent_arrears_period: Optional[str] = None
+    rent_arrears_amount: Optional[decimal.Decimal] = Field(None, ge=0)
+    tenancy_terminated_on: Optional[date] = None
+    sublet_unrentable_reason: Optional[str] = None
+    inpatient_facility_assigned_until: Optional[date] = None
+    care_level: Optional[CareLevelType] = None
+    can_work_at_least_3h_daily: Optional[bool] = None
+    work_scope_and_type: Optional[str] = None
+    employer_name: Optional[str] = None
+    education_or_study_subject: Optional[str] = None
+    employment_office_customer_number: Optional[str] = None
+    commute_distance_km: Optional[decimal.Decimal] = Field(None, ge=0)
+    has_child_with_substantial_income: Optional[bool] = None
+    have_parents_substantial_joint_income: Optional[bool] = None
 
     # Wohngeld and Bewohnerparkausweis yes/no questions. Nullable: NULL means not asked.
     is_wohngeld_first_application: Optional[bool] = None
@@ -255,6 +382,10 @@ class UserInformationUpdateSchema(BaseModel):
     sublet_rent_income: Optional[decimal.Decimal] = Field(None, description="Rent income from subletting")
     rent_paid_until: Optional[date] = Field(None, description="Rent paid until date")
     landlord_name: Optional[str] = Field(None, description="Landlord name")
+    landlord_address: Optional[str] = Field(None, description="Landlord address")
+    main_tenant_name: Optional[str] = Field(
+        None, description="Name of the main tenant, when the applicant is a subtenant"
+    )
     heating_type: Optional[str] = Field(None, description="Heating system type")
     free_housing_right_holder: Optional[str] = Field(None, description="Name of housing right provider")
     is_subsidized_housing: Optional[bool] = Field(None, description="Whether the housing is publicly subsidized")
@@ -339,8 +470,42 @@ class UserInformationUpdateSchema(BaseModel):
     monthly_income: Optional[decimal.Decimal] = Field(None, ge=0, description="The user's monthly net income")
     has_assets: Optional[bool] = Field(None, description="Whether the user possesses assets, real estate, or valuables")
     assets_description: Optional[str] = Field(None, max_length=1000, description="A description of the user's assets")
-    income_sources: Optional[list[str]] = Field(None, description="List of the user's monthly income source categories")
-    assets_types: Optional[list[str]] = Field(None, description="List of the user's asset types")
+    apartment_floor_location: Optional[str] = Field(
+        None, description="Where in the building the flat is, as the form asks it (e.g. '2. OG links')"
+    )
+    resident_in_berlin_since: Optional[date] = Field(None, description="Living in Berlin since")
+    resident_in_district_since: Optional[date] = Field(None, description="Living in the current district since")
+    previous_address: Optional[str] = Field(None, description="The address the user lived at before this one")
+    rent_arrears_period: Optional[str] = Field(None, description="The period rent arrears cover, as free text")
+    rent_arrears_amount: Optional[decimal.Decimal] = Field(None, ge=0, description="Rent arrears in euro")
+    tenancy_terminated_on: Optional[date] = Field(None, description="The date the tenancy was terminated for")
+    sublet_unrentable_reason: Optional[str] = Field(
+        None, description="Why a sublet room cannot currently be rented out"
+    )
+    inpatient_facility_assigned_until: Optional[date] = Field(
+        None, description="End of the assignment period to an inpatient facility"
+    )
+    care_level: Optional[CareLevelType] = Field(
+        None, description="Pflegegrad, when no care-level notice has been verified"
+    )
+    can_work_at_least_3h_daily: Optional[bool] = Field(
+        None, description="Whether the user can work at least three hours a day on the open labour market"
+    )
+    work_scope_and_type: Optional[str] = Field(None, description="Scope and kind of the user's employment")
+    employer_name: Optional[str] = Field(None, description="The user's employer")
+    education_or_study_subject: Optional[str] = Field(None, description="What the user is training in or studying")
+    employment_office_customer_number: Optional[str] = Field(
+        None, description="The user's Agentur für Arbeit customer number"
+    )
+    commute_distance_km: Optional[decimal.Decimal] = Field(
+        None, ge=0, description="Distance between home and workplace in kilometres"
+    )
+    has_child_with_substantial_income: Optional[bool] = Field(
+        None, description="Whether one of the user's children has substantial income"
+    )
+    have_parents_substantial_joint_income: Optional[bool] = Field(
+        None, description="Whether the user's parents jointly have substantial income"
+    )
     associated_persons: Optional[list[AssociatedPersonSchema]] = Field(
         None,
         description=(
@@ -348,6 +513,21 @@ class UserInformationUpdateSchema(BaseModel):
             "members, plus a spouse or partner even if they live elsewhere. Replaces the "
             "whole list on write, so send every person, not just the new one."
         ),
+    )
+    # These rows resolve person_sort_order against associated_persons, so the persons have
+    # to be written first; user_service.ordered_profile_items() is what guarantees that,
+    # independently of the order the keys arrive in.
+    income_entries: Optional[list[IncomeEntrySchema]] = Field(
+        None, description="One row per income line of the form, per person"
+    )
+    expense_entries: Optional[list[ExpenseEntrySchema]] = Field(
+        None, description="One row per expense line of the form, per person"
+    )
+    asset_entries: Optional[list[AssetEntrySchema]] = Field(
+        None, description="One row per asset line of the form, per person"
+    )
+    benefit_claim_entries: Optional[list[BenefitClaimEntrySchema]] = Field(
+        None, description="Benefits still being decided, and expected one-time payments"
     )
     has_costly_medical_nutrition: Optional[bool] = Field(
         None, description="Whether the user requires a costly medical nutrition diet"
@@ -391,6 +571,8 @@ class UserInformationUpdateSchema(BaseModel):
     city: Optional[str] = Field(None, description="City")
     state: Optional[str] = Field(None, description="State or federal state")
     license_plate: Optional[str] = Field(None, max_length=20, description="Vehicle license plate")
+    vehicle_make: Optional[str] = Field(None, description="Vehicle make/model (Fabrikat)")
+    vehicle_year: Optional[str] = Field(None, max_length=4, description="Vehicle year built (Baujahr)")
 
 
 class ChatMessageResponseSchema(BaseModel):

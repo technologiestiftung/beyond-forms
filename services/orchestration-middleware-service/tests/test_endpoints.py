@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from src.db import get_db
 from src.main import app
-from src.models import UploadedFiles, UserDocuments, Users as DbUser
+from src.models import UploadedFiles, UserDocuments, Users as DbUser, IncomeTypeType, AssetTypeType
 from src.services.user_service import UserService, get_user_service
 
 client = TestClient(app)
@@ -127,8 +127,8 @@ def test_update_profile_all_fields_success(mock_post, mock_db):
         "monthly_income": 1250.50,
         "has_assets": True,
         "assets_description": "Some valuable items",
-        "income_sources": ["Gesetzliche Rente"],
-        "assets_types": ["Guthaben/Sparbuch"],
+        "income_entries": [{"income_type": "Pension"}],
+        "asset_entries": [{"asset_type": "Savings and Cash"}],
         "has_disability_id": True,
         "has_costly_medical_nutrition": False,
     }
@@ -153,8 +153,11 @@ def test_update_profile_all_fields_success(mock_post, mock_db):
     assert mock_user.monthly_income == 1250.50
     assert mock_user.has_assets is True
     assert mock_user.assets_description == "Some valuable items"
-    assert mock_user.income_sources == ["Gesetzliche Rente"]
-    assert mock_user.assets_types == ["Guthaben/Sparbuch"]
+    assert len(mock_user.income_entries) == 1
+    assert mock_user.income_entries[0].income_type == IncomeTypeType.PENSION
+    assert mock_user.income_entries[0].person is None
+    assert len(mock_user.asset_entries) == 1
+    assert mock_user.asset_entries[0].asset_type == AssetTypeType.SAVINGS_AND_CASH
     assert mock_user.has_disability_id is True
     assert mock_user.has_costly_medical_nutrition is False
     mock_db.commit.assert_called_once()
@@ -386,7 +389,11 @@ def test_upload_file_success(mock_storage_client, mock_publish_event, mock_user_
     file_content = b"test file content"
     file = io.BytesIO(file_content)
 
-    response = client.post("/upload", files={"file": ("test.png", file, "image/png")})
+    response = client.post(
+        "/upload",
+        files={"file": ("test.png", file, "image/png")},
+        data={"application_id": str(uuid.uuid4())},
+    )
 
     assert response.status_code == 200
     data = response.json()

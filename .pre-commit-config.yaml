@@ -42,3 +42,9 @@ repos:
         types_or: [ts, tsx]
         files: ^services/wallet-frontend/
         pass_filenames: false
+      - id: db-schema-dump
+        name: Regenerate libs/db-schema/index.ts
+        entry: scripts/dump_db_schema.sh
+        language: system
+        files: ^migrations/.*\.sql$
+        pass_filenames: false

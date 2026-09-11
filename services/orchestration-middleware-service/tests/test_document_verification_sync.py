@@ -15,6 +15,8 @@ from src.models import (
     DocumentStatusType,
     GenderType,
     HealthInsuranceStatusType,
+    IncomeEntries,
+    IncomeTypeType,
 )
 from unittest.mock import patch
 from src.mappers import map_flat_to_rules_engine_payload
@@ -248,7 +250,7 @@ def test_map_flat_to_rules_engine_payload_case_and_enum_alignment():
     db_user.heating_costs = decimal.Decimal("85.50")
     db_user.living_area = decimal.Decimal("45.5")
     db_user.number_of_rooms = 2
-    db_user.income_sources = ["pension"]
+    db_user.income_entries = [IncomeEntries(income_type=IncomeTypeType.PENSION)]
     db_user.monthly_income = decimal.Decimal("650.00")
     db_user.health_insurance_status = HealthInsuranceStatusType.COMPULSORY_INSURANCE  # value = "Compulsory Insurance"
     db_user.health_insurance_provider = "AOK Berlin"
@@ -335,7 +337,7 @@ def test_map_flat_to_rules_engine_payload_null_monthly_income():
     db_user.heating_costs = None
     db_user.living_area = None
     db_user.number_of_rooms = None
-    db_user.income_sources = ["pension"]
+    db_user.income_entries = [IncomeEntries(income_type=IncomeTypeType.PENSION)]
     db_user.monthly_income = None
     db_user.health_insurance_status = None
     db_user.health_insurance_provider = None

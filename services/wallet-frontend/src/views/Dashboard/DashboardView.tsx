@@ -14,7 +14,6 @@ import { ApplicationCard } from "./ApplicationCard";
 import { SimpleApplicationCard } from "./SimpleApplicationCard";
 import profileIllustration from "../../assets/illustrations/profile.svg";
 import { DEFAULT_LOCALE } from "../../constants/locale";
-import { DashboardTutorials } from "./DashboardTutorials";
 
 function applicationCardStatusForMilestone(
 	milestoneLevel?: number,
@@ -38,16 +37,6 @@ export const DashboardView: React.FC = () => {
 		isError: isProfileError,
 		refetch,
 	} = useProfile();
-	const {
-		tutorials,
-		isLoading: isTutorialsLoading,
-		fetchTutorials,
-	} = useTutorialStore();
-
-	useEffect(() => {
-		void fetchTutorials();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
 
 	const [hasCompletedOnboarding] = React.useState(() => {
 		if (typeof window === "undefined") {
@@ -73,7 +62,7 @@ export const DashboardView: React.FC = () => {
 		}
 	}, [milestoneLevel, setMilestoneLevel]);
 
-	if (isProfileLoading || isTutorialsLoading) {
+	if (isProfileLoading) {
 		return <DashboardSkeleton />;
 	}
 
@@ -155,10 +144,36 @@ export const DashboardView: React.FC = () => {
 					formType="antrag_wohngeld"
 				/>
 
+				<SimpleApplicationCard
+					title={t(
+						"sections.applications.basic_income.title",
+						"Grundsicherungsgeld",
+					)}
+					description={t(
+						"sections.applications.basic_income.description",
+						"Beantrage Grundsicherungsgeld direkt mit Deinen hinterlegten Angaben.",
+					)}
+					formType="antrag_grundsicherungsgeld"
+				/>
+
+				<SimpleApplicationCard
+					title={t(
+						"sections.applications.child_allowance.title",
+						"Kinderzuschlag",
+					)}
+					description={t(
+						"sections.applications.child_allowance.description",
+						"Beantrage Kinderzuschlag direkt mit Deinen hinterlegten Angaben.",
+					)}
+					formType="antrag_kinderzuschlag"
+				/>
+
+				{/*
+				Commented out for now as we don't want to use tutorials yet
 				<DashboardTutorials
 					tutorials={tutorials}
 					activeLanguage={activeLanguage}
-				/>
+				/>*/}
 
 				{/*
 				Commented out for now as we don't have an emergency info panel yet
