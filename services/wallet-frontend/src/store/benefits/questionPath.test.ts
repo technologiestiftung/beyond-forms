@@ -11,18 +11,17 @@ import { activeQuestions, getValidPath, questionById } from "./questionPath";
 const TODAY = "2026-09-09";
 
 describe("activeQuestions", () => {
-	it("offers all fifteen questions while nothing is answered", () => {
-		expect(activeQuestions({}, TODAY)).toHaveLength(15);
+	it("offers every question while nothing is answered", () => {
+		expect(activeQuestions({}, TODAY)).toHaveLength(14);
 	});
 
-	it("drops the three child questions for a single person", () => {
+	it("drops the children question for a single person", () => {
 		const active = activeQuestions(
 			{ householdComposition: HouseholdComposition.SINGLE },
 			TODAY,
 		).map((q) => q.id);
 		expect(active).not.toContain("children");
-		expect(active).not.toContain("child-support");
-		expect(active).not.toContain("support-duration");
+		expect(active).not.toContain("partner-gross-income");
 		expect(active).toHaveLength(12);
 	});
 });

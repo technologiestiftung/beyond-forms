@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { todayIsoDate } from "../utils/date";
 
 export const WorkCapacity = {
 	FULL: "FULL",
@@ -64,14 +65,6 @@ const isRealCalendarDate = (value: string): boolean => {
 	);
 };
 
-const todayIsoDate = (): string => {
-	const today = new Date();
-	const year = today.getFullYear();
-	const month = String(today.getMonth() + 1).padStart(2, "0");
-	const day = String(today.getDate()).padStart(2, "0");
-	return `${year}-${month}-${day}`;
-};
-
 /**
  * Used for the applicant and for every child. Reading the clock is acceptable here because
  * this is input validation, not decision logic — the engine always takes `today` as an
@@ -103,40 +96,34 @@ export const BenefitCheckAnswersSchema = z.object({
 	livesInGermany: z.boolean(),
 	workCapacity: WorkCapacitySchema,
 	isEmployed: z.boolean(),
+	/** The applicant's own gross income. The partner's is a separate field. */
 	monthlyGrossIncome: z.number().min(0),
+	partnerMonthlyGrossIncome: z.number().min(0),
 	monthlyNetHouseholdIncome: z.number().min(0),
 	monthlyWarmRent: z.number().min(0),
 	assetsBand: AssetsBandSchema,
 	receivesBenefitsAlready: z.boolean(),
 	citizenship: CitizenshipSchema,
 	hasSecureResidenceStatus: z.boolean(),
-	childReceivesFullSupport: z.boolean(),
-	monthsWithoutChildSupport: z.number().int().min(0),
 });
 
 export type BenefitCheckAnswers = z.infer<typeof BenefitCheckAnswersSchema>;
 export type PartialBenefitCheckAnswers = Partial<BenefitCheckAnswers>;
 
+/**
+ * The benefits Klaro can both assess and file an application for. A benefit without a form
+ * in `forms/` does not belong here: the result view offers to apply for everything it lists,
+ * so assessing one would promise an application that does not exist.
+ */
 export const BenefitId = {
 	/** Grundsicherungsgeld, SGB II (bis 30.6.2026: Bürgergeld) */
 	SGB_II_BASIC_INCOME: "SGB_II_BASIC_INCOME",
 	/** Grundsicherung im Alter und bei Erwerbsminderung, SGB XII Kap. 4 */
 	SGB_XII_OLD_AGE_REDUCED_CAPACITY: "SGB_XII_OLD_AGE_REDUCED_CAPACITY",
-	/** Hilfe zum Lebensunterhalt, SGB XII Kap. 3 */
-	SGB_XII_SUBSISTENCE_AID: "SGB_XII_SUBSISTENCE_AID",
 	/** Wohngeld, WoGG */
 	HOUSING_BENEFIT: "HOUSING_BENEFIT",
 	/** Kinderzuschlag, §6a BKGG */
 	CHILD_SUPPLEMENT: "CHILD_SUPPLEMENT",
-	/** Unterhaltsvorschuss, UVG */
-	ADVANCE_MAINTENANCE: "ADVANCE_MAINTENANCE",
-	/**
-	 * Bildungs- und Teilhabepaket, §28 SGB II / §34 SGB XII. Unlike the six above it has
-	 * no test of its own: it follows from one of the base benefits, so `evaluate` derives
-	 * it from their verdicts. Listed last so the stable sort keeps it below the benefit
-	 * that carries it.
-	 */
-	EDUCATION_PARTICIPATION_PACKAGE: "EDUCATION_PARTICIPATION_PACKAGE",
 } as const;
 export type BenefitId = (typeof BenefitId)[keyof typeof BenefitId];
 
@@ -153,7 +140,6 @@ export const ReasonCode = {
 	RETIREMENT_AGE_REACHED: "RETIREMENT_AGE_REACHED",
 	RETIREMENT_AGE_NOT_REACHED: "RETIREMENT_AGE_NOT_REACHED",
 	WORK_CAPACITY_NOT_FULL: "WORK_CAPACITY_NOT_FULL",
-	NOT_IN_CAPACITY_GAP: "NOT_IN_CAPACITY_GAP",
 	RESIDENCE_STATUS_UNCLEAR: "RESIDENCE_STATUS_UNCLEAR",
 	ALREADY_RECEIVING_BENEFITS: "ALREADY_RECEIVING_BENEFITS",
 	BENEFITS_TAKE_PRECEDENCE: "BENEFITS_TAKE_PRECEDENCE",
@@ -163,19 +149,12 @@ export const ReasonCode = {
 	ASSETS_BELOW_ALLOWANCE: "ASSETS_BELOW_ALLOWANCE",
 	ASSETS_SPAN_ALLOWANCE: "ASSETS_SPAN_ALLOWANCE",
 	ASSETS_ABOVE_ALLOWANCE: "ASSETS_ABOVE_ALLOWANCE",
+	COUPLE_ASSET_ALLOWANCE_UNKNOWN: "COUPLE_ASSET_ALLOWANCE_UNKNOWN",
 	RENT_BURDEN_HIGH: "RENT_BURDEN_HIGH",
 	RENT_BURDEN_NORMAL: "RENT_BURDEN_NORMAL",
 	NO_ELIGIBLE_CHILDREN: "NO_ELIGIBLE_CHILDREN",
 	KIZ_MIN_INCOME_MET: "KIZ_MIN_INCOME_MET",
 	KIZ_MIN_INCOME_NOT_MET: "KIZ_MIN_INCOME_NOT_MET",
-	NOT_SINGLE_PARENT: "NOT_SINGLE_PARENT",
-	NO_MINOR_CHILDREN: "NO_MINOR_CHILDREN",
-	CHILD_RECEIVES_FULL_SUPPORT: "CHILD_RECEIVES_FULL_SUPPORT",
-	CHILD_SUPPORT_INCOMPLETE: "CHILD_SUPPORT_INCOMPLETE",
-	EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT:
-		"EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT",
-	EDUCATION_PACKAGE_NEEDS_BASE_BENEFIT: "EDUCATION_PACKAGE_NEEDS_BASE_BENEFIT",
-	CAPACITY_GAP_PRECONDITION_MET: "CAPACITY_GAP_PRECONDITION_MET",
 } as const;
 export type ReasonCode = (typeof ReasonCode)[keyof typeof ReasonCode];
 
@@ -191,7 +170,7 @@ export interface BenefitAssessment {
 }
 
 export interface BenefitCheckResult {
-	/** Always all seven, in the order of `BenefitId`. */
+	/** Always all four, in the order of `BenefitId`. */
 	assessments: BenefitAssessment[];
 	hints: HintCode[];
 }

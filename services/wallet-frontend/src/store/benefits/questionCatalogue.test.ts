@@ -53,7 +53,6 @@ describe("QUESTION_CATALOGUE", () => {
 			q.skipIf?.(childless, TODAY),
 		).map((q) => q.id);
 		expect(skipped).toContain("children");
-		expect(skipped).toContain("child-support");
 	});
 
 	it("skips work capacity once the retirement age is reached", () => {
@@ -64,11 +63,11 @@ describe("QUESTION_CATALOGUE", () => {
 		expect(skipped).toContain("work-capacity");
 	});
 
-	it("skips the gross income question when not employed", () => {
+	it("asks for the gross income even when there is no job", () => {
 		const skipped = QUESTION_CATALOGUE.filter((q) =>
 			q.skipIf?.({ isEmployed: false }, TODAY),
 		).map((q) => q.id);
-		expect(skipped).toContain("gross-income");
+		expect(skipped).not.toContain("gross-income");
 	});
 
 	it("skips the residence status question for EU citizens", () => {
@@ -76,18 +75,6 @@ describe("QUESTION_CATALOGUE", () => {
 			q.skipIf?.({ citizenship: Citizenship.DE_EU }, TODAY),
 		).map((q) => q.id);
 		expect(skipped).toContain("residence-status");
-	});
-
-	it("skips the support duration unless support is actually missing", () => {
-		const duration = QUESTION_CATALOGUE.find(
-			(q) => q.id === "support-duration",
-		);
-		expect(duration?.skipIf?.({ childReceivesFullSupport: true }, TODAY)).toBe(
-			true,
-		);
-		expect(duration?.skipIf?.({ childReceivesFullSupport: false }, TODAY)).toBe(
-			false,
-		);
 	});
 
 	it("declares options that the schema accepts", () => {
@@ -114,7 +101,10 @@ describe("work capacity skip by income", () => {
 
 	it("is skipped for someone earning comfortably above the threshold", () => {
 		expect(
-			workCapacity?.skipIf?.({ isEmployed: true, monthlyGrossIncome: 2400 }, TODAY),
+			workCapacity?.skipIf?.(
+				{ isEmployed: true, monthlyGrossIncome: 2400 },
+				TODAY,
+			),
 		).toBe(true);
 	});
 
@@ -126,23 +116,29 @@ describe("work capacity skip by income", () => {
 	 */
 	it("still asks someone on Werkstatt pay", () => {
 		expect(
-			workCapacity?.skipIf?.({ isEmployed: true, monthlyGrossIncome: 220 }, TODAY),
+			workCapacity?.skipIf?.(
+				{ isEmployed: true, monthlyGrossIncome: 220 },
+				TODAY,
+			),
 		).toBe(false);
 	});
 
 	it("still asks at the threshold itself", () => {
 		expect(
-			workCapacity?.skipIf?.({ isEmployed: true, monthlyGrossIncome: 1000 }, TODAY),
+			workCapacity?.skipIf?.(
+				{ isEmployed: true, monthlyGrossIncome: 1000 },
+				TODAY,
+			),
 		).toBe(false);
 	});
 
-	it("does not skip on income alone when there is no job", () => {
+	it("skips on the applicant's own income whether or not they call it a job", () => {
 		expect(
 			workCapacity?.skipIf?.(
 				{ isEmployed: false, monthlyGrossIncome: 2400 },
 				TODAY,
 			),
-		).toBe(false);
+		).toBe(true);
 	});
 
 	it("still skips past the retirement age regardless of income", () => {
@@ -153,4 +149,56 @@ describe("work capacity skip by income", () => {
 			),
 		).toBe(true);
 	});
+});
+
+/**
+ * A skip condition may only read answers collected before it. Reading a later field would
+ * make the skip depend on a question the visitor has not reached yet, which silently
+ * shortens the path and the progress denominator.
+ */
+describe("skip conditions read only earlier answers", () => {
+	const SAMPLE: Record<string, unknown> = {
+		householdComposition: HouseholdComposition.SINGLE_PARENT,
+		children: [{ dateOfBirth: "2015-03-01" }],
+		dateOfBirth: "1994-01-15",
+		livesInGermany: true,
+		isEmployed: true,
+		monthlyGrossIncome: 1400,
+		workCapacity: WorkCapacity.FULL,
+		monthlyNetHouseholdIncome: 1100,
+		monthlyWarmRent: 650,
+		assetsBand: AssetsBand.UNDER_5000,
+		receivesBenefitsAlready: false,
+		citizenship: Citizenship.NON_EU,
+		hasSecureResidenceStatus: true,
+	};
+
+	it.each(QUESTION_CATALOGUE.map((question, index) => [question.id, index]))(
+		"%s",
+		(_id, index) => {
+			const question = QUESTION_CATALOGUE[index as number];
+			if (!question.skipIf) {
+				return;
+			}
+			const earlier = new Set(
+				QUESTION_CATALOGUE.slice(0, index as number).map(
+					(q) => q.field as string,
+				),
+			);
+			const read: string[] = [];
+			const spy = new Proxy(
+				{ ...SAMPLE },
+				{
+					get(target, property: string) {
+						read.push(property);
+						return target[property];
+					},
+				},
+			);
+
+			question.skipIf(spy, TODAY);
+
+			expect(read.filter((field) => !earlier.has(field))).toEqual([]);
+		},
+	);
 });

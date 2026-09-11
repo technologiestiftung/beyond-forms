@@ -14,7 +14,6 @@ import {
 	hasReachedRetirementAge,
 	householdStandardNeeds,
 	isCouple,
-	minorChildren,
 	residenceRequirementMet,
 	totalNeeds,
 } from "./derive";
@@ -165,10 +164,6 @@ describe("child filters", () => {
 		{ dateOfBirth: "2008-09-10" }, // 17
 		{ dateOfBirth: "2001-09-09" }, // 25 exactly
 	];
-
-	it("counts a child as a minor until the 18th birthday", () => {
-		expect(minorChildren(children, TODAY)).toHaveLength(2);
-	});
 
 	it("excludes a child on their 25th birthday", () => {
 		expect(childrenUnder25(children, TODAY)).toHaveLength(3);

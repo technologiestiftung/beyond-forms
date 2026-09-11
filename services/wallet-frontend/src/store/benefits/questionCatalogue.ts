@@ -9,7 +9,11 @@ import type {
 	PartialBenefitCheckAnswers,
 } from "../../schemas/benefitCheck.schema";
 import { WORK_CAPACITY_SKIP_GROSS_INCOME } from "../../config/benefitRules.config";
-import { compositionImpliesChildren, hasReachedRetirementAge } from "./derive";
+import {
+	compositionImpliesChildren,
+	hasReachedRetirementAge,
+	isCouple,
+} from "./derive";
 
 export type QuestionInput =
 	| "choice"
@@ -26,11 +30,8 @@ export interface BenefitQuestion {
 	/** Only for "choice". Boolean questions use BINARY_OPTIONS. */
 	options?: readonly string[];
 	/** Only for "number". Drives the suffix the input shows. */
-	unit?: "EUR" | "MONTHS";
-	/**
-	 * May only read fields collected EARLIER in this array, and must return false while
-	 * the field it reads is undefined — an unanswered question must never cause a skip.
-	 */
+	unit?: "EUR";
+	/** Invariant enforced by questionCatalogue.test.ts: reads only earlier fields. */
 	skipIf?: (answers: PartialBenefitCheckAnswers, today: string) => boolean;
 }
 
@@ -75,11 +76,26 @@ export const QUESTION_CATALOGUE: readonly BenefitQuestion[] = [
 		input: "boolean",
 	},
 	{
+		// Asked of everyone: not working is not the same as having no gross income, and the
+		// Kinderzuschlag rule needs the figure either way. 0 is a valid answer.
+		//
+		// Strictly the applicant's own. The work-capacity skip below reads it as a statement
+		// about this person's working hours, which a household figure could not support.
 		id: "gross-income",
 		field: "monthlyGrossIncome",
 		input: "number",
 		unit: "EUR",
-		skipIf: (answers) => answers.isEmployed === false,
+	},
+	{
+		// Kinderzuschlag's minimum applies to a couple's combined gross, so the partner's
+		// share has to be asked for separately once the applicant's own is known.
+		id: "partner-gross-income",
+		field: "partnerMonthlyGrossIncome",
+		input: "number",
+		unit: "EUR",
+		skipIf: (answers) =>
+			answers.householdComposition !== undefined &&
+			!isCouple(answers.householdComposition),
 	},
 	{
 		id: "work-capacity",
@@ -91,25 +107,17 @@ export const QUESTION_CATALOGUE: readonly BenefitQuestion[] = [
 			WorkCapacity.PERMANENTLY_REDUCED,
 		],
 		/**
-		 * Two reasons to skip.
+		 * Skipped past the retirement age, where the SGB XII rule keys off the age instead,
+		 * and above the income threshold, where `useBenefitCheckNavigation` records FULL.
 		 *
-		 * Past the retirement age the answer no longer routes anything — the SGB XII
-		 * rule keys off the age instead.
-		 *
-		 * Above the income threshold, working under three hours a day would be unusual,
-		 * so the answer is taken as FULL. Below it the question stays: Werkstatt pay
-		 * sits far under the threshold, and those workers are precisely the people the
-		 * SGB XII assessment must not miss.
-		 *
-		 * `useBenefitCheckNavigation` records `workCapacity: FULL` for the income skip.
-		 * Three of the six rules read the field, so leaving it undefined would strand
-		 * them all on INSUFFICIENT_DATA.
+		 * The threshold exists for the case BELOW it: Werkstatt pay sits far under it, and
+		 * those workers are exactly who the SGB XII assessment must not miss. `gross-income`
+		 * is the applicant's own, so a partner's earnings cannot trigger this skip.
 		 */
 		skipIf: (answers, today) =>
 			(answers.dateOfBirth !== undefined &&
 				hasReachedRetirementAge(answers.dateOfBirth, today)) ||
-			(answers.isEmployed === true &&
-				answers.monthlyGrossIncome !== undefined &&
+			(answers.monthlyGrossIncome !== undefined &&
 				answers.monthlyGrossIncome > WORK_CAPACITY_SKIP_GROSS_INCOME),
 	},
 	{
@@ -141,12 +149,8 @@ export const QUESTION_CATALOGUE: readonly BenefitQuestion[] = [
 		input: "boolean",
 	},
 	{
-		/**
-		 * Always asked. The domain spec §4 skips it unless other answers suggest a claim,
-		 * but every one of the six rules needs the residence requirement, so skipping it
-		 * puts all six on CHECK_ADVISED/INSUFFICIENT_DATA — anyone not asked gets no
-		 * result at all.
-		 */
+		// Always asked: every rule needs the residence requirement, so anyone not asked
+		// would get INSUFFICIENT_DATA on all four and no result at all.
 		id: "citizenship",
 		field: "citizenship",
 		input: "choice",
@@ -157,30 +161,5 @@ export const QUESTION_CATALOGUE: readonly BenefitQuestion[] = [
 		field: "hasSecureResidenceStatus",
 		input: "boolean",
 		skipIf: (answers) => answers.citizenship === Citizenship.DE_EU,
-	},
-	{
-		id: "child-support",
-		field: "childReceivesFullSupport",
-		input: "boolean",
-		skipIf: childless,
-	},
-	{
-		id: "support-duration",
-		field: "monthsWithoutChildSupport",
-		input: "number",
-		unit: "MONTHS",
-		/**
-		 * Two reasons to skip, and both are needed.
-		 *
-		 * `childless` covers a household that never sees the support question at all —
-		 * without it, a single person would be asked how long maintenance has been
-		 * missing.
-		 *
-		 * The support flag is compared with `=== true` rather than `!== false`, because
-		 * the latter is also true while the field is undefined and would skip the
-		 * question before it has been asked, leaving the progress denominator short.
-		 */
-		skipIf: (answers) =>
-			childless(answers) || answers.childReceivesFullSupport === true,
 	},
 ];

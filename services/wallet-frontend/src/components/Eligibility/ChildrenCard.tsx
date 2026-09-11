@@ -1,21 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { i18nKeys } from "../../i18n/i18nKeys";
-import { PrimaryButton } from "../ui/PrimaryButton";
-import { Info, Plus, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import type { ChildEntry } from "../../schemas/benefitCheck.schema";
-import {
-	EARLIEST_BIRTHDATE,
-	dateRangeErrorKey,
-	isUsableDate,
-	todayIso,
-} from "./dateRange";
+import { DateField } from "./DateField";
+import { QuestionShell } from "./QuestionShell";
+import type { QuestionHeader } from "./QuestionShell";
+import { dateRangeErrorKey, isUsableDate } from "./dateRange";
+import { todayIsoDate } from "../../utils/date";
 
-interface ChildrenCardProps {
-	id: string;
-	question: string;
-	category: string;
-	tip?: string;
+interface ChildrenCardProps extends QuestionHeader {
 	/** Templates carrying {{index}}; already translated by the caller. */
 	addLabel: string;
 	removeLabel: string;
@@ -40,7 +32,6 @@ export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 	onChange,
 	onNext,
 }) => {
-	const { t } = useTranslation();
 	const legendRef = useRef<HTMLLegendElement>(null);
 
 	// One empty row to start, so a parent with one child types straight away.
@@ -48,19 +39,15 @@ export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 		value && value.length > 0 ? value.map((child) => child.dateOfBirth) : [""],
 	);
 
-	// Which row the cursor is in, so its message can wait until the row is left.
-	const [focusedRow, setFocusedRow] = useState<number | null>(null);
-
 	useEffect(() => {
 		legendRef.current?.focus();
 	}, [id]);
 
-	const maxDate = useMemo(() => todayIso(), []);
+	const maxDate = useMemo(() => todayIsoDate(), []);
 
 	const publish = (next: string[]) => {
 		setRows(next);
-		// Empty and half-typed rows are dropped, so neither an accidentally added row nor
-		// a date still being typed becomes data.
+		// Half-typed rows are dropped, so a date still being entered never becomes data.
 		onChange(
 			next
 				.filter((dateOfBirth) => isUsableDate(dateOfBirth, maxDate))
@@ -71,44 +58,16 @@ export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 	const isComplete =
 		rows.length > 0 && rows.every((row) => isUsableDate(row, maxDate));
 
-	const handleSubmit = (event: React.FormEvent) => {
-		event.preventDefault();
-		if (isComplete) {
-			onNext();
-		}
-	};
-
 	return (
-		<form
-			onSubmit={handleSubmit}
-			data-testid="question-card"
-			className="w-full font-sans flex flex-col justify-between flex-grow min-h-[360px]"
+		<QuestionShell
+			id={id}
+			question={question}
+			category={category}
+			tip={tip}
+			canAdvance={isComplete}
+			onNext={onNext}
 		>
-			<fieldset className="w-full border-none p-0 m-0 flex flex-col gap-6 mb-8">
-				<div className="flex flex-col gap-3">
-					<p className="text-body text-brand-grey">
-						{t(i18nKeys.eligibility.title)}
-					</p>
-					<h1 className="text-xl font-bold text-brand-black leading-snug">
-						{category}
-					</h1>
-				</div>
-
-				{tip && (
-					<div
-						id={`${id}-tip`}
-						className="bg-brand-bg border border-brand-border/40 rounded-xl p-4 flex gap-2 items-start"
-					>
-						<Info
-							className="size-5 text-brand-grey shrink-0 mt-0.5"
-							aria-hidden="true"
-						/>
-						<p className="text-base text-brand-grey leading-snug whitespace-pre-line">
-							{tip}
-						</p>
-					</div>
-				)}
-
+			<fieldset className="w-full border-none p-0 m-0 flex flex-col gap-4">
 				<legend
 					ref={legendRef}
 					tabIndex={-1}
@@ -119,82 +78,50 @@ export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 				</legend>
 
 				<ul className="flex flex-col gap-4 w-full list-none p-0 m-0">
-					{rows.map((dateOfBirth, index) => {
-						const errorKey =
-							focusedRow === index
-								? undefined
-								: dateRangeErrorKey(dateOfBirth, maxDate);
-						const errorId = `${id}-child-${index}-error`;
-						const describedBy =
-							[tip ? `${id}-tip` : null, errorKey ? errorId : null]
-								.filter(Boolean)
-								.join(" ") || undefined;
-
-						return (
-							<li key={index} className="flex flex-col gap-2">
-								<label
-									htmlFor={`${id}-child-${index}`}
-									className="text-base text-brand-black"
-								>
-									{withIndex(childLabel, index)}
-								</label>
-								<div className="flex items-center gap-2">
-									<input
-										id={`${id}-child-${index}`}
-										type="date"
-										aria-describedby={describedBy}
-										aria-invalid={errorKey !== undefined}
-										data-testid={`child-date-${index}`}
-										value={dateOfBirth}
-										min={EARLIEST_BIRTHDATE}
-										max={maxDate}
-										onFocus={() => setFocusedRow(index)}
-										onBlur={() => setFocusedRow(null)}
-										/*
-										 * The row mirrors the field verbatim. Writing a corrected
-										 * value back mid-typing makes React reset the node, and a
-										 * date input loses its day and month segments when that
-										 * happens: typing the first digit of the year completes the
-										 * value as year 0001, below `min`, and the entry vanishes.
-										 */
-										onChange={(event) => {
-											const next = [...rows];
-											next[index] = event.target.value;
-											publish(next);
-										}}
-										className={`h-12 flex-1 px-3 rounded-xl border-2 text-base text-brand-black bg-white focus:outline-none focus:border-brand-primary ${
-											errorKey ? "border-red-400" : "border-brand-border/30"
-										}`}
-									/>
-									{rows.length > 1 && (
-										<button
-											type="button"
-											aria-label={withIndex(removeLabel, index)}
-											data-testid={`remove-child-${index}`}
-											onClick={() =>
-												publish(
-													rows.filter((_, position) => position !== index),
-												)
-											}
-											className="size-12 shrink-0 rounded-xl border-2 border-brand-border/30 flex items-center justify-center text-brand-grey"
-										>
-											<X className="size-5" aria-hidden="true" />
-										</button>
-									)}
-								</div>
-								{errorKey && (
-									<p
-										id={errorId}
-										role="alert"
-										data-testid={`date-error-${index}`}
-										className="text-sm text-red-700"
+					{rows.map((dateOfBirth, index) => (
+						<li key={index} className="flex flex-col gap-2">
+							<label
+								htmlFor={`${id}-child-${index}`}
+								className="text-base text-brand-black"
+							>
+								{withIndex(childLabel, index)}
+							</label>
+							<div className="flex items-start gap-2">
+								<DateField
+									id={`${id}-child-${index}`}
+									value={dateOfBirth || undefined}
+									onChange={(iso) => {
+										const next = [...rows];
+										next[index] = iso;
+										publish(next);
+									}}
+									onClear={() => {
+										const next = [...rows];
+										next[index] = "";
+										publish(next);
+									}}
+									errorKey={(iso) => dateRangeErrorKey(iso, maxDate)}
+									describedBy={`${id}-child-${index}-error`}
+									className="flex-1"
+									testId={`child-date-${index}`}
+									errorTestId={`date-error-${index}`}
+								/>
+								{rows.length > 1 && (
+									<button
+										type="button"
+										aria-label={withIndex(removeLabel, index)}
+										data-testid={`remove-child-${index}`}
+										onClick={() =>
+											publish(rows.filter((_, position) => position !== index))
+										}
+										className="size-12 shrink-0 rounded-xl border-2 border-brand-border/30 flex items-center justify-center text-brand-grey"
 									>
-										{t(errorKey)}
-									</p>
+										<X className="size-5" aria-hidden="true" />
+									</button>
 								)}
-							</li>
-						);
-					})}
+							</div>
+						</li>
+					))}
 				</ul>
 
 				<button
@@ -207,16 +134,6 @@ export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 					{addLabel}
 				</button>
 			</fieldset>
-
-			<div className="w-full">
-				<PrimaryButton
-					type="submit"
-					disabled={!isComplete}
-					data-testid="next-button"
-				>
-					{t(i18nKeys.common.next)}
-				</PrimaryButton>
-			</div>
-		</form>
+		</QuestionShell>
 	);
 };

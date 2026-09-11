@@ -62,11 +62,9 @@ export const assetAllowance = (ageYears: number): number => {
 export type AssetsComparison = "BELOW" | "SPANS" | "ABOVE";
 
 /**
- * Three-valued on purpose. The domain spec §5 returns a boolean built from the band's
- * lower bound and then explains in a comment that a band straddling the allowance is
- * an uncertain result — which a boolean cannot carry, so §6.1 rebuilds it from two
- * consecutive if-branches. Naming the third case here makes the uncertainty explicit
- * and lets test case E fall out of the function instead of out of branch ordering.
+ * Three-valued on purpose: a band that straddles the allowance is an uncertain result, and
+ * a boolean cannot carry that — it would have to be rebuilt from branch ordering at every
+ * call site.
  */
 export const assetsVsAllowance = (
 	band: AssetsBand,
@@ -97,11 +95,7 @@ export const compositionImpliesChildren = (
 	composition === HouseholdComposition.SINGLE_PARENT ||
 	composition === HouseholdComposition.COUPLE_WITH_CHILDREN;
 
-/**
- * Which Regelbedarfsstufe a child falls into. The domain spec calls regelbedarf(haushalt)
- * without defining the mapping; this is the design doc's §5 assignment and is on the
- * verification checklist.
- */
+/** Which Regelbedarfsstufe a child falls into. UNVERIFIED — on the checklist in benefitRules.config.ts. */
 const needsLevelForChildAge = (ageYears: number): 3 | 4 | 5 | 6 => {
 	if (ageYears <= 5) {
 		return 6;
@@ -137,12 +131,6 @@ export const totalNeeds = (
 	monthlyWarmRent: number,
 	today: string,
 ): number => householdStandardNeeds(household, today) + monthlyWarmRent;
-
-export const minorChildren = (
-	children: ChildEntry[],
-	today: string,
-): ChildEntry[] =>
-	children.filter((child) => ageInYears(child.dateOfBirth, today) < 18);
 
 export const childrenUnder25 = (
 	children: ChildEntry[],

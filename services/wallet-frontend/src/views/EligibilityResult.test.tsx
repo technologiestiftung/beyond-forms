@@ -26,8 +26,22 @@ const CASE_C: PartialBenefitCheckAnswers = {
 	assetsBand: AssetsBand.UNDER_5000,
 	receivesBenefitsAlready: false,
 	citizenship: Citizenship.DE_EU,
-	childReceivesFullSupport: false,
-	monthsWithoutChildSupport: 8,
+};
+
+/** A single whose income falls short: the one fixture that yields a LIKELY_YES. */
+const LIKELY: PartialBenefitCheckAnswers = {
+	householdComposition: HouseholdComposition.SINGLE,
+	children: [],
+	dateOfBirth: "1994-01-15",
+	livesInGermany: true,
+	workCapacity: WorkCapacity.FULL,
+	isEmployed: true,
+	monthlyGrossIncome: 1400,
+	monthlyNetHouseholdIncome: 1100,
+	monthlyWarmRent: 650,
+	assetsBand: AssetsBand.UNDER_5000,
+	receivesBenefitsAlready: false,
+	citizenship: Citizenship.DE_EU,
 };
 
 /** A comfortable single: nothing matches, so the referral must appear. */
@@ -74,12 +88,9 @@ describe("EligibilityResult", () => {
 			.getAllByTestId(/^assessment-/)
 			.map((card) => card.getAttribute("data-testid"));
 		expect(ids).toEqual([
-			// LIKELY_YES
-			`assessment-${BenefitId.ADVANCE_MAINTENANCE}`,
 			// CHECK_ADVISED, in the engine's own order because the sort is stable
 			`assessment-${BenefitId.HOUSING_BENEFIT}`,
 			`assessment-${BenefitId.CHILD_SUPPLEMENT}`,
-			`assessment-${BenefitId.EDUCATION_PARTICIPATION_PACKAGE}`,
 			// LIKELY_NO
 			`assessment-${BenefitId.SGB_II_BASIC_INCOME}`,
 		]);
@@ -111,16 +122,16 @@ describe("EligibilityResult", () => {
 	});
 
 	it("offers an action on the decided benefits but not on the rejected one", () => {
-		seed(CASE_C);
+		seed(LIKELY);
 		renderResult();
 		expect(
-			screen.getByTestId(`apply-${BenefitId.ADVANCE_MAINTENANCE}`),
+			screen.getByTestId(`apply-${BenefitId.SGB_II_BASIC_INCOME}`),
 		).toHaveTextContent("result.apply");
 		expect(
 			screen.getByTestId(`apply-${BenefitId.HOUSING_BENEFIT}`),
 		).toHaveTextContent("result.check_now");
 		expect(
-			screen.queryByTestId(`apply-${BenefitId.SGB_II_BASIC_INCOME}`),
+			screen.queryByTestId(`apply-${BenefitId.CHILD_SUPPLEMENT}`),
 		).toBeNull();
 	});
 
@@ -130,9 +141,10 @@ describe("EligibilityResult", () => {
 		expect(screen.getByTestId("result-disclaimer")).toBeInTheDocument();
 	});
 
-	it("renders the disclaimer even with no answers at all", () => {
+	it("sends an unfinished check back to the question still waiting", () => {
 		renderResult();
-		expect(screen.getByTestId("result-disclaimer")).toBeInTheDocument();
+		expect(screen.queryByTestId("result-disclaimer")).toBeNull();
+		expect(screen.queryAllByTestId(/^assessment-/)).toHaveLength(0);
 	});
 
 	it("shows the hints the engine produced", () => {

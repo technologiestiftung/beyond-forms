@@ -4,6 +4,7 @@ import {
 	openManualPhoneForm,
 	registerAuthBypassRoute,
 } from "./helpers/auth";
+import { completeEligibilityCheck } from "./helpers/eligibility";
 
 // The mandatory tutorial gate was disabled in the demo-mode PR (see the
 // commented-out block in src/components/Auth/ProtectedRoute.tsx): new users
@@ -26,27 +27,8 @@ test.describe.skip("Mandatory Onboarding Technical Tutorial E2E Gate & Session p
 	}) => {
 		// 1. Onboard through eligibility check
 		await page.goto("/");
-		await page.getByTestId("start-button").click();
-
-		await page.getByTestId("option-german").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-yes").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("dob-date-input").fill("1959-01-20");
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-old_age").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-not_sufficient").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-no").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("outcome-cta").click();
+		await completeEligibilityCheck(page, { dateOfBirth: "20.01.1959" });
+		await page.getByTestId("result-cta").click();
 		await expect(page).toHaveURL(/\/auth\?origin=eligibility/);
 
 		// 2. Trigger Authentication success for a new user (phone ending in 1)

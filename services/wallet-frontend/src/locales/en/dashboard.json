@@ -55,6 +55,19 @@
 			"housing_allowance": {
 				"title": "Housing allowance",
 				"description": "Apply for housing allowance (Wohngeld) directly with your saved details."
+			},
+			"basic_income": {
+				"title": "Basic Income Support",
+				"description": "Apply for basic income support using the details you have already saved."
+			},
+			"child_allowance": {
+				"title": "Child Allowance",
+				"description": "Apply for child allowance using the details you have already saved."
+			},
+			"hidden_group": {
+				"count_one": "1 benefit probably does not apply to you",
+				"count_other": "{{count}} benefits probably do not apply to you",
+				"description": "Based on the details in your profile. This is only an estimate — you can still submit these applications."
 			}
 		}
 	},

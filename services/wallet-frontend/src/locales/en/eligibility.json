@@ -75,7 +75,6 @@
 		"household": {
 			"category": "Household",
 			"title": "Who lives in your household?",
-			"tip": "How many people live together changes the calculation. Children count too.",
 			"options": {
 				"SINGLE": "I live alone.",
 				"SINGLE_PARENT": "I am a single parent.",
@@ -93,8 +92,7 @@
 		},
 		"birthdate": {
 			"category": "Date of birth",
-			"title": "When were you born?",
-			"tip": "Your age helps decide which benefits might be right for you. Different rules apply once you reach the statutory retirement age."
+			"title": "When were you born?"
 		},
 		"germany": {
 			"category": "Place of residence",
@@ -108,7 +106,7 @@
 		"work-capacity": {
 			"category": "Ability to work",
 			"title": "Can you work at least three hours a day?",
-			"tip": "Three hours is a threshold in the law. It decides which office is responsible for you. We ask even if you are working: some people work in a sheltered workshop, for example, and still count as having reduced earning capacity.",
+			"tip": "Some people work in a sheltered workshop, for example, and still count as having reduced earning capacity. That is why we ask even if you are working.",
 			"options": {
 				"FULL": "Yes, at least three hours a day.",
 				"TEMPORARILY_REDUCED": "Not at the moment, but perhaps again later.",
@@ -117,46 +115,51 @@
 		},
 		"employment": {
 			"category": "Work",
-			"title": "Are you working at the moment?",
-			"tip": "If you live with a partner, their work counts as well.",
 			"options": {
 				"YES": "Yes, I am working.",
 				"NO": "No, not at the moment."
-			}
+			},
+			"title_single": "Are you working at the moment?",
+			"title_couple": "Are you or your partner working at the moment?"
 		},
 		"gross-income": {
 			"category": "Work",
-			"title": "How much is the gross monthly income?",
-			"tip": "Gross means the amount before tax and contributions. You can find it on your payslip. If you live with a partner, add both together.",
+			"title": "How much is your gross income per month?",
+			"tip": "Gross means the amount before tax and contributions. You can find it on your payslip. If you are not working, enter 0.",
 			"unit": "Euro"
 		},
 		"net-income": {
 			"category": "Income",
-			"title": "How much money does your household have per month in total?",
-			"tip": "Add up everything that comes in each month: wages after deductions, pension, child benefit, maintenance, other benefits. An approximate amount is enough.",
-			"unit": "Euro"
+			"tip": "Add up everything that comes in each month: wages after deductions, pension, child benefit, maintenance, other benefits.",
+			"unit": "Euro",
+			"title_single": "How much money do you have available per month in total?",
+			"title_couple": "How much money does your household have available per month in total?",
+			"hint": "An approximate amount is enough."
 		},
 		"warm-rent": {
 			"category": "Housing",
 			"title": "How much is your rent per month, including bills?",
 			"tip": "That means rent plus service charges plus heating. You can find the amount in your tenancy agreement or on your bank statement.",
-			"unit": "Euro"
+			"unit": "Euro",
+			"hint": "You can find the amount in your tenancy agreement."
 		},
 		"assets": {
 			"category": "Savings",
-			"title": "How much money have you saved?",
-			"tip": "This means everything you have put aside: accounts, savings books, cash, securities. You are allowed to keep some of it — how much depends on your age. A rough estimate is enough.",
+			"tip": "This means everything that has been put aside: accounts, savings books, cash, securities. You are allowed to keep some of it — how much depends on your age.",
 			"options": {
 				"UNDER_5000": "Less than 5,000 euros.",
 				"FROM_5000_TO_15000": "Between 5,000 and 15,000 euros.",
 				"FROM_15000_TO_25000": "Between 15,000 and 25,000 euros.",
 				"OVER_25000": "More than 25,000 euros."
-			}
+			},
+			"title_single": "How much money have you saved?",
+			"title_couple": "How much money have you saved together?",
+			"hint": "A rough estimate is enough."
 		},
 		"benefits": {
 			"category": "Benefits you already receive",
 			"title": "Are you already receiving a social benefit?",
-			"tip": "For example Grundsicherungsgeld, Grundsicherung im Alter or Hilfe zum Lebensunterhalt. Some benefits cannot be received at the same time.",
+			"tip": "For example Grundsicherungsgeld, Grundsicherung im Alter or Wohngeld.",
 			"options": {
 				"YES": "Yes, I already receive a benefit.",
 				"NO": "No, not at the moment."
@@ -165,7 +168,6 @@
 		"citizenship": {
 			"category": "Citizenship",
 			"title": "Do you hold German citizenship or that of an EU country?",
-			"tip": "Different laws apply depending on your citizenship and residence status.",
 			"options": {
 				"DE_EU": "Yes, German or from an EU country.",
 				"NON_EU": "No, from another country."
@@ -180,39 +182,12 @@
 				"NO": "No, or I am not sure."
 			}
 		},
-		"child-support": {
-			"category": "Maintenance",
-			"title": "Does your child receive maintenance from the other parent?",
-			"tip": "If no maintenance or too little is paid, the state can step in. That is called Unterhaltsvorschuss.",
-			"options": {
-				"YES": "Yes, the full amount.",
-				"NO": "No, or only part of it."
-			}
-		},
-		"support-duration": {
-			"category": "Maintenance",
-			"title": "For how many months has the maintenance been missing?",
-			"tip": "An approximate number is enough. If you are not sure, estimate.",
-			"unit": "Months"
+		"partner-gross-income": {
+			"category": "Work",
+			"title": "How much is your partner's gross income per month?",
+			"tip": "Again, the amount before tax and contributions. If your partner is not working, enter 0.",
+			"unit": "Euro"
 		}
-	},
-	"outcome": {
-		"eligible": {
-			"title": "You could be entitled to basic income support.",
-			"description": "This is an initial assessment. Klaro helps you fill out your application step-by-step. It is easy, digital, and free.",
-			"cta": "Fill out application now"
-		},
-		"not_eligible": {
-			"title": "Basic Income Support is not a good fit at the moment...",
-			"description": "You can still create an account and save your answers securely. So you can use Klaro later when your situation changes or you need support with further steps. Later we will offer more applications!",
-			"cta": "Create account"
-		},
-		"sozialamt": {
-			"title": "Please contact your local Social Services Office",
-			"description": "Based on your answers, none of the qualifying residence statuses apply. Please contact your local Social Services Office (Sozialamt) for guidance on which support may be available to you.",
-			"cta": "Find your Social Services Office"
-		},
-		"start_over": "Start over"
 	},
 	"result": {
 		"title": "Your initial assessment",
@@ -230,11 +205,8 @@
 		"benefit": {
 			"SGB_II_BASIC_INCOME": "Grundsicherungsgeld",
 			"SGB_XII_OLD_AGE_REDUCED_CAPACITY": "Grundsicherung in old age and on reduced earning capacity",
-			"SGB_XII_SUBSISTENCE_AID": "Hilfe zum Lebensunterhalt",
 			"HOUSING_BENEFIT": "Wohngeld (housing benefit)",
-			"CHILD_SUPPLEMENT": "Kinderzuschlag (child supplement)",
-			"ADVANCE_MAINTENANCE": "Unterhaltsvorschuss (advance maintenance)",
-			"EDUCATION_PARTICIPATION_PACKAGE": "Bildungs- und Teilhabepaket (education and participation package)"
+			"CHILD_SUPPLEMENT": "Kinderzuschlag (child supplement)"
 		},
 		"status": {
 			"LIKELY_YES": "Worth applying for",
@@ -247,7 +219,6 @@
 			"RETIREMENT_AGE_REACHED": "You have reached the statutory retirement age.",
 			"RETIREMENT_AGE_NOT_REACHED": "You have not yet reached the statutory retirement age.",
 			"WORK_CAPACITY_NOT_FULL": "You cannot work at least three hours a day.",
-			"NOT_IN_CAPACITY_GAP": "This benefit only applies if you are temporarily unable to work.",
 			"RESIDENCE_STATUS_UNCLEAR": "Your residence status needs to be assessed individually.",
 			"ALREADY_RECEIVING_BENEFITS": "According to your answers you already receive a comparable benefit.",
 			"BENEFITS_TAKE_PRECEDENCE": "If you already receive a Grundsicherung, you usually cannot receive this benefit on top.",
@@ -257,18 +228,12 @@
 			"ASSETS_BELOW_ALLOWANCE": "Your savings are below the allowance.",
 			"ASSETS_SPAN_ALLOWANCE": "Your savings are around the allowance. The exact amount decides.",
 			"ASSETS_ABOVE_ALLOWANCE": "Your savings are above the allowance.",
+			"COUPLE_ASSET_ALLOWANCE_UNKNOWN": "For couples the allowance applies per person. How much you may keep together has to be checked by the responsible office.",
 			"RENT_BURDEN_HIGH": "Your rent is high relative to your income.",
 			"RENT_BURDEN_NORMAL": "Your rent is unremarkable relative to your income.",
 			"NO_ELIGIBLE_CHILDREN": "There are no children in your household this benefit applies to.",
 			"KIZ_MIN_INCOME_MET": "Your gross income reaches the minimum threshold.",
-			"KIZ_MIN_INCOME_NOT_MET": "Your gross income does not reach the minimum threshold. Grundsicherungsgeld for the children is the more likely fit.",
-			"NOT_SINGLE_PARENT": "This benefit exists only for single parents.",
-			"NO_MINOR_CHILDREN": "There is no child under 18 in your household.",
-			"CHILD_RECEIVES_FULL_SUPPORT": "Your child receives full maintenance.",
-			"CHILD_SUPPORT_INCOMPLETE": "Your child receives no maintenance, or too little.",
-			"EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT": "If you receive one of the basic benefits checked here, your children are usually automatically entitled to support for school, sport and music.",
-			"EDUCATION_PACKAGE_NEEDS_BASE_BENEFIT": "The package requires that you receive Grundsicherungsgeld, Wohngeld, Kinderzuschlag or Sozialhilfe.",
-			"CAPACITY_GAP_PRECONDITION_MET": "The basic precondition is met. The responsible office has to assess income and savings."
+			"KIZ_MIN_INCOME_NOT_MET": "Your gross income does not reach the minimum threshold. Grundsicherungsgeld for the children is the more likely fit."
 		},
 		"hint": {
 			"ASYLUM_BENEFITS_REFERRAL": "If your residence is not yet secure, Asylbewerberleistungen may apply to you rather than the benefits checked here. An advice service can tell you what applies."

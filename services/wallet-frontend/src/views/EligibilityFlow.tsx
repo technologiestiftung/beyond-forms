@@ -11,6 +11,7 @@ import { StepLayout } from "../components/Layout/StepLayout";
 import { getEligibilityRoute } from "../constants/routes";
 import { useBenefitCheckNavigation } from "../hooks/useBenefitCheckNavigation";
 import { BINARY_OPTIONS } from "../store/benefits/questionCatalogue";
+import { isCouple } from "../store/benefits/derive";
 import { i18nKeys } from "../i18n/i18nKeys";
 import type { BenefitCheckAnswers } from "../schemas/benefitCheck.schema";
 
@@ -57,13 +58,27 @@ export const EligibilityFlow: React.FC = () => {
 	}
 
 	const copy = (part: string) => t(`questions.${question.id}.${part}`);
-	const tipText = t(`questions.${question.id}.tip`, { defaultValue: "" });
+	const optionalCopy = (part: string) =>
+		t(`questions.${question.id}.${part}`, { defaultValue: "" }) || undefined;
+
+	/**
+	 * Several questions read differently to someone living alone than to a couple — asking
+	 * a single person what "Dein Haushalt" earns, or explaining that a partner's income
+	 * counts, makes the check sound like it was written for somebody else. Question one
+	 * already told us which it is, so the copy follows it where a variant exists.
+	 */
+	const title =
+		optionalCopy(
+			answers.householdComposition && isCouple(answers.householdComposition)
+				? "title_couple"
+				: "title_single",
+		) ?? copy("title");
 
 	const header = {
 		id: question.id,
-		question: copy("title"),
+		question: title,
 		category: copy("category"),
-		tip: tipText || undefined,
+		tip: optionalCopy("tip"),
 	};
 
 	const write = <K extends keyof BenefitCheckAnswers>(
@@ -135,6 +150,7 @@ export const EligibilityFlow: React.FC = () => {
 						key={question.id}
 						{...header}
 						unitLabel={copy("unit")}
+						hint={optionalCopy("hint")}
 						value={answers[question.field] as number | undefined}
 						onChange={(raw) => write(raw as never)}
 						onClear={() => clearAnswer(question.field)}

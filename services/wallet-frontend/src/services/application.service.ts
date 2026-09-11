@@ -4,11 +4,59 @@ import {
 	HouseholdComposition,
 	WorkCapacity,
 } from "../schemas/benefitCheck.schema";
-import type { PartialBenefitCheckAnswers } from "../schemas/benefitCheck.schema";
+import type {
+	ChildEntry,
+	PartialBenefitCheckAnswers,
+} from "../schemas/benefitCheck.schema";
 import { authenticatedFetch } from "../utils/apiClient";
 import { env } from "../config/env.config";
-import { mergeChildren } from "./associatedPersons";
-import type { AssociatedPersonRow } from "./associatedPersons";
+
+/**
+ * One row of the profile's `associated_persons`, as `GET /profile` returns it. Only the
+ * fields the merge reasons about are named; the rest are carried through untouched.
+ */
+export interface AssociatedPersonRow {
+	association_type: string;
+	date_of_birth?: string | null;
+	[key: string]: unknown;
+}
+
+const CHILD = "Child";
+
+/**
+ * Adds the questionnaire's children to the collection the profile already has.
+ *
+ * `sort_order` is deliberately not set: the server assigns it by position on write.
+ */
+export const mergeChildren = (
+	existing: AssociatedPersonRow[],
+	children: ChildEntry[],
+): AssociatedPersonRow[] => {
+	// Counted rather than a Set, so twins already half-recorded still gain their sibling.
+	const unmatched = new Map<string, number>();
+	for (const row of existing) {
+		if (row.association_type === CHILD) {
+			const key = row.date_of_birth ?? "";
+			unmatched.set(key, (unmatched.get(key) ?? 0) + 1);
+		}
+	}
+
+	const added: AssociatedPersonRow[] = [];
+	for (const child of children) {
+		const remaining = unmatched.get(child.dateOfBirth) ?? 0;
+		if (remaining > 0) {
+			unmatched.set(child.dateOfBirth, remaining - 1);
+			continue;
+		}
+		added.push({
+			association_type: CHILD,
+			lives_in_household: true,
+			date_of_birth: child.dateOfBirth,
+		});
+	}
+
+	return [...existing, ...added];
+};
 
 export interface SyncResponse {
 	success: boolean;
@@ -31,16 +79,14 @@ const ABILITY_TO_WORK_BY_CAPACITY: Record<WorkCapacity, string> = {
 /**
  * Answers that reach the profile when a guest signs in.
  *
- * GAP: four answers have no column in UserProfileValidationSchema and are deliberately
- * left out — monthlyGrossIncome (monthly_income is documented as net), assetsBand (only
- * the has_assets boolean exists), childReceivesFullSupport and monthsWithoutChildSupport
- * (the existing fields mean paying support, not receiving it). Sending them would return
- * HTTP 200 and discard the data, because the schema sets no extra="forbid" and Pydantic's
- * default is extra="ignore". See part A's design, §9.
+ * GAP: three answers have no column and are deliberately left out — monthlyGrossIncome
+ * (monthly_income is documented as net), assetsBand (only the has_assets boolean exists),
+ * and monthlyWarmRent (rent_total, heating_costs and hot_water_costs exist separately, and
+ * a warm rent cannot be split back into them without inventing numbers). Sending them would
+ * return HTTP 200 and silently discard them: the schema sets no extra="forbid".
  *
- * GAP: monthlyWarmRent has no home either. rent_total, heating_costs and hot_water_costs
- * exist separately and a warm rent cannot be split back into them without inventing
- * numbers.
+ * Those three are why `profileToBenefitAnswers` cannot rebuild the means tests, and why the
+ * dashboard only ever folds away a benefit on a categorical ground.
  *
  * Children are deliberately absent from this function. They need the profile's current
  * collection to merge against, which makes the step asynchronous; syncGuestData handles
@@ -100,6 +146,11 @@ export const mapEligibilityToProfilePayload = (
 		payload.monthly_income = answers.monthlyNetHouseholdIncome;
 	}
 
+	if (answers.receivesBenefitsAlready !== undefined) {
+		payload.has_applied_for_benefits_awaiting_decision =
+			answers.receivesBenefitsAlready;
+	}
+
 	return payload;
 };
 
@@ -149,11 +200,6 @@ export const applicationService = {
 			return { success: true };
 		}
 
-		/**
-		 * Only with at least one child. The questionnaire writes `children: []` by itself
-		 * for a childless household, so merging on an empty list would let the answer
-		 * "I live alone" delete children already recorded in the profile.
-		 */
 		if (answers.children !== undefined && answers.children.length > 0) {
 			const existing = await readAssociatedPersons();
 			if (existing !== null) {

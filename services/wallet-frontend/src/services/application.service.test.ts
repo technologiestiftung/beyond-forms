@@ -9,7 +9,9 @@ import type { PartialBenefitCheckAnswers } from "../schemas/benefitCheck.schema"
 import {
 	applicationService,
 	mapEligibilityToProfilePayload,
+	mergeChildren,
 } from "./application.service";
+import type { AssociatedPersonRow } from "./application.service";
 
 /**
  * env.config parses import.meta.env once at module scope, and vitest.setup.ts stubs
@@ -118,14 +120,10 @@ describe("mapEligibilityToProfilePayload", () => {
 		const payload = mapEligibilityToProfilePayload({
 			monthlyGrossIncome: 1400,
 			assetsBand: AssetsBand.OVER_25000,
-			childReceivesFullSupport: false,
-			monthsWithoutChildSupport: 8,
 			monthlyWarmRent: 650,
 		});
 		expect(payload).not.toHaveProperty("monthly_gross_income");
 		expect(payload).not.toHaveProperty("assets_band");
-		expect(payload).not.toHaveProperty("child_receives_full_support");
-		expect(payload).not.toHaveProperty("months_without_child_support");
 		expect(payload).not.toHaveProperty("rent_total");
 	});
 });
@@ -227,5 +225,78 @@ describe("syncGuestData: children", () => {
 			),
 		).toHaveLength(0);
 		expect(bodyOfLastPost()).not.toHaveProperty("associated_persons");
+	});
+});
+
+const spouse: AssociatedPersonRow = {
+	association_type: "Spouse",
+	lives_in_household: true,
+	first_name: "Ingrid",
+	date_of_birth: "1957-08-14",
+};
+
+const childRow = (
+	dateOfBirth: string,
+	firstName?: string,
+): AssociatedPersonRow => ({
+	association_type: "Child",
+	lives_in_household: true,
+	date_of_birth: dateOfBirth,
+	...(firstName ? { first_name: firstName } : {}),
+});
+
+describe("mergeChildren", () => {
+	it("creates a row when the collection is empty", () => {
+		expect(mergeChildren([], [{ dateOfBirth: "2020-02-11" }])).toEqual([
+			{
+				association_type: "Child",
+				lives_in_household: true,
+				date_of_birth: "2020-02-11",
+			},
+		]);
+	});
+
+	it("leaves a spouse untouched and appends the child after them", () => {
+		const merged = mergeChildren([spouse], [{ dateOfBirth: "2020-02-11" }]);
+		expect(merged).toHaveLength(2);
+		expect(merged[0]).toEqual(spouse);
+		expect(merged[1].association_type).toBe("Child");
+	});
+
+	it("keeps an existing child's name when the date of birth matches", () => {
+		const merged = mergeChildren(
+			[childRow("2020-02-11", "Mia")],
+			[{ dateOfBirth: "2020-02-11" }],
+		);
+		expect(merged).toHaveLength(1);
+		expect(merged[0].first_name).toBe("Mia");
+	});
+
+	it("keeps a child the questionnaire did not list again", () => {
+		const merged = mergeChildren(
+			[childRow("2020-02-11", "Mia"), childRow("2015-03-01", "Jonas")],
+			[{ dateOfBirth: "2020-02-11" }],
+		);
+		expect(merged.map((row) => row.first_name)).toEqual(["Mia", "Jonas"]);
+	});
+
+	it("keeps every existing row when the questionnaire lists no children", () => {
+		const merged = mergeChildren([spouse, childRow("2015-03-01")], []);
+		expect(merged).toHaveLength(2);
+	});
+
+	it("adds the second twin when only one is already recorded", () => {
+		const merged = mergeChildren(
+			[childRow("2020-02-11", "Mia")],
+			[{ dateOfBirth: "2020-02-11" }, { dateOfBirth: "2020-02-11" }],
+		);
+		expect(merged).toHaveLength(2);
+		expect(merged[0].first_name).toBe("Mia");
+		expect(merged[1].first_name).toBeUndefined();
+	});
+
+	it("sets no sort_order, which the server assigns by position", () => {
+		const merged = mergeChildren([spouse], [{ dateOfBirth: "2020-02-11" }]);
+		expect(merged[1]).not.toHaveProperty("sort_order");
 	});
 });

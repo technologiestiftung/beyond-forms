@@ -1,7 +1,6 @@
 import {
 	BenefitId,
 	BenefitStatus,
-	HouseholdComposition,
 	ReasonCode,
 	WorkCapacity,
 } from "../../schemas/benefitCheck.schema";
@@ -22,7 +21,6 @@ import {
 	hasReachedRetirementAge,
 	householdStandardNeeds,
 	isCouple,
-	minorChildren,
 	residenceRequirementMet,
 	totalNeeds,
 } from "./derive";
@@ -38,15 +36,7 @@ const INSUFFICIENT: Verdict = {
 	reasons: [ReasonCode.INSUFFICIENT_DATA],
 };
 
-/**
- * The income-and-assets test shared by the SGB II and SGB XII Kap. 4 rules, which the
- * domain spec §6.1 and §6.2 spell out identically.
- *
- * Note the ABOVE branch: the domain spec folds a clearly-over-allowance case into
- * "moeglich_pruefen" because its boolean helper cannot tell it apart from a straddling
- * band. With the three-valued comparison the two separate, and a clear overshoot reads
- * as LIKELY_NO.
- */
+/** The income-and-assets test shared by the SGB II and SGB XII Kap. 4 rules. */
 const assessMeans = (
 	answers: PartialBenefitCheckAnswers,
 	today: string,
@@ -95,6 +85,21 @@ const assessMeans = (
 			],
 		};
 	}
+
+	// `allowance` covers the applicant alone, because the partner's age is never asked.
+	// SGB II grants one allowance per member of the Bedarfsgemeinschaft, so a couple's real
+	// allowance is up to double and a clear overshoot of the single figure is not a
+	// rejection. BELOW needs no such care: below the smaller figure is below the larger one.
+	if (isCouple(answers.householdComposition)) {
+		return {
+			status: BenefitStatus.CHECK_ADVISED,
+			reasons: [
+				ReasonCode.INCOME_BELOW_NEEDS,
+				ReasonCode.COUPLE_ASSET_ALLOWANCE_UNKNOWN,
+			],
+		};
+	}
+
 	return {
 		status: BenefitStatus.LIKELY_NO,
 		reasons: [ReasonCode.ASSETS_ABOVE_ALLOWANCE],
@@ -118,8 +123,6 @@ export const assessSgbIiBasicIncome = (
 		};
 	}
 
-	// Reachable only below the retirement age, which is exactly when the questionnaire
-	// asks for work capacity. If the question order changes, this breaks silently.
 	if (answers.workCapacity === undefined) {
 		return { benefit, ...INSUFFICIENT };
 	}
@@ -202,96 +205,14 @@ export const assessSgbXiiOldAgeReducedCapacity = (
 		};
 	}
 
-	// The domain spec §6.2 flags an open question of whether SGB XII uses a different
-	// asset allowance table than SGB II. Until that is answered, both share one table.
+	// Whether SGB XII uses a different asset allowance table than SGB II is on the
+	// verification checklist in benefitRules.config.ts. Until it is answered, both share one.
 	return { benefit, ...assessMeans(answers, today) };
 };
 
 /**
- * Domain spec §6.3. Deliberately does NOT reuse `assessMeans`: once the applicant is in
- * the capacity gap, the spec's fallthrough is "check advised", never a rejection, so this
- * rule has no LIKELY_NO on the means test.
- */
-export const assessSgbXiiSubsistenceAid = (
-	answers: PartialBenefitCheckAnswers,
-	today: string,
-): BenefitAssessment => {
-	const benefit = BenefitId.SGB_XII_SUBSISTENCE_AID;
-
-	if (answers.dateOfBirth === undefined) {
-		return { benefit, ...INSUFFICIENT };
-	}
-	if (hasReachedRetirementAge(answers.dateOfBirth, today)) {
-		return {
-			benefit,
-			status: BenefitStatus.NOT_APPLICABLE,
-			reasons: [ReasonCode.NOT_IN_CAPACITY_GAP],
-		};
-	}
-	if (answers.workCapacity === undefined) {
-		return { benefit, ...INSUFFICIENT };
-	}
-	if (answers.workCapacity !== WorkCapacity.TEMPORARILY_REDUCED) {
-		return {
-			benefit,
-			status: BenefitStatus.NOT_APPLICABLE,
-			reasons: [ReasonCode.NOT_IN_CAPACITY_GAP],
-		};
-	}
-
-	const residence = residenceRequirementMet(answers);
-	if (residence === undefined) {
-		return { benefit, ...INSUFFICIENT };
-	}
-	if (!residence) {
-		return {
-			benefit,
-			status: BenefitStatus.LIKELY_NO,
-			reasons: [ReasonCode.RESIDENCE_STATUS_UNCLEAR],
-		};
-	}
-
-	if (
-		answers.householdComposition === undefined ||
-		answers.children === undefined ||
-		answers.monthlyWarmRent === undefined ||
-		answers.monthlyNetHouseholdIncome === undefined ||
-		answers.assetsBand === undefined
-	) {
-		return { benefit, ...INSUFFICIENT };
-	}
-
-	const household: Household = {
-		composition: answers.householdComposition,
-		children: answers.children,
-	};
-	const needs = totalNeeds(household, answers.monthlyWarmRent, today);
-	const allowance = assetAllowance(ageInYears(answers.dateOfBirth, today));
-	const assetsBelow =
-		assetsVsAllowance(answers.assetsBand, allowance) === "BELOW";
-
-	if (answers.monthlyNetHouseholdIncome < needs && assetsBelow) {
-		return {
-			benefit,
-			status: BenefitStatus.LIKELY_YES,
-			reasons: [
-				ReasonCode.INCOME_BELOW_NEEDS,
-				ReasonCode.ASSETS_BELOW_ALLOWANCE,
-			],
-		};
-	}
-
-	return {
-		benefit,
-		status: BenefitStatus.CHECK_ADVISED,
-		reasons: [ReasonCode.CAPACITY_GAP_PRECONDITION_MET],
-	};
-};
-
-/**
- * Domain spec §6.4. The rent-burden threshold is that document's own heuristic, not an
- * official figure; the real decision needs the Wohngeld formula (§19 WoGG, Mietstufe 4
- * for Berlin), which this pre-assessment does not implement.
+ * The rent-burden threshold is a heuristic, not an official figure. The real decision needs
+ * the Wohngeld formula (§19 WoGG, Mietstufe 4 for Berlin), which this does not implement.
  */
 export const assessHousingBenefit = (
 	answers: PartialBenefitCheckAnswers,
@@ -346,14 +267,6 @@ export const assessHousingBenefit = (
 	};
 };
 
-/**
- * Domain spec §6.5, with one correction: the spec requires ALL children to be under 25
- *
- *   hatKinder = kinder.length > 0 and alle(kinder, k -> k.alterJahre < 25)
- *
- * which drops a household containing both a 26-year-old and a 5-year-old, even though the
- * younger child qualifies. "At least one child under 25" is used instead.
- */
 export const assessChildSupplement = (
 	answers: PartialBenefitCheckAnswers,
 	today: string,
@@ -375,6 +288,8 @@ export const assessChildSupplement = (
 	if (answers.children === undefined) {
 		return { benefit, ...INSUFFICIENT };
 	}
+	// At least one child under 25 qualifies, rather than all of them: a household with a
+	// 26-year-old and a 5-year-old still has a claim for the younger child.
 	if (childrenUnder25(answers.children, today).length === 0) {
 		return {
 			benefit,
@@ -393,11 +308,20 @@ export const assessChildSupplement = (
 		return { benefit, ...INSUFFICIENT };
 	}
 
-	const minimum = isCouple(answers.householdComposition)
+	// The minimum applies to what the parents earn together, so a couple needs both figures
+	// before the test means anything.
+	const couple = isCouple(answers.householdComposition);
+	if (couple && answers.partnerMonthlyGrossIncome === undefined) {
+		return { benefit, ...INSUFFICIENT };
+	}
+
+	const minimum = couple
 		? KIZ_MIN_GROSS_INCOME.couple
 		: KIZ_MIN_GROSS_INCOME.single;
+	const grossIncome =
+		answers.monthlyGrossIncome + (answers.partnerMonthlyGrossIncome ?? 0);
 
-	if (answers.monthlyGrossIncome < minimum) {
+	if (grossIncome < minimum) {
 		return {
 			benefit,
 			status: BenefitStatus.LIKELY_NO,
@@ -409,57 +333,5 @@ export const assessChildSupplement = (
 		benefit,
 		status: BenefitStatus.CHECK_ADVISED,
 		reasons: [ReasonCode.KIZ_MIN_INCOME_MET],
-	};
-};
-
-/**
- * Domain spec §6.6, with the missing-data rule applied. The spec writes
- *
- *   if not a.unterhalt or a.unterhalt.erhaeltVollenUnterhalt: -> eher_nein
- *
- * which treats an unanswered question as if the child were receiving support. The two are
- * split here: absent data yields CHECK_ADVISED, an actual "yes" yields LIKELY_NO.
- */
-export const assessAdvanceMaintenance = (
-	answers: PartialBenefitCheckAnswers,
-	today: string,
-): BenefitAssessment => {
-	const benefit = BenefitId.ADVANCE_MAINTENANCE;
-
-	if (answers.householdComposition === undefined) {
-		return { benefit, ...INSUFFICIENT };
-	}
-	if (answers.householdComposition !== HouseholdComposition.SINGLE_PARENT) {
-		return {
-			benefit,
-			status: BenefitStatus.NOT_APPLICABLE,
-			reasons: [ReasonCode.NOT_SINGLE_PARENT],
-		};
-	}
-	if (answers.children === undefined) {
-		return { benefit, ...INSUFFICIENT };
-	}
-	if (minorChildren(answers.children, today).length === 0) {
-		return {
-			benefit,
-			status: BenefitStatus.NOT_APPLICABLE,
-			reasons: [ReasonCode.NO_MINOR_CHILDREN],
-		};
-	}
-	if (answers.childReceivesFullSupport === undefined) {
-		return { benefit, ...INSUFFICIENT };
-	}
-	if (answers.childReceivesFullSupport) {
-		return {
-			benefit,
-			status: BenefitStatus.LIKELY_NO,
-			reasons: [ReasonCode.CHILD_RECEIVES_FULL_SUPPORT],
-		};
-	}
-
-	return {
-		benefit,
-		status: BenefitStatus.LIKELY_YES,
-		reasons: [ReasonCode.CHILD_SUPPORT_INCOMPLETE],
 	};
 };

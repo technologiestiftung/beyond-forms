@@ -11,16 +11,35 @@ const questionsOf = (locale: string): Record<string, Record<string, unknown>> =>
 describe.each(["de", "en"])("question copy (%s)", (locale) => {
 	const questions = questionsOf(locale);
 
-	it("has category, title and tip for every question", () => {
+	it("has a category and a title for every question", () => {
 		for (const question of QUESTION_CATALOGUE) {
 			const block = questions[question.id];
 			expect(block, `${question.id} missing`).toBeDefined();
-			for (const key of ["category", "title", "tip"]) {
-				expect(typeof block[key], `${question.id}.${key}`).toBe("string");
-				expect(
-					(block[key] as string).length,
-					`${question.id}.${key}`,
-				).toBeGreaterThan(0);
+			expect(typeof block.category, `${question.id}.category`).toBe("string");
+
+			// A question carries either one title or the single/couple pair, never neither.
+			const hasPlainTitle = typeof block.title === "string";
+			const hasBothVariants =
+				typeof block.title_single === "string" &&
+				typeof block.title_couple === "string";
+			expect(
+				hasPlainTitle || hasBothVariants,
+				`${question.id} has no usable title`,
+			).toBe(true);
+		}
+	});
+
+	/**
+	 * Tips are not mandatory — an info box on every one of thirteen screens stops being
+	 * read. Where one exists it must say something, and it must exist in both languages,
+	 * which the symmetry test below enforces.
+	 */
+	it("has no empty tip", () => {
+		for (const question of QUESTION_CATALOGUE) {
+			const tip = questions[question.id].tip;
+			if (tip !== undefined) {
+				expect(typeof tip, `${question.id}.tip`).toBe("string");
+				expect((tip as string).length, `${question.id}.tip`).toBeGreaterThan(0);
 			}
 		}
 	});
@@ -58,6 +77,16 @@ describe.each(["de", "en"])("question copy (%s)", (locale) => {
 		}
 		expect(block.remove as string).toContain("{{index}}");
 		expect(block.child_label as string).toContain("{{index}}");
+	});
+
+	it("carries the same set of keys in both languages", () => {
+		const other = questionsOf(locale === "de" ? "en" : "de");
+		for (const question of QUESTION_CATALOGUE) {
+			expect(
+				Object.keys(questions[question.id]).sort(),
+				`${question.id} differs between de and en`,
+			).toEqual(Object.keys(other[question.id]).sort());
+		}
 	});
 
 	it("carries no copy for questions that no longer exist", () => {

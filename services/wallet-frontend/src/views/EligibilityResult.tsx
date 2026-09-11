@@ -1,14 +1,20 @@
-import React, { useId, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useId, useMemo, useState } from "react";
+import { Link, Navigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { StepLayout } from "../components/Layout/StepLayout";
 import { BenefitAssessmentCard } from "../components/Eligibility/BenefitAssessmentCard";
 import { useBenefitCheckStore } from "../store/useBenefitCheckStore";
 import { evaluateBenefitCheck } from "../store/benefits/evaluate";
+import { firstOpenQuestion } from "../store/benefits/questionPath";
 import { BenefitStatus } from "../schemas/benefitCheck.schema";
-import { AppRoutes, URL_PARAMS } from "../constants/routes";
+import {
+	AppRoutes,
+	URL_PARAMS,
+	getEligibilityRoute,
+} from "../constants/routes";
 import { EXTERNAL_LINKS } from "../config/externalLinks";
+import { todayIsoDate } from "../utils/date";
 
 /**
  * ProtectedRoute forwards an unauthenticated visitor to Auth and keeps the query string,
@@ -35,8 +41,21 @@ export const EligibilityResult: React.FC = () => {
 	const [showNotApplicable, setShowNotApplicable] = useState(false);
 	const notApplicableId = useId();
 	// Input-side clock only; the engine takes `today` as an argument so it stays testable.
-	const today = new Date().toLocaleDateString("sv-SE");
-	const result = evaluateBenefitCheck(answers, today);
+	const today = todayIsoDate();
+	const openQuestion = useMemo(
+		() => firstOpenQuestion(answers, today),
+		[answers, today],
+	);
+	const result = useMemo(
+		() => evaluateBenefitCheck(answers, today),
+		[answers, today],
+	);
+
+	// An unfinished check has no result worth showing — every card would read "Angaben
+	// fehlen". Send the visitor to the question that is actually waiting for them.
+	if (openQuestion) {
+		return <Navigate to={getEligibilityRoute(openQuestion.id)} replace />;
+	}
 
 	const nothingMatches = !result.assessments.some(
 		(assessment) =>

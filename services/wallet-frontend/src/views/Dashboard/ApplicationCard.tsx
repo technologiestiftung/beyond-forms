@@ -39,7 +39,10 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 		activeLevel = 2;
 	} else {
 		activeLevel = Math.max(0, Math.min(3, Math.floor(currentLevel))) as
-			0 | 1 | 2 | 3;
+			| 0
+			| 1
+			| 2
+			| 3;
 	}
 
 	if (status === "not_started") {

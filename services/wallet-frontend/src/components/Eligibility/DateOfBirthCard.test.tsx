@@ -6,6 +6,7 @@ vi.mock("react-i18next", () => ({
 	useTranslation: () => ({
 		t: (key: string, options?: { defaultValue?: string }) =>
 			options?.defaultValue ?? key,
+		i18n: { language: "de" },
 	}),
 }));
 
@@ -23,7 +24,7 @@ describe("DateOfBirthCard", () => {
 		render(<DateOfBirthCard {...baseProps} />);
 		const input = screen.getByTestId("dob-date-input");
 		fireEvent.focus(input);
-		fireEvent.change(input, { target: { value: "0001-02-11" } });
+		fireEvent.change(input, { target: { value: "11.02.0001" } });
 		expect(screen.queryByTestId("date-error")).toBeNull();
 	});
 
@@ -31,7 +32,7 @@ describe("DateOfBirthCard", () => {
 		render(<DateOfBirthCard {...baseProps} />);
 		const input = screen.getByTestId("dob-date-input");
 		fireEvent.focus(input);
-		fireEvent.change(input, { target: { value: "0001-02-11" } });
+		fireEvent.change(input, { target: { value: "11.02.0001" } });
 		fireEvent.blur(input);
 		expect(screen.getByTestId("date-error")).toHaveTextContent(
 			"date_error.too_early",
@@ -42,7 +43,7 @@ describe("DateOfBirthCard", () => {
 	it("names a date in the future once the field is left", () => {
 		render(<DateOfBirthCard {...baseProps} />);
 		const input = screen.getByTestId("dob-date-input");
-		fireEvent.change(input, { target: { value: "2099-02-11" } });
+		fireEvent.change(input, { target: { value: "11.02.2099" } });
 		fireEvent.blur(input);
 		expect(screen.getByTestId("date-error")).toHaveTextContent(
 			"date_error.future",
@@ -52,10 +53,10 @@ describe("DateOfBirthCard", () => {
 	it("drops the message once the date is corrected", () => {
 		render(<DateOfBirthCard {...baseProps} />);
 		const input = screen.getByTestId("dob-date-input");
-		fireEvent.change(input, { target: { value: "2099-02-11" } });
+		fireEvent.change(input, { target: { value: "11.02.2099" } });
 		fireEvent.blur(input);
 		expect(screen.getByTestId("date-error")).toBeInTheDocument();
-		fireEvent.change(input, { target: { value: "1997-05-02" } });
+		fireEvent.change(input, { target: { value: "02.05.1997" } });
 		expect(screen.queryByTestId("date-error")).toBeNull();
 	});
 
@@ -68,7 +69,7 @@ describe("DateOfBirthCard", () => {
 	it("keeps the next button disabled on an out-of-range date", () => {
 		render(<DateOfBirthCard {...baseProps} />);
 		fireEvent.change(screen.getByTestId("dob-date-input"), {
-			target: { value: "2099-02-11" },
+			target: { value: "11.02.2099" },
 		});
 		expect(screen.getByTestId("next-button")).toBeDisabled();
 	});
@@ -105,7 +106,7 @@ describe("DateOfBirthCard", () => {
 
 		// Simulate entering a valid date
 		const dateInput = screen.getByTestId("dob-date-input");
-		fireEvent.change(dateInput, { target: { value: "1959-01-20" } });
+		fireEvent.change(dateInput, { target: { value: "20.01.1959" } });
 		expect(onChangeMock).toHaveBeenCalledWith("1959-01-20");
 
 		// Re-render with selected value

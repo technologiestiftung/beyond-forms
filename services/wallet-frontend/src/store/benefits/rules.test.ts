@@ -10,12 +10,10 @@ import {
 } from "../../schemas/benefitCheck.schema";
 import type { PartialBenefitCheckAnswers } from "../../schemas/benefitCheck.schema";
 import {
-	assessAdvanceMaintenance,
 	assessChildSupplement,
 	assessHousingBenefit,
 	assessSgbIiBasicIncome,
 	assessSgbXiiOldAgeReducedCapacity,
-	assessSgbXiiSubsistenceAid,
 } from "./rules";
 
 const TODAY = "2026-09-09";
@@ -106,6 +104,34 @@ describe("assessSgbIiBasicIncome", () => {
 		);
 		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
 		expect(result.reasons).toContain(ReasonCode.ASSETS_SPAN_ALLOWANCE);
+	});
+
+	it("advises a check for a couple above the single allowance, whose own is unknown", () => {
+		const result = assessSgbIiBasicIncome(
+			{
+				...CASE_A,
+				householdComposition: HouseholdComposition.COUPLE_NO_CHILDREN,
+				monthlyNetHouseholdIncome: 800,
+				assetsBand: AssetsBand.OVER_25000,
+			},
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
+		expect(result.reasons).toContain(ReasonCode.COUPLE_ASSET_ALLOWANCE_UNKNOWN);
+	});
+
+	it("still says likely for a couple below even the single allowance", () => {
+		const result = assessSgbIiBasicIncome(
+			{
+				...CASE_A,
+				householdComposition: HouseholdComposition.COUPLE_NO_CHILDREN,
+				monthlyNetHouseholdIncome: 800,
+				assetsBand: AssetsBand.UNDER_5000,
+			},
+			TODAY,
+		);
+		expect(result.status).toBe(BenefitStatus.LIKELY_YES);
+		expect(result.reasons).toContain(ReasonCode.ASSETS_BELOW_ALLOWANCE);
 	});
 
 	it("is unlikely when assets are clearly above the allowance", () => {
@@ -214,75 +240,6 @@ describe("assessSgbXiiOldAgeReducedCapacity", () => {
 	});
 });
 
-/** Temporarily unable to work at 45 — the domain spec's case D. The case gives no rent,
- *  so 500 is supplied here to make the needs test computable. */
-const CASE_D: PartialBenefitCheckAnswers = {
-	dateOfBirth: "1981-04-10",
-	workCapacity: WorkCapacity.TEMPORARILY_REDUCED,
-	householdComposition: HouseholdComposition.SINGLE,
-	children: [],
-	isEmployed: false,
-	monthlyGrossIncome: 0,
-	monthlyNetHouseholdIncome: 300,
-	monthlyWarmRent: 500,
-	assetsBand: AssetsBand.UNDER_5000,
-	receivesBenefitsAlready: false,
-	citizenship: Citizenship.DE_EU,
-	livesInGermany: true,
-};
-
-describe("assessSgbXiiSubsistenceAid", () => {
-	it("is likely for case D", () => {
-		const result = assessSgbXiiSubsistenceAid(CASE_D, TODAY);
-		expect(result.benefit).toBe(BenefitId.SGB_XII_SUBSISTENCE_AID);
-		expect(result.status).toBe(BenefitStatus.LIKELY_YES);
-	});
-
-	it("does not apply to an applicant with full work capacity", () => {
-		const result = assessSgbXiiSubsistenceAid(
-			{ ...CASE_D, workCapacity: WorkCapacity.FULL },
-			TODAY,
-		);
-		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
-		expect(result.reasons).toEqual([ReasonCode.NOT_IN_CAPACITY_GAP]);
-	});
-
-	it("does not apply to a permanently reduced applicant", () => {
-		const result = assessSgbXiiSubsistenceAid(
-			{ ...CASE_D, workCapacity: WorkCapacity.PERMANENTLY_REDUCED },
-			TODAY,
-		);
-		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
-	});
-
-	it("does not apply once the retirement age is reached", () => {
-		const result = assessSgbXiiSubsistenceAid(
-			{ ...CASE_D, dateOfBirth: "1955-04-10" },
-			TODAY,
-		);
-		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
-	});
-
-	/**
-	 * The domain spec §6.3 has no "income covers needs" exit: once the applicant is in
-	 * the capacity gap, the fallthrough is "moeglich_pruefen", never "eher_nein".
-	 */
-	it("advises a check rather than rejecting when income covers the needs", () => {
-		const result = assessSgbXiiSubsistenceAid(
-			{ ...CASE_D, monthlyNetHouseholdIncome: 3000 },
-			TODAY,
-		);
-		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
-		expect(result.reasons).toContain(ReasonCode.CAPACITY_GAP_PRECONDITION_MET);
-	});
-
-	it("advises a check when answers are missing", () => {
-		const result = assessSgbXiiSubsistenceAid({}, TODAY);
-		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
-		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
-	});
-});
-
 describe("assessHousingBenefit", () => {
 	/** Income covers subsistence, rent burden 700/1900 = 0.37. */
 	const RENT_BURDENED: PartialBenefitCheckAnswers = {
@@ -349,8 +306,6 @@ const CASE_C: PartialBenefitCheckAnswers = {
 	assetsBand: AssetsBand.UNDER_5000,
 	receivesBenefitsAlready: false,
 	citizenship: Citizenship.DE_EU,
-	childReceivesFullSupport: false,
-	monthsWithoutChildSupport: 8,
 	livesInGermany: true,
 };
 
@@ -428,90 +383,41 @@ describe("assessChildSupplement", () => {
 		expect(result.reasons).toEqual([ReasonCode.KIZ_MIN_INCOME_NOT_MET]);
 	});
 
-	it("applies the higher minimum to couples", () => {
+	it("applies the higher minimum to a couple's combined gross income", () => {
 		const couple: PartialBenefitCheckAnswers = {
 			...CASE_C,
 			householdComposition: HouseholdComposition.COUPLE_WITH_CHILDREN,
 			children: [{ dateOfBirth: "2020-02-11" }],
 			isEmployed: true,
 			monthlyGrossIncome: 700,
+			partnerMonthlyGrossIncome: 100,
 		};
+		// 800 together, under the 900 a couple needs — though it would clear a single's 600.
 		expect(assessChildSupplement(couple, TODAY).status).toBe(
 			BenefitStatus.LIKELY_NO,
 		);
+		expect(
+			assessChildSupplement(
+				{ ...couple, partnerMonthlyGrossIncome: 300 },
+				TODAY,
+			).status,
+		).toBe(BenefitStatus.CHECK_ADVISED);
+	});
+
+	it("waits for the partner's gross income before judging a couple", () => {
+		const couple: PartialBenefitCheckAnswers = {
+			...CASE_C,
+			householdComposition: HouseholdComposition.COUPLE_WITH_CHILDREN,
+			children: [{ dateOfBirth: "2020-02-11" }],
+			monthlyGrossIncome: 1400,
+		};
+		const result = assessChildSupplement(couple, TODAY);
+		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
+		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
 	});
 
 	it("advises a check when answers are missing", () => {
 		const result = assessChildSupplement({}, TODAY);
-		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
-		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
-	});
-});
-
-describe("assessAdvanceMaintenance", () => {
-	it("is likely for case C", () => {
-		const result = assessAdvanceMaintenance(CASE_C, TODAY);
-		expect(result.benefit).toBe(BenefitId.ADVANCE_MAINTENANCE);
-		expect(result.status).toBe(BenefitStatus.LIKELY_YES);
-		expect(result.reasons).toContain(ReasonCode.CHILD_SUPPORT_INCOMPLETE);
-	});
-
-	it("does not apply to a couple", () => {
-		const result = assessAdvanceMaintenance(
-			{
-				...CASE_C,
-				householdComposition: HouseholdComposition.COUPLE_WITH_CHILDREN,
-				children: [{ dateOfBirth: "2020-02-11" }],
-			},
-			TODAY,
-		);
-		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
-		expect(result.reasons).toEqual([ReasonCode.NOT_SINGLE_PARENT]);
-	});
-
-	it("does not apply without a minor child", () => {
-		const result = assessAdvanceMaintenance(
-			{
-				...CASE_C,
-				householdComposition: HouseholdComposition.SINGLE_PARENT,
-				children: [{ dateOfBirth: "2005-01-01" }],
-			},
-			TODAY,
-		);
-		expect(result.status).toBe(BenefitStatus.NOT_APPLICABLE);
-		expect(result.reasons).toEqual([ReasonCode.NO_MINOR_CHILDREN]);
-	});
-
-	it("is unlikely when the child receives full support", () => {
-		const result = assessAdvanceMaintenance(
-			{
-				...CASE_C,
-				childReceivesFullSupport: true,
-				monthsWithoutChildSupport: 0,
-			},
-			TODAY,
-		);
-		expect(result.status).toBe(BenefitStatus.LIKELY_NO);
-		expect(result.reasons).toEqual([ReasonCode.CHILD_RECEIVES_FULL_SUPPORT]);
-	});
-
-	/**
-	 * The domain spec §6.6 folds a missing `unterhalt` object into "eher_nein":
-	 *
-	 *   if not a.unterhalt or a.unterhalt.erhaeltVollenUnterhalt: -> eher_nein
-	 *
-	 * An unanswered question is not the same as "the child does receive support", so the
-	 * two cases are split here.
-	 */
-	it("advises a check when the support question is unanswered", () => {
-		const { childReceivesFullSupport: _dropped, ...withoutSupport } = CASE_C;
-		const result = assessAdvanceMaintenance(withoutSupport, TODAY);
-		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
-		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
-	});
-
-	it("advises a check when answers are missing entirely", () => {
-		const result = assessAdvanceMaintenance({}, TODAY);
 		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
 		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
 	});
@@ -530,13 +436,6 @@ describe("children guards after flattening", () => {
 	it("child supplement advises a check while the children list is unanswered", () => {
 		const { children: _dropped, ...withoutChildren } = CASE_C;
 		const result = assessChildSupplement(withoutChildren, TODAY);
-		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
-		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
-	});
-
-	it("advance maintenance advises a check while the children list is unanswered", () => {
-		const { children: _dropped, ...withoutChildren } = CASE_C;
-		const result = assessAdvanceMaintenance(withoutChildren, TODAY);
 		expect(result.status).toBe(BenefitStatus.CHECK_ADVISED);
 		expect(result.reasons).toEqual([ReasonCode.INSUFFICIENT_DATA]);
 	});

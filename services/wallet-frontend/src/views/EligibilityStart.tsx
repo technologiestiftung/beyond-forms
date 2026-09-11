@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { StepLayout } from "../components/Layout/StepLayout";
 import * as Icons from "../components/ui/Icons";
 import { AppRoutes, getEligibilityRoute } from "../constants/routes";
+import { QUESTION_CATALOGUE } from "../store/benefits/questionCatalogue";
 import { i18nKeys } from "../i18n/i18nKeys";
 
 import { useBenefitCheckStore } from "../store/useBenefitCheckStore";
@@ -27,7 +28,7 @@ export const EligibilityStart: React.FC = () => {
 	}, [isAuthenticated, navigate, resetEligibility]);
 
 	const handleGoToCheck = () => {
-		navigate(getEligibilityRoute("nationality"));
+		navigate(getEligibilityRoute(QUESTION_CATALOGUE[0].id));
 	};
 
 	const handleGoToLogin = () => {

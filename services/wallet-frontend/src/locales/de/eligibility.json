@@ -75,7 +75,6 @@
 		"household": {
 			"category": "Haushalt",
 			"title": "Wer lebt in Deinem Haushalt?",
-			"tip": "Wie viele Menschen zusammenleben, verändert die Berechnung. Kinder zählen mit.",
 			"options": {
 				"SINGLE": "Ich lebe allein.",
 				"SINGLE_PARENT": "Ich bin alleinerziehend.",
@@ -93,8 +92,7 @@
 		},
 		"birthdate": {
 			"category": "Geburtsdatum",
-			"title": "Wann bist Du geboren?",
-			"tip": "Dein Alter entscheidet mit, welche Leistungen für Dich infrage kommen. Ab der Regelaltersgrenze gelten andere Regeln als davor."
+			"title": "Wann bist Du geboren?"
 		},
 		"germany": {
 			"category": "Wohnsitz",
@@ -108,7 +106,7 @@
 		"work-capacity": {
 			"category": "Arbeiten können",
 			"title": "Kannst Du mindestens drei Stunden am Tag arbeiten?",
-			"tip": "Drei Stunden sind eine Grenze im Gesetz. Danach richtet sich, welche Stelle für Dich zuständig ist. Wir fragen das auch, wenn Du arbeitest: Manche Menschen arbeiten zum Beispiel in einer Werkstatt und gelten trotzdem als erwerbsgemindert.",
+			"tip": "Manche Menschen arbeiten zum Beispiel in einer Werkstatt und gelten trotzdem als erwerbsgemindert. Deshalb fragen wir das auch, wenn Du arbeitest.",
 			"options": {
 				"FULL": "Ja, mindestens drei Stunden am Tag.",
 				"TEMPORARILY_REDUCED": "Im Moment nicht, aber vielleicht später wieder.",
@@ -117,46 +115,51 @@
 		},
 		"employment": {
 			"category": "Arbeit",
-			"title": "Arbeitest Du im Moment?",
-			"tip": "Wenn Du mit einem Partner oder einer Partnerin zusammenlebst, zählt dessen Arbeit auch dazu.",
 			"options": {
 				"YES": "Ja, ich arbeite.",
 				"NO": "Nein, im Moment nicht."
-			}
+			},
+			"title_single": "Arbeitest Du im Moment?",
+			"title_couple": "Arbeitest Du oder Dein Partner oder Deine Partnerin im Moment?"
 		},
 		"gross-income": {
 			"category": "Arbeit",
-			"title": "Wie hoch ist das Bruttoeinkommen im Monat?",
-			"tip": "Brutto heißt: der Betrag vor Steuern und Abgaben. Du findest ihn auf der Lohnabrechnung. Lebst Du mit einem Partner oder einer Partnerin zusammen, rechne beides zusammen.",
+			"title": "Wie hoch ist Dein Bruttoeinkommen im Monat?",
+			"tip": "Brutto heißt: der Betrag vor Steuern und Abgaben. Du findest ihn auf Deiner Lohnabrechnung. Wenn Du nicht arbeitest, trage 0 ein.",
 			"unit": "Euro"
 		},
 		"net-income": {
 			"category": "Einkommen",
-			"title": "Wie viel Geld hat Dein Haushalt im Monat insgesamt?",
-			"tip": "Zähle alles zusammen, was jeden Monat reinkommt: Lohn nach Abzügen, Rente, Kindergeld, Unterhalt, andere Leistungen. Ein ungefährer Betrag genügt.",
-			"unit": "Euro"
+			"tip": "Zähle alles zusammen, was jeden Monat reinkommt: Lohn nach Abzügen, Rente, Kindergeld, Unterhalt, andere Leistungen.",
+			"unit": "Euro",
+			"title_single": "Wie viel Geld hast Du im Monat insgesamt zur Verfügung?",
+			"title_couple": "Wie viel Geld hat Dein Haushalt im Monat insgesamt zur Verfügung?",
+			"hint": "Ein ungefährer Betrag genügt."
 		},
 		"warm-rent": {
 			"category": "Wohnen",
 			"title": "Wie hoch ist Deine Warmmiete im Monat?",
 			"tip": "Warmmiete heißt: Miete plus Nebenkosten plus Heizkosten. Der Betrag steht in Deinem Mietvertrag oder auf dem Kontoauszug.",
-			"unit": "Euro"
+			"unit": "Euro",
+			"hint": "Der Betrag steht in Deinem Mietvertrag."
 		},
 		"assets": {
 			"category": "Ersparnisse",
-			"title": "Wie viel Geld hast Du gespart?",
-			"tip": "Gemeint ist alles, was Du zurückgelegt hast: Konto, Sparbuch, Bargeld, Wertpapiere. Einen Teil darfst Du behalten — wie viel, hängt von Deinem Alter ab. Eine grobe Schätzung genügt.",
+			"tip": "Gemeint ist alles, was zurückgelegt wurde: Konto, Sparbuch, Bargeld, Wertpapiere. Einen Teil darfst Du behalten — wie viel, hängt von Deinem Alter ab.",
 			"options": {
 				"UNDER_5000": "Weniger als 5.000 Euro.",
 				"FROM_5000_TO_15000": "Zwischen 5.000 und 15.000 Euro.",
 				"FROM_15000_TO_25000": "Zwischen 15.000 und 25.000 Euro.",
 				"OVER_25000": "Mehr als 25.000 Euro."
-			}
+			},
+			"title_single": "Wie viel Geld hast Du gespart?",
+			"title_couple": "Wie viel Geld habt Ihr zusammen gespart?",
+			"hint": "Eine grobe Schätzung genügt."
 		},
 		"benefits": {
 			"category": "Laufende Leistungen",
 			"title": "Bekommst Du schon eine Sozialleistung?",
-			"tip": "Gemeint sind zum Beispiel Grundsicherungsgeld, Grundsicherung im Alter oder Hilfe zum Lebensunterhalt. Manche Leistungen kann man nicht gleichzeitig bekommen.",
+			"tip": "Gemeint sind zum Beispiel Grundsicherungsgeld, Grundsicherung im Alter oder Wohngeld.",
 			"options": {
 				"YES": "Ja, ich bekomme schon eine Leistung.",
 				"NO": "Nein, im Moment nicht."
@@ -165,7 +168,6 @@
 		"citizenship": {
 			"category": "Staatsangehörigkeit",
 			"title": "Hast Du die deutsche Staatsangehörigkeit oder die eines EU-Landes?",
-			"tip": "Je nach Staatsangehörigkeit und Aufenthaltsstatus gelten unterschiedliche Gesetze.",
 			"options": {
 				"DE_EU": "Ja, deutsch oder aus einem EU-Land.",
 				"NON_EU": "Nein, aus einem anderen Land."
@@ -180,39 +182,12 @@
 				"NO": "Nein, oder ich bin mir nicht sicher."
 			}
 		},
-		"child-support": {
-			"category": "Unterhalt",
-			"title": "Bekommt Dein Kind Unterhalt vom anderen Elternteil?",
-			"tip": "Wird kein oder zu wenig Unterhalt gezahlt, kann der Staat einspringen. Das heißt Unterhaltsvorschuss.",
-			"options": {
-				"YES": "Ja, den vollen Unterhalt.",
-				"NO": "Nein, oder nur einen Teil."
-			}
-		},
-		"support-duration": {
-			"category": "Unterhalt",
-			"title": "Seit wie vielen Monaten fehlt der Unterhalt?",
-			"tip": "Eine ungefähre Zahl genügt. Wenn Du es nicht genau weißt, schätze.",
-			"unit": "Monate"
+		"partner-gross-income": {
+			"category": "Arbeit",
+			"title": "Wie hoch ist das Bruttoeinkommen Deines Partners oder Deiner Partnerin im Monat?",
+			"tip": "Auch hier der Betrag vor Steuern und Abgaben. Wenn Dein Partner oder Deine Partnerin nicht arbeitet, trage 0 ein.",
+			"unit": "Euro"
 		}
-	},
-	"outcome": {
-		"eligible": {
-			"title": "Du könntest Anspruch auf Grundsicherung haben.",
-			"description": "Das ist eine erste Einschätzung. Klaro hilft Dir dabei Deinen Antrag Schritt-für-Schritt auszufüllen. Das geht einfach, digital und ist kostenlos.",
-			"cta": "Jetzt Antrag ausfüllen"
-		},
-		"not_eligible": {
-			"title": "Grundsicherung passt im Moment eher nicht...",
-			"description": "Du kannst trotzdem ein Konto erstellen und Deine Angaben sicher speichern. So kannst Du Klaro später weiter nutzen, wenn sich Deine Situation ändert oder Du Unterstützung bei weiteren Schritten brauchst. Später werden wir weitere Anträge anbieten!",
-			"cta": "Konto erstellen"
-		},
-		"sozialamt": {
-			"title": "Bitte wende Dich an das zuständige Sozialamt",
-			"description": "Nach Deinen Antworten trifft keiner der qualifizierenden Aufenthaltsstatus zu. Bitte wende Dich an das zuständige Sozialamt, um zu erfahren, welche Unterstützung für Dich infrage kommt.",
-			"cta": "Sozialamt finden"
-		},
-		"start_over": "Von vorne anfangen"
 	},
 	"result": {
 		"title": "Deine Ersteinschätzung",
@@ -230,11 +205,8 @@
 		"benefit": {
 			"SGB_II_BASIC_INCOME": "Grundsicherungsgeld",
 			"SGB_XII_OLD_AGE_REDUCED_CAPACITY": "Grundsicherung im Alter und bei Erwerbsminderung",
-			"SGB_XII_SUBSISTENCE_AID": "Hilfe zum Lebensunterhalt",
 			"HOUSING_BENEFIT": "Wohngeld",
-			"CHILD_SUPPLEMENT": "Kinderzuschlag",
-			"ADVANCE_MAINTENANCE": "Unterhaltsvorschuss",
-			"EDUCATION_PARTICIPATION_PACKAGE": "Bildungs- und Teilhabepaket"
+			"CHILD_SUPPLEMENT": "Kinderzuschlag"
 		},
 		"status": {
 			"LIKELY_YES": "Das lohnt sich",
@@ -247,7 +219,6 @@
 			"RETIREMENT_AGE_REACHED": "Du hast die Regelaltersgrenze erreicht.",
 			"RETIREMENT_AGE_NOT_REACHED": "Du hast die Regelaltersgrenze noch nicht erreicht.",
 			"WORK_CAPACITY_NOT_FULL": "Du kannst nicht mindestens drei Stunden am Tag arbeiten.",
-			"NOT_IN_CAPACITY_GAP": "Diese Leistung gilt nur, wenn Du vorübergehend nicht arbeiten kannst.",
 			"RESIDENCE_STATUS_UNCLEAR": "Dein Aufenthaltsstatus muss im Einzelfall geprüft werden.",
 			"ALREADY_RECEIVING_BENEFITS": "Du bekommst laut Deinen Angaben schon eine vergleichbare Leistung.",
 			"BENEFITS_TAKE_PRECEDENCE": "Wer schon eine Grundsicherung bekommt, kann diese Leistung meist nicht zusätzlich bekommen.",
@@ -257,18 +228,12 @@
 			"ASSETS_BELOW_ALLOWANCE": "Deine Ersparnisse liegen unter dem Freibetrag.",
 			"ASSETS_SPAN_ALLOWANCE": "Deine Ersparnisse liegen im Bereich des Freibetrags. Der genaue Betrag entscheidet.",
 			"ASSETS_ABOVE_ALLOWANCE": "Deine Ersparnisse liegen über dem Freibetrag.",
+			"COUPLE_ASSET_ALLOWANCE_UNKNOWN": "Bei Paaren gilt der Freibetrag pro Person. Wie viel Ihr zusammen behalten dürft, muss die zuständige Stelle prüfen.",
 			"RENT_BURDEN_HIGH": "Deine Miete ist im Verhältnis zu Deinem Einkommen hoch.",
 			"RENT_BURDEN_NORMAL": "Deine Miete ist im Verhältnis zu Deinem Einkommen unauffällig.",
 			"NO_ELIGIBLE_CHILDREN": "In Deinem Haushalt leben keine Kinder, für die diese Leistung gilt.",
 			"KIZ_MIN_INCOME_MET": "Dein Bruttoeinkommen erreicht die Mindestgrenze.",
-			"KIZ_MIN_INCOME_NOT_MET": "Dein Bruttoeinkommen erreicht die Mindestgrenze nicht. Dann kommt eher Grundsicherungsgeld für die Kinder infrage.",
-			"NOT_SINGLE_PARENT": "Diese Leistung gibt es nur für Alleinerziehende.",
-			"NO_MINOR_CHILDREN": "In Deinem Haushalt lebt kein Kind unter 18 Jahren.",
-			"CHILD_RECEIVES_FULL_SUPPORT": "Dein Kind bekommt den vollen Unterhalt.",
-			"CHILD_SUPPORT_INCOMPLETE": "Dein Kind bekommt keinen oder zu wenig Unterhalt.",
-			"EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT": "Wenn Du eine der hier geprüften Grundleistungen bekommst, haben Deine Kinder meist automatisch Anspruch auf Zuschüsse für Schule, Sport und Musik.",
-			"EDUCATION_PACKAGE_NEEDS_BASE_BENEFIT": "Das Paket setzt voraus, dass Du Grundsicherungsgeld, Wohngeld, Kinderzuschlag oder Sozialhilfe bekommst.",
-			"CAPACITY_GAP_PRECONDITION_MET": "Die Grundvoraussetzung ist erfüllt. Einkommen und Ersparnisse muss die zuständige Stelle prüfen."
+			"KIZ_MIN_INCOME_NOT_MET": "Dein Bruttoeinkommen erreicht die Mindestgrenze nicht. Dann kommt eher Grundsicherungsgeld für die Kinder infrage."
 		},
 		"hint": {
 			"ASYLUM_BENEFITS_REFERRAL": "Ist Dein Aufenthalt noch nicht gesichert, gelten für Dich möglicherweise Asylbewerberleistungen statt der hier geprüften. Eine Beratungsstelle kann Dir sagen, was für Dich gilt."

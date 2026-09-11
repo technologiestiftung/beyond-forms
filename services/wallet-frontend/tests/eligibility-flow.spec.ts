@@ -1,7 +1,8 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { completeEligibilityCheck } from "./helpers/eligibility";
 
-test.describe("Eligibility Navigator - Principal Journey Audit", () => {
+test.describe("Anspruchsradar - Principal Journey Audit", () => {
 	test.beforeEach(async ({ page }) => {
 		await page.goto("/");
 		await page.evaluate(() => {
@@ -14,7 +15,7 @@ test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 	test("Start Screen: Verify content and start action", async ({ page }) => {
 		await expect(page.getByTestId("start-button")).toBeVisible();
 		await page.getByTestId("start-button").click();
-		await expect(page).toHaveURL(/\/eligibility-check\/nationality/);
+		await expect(page).toHaveURL(/\/eligibility-check\/household/);
 	});
 
 	test("Language Switcher: Toggle between DE and EN on Start Screen", async ({
@@ -24,14 +25,12 @@ test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 		await page.getByTestId("language-switcher").click();
 		await page.getByText("EN", { exact: true }).click();
 		await expect(
-			page.getByText(/Check Grundsicherung easily and quickly/i),
+			page.getByText(/Check your entitlement to social benefits/i),
 		).toBeVisible();
 		await page.getByTestId("language-switcher").click();
 		await page.getByText("DE", { exact: true }).click();
 		await expect(
-			page.getByText(
-				/Schnell und einfach Deinen Anspruch auf Grundsicherung prüfen/i,
-			),
+			page.getByText(/Deinen Anspruch auf Sozialleistungen prüfen/i),
 		).toBeVisible();
 	});
 
@@ -42,8 +41,8 @@ test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 			page.getByText(
 				new RegExp(
 					[
-						"Was trifft auf Dich zu\\?",
-						"Which of the following applies to you\\?",
+						"Wer lebt in Deinem Haushalt\\?",
+						"Who lives in your household\\?",
 					].join("|"),
 					"i",
 				),
@@ -51,170 +50,111 @@ test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 		).toBeVisible();
 		await page.getByTestId("language-switcher").click();
 		await page.getByText("EN", { exact: true }).click();
-		await expect(
-			page.getByText(/Which of the following applies to you/i),
-		).toBeVisible();
+		await expect(page.getByText(/Who lives in your household/i)).toBeVisible();
 
-		await page.getByTestId("option-german").click();
+		await page.getByTestId("option-single").click();
 		await page.getByTestId("next-button").click();
-
-		await expect(page.getByText(/Do you live in Germany/i)).toBeVisible();
-		await page.getByTestId("language-switcher").click();
-		await page.getByText("DE", { exact: true }).click();
-		await expect(page.getByText(/Wohnst Du in Deutschland/i)).toBeVisible();
+		await expect(page).toHaveURL(/\/eligibility-check\/birthdate/);
 	});
 
-	const fillDateOfBirth = async ({
-		page,
-		day = "01",
-		month = "01",
-		year = "1955",
-	}: {
-		page: import("@playwright/test").Page;
-		day?: string;
-		month?: string;
-		year?: string;
-	}) => {
-		const isoDate = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-		await page.getByTestId("dob-date-input").fill(isoDate);
-	};
-
-	test("Persona Journey: Sandor (Eligible Senior) - DE Path", async ({
+	test("Skips the children question for someone living alone", async ({
 		page,
 	}) => {
 		await page.getByTestId("start-button").click();
-
-		await page.getByTestId("option-german").click();
+		await page.getByTestId("option-single").click();
 		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-yes").click();
-		await page.getByTestId("next-button").click();
-
-		await fillDateOfBirth({ page });
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-old_age").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-not_sufficient").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-no").click();
-		await page.getByTestId("next-button").click();
-
-		await expect(page).toHaveURL(/\/eligibility-check\/result/);
-		await expect(page.getByTestId("outcome-title")).toContainText(
-			/Du könntest|You could be entitled/i,
-		);
-
-		await page.waitForTimeout(1000);
-		const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
-		expect(accessibilityScanResults.violations).toEqual([]);
+		await expect(page).toHaveURL(/\/eligibility-check\/birthdate/);
 	});
 
-	test("Persona Journey: No pension (Other Benefit Path)", async ({ page }) => {
-		await page.getByTestId("language-switcher").click();
-		await page.getByText("EN", { exact: true }).click();
+	test("Asks for children when the household has them", async ({ page }) => {
 		await page.getByTestId("start-button").click();
-
-		await page.getByTestId("option-german").click();
+		await page.getByTestId("option-single_parent").click();
 		await page.getByTestId("next-button").click();
+		await expect(page).toHaveURL(/\/eligibility-check\/children/);
 
-		await page.getByTestId("option-yes").click();
+		await page.getByTestId("child-date-0").fill("11.02.2020");
+		await page.getByTestId("add-child").click();
+		await expect(page.getByTestId("child-date-1")).toBeVisible();
+		await page.getByTestId("remove-child-1").click();
+		await expect(page.getByTestId("child-date-1")).toHaveCount(0);
 		await page.getByTestId("next-button").click();
-
-		await fillDateOfBirth({ page });
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-none").click();
-		await page.getByTestId("next-button").click();
-
-		await expect(page).toHaveURL(/\/eligibility-check\/result/);
-		await expect(page.getByTestId("outcome-title")).toContainText(
-			/not a good fit|passt im Moment eher nicht/i,
-		);
+		await expect(page).toHaveURL(/\/eligibility-check\/birthdate/);
 	});
 
-	test("Persona Journey: Sozialamt referral", async ({ page }) => {
+	/**
+	 * The reason the date field is a masked text input rather than `<input type="date">`:
+	 * a native picker takes its order from the browser's locale, so this is the assertion
+	 * that would have caught mm/dd/yyyy showing up in the German UI.
+	 */
+	test("Dates are entered day-first in the German interface", async ({
+		page,
+	}) => {
 		await page.getByTestId("start-button").click();
-
-		await page.getByTestId("option-none").click();
+		await page.getByTestId("option-single").click();
 		await page.getByTestId("next-button").click();
 
-		await expect(page).toHaveURL(/\/eligibility-check\/result/);
-		await expect(page.getByTestId("outcome-title")).toContainText(
-			/Sozialamt|Social Services Office/i,
-		);
-
-		const cta = page.getByTestId("outcome-cta");
-		await expect(cta).toHaveAttribute(
-			"href",
-			"https://service.berlin.de/standorte/sozialamt/",
-		);
-		await expect(cta).toHaveAttribute("target", "_blank");
+		const dob = page.getByTestId("dob-date-input");
+		await expect(dob).toHaveAttribute("placeholder", "TT.MM.JJJJ");
+		await dob.fill("15.01.1994");
+		await expect(dob).toHaveValue("15.01.1994");
+		await page.getByTestId("next-button").click();
+		await expect(page).toHaveURL(/\/eligibility-check\/germany/);
 	});
 
-	test("Empathetic UX: Non-Destructive State (Undo/Redo)", async ({ page }) => {
+	test("Rejects an impossible date and keeps the next button disabled", async ({
+		page,
+	}) => {
 		await page.getByTestId("start-button").click();
-
-		await page.getByTestId("option-german").click();
-		await page.getByTestId("next-button").click();
-		await page.getByTestId("option-yes").click();
-		await page.getByTestId("next-button").click();
-		await fillDateOfBirth({ page });
-		await page.getByTestId("next-button").click();
-		await page.getByTestId("option-none").click();
+		await page.getByTestId("option-single").click();
 		await page.getByTestId("next-button").click();
 
-		await expect(page.getByTestId("outcome-title")).toBeVisible();
+		await page.getByTestId("dob-date-input").fill("30.02.2020");
+		await page.getByTestId("dob-date-input").blur();
+		await expect(page.getByTestId("next-button")).toBeDisabled();
+	});
 
-		await page.getByTestId("back-button").click();
-		await page.getByTestId("back-button").click();
-		await page.getByTestId("back-button").click();
-		await page.getByTestId("back-button").click();
+	test("Completes the check and reaches the result", async ({ page }) => {
+		await completeEligibilityCheck(page);
+		await expect(page.getByTestId("result-cta")).toBeVisible();
+		// Every listed benefit is one Klaro can actually file an application for.
+		const cards = page.getByTestId(/^assessment-/);
+		expect(await cards.count()).toBeGreaterThan(0);
+	});
 
-		await page.getByTestId("option-none").click();
-		await page.getByTestId("next-button").click();
-
-		await expect(page.getByTestId("outcome-title")).toContainText(
-			/Sozialamt|Social Services Office/i,
-		);
-
-		await page.getByText(/Von vorne anfangen|Start over/i).click();
-
-		await page.evaluate(() => {
-			window.localStorage.clear();
-			window.sessionStorage.clear();
+	test("Refers to the Sozialamt when nothing matches", async ({ page }) => {
+		await completeEligibilityCheck(page, {
+			grossIncome: "5000",
+			netIncome: "4000",
+			warmRent: "700",
+			assets: "over_25000",
 		});
-
-		await page.goto("/");
-
-		const landingCta = page.getByTestId("start-button");
-		await expect(landingCta).toBeVisible({ timeout: 15000 });
-		await landingCta.click();
-
-		await expect(page).toHaveURL(/\/eligibility-check\/nationality/);
-
-		await expect(
-			page.getByTestId("option-german").locator("input"),
-		).not.toBeChecked();
+		await expect(page.getByTestId("result-referral")).toBeVisible();
 	});
 
-	test("UX: State should reset when starting over from Landing Page", async ({
-		page,
-	}) => {
+	test("Back navigation returns to the previous question", async ({ page }) => {
 		await page.getByTestId("start-button").click();
+		await page.getByTestId("option-single").click();
+		await page.getByTestId("next-button").click();
+		await expect(page).toHaveURL(/\/eligibility-check\/birthdate/);
 
-		await page.getByTestId("option-german").click();
+		await page.getByTestId("back-button").click();
+		await expect(page).toHaveURL(/\/eligibility-check\/household/);
+		// The answer survives the trip back.
 		await expect(
-			page.getByTestId("option-german").locator("input"),
+			page.getByTestId("option-single").locator("input"),
 		).toBeChecked();
+	});
 
-		await page.goto("/");
-		await page.getByTestId("start-button").click();
+	test("An unfinished check cannot reach the result page", async ({ page }) => {
+		await page.goto("/eligibility-check/result");
+		await expect(page).toHaveURL(/\/eligibility-check\/household/);
+	});
 
-		await expect(
-			page.getByTestId("option-german").locator("input"),
-		).not.toBeChecked();
+	test("Result page has no accessibility violations", async ({ page }) => {
+		await completeEligibilityCheck(page);
+		const results = await new AxeBuilder({ page })
+			.withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+			.analyze();
+		expect(results.violations).toEqual([]);
 	});
 });

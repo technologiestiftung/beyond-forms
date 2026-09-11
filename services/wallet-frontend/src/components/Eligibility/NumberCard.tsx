@@ -1,15 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { i18nKeys } from "../../i18n/i18nKeys";
-import { PrimaryButton } from "../ui/PrimaryButton";
-import { Info } from "lucide-react";
+import { QuestionShell } from "./QuestionShell";
+import type { QuestionHeader } from "./QuestionShell";
 
-interface NumberCardProps {
-	id: string;
-	question: string;
-	category: string;
-	tip?: string;
+interface NumberCardProps extends QuestionHeader {
 	unitLabel: string;
+	/** Optional hint under the field, for "an approximate figure is enough". */
+	hint?: string;
 	value?: number;
 	onChange: (value: number) => void;
 	onClear: () => void;
@@ -25,12 +21,12 @@ export const NumberCard: React.FC<NumberCardProps> = ({
 	category,
 	tip,
 	unitLabel,
+	hint,
 	value,
 	onChange,
 	onClear,
 	onNext,
 }) => {
-	const { t } = useTranslation();
 	const labelRef = useRef<HTMLLabelElement>(null);
 	const [draft, setDraft] = useState(value === undefined ? "" : String(value));
 
@@ -57,85 +53,59 @@ export const NumberCard: React.FC<NumberCardProps> = ({
 		}
 	};
 
-	const handleSubmit = (event: React.FormEvent) => {
-		event.preventDefault();
-		if (value !== undefined) {
-			onNext();
-		}
-	};
+	const describedBy =
+		[tip ? `${id}-tip` : null, hint ? `${id}-hint` : null]
+			.filter(Boolean)
+			.join(" ") || undefined;
 
 	return (
-		<form
-			onSubmit={handleSubmit}
-			data-testid="question-card"
-			className="w-full font-sans flex flex-col justify-between flex-grow min-h-[360px]"
+		<QuestionShell
+			id={id}
+			question={question}
+			category={category}
+			tip={tip}
+			canAdvance={value !== undefined}
+			onNext={onNext}
 		>
-			<fieldset className="w-full border-none p-0 m-0 flex flex-col gap-6 mb-8">
-				<div className="flex flex-col gap-3">
-					<p className="text-body text-brand-grey">
-						{t(i18nKeys.eligibility.title)}
-					</p>
-					<h1 className="text-xl font-bold text-brand-black leading-snug">
-						{category}
-					</h1>
-				</div>
-
-				{tip && (
-					<div
-						id={`${id}-tip`}
-						className="bg-brand-bg border border-brand-border/40 rounded-xl p-4 flex gap-2 items-start"
-					>
-						<Info
-							className="size-5 text-brand-grey shrink-0 mt-0.5"
-							aria-hidden="true"
-						/>
-						<p className="text-base text-brand-grey leading-snug whitespace-pre-line">
-							{tip}
-						</p>
-					</div>
-				)}
-
-				<div className="w-full">
-					<label
-						ref={labelRef}
-						htmlFor={`${id}-number`}
-						tabIndex={-1}
-						id={`${id}-legend`}
-						className="font-bold text-brand-black leading-snug focus:outline-none mb-6 block"
-					>
-						{question}
-					</label>
-					<div className="flex items-center gap-3">
-						<input
-							id={`${id}-number`}
-							// Not type="number": that shows spinner arrows on mobile and lets a
-							// stray scroll change the value.
-							type="text"
-							inputMode="decimal"
-							autoComplete="off"
-							aria-labelledby={`${id}-legend`}
-							aria-describedby={tip ? `${id}-tip` : undefined}
-							data-testid="number-input"
-							value={draft}
-							onChange={handleChange}
-							className="h-12 flex-1 px-3 rounded-xl border-2 border-brand-border/30 text-base text-brand-black bg-white focus:outline-none focus:border-brand-primary"
-						/>
-						<span className="text-base text-brand-grey shrink-0">
-							{unitLabel}
-						</span>
-					</div>
-				</div>
-			</fieldset>
-
 			<div className="w-full">
-				<PrimaryButton
-					type="submit"
-					disabled={value === undefined}
-					data-testid="next-button"
+				<label
+					ref={labelRef}
+					htmlFor={`${id}-number`}
+					tabIndex={-1}
+					id={`${id}-legend`}
+					className="font-bold text-brand-black leading-snug focus:outline-none mb-6 block"
 				>
-					{t(i18nKeys.common.next)}
-				</PrimaryButton>
+					{question}
+				</label>
+				<div className="flex items-center gap-3">
+					<input
+						id={`${id}-number`}
+						// Not type="number": that shows spinner arrows on mobile and lets a
+						// stray scroll change the value.
+						type="text"
+						inputMode="decimal"
+						autoComplete="off"
+						aria-labelledby={`${id}-legend`}
+						aria-describedby={describedBy}
+						data-testid="number-input"
+						value={draft}
+						onChange={handleChange}
+						className="h-12 flex-1 px-3 rounded-xl border-2 border-brand-border/30 text-base text-brand-black bg-white focus:outline-none focus:border-brand-primary"
+					/>
+					<span className="text-base text-brand-grey shrink-0">
+						{unitLabel}
+					</span>
+				</div>
+				{hint && (
+					<p
+						id={`${id}-hint`}
+						data-testid="number-hint"
+						className="mt-2 text-sm text-brand-grey"
+					>
+						{hint}
+					</p>
+				)}
 			</div>
-		</form>
+		</QuestionShell>
 	);
 };

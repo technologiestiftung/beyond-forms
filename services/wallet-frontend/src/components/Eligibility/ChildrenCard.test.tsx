@@ -57,7 +57,7 @@ describe("ChildrenCard", () => {
 		const onChange = vi.fn();
 		render(<ChildrenCard {...baseProps} onChange={onChange} />);
 		fireEvent.change(screen.getByTestId("child-date-0"), {
-			target: { value: "2019-04-02" },
+			target: { value: "02.04.2019" },
 		});
 		expect(onChange).toHaveBeenCalledWith([{ dateOfBirth: "2019-04-02" }]);
 		expect(screen.getByTestId("next-button")).not.toBeDisabled();
@@ -80,15 +80,15 @@ describe("ChildrenCard", () => {
 	it("leaves a half-typed year on screen", () => {
 		render(<ChildrenCard {...baseProps} />);
 		const input = screen.getByTestId("child-date-0");
-		fireEvent.change(input, { target: { value: "0001-02-11" } });
-		expect(input).toHaveValue("0001-02-11");
+		fireEvent.change(input, { target: { value: "11.02.0001" } });
+		expect(input).toHaveValue("11.02.0001");
 	});
 
 	it("does not report a date outside the allowed range upward", () => {
 		const onChange = vi.fn();
 		render(<ChildrenCard {...baseProps} onChange={onChange} />);
 		fireEvent.change(screen.getByTestId("child-date-0"), {
-			target: { value: "0001-02-11" },
+			target: { value: "11.02.0001" },
 		});
 		expect(onChange).toHaveBeenCalledWith([]);
 	});
@@ -96,7 +96,7 @@ describe("ChildrenCard", () => {
 	it("keeps the next button disabled on a date outside the allowed range", () => {
 		render(<ChildrenCard {...baseProps} />);
 		fireEvent.change(screen.getByTestId("child-date-0"), {
-			target: { value: "0001-02-11" },
+			target: { value: "11.02.0001" },
 		});
 		expect(screen.getByTestId("next-button")).toBeDisabled();
 	});
@@ -110,7 +110,7 @@ describe("ChildrenCard", () => {
 		render(<ChildrenCard {...baseProps} />);
 		const input = screen.getByTestId("child-date-0");
 		fireEvent.focus(input);
-		fireEvent.change(input, { target: { value: "0001-02-11" } });
+		fireEvent.change(input, { target: { value: "11.02.0001" } });
 		expect(screen.queryByTestId("date-error-0")).toBeNull();
 	});
 
@@ -118,7 +118,7 @@ describe("ChildrenCard", () => {
 		render(<ChildrenCard {...baseProps} />);
 		const input = screen.getByTestId("child-date-0");
 		fireEvent.focus(input);
-		fireEvent.change(input, { target: { value: "0001-02-11" } });
+		fireEvent.change(input, { target: { value: "11.02.0001" } });
 		fireEvent.blur(input);
 		expect(screen.getByTestId("date-error-0")).toHaveTextContent(
 			"date_error.too_early",
@@ -130,7 +130,7 @@ describe("ChildrenCard", () => {
 		render(<ChildrenCard {...baseProps} />);
 		const input = screen.getByTestId("child-date-0");
 		fireEvent.focus(input);
-		fireEvent.change(input, { target: { value: "2099-02-11" } });
+		fireEvent.change(input, { target: { value: "11.02.2099" } });
 		fireEvent.blur(input);
 		expect(screen.getByTestId("date-error-0")).toHaveTextContent(
 			"date_error.future",
@@ -140,10 +140,10 @@ describe("ChildrenCard", () => {
 	it("drops the message once the date is corrected", () => {
 		render(<ChildrenCard {...baseProps} />);
 		const input = screen.getByTestId("child-date-0");
-		fireEvent.change(input, { target: { value: "2099-02-11" } });
+		fireEvent.change(input, { target: { value: "11.02.2099" } });
 		fireEvent.blur(input);
 		expect(screen.getByTestId("date-error-0")).toBeInTheDocument();
-		fireEvent.change(input, { target: { value: "2019-04-02" } });
+		fireEvent.change(input, { target: { value: "02.04.2019" } });
 		expect(screen.queryByTestId("date-error-0")).toBeNull();
 		expect(input).toHaveAttribute("aria-invalid", "false");
 	});
@@ -160,7 +160,7 @@ describe("ChildrenCard", () => {
 		);
 		fireEvent.click(screen.getByTestId("add-child"));
 		const second = screen.getByTestId("child-date-1");
-		fireEvent.change(second, { target: { value: "2099-02-11" } });
+		fireEvent.change(second, { target: { value: "11.02.2099" } });
 		fireEvent.blur(second);
 		expect(screen.queryByTestId("date-error-0")).toBeNull();
 		expect(screen.getByTestId("date-error-1")).toBeInTheDocument();
@@ -174,6 +174,6 @@ describe("ChildrenCard", () => {
 			/>,
 		);
 		expect(screen.getAllByTestId(/^child-date-/)).toHaveLength(2);
-		expect(screen.getByTestId("child-date-1")).toHaveValue("2021-06-11");
+		expect(screen.getByTestId("child-date-1")).toHaveValue("11.06.2021");
 	});
 });

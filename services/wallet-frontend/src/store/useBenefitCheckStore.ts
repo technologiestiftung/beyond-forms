@@ -7,13 +7,7 @@ import type {
 } from "../schemas/benefitCheck.schema";
 import { getValidPath } from "./benefits/questionPath";
 import { createZustandStorage } from "../utils/storage";
-
-/**
- * Input validation only; the engine always takes `today` as an argument. The sv-SE locale
- * is the shortest way to a local ISO date — toISOString() would shift the day in negative
- * offsets.
- */
-const todayIsoDate = (): string => new Date().toLocaleDateString("sv-SE");
+import { todayIsoDate } from "../utils/date";
 
 interface BenefitCheckState {
 	answers: PartialBenefitCheckAnswers;

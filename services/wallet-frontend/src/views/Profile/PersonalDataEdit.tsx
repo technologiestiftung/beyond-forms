@@ -740,10 +740,7 @@ const InsuranceSection: React.FC<SectionProps> = ({
 			</h2>
 			<SelectField
 				id="socialSecurityType"
-				label={t(
-					"personal.fields.socialSecurityType",
-					"Sozialversicherung",
-				)}
+				label={t("personal.fields.socialSecurityType", "Sozialversicherung")}
 				register={register("socialSecurityType")}
 				onBlur={() => handleFieldBlur("socialSecurityType")}
 				placeholderText={`-- ${t("common.please_select", "Bitte auswählen")} --`}
@@ -768,10 +765,7 @@ const InsuranceSection: React.FC<SectionProps> = ({
 			/>
 			<FormField
 				id="healthInsuranceProvider"
-				label={t(
-					"personal.fields.healthInsuranceProvider",
-					"Krankenkasse",
-				)}
+				label={t("personal.fields.healthInsuranceProvider", "Krankenkasse")}
 				register={register("healthInsuranceProvider")}
 				onBlur={() => handleFieldBlur("healthInsuranceProvider")}
 			/>
@@ -849,10 +843,7 @@ const InsuranceSection: React.FC<SectionProps> = ({
 			/>
 			<FormField
 				id="previousBenefitsRefNo"
-				label={t(
-					"personal.fields.previousBenefitsRefNo",
-					"Aktenzeichen",
-				)}
+				label={t("personal.fields.previousBenefitsRefNo", "Aktenzeichen")}
 				register={register("previousBenefitsRefNo")}
 				onBlur={() => handleFieldBlur("previousBenefitsRefNo")}
 			/>
@@ -877,7 +868,9 @@ const HouseholdSection: React.FC<SectionProps> = ({
 					"Personen im Haushalt",
 				)}
 				type="number"
-				register={register("personsInHouseholdCount", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("personsInHouseholdCount", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("personsInHouseholdCount")}
 			/>
 			<FormField
@@ -938,42 +931,54 @@ const HousingSection: React.FC<SectionProps> = ({
 				id="rentTotal"
 				label={t("housing.fields.rentTotal")}
 				type="number"
-				register={register("rentTotal", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("rentTotal", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("rentTotal")}
 			/>
 			<FormField
 				id="heatingCosts"
 				label={t("housing.fields.heatingCosts")}
 				type="number"
-				register={register("heatingCosts", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("heatingCosts", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("heatingCosts")}
 			/>
 			<FormField
 				id="hotWaterCosts"
 				label={t("personal.fields.hotWaterCosts", "Warmwasserkosten (€)")}
 				type="number"
-				register={register("hotWaterCosts", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("hotWaterCosts", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("hotWaterCosts")}
 			/>
 			<FormField
 				id="cableTvCosts"
 				label={t("personal.fields.cableTvCosts", "Kabel-/TV-Kosten (€)")}
 				type="number"
-				register={register("cableTvCosts", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("cableTvCosts", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("cableTvCosts")}
 			/>
 			<FormField
 				id="livingArea"
 				label={t("housing.fields.livingArea")}
 				type="number"
-				register={register("livingArea", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("livingArea", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("livingArea")}
 			/>
 			<FormField
 				id="numberOfRooms"
 				label={t("housing.fields.numberOfRooms")}
 				type="number"
-				register={register("numberOfRooms", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("numberOfRooms", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("numberOfRooms")}
 			/>
 			<FormField
@@ -999,7 +1004,9 @@ const HousingSection: React.FC<SectionProps> = ({
 				id="subletRoomCount"
 				label={t("personal.fields.subletRoomCount", "Untervermietete Zimmer")}
 				type="number"
-				register={register("subletRoomCount", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("subletRoomCount", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("subletRoomCount")}
 			/>
 			<FormField
@@ -1009,7 +1016,9 @@ const HousingSection: React.FC<SectionProps> = ({
 					"Einnahmen aus Untervermietung (€)",
 				)}
 				type="number"
-				register={register("subletRentIncome", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("subletRentIncome", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("subletRentIncome")}
 			/>
 			<FormField
@@ -1061,7 +1070,9 @@ const HousingSection: React.FC<SectionProps> = ({
 				id="garageCosts"
 				label={t("personal.fields.garageCosts", "Garagenkosten (€)")}
 				type="number"
-				register={register("garageCosts", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("garageCosts", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("garageCosts")}
 			/>
 			<CheckboxField
@@ -1080,7 +1091,9 @@ const HousingSection: React.FC<SectionProps> = ({
 					"Haushaltsenergiekosten (€)",
 				)}
 				type="number"
-				register={register("householdEnergyCosts", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("householdEnergyCosts", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("householdEnergyCosts")}
 			/>
 			<CheckboxField
@@ -1099,7 +1112,9 @@ const HousingSection: React.FC<SectionProps> = ({
 					"Gewerblich genutzte Fläche (m²)",
 				)}
 				type="number"
-				register={register("commerciallyUsedAreaSqm", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("commerciallyUsedAreaSqm", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("commerciallyUsedAreaSqm")}
 			/>
 		</div>
@@ -1136,7 +1151,9 @@ const FinancialSection: React.FC<SectionProps> = ({
 				id="monthlyIncome"
 				label={t("personal.fields.monthlyIncome", "Monatliches Einkommen (€)")}
 				type="number"
-				register={register("monthlyIncome", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("monthlyIncome", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("monthlyIncome")}
 			/>
 			<MultiCheckboxField
@@ -1169,12 +1186,11 @@ const FinancialSection: React.FC<SectionProps> = ({
 			/>
 			<FormField
 				id="professionalExpenses"
-				label={t(
-					"personal.fields.professionalExpenses",
-					"Werbungskosten (€)",
-				)}
+				label={t("personal.fields.professionalExpenses", "Werbungskosten (€)")}
 				type="number"
-				register={register("professionalExpenses", { setValueAs: emptyStringToUndefinedNumber })}
+				register={register("professionalExpenses", {
+					setValueAs: emptyStringToUndefinedNumber,
+				})}
 				onBlur={() => handleFieldBlur("professionalExpenses")}
 			/>
 			<CheckboxField

@@ -38,7 +38,7 @@ describe("BenefitAssessmentCard", () => {
 			status: BenefitStatus.CHECK_ADVISED,
 			reasons: [
 				ReasonCode.RENT_BURDEN_HIGH,
-				ReasonCode.EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT,
+				ReasonCode.INCOME_BELOW_SUBSISTENCE,
 			],
 		});
 		expect(screen.queryByText("result.reason.RENT_BURDEN_HIGH")).toBeNull();
@@ -49,7 +49,7 @@ describe("BenefitAssessmentCard", () => {
 			screen.getByText("result.reason.RENT_BURDEN_HIGH"),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText("result.reason.EDUCATION_PACKAGE_FOLLOWS_BASE_BENEFIT"),
+			screen.getByText("result.reason.INCOME_BELOW_SUBSISTENCE"),
 		).toBeInTheDocument();
 	});
 
@@ -93,23 +93,23 @@ describe("BenefitAssessmentCard", () => {
 
 	it("gives no icon to a benefit that does not concern the applicant", () => {
 		renderCard({
-			benefit: BenefitId.SGB_XII_SUBSISTENCE_AID,
+			benefit: BenefitId.SGB_XII_OLD_AGE_REDUCED_CAPACITY,
 			status: BenefitStatus.NOT_APPLICABLE,
-			reasons: [ReasonCode.NOT_IN_CAPACITY_GAP],
+			reasons: [ReasonCode.RETIREMENT_AGE_NOT_REACHED],
 		});
 		expect(screen.queryByTestId("status-icon")).toBeNull();
 		expect(
-			screen.getByTestId("assessment-SGB_XII_SUBSISTENCE_AID"),
+			screen.getByTestId("assessment-SGB_XII_OLD_AGE_REDUCED_CAPACITY"),
 		).toHaveAttribute("data-muted", "true");
 	});
 
 	it("sends a likely benefit to the application", () => {
 		renderCard({
-			benefit: BenefitId.ADVANCE_MAINTENANCE,
+			benefit: BenefitId.SGB_II_BASIC_INCOME,
 			status: BenefitStatus.LIKELY_YES,
-			reasons: [ReasonCode.CHILD_SUPPORT_INCOMPLETE],
+			reasons: [ReasonCode.INCOME_BELOW_NEEDS],
 		});
-		const action = screen.getByTestId("apply-ADVANCE_MAINTENANCE");
+		const action = screen.getByTestId("apply-SGB_II_BASIC_INCOME");
 		expect(action).toHaveAttribute("href", APPLY_PATH);
 		expect(action).toHaveTextContent("result.apply");
 	});

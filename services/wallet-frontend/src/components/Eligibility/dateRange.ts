@@ -3,12 +3,6 @@ import { i18nKeys } from "../../i18n/i18nKeys";
 export const EARLIEST_BIRTHDATE = "1900-01-01";
 
 /**
- * Today in the visitor's own timezone. `toISOString` would give UTC, which is the wrong
- * day for a few hours every evening in Berlin and would reject a birthday entered today.
- */
-export const todayIso = (): string => new Date().toLocaleDateString("sv-SE");
-
-/**
  * ISO dates compare correctly as plain strings, and "" fails the lower bound, so this one
  * expression separates "ready to use" from empty and out-of-range alike.
  *

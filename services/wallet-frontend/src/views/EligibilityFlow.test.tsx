@@ -56,8 +56,9 @@ describe("EligibilityFlow", () => {
 		store.setAnswer("children", []);
 		store.setAnswer("dateOfBirth", "1994-01-15");
 		store.setAnswer("livesInGermany", true);
-		store.setAnswer("workCapacity", WorkCapacity.FULL);
 		store.setAnswer("isEmployed", false);
+		store.setAnswer("monthlyGrossIncome", 0);
+		store.setAnswer("workCapacity", WorkCapacity.FULL);
 		renderAt("net-income");
 		expect(screen.getByTestId("number-input")).toBeInTheDocument();
 		// The global i18n mock in vitest.setup.ts returns the key, so this asserts that

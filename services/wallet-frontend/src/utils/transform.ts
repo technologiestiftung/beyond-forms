@@ -129,7 +129,8 @@ export const mapProfileToFrontend = (
 	};
 
 	const personalData = (camelData["personalData"] as
-		Record<string, unknown> | undefined) || {
+		| Record<string, unknown>
+		| undefined) || {
 		firstName: getVal<string>("firstName"),
 		lastName: getVal<string>("lastName"),
 		dateOfBirth: getVal<string>("dateOfBirth"),
@@ -167,7 +168,8 @@ export const mapProfileToFrontend = (
 	};
 
 	const address = (camelData["address"] as
-		Record<string, unknown> | undefined) || {
+		| Record<string, unknown>
+		| undefined) || {
 		street: getVal<string>("street"),
 		houseNumber: getVal<string>("houseNumber"),
 		zipCode: getVal<string>("zipCode"),
@@ -177,15 +179,18 @@ export const mapProfileToFrontend = (
 	};
 
 	const contact = (camelData["contact"] as
-		Record<string, unknown> | undefined) || {
+		| Record<string, unknown>
+		| undefined) || {
 		email: getVal<string>("email"),
 		phoneNumber: getVal<string>("phoneNumber"),
 	};
 
 	const financial = (camelData["financial"] as
-		Record<string, unknown> | undefined) || {
+		| Record<string, unknown>
+		| undefined) || {
 		bankDetails: (camelData["bankDetails"] as
-			Record<string, unknown> | undefined) || {
+			| Record<string, unknown>
+			| undefined) || {
 			bankName: getVal<string>("bankName"),
 			accountHolder: getVal<string>("accountHolder"),
 			iban: getVal<string>("iban"),
@@ -224,14 +229,16 @@ export const mapProfileToFrontend = (
 	};
 
 	const household = (camelData["household"] as
-		Record<string, unknown> | undefined) || {
+		| Record<string, unknown>
+		| undefined) || {
 		personsInHouseholdCount: getVal<number>("personsInHouseholdCount"),
 		maritalStatus: getVal<MaritalStatusType>("maritalStatus"),
 		marriedSince: getVal<string>("marriedSince"),
 	};
 
 	const housing = (camelData["housing"] as
-		Record<string, unknown> | undefined) || {
+		| Record<string, unknown>
+		| undefined) || {
 		accomodationType: getVal<string>("accomodationType"),
 		tenancyStatus: getVal<string>("tenancyStatus"),
 		rentTotal: getVal<number>("rentTotal"),
@@ -253,12 +260,15 @@ export const mapProfileToFrontend = (
 		garageCosts: getVal<number>("garageCosts"),
 		hasHouseholdEnergyCosts: getVal<boolean>("hasHouseholdEnergyCosts"),
 		householdEnergyCosts: getVal<number>("householdEnergyCosts"),
-		isLivingAreaUsedCommercially: getVal<boolean>("isLivingAreaUsedCommercially"),
+		isLivingAreaUsedCommercially: getVal<boolean>(
+			"isLivingAreaUsedCommercially",
+		),
 		commerciallyUsedAreaSqm: getVal<number>("commerciallyUsedAreaSqm"),
 	};
 
 	const health = (camelData["health"] as
-		Record<string, unknown> | undefined) || {
+		| Record<string, unknown>
+		| undefined) || {
 		hasDisabilityId: getVal<boolean>("hasDisabilityId"),
 		hasCostlyMedicalNutrition: getVal<boolean>("hasCostlyMedicalNutrition"),
 		isCareDependent: getVal<boolean>("isCareDependent"),
@@ -280,16 +290,21 @@ export const mapProfileToFrontend = (
 		hasPermanentReductionInEarningCapacity: getVal<boolean>(
 			"hasPermanentReductionInEarningCapacity",
 		),
-		disabilityApplicationPending: getVal<boolean>("disabilityApplicationPending"),
+		disabilityApplicationPending: getVal<boolean>(
+			"disabilityApplicationPending",
+		),
 	};
 
-	const vehicle = (camelData["vehicle"] as Record<string, unknown> | undefined) || {
+	const vehicle = (camelData["vehicle"] as
+		| Record<string, unknown>
+		| undefined) || {
 		licensePlate: getVal<string>("licensePlate"),
 	};
 
 	const documents = (camelData["documents"] as unknown[]) || [];
 	const settings = (camelData["settings"] as
-		Record<string, unknown> | undefined) || {
+		| Record<string, unknown>
+		| undefined) || {
 		language: DEFAULT_LOCALE,
 		notificationsEnabled: true,
 		personaAddress: "Formal",

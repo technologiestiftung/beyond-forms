@@ -7,7 +7,8 @@ import { useProfileStore } from "../../store/useProfileStore";
 const { mockProfileReturn } = vi.hoisted(() => ({
 	mockProfileReturn: {
 		profileData: { personalData: { firstName: "Jane" } } as
-			{ personalData: { firstName: string } } | undefined,
+			| Record<string, unknown>
+			| undefined,
 		milestoneLevel: 0,
 		isLoading: false,
 		isError: false,
@@ -99,10 +100,16 @@ describe("DashboardView", () => {
 		expect(screen.getByTestId("language-switcher")).toBeInTheDocument();
 
 		expect(
-			screen.getByRole("heading", { level: 2, name: "Bewohnerparkausweis" }),
+			screen.getByRole("heading", {
+				level: 2,
+				name: "sections.applications.parking_permit.title",
+			}),
 		).toBeInTheDocument();
 		expect(
-			screen.getByRole("heading", { level: 2, name: "Wohngeld" }),
+			screen.getByRole("heading", {
+				level: 2,
+				name: "sections.applications.housing_allowance.title",
+			}),
 		).toBeInTheDocument();
 		expect(
 			screen.getAllByRole("button", { name: "Antrag generieren" }),
@@ -146,5 +153,71 @@ describe("DashboardView", () => {
 		const retry = screen.getByRole("button", { name: "load_error.retry" });
 		retry.click();
 		expect(mockProfileReturn.refetch).toHaveBeenCalledTimes(1);
+	});
+
+	it("shows every application when no assessment has been stored", async () => {
+		render(
+			<MemoryRouter>
+				<DashboardView />
+			</MemoryRouter>,
+		);
+		await screen.findByTestId("language-switcher");
+		expect(
+			screen.getAllByRole("button", { name: "Antrag generieren" }),
+		).toHaveLength(4);
+		expect(screen.queryByTestId("dashboard-hidden-toggle")).toBeNull();
+	});
+
+	it("folds away the benefits the profile rules out", async () => {
+		// A single pensioner: past the retirement age SGB II does not apply, and with nobody
+		// else in the household neither does Kinderzuschlag. Both are categorical — no
+		// income figure needed, which is exactly what the profile can answer.
+		mockProfileReturn.profileData = {
+			personalData: {
+				firstName: "Jane",
+				dateOfBirth: "1950-01-01",
+				isGermanCitizen: true,
+			},
+			household: { maritalStatus: "Single", personsInHouseholdCount: 1 },
+		};
+		render(
+			<MemoryRouter>
+				<DashboardView />
+			</MemoryRouter>,
+		);
+		await screen.findByTestId("dashboard-hidden-toggle");
+
+		expect(screen.queryByTestId("dashboard-hidden-list")).toBeNull();
+		screen.getByTestId("dashboard-hidden-toggle").click();
+		expect(await screen.findByTestId("dashboard-hidden-list")).toBeTruthy();
+	});
+
+	it("keeps a benefit visible when the profile cannot decide it", async () => {
+		// The profile carries no gross income, savings band or warm rent, so every
+		// means-tested verdict is undecided — and undecided must never hide a form.
+		mockProfileReturn.profileData = {
+			personalData: {
+				firstName: "Jane",
+				dateOfBirth: "1994-01-15",
+				isGermanCitizen: true,
+			},
+			household: { maritalStatus: "Single", personsInHouseholdCount: 1 },
+			health: { abilityToWork: "Fully able" },
+			financial: { monthlyIncome: 1100 },
+		};
+		render(
+			<MemoryRouter>
+				<DashboardView />
+			</MemoryRouter>,
+		);
+		await screen.findByTestId("language-switcher");
+
+		// Grundsicherungsgeld stays on offer: nothing in the profile rules it out.
+		expect(
+			screen.getByRole("heading", {
+				level: 2,
+				name: "sections.applications.basic_income.title",
+			}),
+		).toBeInTheDocument();
 	});
 });
