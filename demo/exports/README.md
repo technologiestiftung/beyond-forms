@@ -9,7 +9,7 @@ Generated artefacts, not source. Regenerate any time:
 
 Per persona:
 
-- `antrag_grundsicherung.pdf` — the filled application, exactly what `GET /export/antrag_grundsicherung` returns.
+- `antrag_grundsicherung_im_alter.pdf` — the filled application, exactly what `GET /export/antrag_grundsicherung_im_alter` returns.
 - `documents/<status>_<slot>_<filename>` — every document blob the account holds, prefixed
   with its processing status so the state is visible in a file listing.
 

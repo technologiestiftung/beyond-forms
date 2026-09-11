@@ -52,6 +52,31 @@ class AssociationType(str, enum.Enum):
     OTHER = "Other"
 
 
+class AssetTypeType(str, enum.Enum):
+    SAVINGS_AND_CASH = "Savings and Cash"
+    SECURITIES = "Securities"
+    VALUABLES = "Valuables"
+    GIFTED_ASSETS = "Gifted Assets"
+    MOTOR_VEHICLE = "Motor Vehicle"
+    REAL_ESTATE = "Real Estate"
+    SUBSIDISED_PRIVATE_PENSION = "Subsidised Private Pension"
+    TRANSFER_CONTRACT_CLAIMS = "Transfer Contract Claims"
+    OTHER_ASSETS = "Other Assets"
+
+
+class BenefitClaimKindType(str, enum.Enum):
+    PENDING_APPLICATION = "Pending Application"
+    EXPECTED_ONE_TIME_PAYMENT = "Expected One-Time Payment"
+
+
+class CareLevelType(str, enum.Enum):
+    PFLEGEGRAD_1 = "Pflegegrad 1"
+    PFLEGEGRAD_2 = "Pflegegrad 2"
+    PFLEGEGRAD_3 = "Pflegegrad 3"
+    PFLEGEGRAD_4 = "Pflegegrad 4"
+    PFLEGEGRAD_5 = "Pflegegrad 5"
+
+
 class ChatMessageRoleType(str, enum.Enum):
     USER = "user"
     ASSISTANT = "assistant"
@@ -95,6 +120,30 @@ class DocumentStatusType(str, enum.Enum):
     VERIFIED = "verified"
 
 
+class ExpenseTypeType(str, enum.Enum):
+    INCOME_TAX = "Income Tax"
+    HEALTH_INSURANCE = "Health Insurance"
+    CARE_INSURANCE = "Care Insurance"
+    UNEMPLOYMENT_INSURANCE = "Unemployment Insurance"
+    PENSION_INSURANCE = "Pension Insurance"
+    CHURCH_TAX = "Church Tax"
+    ACCIDENT_INSURANCE = "Accident Insurance"
+    RETIREMENT_PROVISION = "Retirement Provision"
+    HOUSEHOLD_CONTENTS_INSURANCE = "Household Contents Insurance"
+    FUNERAL_INSURANCE = "Funeral Insurance"
+    LIFE_INSURANCE = "Life Insurance"
+    LIABILITY_INSURANCE = "Liability Insurance"
+    WORK_EQUIPMENT = "Work Equipment"
+    PROFESSIONAL_ASSOCIATION_FEES = "Professional Association Fees"
+    DOUBLE_HOUSEHOLD = "Double Household"
+    COMMUTE_PUBLIC_TRANSPORT = "Commute Public Transport"
+    COMMUTE_CAR = "Commute Car"
+    COMMUTE_SMALL_CAR = "Commute Small Car"
+    COMMUTE_MOTORCYCLE = "Commute Motorcycle"
+    COMMUTE_MOPED = "Commute Moped"
+    COMMUTE_OTHER = "Commute Other"
+
+
 class GenderType(str, enum.Enum):
     MALE = "Male"
     FEMALE = "Female"
@@ -107,6 +156,61 @@ class HealthInsuranceStatusType(str, enum.Enum):
     FAMILY_INSURANCE = "Family Insurance"
     PRIVATE_INSURANCE = "Private Insurance"
     CARE_BY_HEALTH_FUNDS_UNDER___264_SGB_V = "Care by Health Funds under § 264 SGB V"
+
+
+class IncomeTypeType(str, enum.Enum):
+    EMPLOYMENT = "Employment"
+    HEALTH_INSURANCE_BENEFITS = "Health Insurance Benefits"
+    BUSINESS = "Business"
+    AGRICULTURE_AND_FORESTRY = "Agriculture and Forestry"
+    OTHER_SELF_EMPLOYMENT = "Other Self-Employment"
+    RENTAL_AND_LEASING = "Rental and Leasing"
+    HOUSING_BENEFIT = "Housing Benefit"
+    PENSION = "Pension"
+    SOCIAL_ASSISTANCE = "Social Assistance"
+    BASIC_SECURITY_BENEFITS = "Basic Security Benefits"
+    ASYLUM_SEEKER_BENEFITS = "Asylum Seeker Benefits"
+    FEDERAL_WAR_VICTIMS_RELIEF = "Federal War Victims Relief"
+    EQUALISATION_OF_BURDENS = "Equalisation of Burdens"
+    EMPLOYMENT_AGENCY_BENEFITS = "Employment Agency Benefits"
+    CHILD_BENEFIT = "Child Benefit"
+    CHILD_BENEFIT_SUPPLEMENT = "Child Benefit Supplement"
+    PARENTAL_ALLOWANCE = "Parental Allowance"
+    EDUCATION_GRANT = "Education Grant"
+    ALIMONY = "Alimony"
+    ALIMONY_ADVANCE = "Alimony Advance"
+    PRIVATE_MONETARY_CLAIMS = "Private Monetary Claims"
+    TAX_REFUND = "Tax Refund"
+    CAPITAL_INCOME = "Capital Income"
+    OTHER_INCOME = "Other Income"
+
+
+INCOME_TYPE_DE = {
+    IncomeTypeType.EMPLOYMENT: "Nichtselbstständige Tätigkeit",
+    IncomeTypeType.HEALTH_INSURANCE_BENEFITS: "Leistungen der Krankenkasse",
+    IncomeTypeType.BUSINESS: "Gewerbebetrieb",
+    IncomeTypeType.AGRICULTURE_AND_FORESTRY: "Land- und Forstwirtschaft",
+    IncomeTypeType.OTHER_SELF_EMPLOYMENT: "Sonstige selbstständige Tätigkeit",
+    IncomeTypeType.RENTAL_AND_LEASING: "Vermietung und Verpachtung",
+    IncomeTypeType.HOUSING_BENEFIT: "Wohngeld/Lastenzuschuss",
+    IncomeTypeType.PENSION: "Rente/Pension",
+    IncomeTypeType.SOCIAL_ASSISTANCE: "Sozialhilfeleistungen",
+    IncomeTypeType.BASIC_SECURITY_BENEFITS: "Grundsicherungsleistungen",
+    IncomeTypeType.ASYLUM_SEEKER_BENEFITS: "Asylbewerberleistungen",
+    IncomeTypeType.FEDERAL_WAR_VICTIMS_RELIEF: "Leistungen nach dem Bundesversorgungsgesetz",
+    IncomeTypeType.EQUALISATION_OF_BURDENS: "Leistungen des Lastenausgleichsamtes",
+    IncomeTypeType.EMPLOYMENT_AGENCY_BENEFITS: "Leistungen der Agentur für Arbeit",
+    IncomeTypeType.CHILD_BENEFIT: "Kindergeld",
+    IncomeTypeType.CHILD_BENEFIT_SUPPLEMENT: "Kinderzuschlag",
+    IncomeTypeType.PARENTAL_ALLOWANCE: "Elterngeld",
+    IncomeTypeType.EDUCATION_GRANT: "Ausbildungsförderung",
+    IncomeTypeType.ALIMONY: "Unterhalt",
+    IncomeTypeType.ALIMONY_ADVANCE: "Unterhaltsvorschuss",
+    IncomeTypeType.PRIVATE_MONETARY_CLAIMS: "Privatrechtliche geldwerte Ansprüche",
+    IncomeTypeType.TAX_REFUND: "Steuererstattung",
+    IncomeTypeType.CAPITAL_INCOME: "Kapitalerträge",
+    IncomeTypeType.OTHER_INCOME: "Sonstige Einkünfte",
+}
 
 
 class MaritalStatusType(str, enum.Enum):
@@ -314,6 +418,8 @@ class Users(Base):
     sublet_rent_income: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
     rent_paid_until: Mapped[Optional[datetime.date]] = mapped_column(Date)
     landlord_name: Mapped[Optional[str]] = mapped_column(String(255))
+    landlord_address: Mapped[Optional[str]] = mapped_column(String(255))
+    main_tenant_name: Mapped[Optional[str]] = mapped_column(String(255))
     heating_type: Mapped[Optional[str]] = mapped_column(String(255))
     free_housing_right_holder: Mapped[Optional[str]] = mapped_column(String(255))
     persons_in_household_count: Mapped[Optional[int]] = mapped_column(Integer)
@@ -333,8 +439,6 @@ class Users(Base):
     monthly_income: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
     has_assets: Mapped[Optional[bool]] = mapped_column(Boolean)
     assets_description: Mapped[Optional[str]] = mapped_column(Text)
-    income_sources: Mapped[Optional[list[str]]] = mapped_column(JSONB)
-    assets_types: Mapped[Optional[list[str]]] = mapped_column(JSONB)
     has_costly_medical_nutrition: Mapped[Optional[bool]] = mapped_column(Boolean)
     is_care_dependent: Mapped[Optional[bool]] = mapped_column(Boolean)
     inpatient_facility_move_in_date: Mapped[Optional[datetime.date]] = mapped_column(Date)
@@ -358,6 +462,8 @@ class Users(Base):
     identification_numbers: Mapped[Optional[str]] = mapped_column(String(255))
     tax_id: Mapped[Optional[str]] = mapped_column(String(255))
     license_plate: Mapped[Optional[str]] = mapped_column(String(20))
+    vehicle_make: Mapped[Optional[str]] = mapped_column(String(255))
+    vehicle_year: Mapped[Optional[str]] = mapped_column(String(4))
     bic: Mapped[Optional[str]] = mapped_column(String(11))
     has_applied_for_benefits_awaiting_decision: Mapped[Optional[bool]] = mapped_column(Boolean)
     benefits_awaiting_decision_type: Mapped[Optional[str]] = mapped_column(String(255))
@@ -382,6 +488,27 @@ class Users(Base):
     is_living_area_used_commercially: Mapped[Optional[bool]] = mapped_column(Boolean)
     commercially_used_area_sqm: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
     is_victim_of_national_socialist_persecution: Mapped[Optional[bool]] = mapped_column(Boolean)
+    apartment_floor_location: Mapped[Optional[str]] = mapped_column(String(255))
+    resident_in_berlin_since: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    resident_in_district_since: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    previous_address: Mapped[Optional[str]] = mapped_column(String(255))
+    rent_arrears_period: Mapped[Optional[str]] = mapped_column(String(255))
+    rent_arrears_amount: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
+    tenancy_terminated_on: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    sublet_unrentable_reason: Mapped[Optional[str]] = mapped_column(String(255))
+    inpatient_facility_assigned_until: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    care_level: Mapped[Optional[CareLevelType]] = mapped_column(
+        Enum(CareLevelType, values_callable=lambda cls: [member.value for member in cls], name="care_level_type")
+    )
+    can_work_at_least_3h_daily: Mapped[Optional[bool]] = mapped_column(Boolean)
+    work_scope_and_type: Mapped[Optional[str]] = mapped_column(String(255))
+    employer_name: Mapped[Optional[str]] = mapped_column(String(255))
+    education_or_study_subject: Mapped[Optional[str]] = mapped_column(String(255))
+    employment_office_customer_number: Mapped[Optional[str]] = mapped_column(String(255))
+    commute_distance_km: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
+    has_child_with_substantial_income: Mapped[Optional[bool]] = mapped_column(Boolean)
+    have_parents_substantial_joint_income: Mapped[Optional[bool]] = mapped_column(Boolean)
+    monthly_expenses_total: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
 
     # Wohngeld and Bewohnerparkausweis yes/no questions. Nullable: NULL means not asked.
     is_wohngeld_first_application: Mapped[Optional[bool]] = mapped_column(Boolean)
@@ -401,6 +528,7 @@ class Users(Base):
     wohngeld_payment_to_applicant: Mapped[Optional[bool]] = mapped_column(Boolean)
     consents_to_bank_statement_retention: Mapped[Optional[bool]] = mapped_column(Boolean)
     consents_to_registry_verification: Mapped[Optional[bool]] = mapped_column(Boolean)
+    demo_seed_fixture_hash: Mapped[Optional[str]] = mapped_column(String(64))
 
     conversations: Mapped[list["Conversations"]] = relationship(
         "Conversations", back_populates="fk_user", cascade="all, delete-orphan"
@@ -419,6 +547,21 @@ class Users(Base):
         back_populates="user",
         cascade="all, delete-orphan",
         order_by="AssociatedPersons.sort_order",
+    )
+    income_entries: Mapped[list["IncomeEntries"]] = relationship(
+        "IncomeEntries", back_populates="user", cascade="all, delete-orphan"
+    )
+    expense_entries: Mapped[list["ExpenseEntries"]] = relationship(
+        "ExpenseEntries", back_populates="user", cascade="all, delete-orphan"
+    )
+    asset_entries: Mapped[list["AssetEntries"]] = relationship(
+        "AssetEntries", back_populates="user", cascade="all, delete-orphan"
+    )
+    benefit_claim_entries: Mapped[list["BenefitClaimEntries"]] = relationship(
+        "BenefitClaimEntries",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        order_by="BenefitClaimEntries.sort_order",
     )
 
 
@@ -465,11 +608,80 @@ class AssociatedPersons(Base):
     monthly_pension_income: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
     has_own_income: Mapped[Optional[bool]] = mapped_column(Boolean)
     is_alimony_obligated: Mapped[Optional[bool]] = mapped_column(Boolean)
+    is_german_citizen: Mapped[Optional[bool]] = mapped_column(Boolean)
+    id_document_issuing_authority: Mapped[Optional[str]] = mapped_column(String(255))
+    id_document_valid_until: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    has_guardian: Mapped[Optional[bool]] = mapped_column(Boolean)
+    has_custodian: Mapped[Optional[bool]] = mapped_column(Boolean)
+    displaced_status: Mapped[Optional[DisplacedStatusType]] = mapped_column(
+        Enum(DisplacedStatusType, values_callable=lambda cls: [member.value for member in cls], name="displaced_status_type")
+    )
+    displaced_issued_on: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    displaced_issued_by: Mapped[Optional[str]] = mapped_column(String(255))
+    has_received_previous_benefits: Mapped[Optional[bool]] = mapped_column(Boolean)
+    previous_benefits_authority: Mapped[Optional[str]] = mapped_column(String(255))
+    previous_benefits_period: Mapped[Optional[str]] = mapped_column(String(255))
+    previous_benefits_ref_no: Mapped[Optional[str]] = mapped_column(String(255))
+    has_disability_id: Mapped[Optional[bool]] = mapped_column(Boolean)
+    disability_valid_until: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    merkzeichen: Mapped[Optional[DisabilityMerkzeichenType]] = mapped_column(
+        Enum(DisabilityMerkzeichenType, values_callable=lambda cls: [member.value for member in cls], name="disability_merkzeichen_type")
+    )
+    disability_application_pending: Mapped[Optional[bool]] = mapped_column(Boolean)
+    social_security_type: Mapped[Optional[SocialSecurityTypeType]] = mapped_column(
+        Enum(SocialSecurityTypeType, values_callable=lambda cls: [member.value for member in cls], name="social_security_type_type")
+    )
+    health_insurance_provider: Mapped[Optional[str]] = mapped_column(String(255))
+    health_insurance_status: Mapped[Optional[HealthInsuranceStatusType]] = mapped_column(
+        Enum(HealthInsuranceStatusType, values_callable=lambda cls: [member.value for member in cls], name="health_insurance_status_type")
+    )
+    pension_insurance_provider: Mapped[Optional[str]] = mapped_column(String(255))
+    pension_insurance_no: Mapped[Optional[str]] = mapped_column(String(255))
+    is_care_dependent: Mapped[Optional[bool]] = mapped_column(Boolean)
+    care_level: Mapped[Optional[CareLevelType]] = mapped_column(
+        Enum(CareLevelType, values_callable=lambda cls: [member.value for member in cls], name="care_level_type")
+    )
+    has_inpatient_facility_accommodation: Mapped[Optional[bool]] = mapped_column(Boolean)
+    inpatient_facility_assigned_from: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    inpatient_facility_assigned_until: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    inpatient_facility_last_residence: Mapped[Optional[str]] = mapped_column(String(255))
+    has_permanent_reduction_in_earning_capacity: Mapped[Optional[bool]] = mapped_column(Boolean)
+    reduced_work_capacity_is_permanent: Mapped[Optional[bool]] = mapped_column(Boolean)
+    reduced_work_capacity_start_date: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    reduced_work_capacity_end_date: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    reduced_work_capacity_reason: Mapped[Optional[str]] = mapped_column(Text)
+    can_work_at_least_3h_daily: Mapped[Optional[bool]] = mapped_column(Boolean)
+    work_scope_and_type: Mapped[Optional[str]] = mapped_column(String(255))
+    employer_name: Mapped[Optional[str]] = mapped_column(String(255))
+    is_student_or_trainee: Mapped[Optional[bool]] = mapped_column(Boolean)
+    education_or_study_subject: Mapped[Optional[str]] = mapped_column(String(255))
+    employment_office_customer_number: Mapped[Optional[str]] = mapped_column(String(255))
+    commute_distance_km: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
+    has_applied_for_sgb2_benefits: Mapped[Optional[bool]] = mapped_column(Boolean)
+    has_applied_for_asylum_benefits: Mapped[Optional[bool]] = mapped_column(Boolean)
+    has_child_with_substantial_income: Mapped[Optional[bool]] = mapped_column(Boolean)
+    have_parents_substantial_joint_income: Mapped[Optional[bool]] = mapped_column(Boolean)
+    monthly_expenses_total: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
 
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text("now()"))
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text("now()"))
 
     user: Mapped["Users"] = relationship("Users", back_populates="associated_persons")
+    income_entries: Mapped[list["IncomeEntries"]] = relationship(
+        "IncomeEntries", back_populates="person", cascade="all, delete-orphan"
+    )
+    expense_entries: Mapped[list["ExpenseEntries"]] = relationship(
+        "ExpenseEntries", back_populates="person", cascade="all, delete-orphan"
+    )
+    asset_entries: Mapped[list["AssetEntries"]] = relationship(
+        "AssetEntries", back_populates="person", cascade="all, delete-orphan"
+    )
+    benefit_claim_entries: Mapped[list["BenefitClaimEntries"]] = relationship(
+        "BenefitClaimEntries",
+        back_populates="person",
+        cascade="all, delete-orphan",
+        order_by="BenefitClaimEntries.sort_order",
+    )
 
 
 class Conversations(Base):
@@ -625,3 +837,182 @@ class UserDocuments(Base):
     fk_application: Mapped["UserApplications"] = relationship("UserApplications", back_populates="user_documents")
     fk_file: Mapped[Optional["UploadedFiles"]] = relationship("UploadedFiles", back_populates="user_documents")
     fk_user: Mapped["Users"] = relationship("Users", back_populates="user_documents")
+
+
+class _MoneyEntry(Base):
+    """The shared shape of the Grundsicherung money grids: a row per (person, type),
+    where `person_id IS NULL` means the applicant. A grid column per person rather than a
+    column per form line is what lets the same rows serve Person 3+ and the other forms;
+    the alternative was ~110 scalar columns duplicated onto every person table."""
+
+    __abstract__ = True
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, server_default=text("gen_random_uuid()"))
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
+    person_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text("now()"))
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text("now()"))
+
+    @property
+    def person_sort_order(self) -> Optional[int]:
+        """The owner as the API names it. The entry schemas read a row through
+        `from_attributes`, and without this every person's row would serialise as the
+        applicant's - handing a caller back a grid it cannot write again."""
+        return self.person.sort_order if self.person is not None else None
+
+
+class IncomeEntries(_MoneyEntry):
+    __tablename__ = "income_entries"
+    __table_args__ = (
+        ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE", name="income_entries_user_id_fkey"),
+        ForeignKeyConstraint(
+            ["person_id"], ["associated_persons.id"], ondelete="CASCADE", name="income_entries_person_id_fkey"
+        ),
+        PrimaryKeyConstraint("id", name="income_entries_pkey"),
+        Index("income_entries_user_id_idx", "user_id"),
+        # Partial, because NULLs are never equal in a plain UNIQUE constraint, so the
+        # applicant's rows (person_id IS NULL) would not be deduplicated by one.
+        Index(
+            "income_entries_applicant_type_idx",
+            "user_id",
+            "income_type",
+            unique=True,
+            postgresql_where=text("person_id IS NULL"),
+        ),
+        Index(
+            "income_entries_person_type_idx",
+            "person_id",
+            "income_type",
+            unique=True,
+            postgresql_where=text("person_id IS NOT NULL"),
+        ),
+    )
+
+    income_type: Mapped[IncomeTypeType] = mapped_column(
+        Enum(IncomeTypeType, values_callable=lambda cls: [member.value for member in cls], name="income_type"),
+        nullable=False,
+    )
+    monthly_amount: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
+    # One column per row on the form, shared by both person columns.
+    awarding_office: Mapped[Optional[str]] = mapped_column(String(255))
+    reference_no: Mapped[Optional[str]] = mapped_column(String(255))
+
+    user: Mapped["Users"] = relationship("Users", back_populates="income_entries")
+    person: Mapped[Optional["AssociatedPersons"]] = relationship(
+        "AssociatedPersons", back_populates="income_entries"
+    )
+
+
+class ExpenseEntries(_MoneyEntry):
+    __tablename__ = "expense_entries"
+    __table_args__ = (
+        ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE", name="expense_entries_user_id_fkey"),
+        ForeignKeyConstraint(
+            ["person_id"], ["associated_persons.id"], ondelete="CASCADE", name="expense_entries_person_id_fkey"
+        ),
+        PrimaryKeyConstraint("id", name="expense_entries_pkey"),
+        Index("expense_entries_user_id_idx", "user_id"),
+        # Partial, because NULLs are never equal in a plain UNIQUE constraint, so the
+        # applicant's rows (person_id IS NULL) would not be deduplicated by one.
+        Index(
+            "expense_entries_applicant_type_idx",
+            "user_id",
+            "expense_type",
+            unique=True,
+            postgresql_where=text("person_id IS NULL"),
+        ),
+        Index(
+            "expense_entries_person_type_idx",
+            "person_id",
+            "expense_type",
+            unique=True,
+            postgresql_where=text("person_id IS NOT NULL"),
+        ),
+    )
+
+    expense_type: Mapped[ExpenseTypeType] = mapped_column(
+        Enum(ExpenseTypeType, values_callable=lambda cls: [member.value for member in cls], name="expense_type"),
+        nullable=False,
+    )
+    monthly_amount: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
+    note: Mapped[Optional[str]] = mapped_column(String(255))
+
+    user: Mapped["Users"] = relationship("Users", back_populates="expense_entries")
+    person: Mapped[Optional["AssociatedPersons"]] = relationship(
+        "AssociatedPersons", back_populates="expense_entries"
+    )
+
+
+class AssetEntries(_MoneyEntry):
+    __tablename__ = "asset_entries"
+    __table_args__ = (
+        ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE", name="asset_entries_user_id_fkey"),
+        ForeignKeyConstraint(
+            ["person_id"], ["associated_persons.id"], ondelete="CASCADE", name="asset_entries_person_id_fkey"
+        ),
+        PrimaryKeyConstraint("id", name="asset_entries_pkey"),
+        Index("asset_entries_user_id_idx", "user_id"),
+        # Partial, because NULLs are never equal in a plain UNIQUE constraint, so the
+        # applicant's rows (person_id IS NULL) would not be deduplicated by one.
+        Index(
+            "asset_entries_applicant_type_idx",
+            "user_id",
+            "asset_type",
+            unique=True,
+            postgresql_where=text("person_id IS NULL"),
+        ),
+        Index(
+            "asset_entries_person_type_idx",
+            "person_id",
+            "asset_type",
+            unique=True,
+            postgresql_where=text("person_id IS NOT NULL"),
+        ),
+    )
+
+    asset_type: Mapped[AssetTypeType] = mapped_column(
+        Enum(AssetTypeType, values_callable=lambda cls: [member.value for member in cls], name="asset_type"),
+        nullable=False,
+    )
+    amount: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
+    description: Mapped[Optional[str]] = mapped_column(Text)
+
+    user: Mapped["Users"] = relationship("Users", back_populates="asset_entries")
+    person: Mapped[Optional["AssociatedPersons"]] = relationship("AssociatedPersons", back_populates="asset_entries")
+
+
+class BenefitClaimEntries(_MoneyEntry):
+    """A free list rather than one row per fixed type: the form prints three blank rows
+    for benefits still being decided and two for expected lump sums, so `sort_order`
+    decides which row a record lands in."""
+
+    __tablename__ = "benefit_claim_entries"
+    __table_args__ = (
+        ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE", name="benefit_claim_entries_user_id_fkey"),
+        ForeignKeyConstraint(
+            ["person_id"], ["associated_persons.id"], ondelete="CASCADE", name="benefit_claim_entries_person_id_fkey"
+        ),
+        PrimaryKeyConstraint("id", name="benefit_claim_entries_pkey"),
+        Index("benefit_claim_entries_lookup_idx", "user_id", "claim_kind", "sort_order"),
+    )
+
+    claim_kind: Mapped[BenefitClaimKindType] = mapped_column(
+        Enum(
+            BenefitClaimKindType,
+            values_callable=lambda cls: [member.value for member in cls],
+            name="benefit_claim_kind",
+        ),
+        nullable=False,
+    )
+    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("0"))
+    benefit_type: Mapped[Optional[str]] = mapped_column(String(255))
+    # Antragsdatum for a pending application, expected payment date for a lump sum.
+    event_date: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    amount: Mapped[Optional[decimal.Decimal]] = mapped_column(Numeric(10, 2))
+    office_reference: Mapped[Optional[str]] = mapped_column(String(255))
+
+    user: Mapped["Users"] = relationship("Users", back_populates="benefit_claim_entries")
+    person: Mapped[Optional["AssociatedPersons"]] = relationship(
+        "AssociatedPersons", back_populates="benefit_claim_entries"
+    )
+

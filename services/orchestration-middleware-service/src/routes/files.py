@@ -19,11 +19,20 @@ from beyondforms.auth import require_authenticated_user
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, BackgroundTasks
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 from google.cloud import storage, exceptions as gcloud_exceptions
 from src.constants import SLOT_ID_TO_DIS_TYPE
 from src.db import SessionLocal, get_db
-from src.models import DocumentStatusType, UploadedFiles, UserApplications, UserDocuments, Users
+from src.models import (
+    DocumentStatusType,
+    IncomeEntries,
+    IncomeTypeType,
+    UploadedFiles,
+    UserApplications,
+    UserDocuments,
+    Users,
+)
 from src.services.pubsub_service import publish_document_event
 from src.services.user_service import UserService, get_user_service
 from src.services.berlin_districts import sync_berlin_district
@@ -133,22 +142,20 @@ def save_file_to_database(
     user_service: UserService,
     internal_user_id: str,
     document_type: Optional[str],
+    application_id: uuid.UUID,
 ):
     new_uploaded_file = UploadedFiles(name=file.filename, bucket_name=GCS_BUCKET_NAME, object_name=unique_filename)
     db.add(new_uploaded_file)
     db.flush()
 
-    # Profile-document uploads hang off the Grundsicherung application — the
-    # form the documents flow is built around. Other form_types are created
-    # explicitly (seed, or a future per-form start).
-    _, application_id = user_service.get_or_create_user_application(
-        internal_user_id, form_type="antrag_grundsicherung"
-    )
+    # Validates the application belongs to this user (IDOR prevention) - raises 404
+    # otherwise, so a document can never be attached to an application by guessing an id.
+    application = user_service.get_user_application(internal_user_id, application_id)
 
     new_doc = UserDocuments(
         document_id=uuid.uuid4(),
         fk_user_id=internal_user_id,
-        fk_application_id=application_id,
+        fk_application_id=application.application_id,
         fk_file_id=new_uploaded_file.id,
         document_type=document_type if document_type else "tbd",
         status=DocumentStatusType.PROCESSING,
@@ -172,6 +179,7 @@ def publish_document_event_to_pubsub(
 def _upload_file_impl(
     file: UploadFile,
     document_type: Optional[str],
+    application_id: uuid.UUID,
     db: Session,
     current_user: AuthUser,
     user_service: UserService,
@@ -186,7 +194,7 @@ def _upload_file_impl(
     publish_error = None
     try:
         new_uploaded_file, new_user_document = save_file_to_database(
-            file, db, unique_filename, user_service, internal_user_id, document_type
+            file, db, unique_filename, user_service, internal_user_id, document_type, application_id
         )
         db.commit()
     except HTTPException:
@@ -230,13 +238,15 @@ def _upload_file_impl(
     }
 
 
-async def upload_one_file_async(file: UploadFile, document_type: Optional[str], current_user: AuthUser):
+async def upload_one_file_async(
+    file: UploadFile, document_type: Optional[str], application_id: uuid.UUID, current_user: AuthUser
+):
     db = SessionLocal()
     try:
         user_service = UserService(db)
         storage_client = get_storage_client()
         return await asyncio.to_thread(
-            _upload_file_impl, file, document_type, db, current_user, user_service, storage_client
+            _upload_file_impl, file, document_type, application_id, db, current_user, user_service, storage_client
         )
     finally:
         db.close()
@@ -256,6 +266,7 @@ def upload_file(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     document_type: Optional[str] = Form(None),
+    application_id: uuid.UUID = Form(...),
     db: Session = Depends(get_db),
     current_user: AuthUser = Depends(require_authenticated_user),
     user_service: UserService = Depends(get_user_service),
@@ -266,7 +277,9 @@ def upload_file(
     """
     file_size = get_file_size(file)
     validate_file_size(file_size)
-    return _upload_file_impl(file, document_type, db, current_user, user_service, storage_client, background_tasks)
+    return _upload_file_impl(
+        file, document_type, application_id, db, current_user, user_service, storage_client, background_tasks
+    )
 
 
 @router.post("/upload-stitched", response_model=UploadedFileResponse)
@@ -274,6 +287,7 @@ def upload_stitched_files(
     background_tasks: BackgroundTasks,
     files: List[UploadFile] = File(...),
     document_type: Optional[str] = Form(None),
+    application_id: uuid.UUID = Form(...),
     db: Session = Depends(get_db),
     current_user: AuthUser = Depends(require_authenticated_user),
     user_service: UserService = Depends(get_user_service),
@@ -362,7 +376,14 @@ def upload_stitched_files(
         )
 
         return _upload_file_impl(
-            stitched_upload_file, document_type, db, current_user, user_service, storage_client, background_tasks
+            stitched_upload_file,
+            document_type,
+            application_id,
+            db,
+            current_user,
+            user_service,
+            storage_client,
+            background_tasks,
         )
 
     except Exception as e:
@@ -376,6 +397,7 @@ def upload_stitched_files(
 async def bulk_upload_files(
     files: List[UploadFile] = File(...),
     document_types: List[str] = Form(...),
+    application_id: uuid.UUID = Form(...),
     current_user: AuthUser = Depends(require_authenticated_user),
     db: Session = Depends(get_db),
     user_service: UserService = Depends(get_user_service),
@@ -394,7 +416,7 @@ async def bulk_upload_files(
         )
 
     results = await asyncio.gather(
-        *[upload_one_file_async(f, dt, current_user) for f, dt in zip(files, document_types)],
+        *[upload_one_file_async(f, dt, application_id, current_user) for f, dt in zip(files, document_types)],
         return_exceptions=True,
     )
 
@@ -731,9 +753,40 @@ def verify_document(
     doc.status = DocumentStatusType.VERIFIED
 
     if slot_id == "pension_notice":
-        sources = set(user.income_sources or [])
-        sources.add("pension")
-        user.income_sources = list(sources)
+        # A verified Rentenbescheid proves the applicant has pension income, so make sure
+        # the applicant's 'Pension' row exists, carrying the verified amount when one was
+        # confirmed. on_conflict_do_nothing targets the partial unique index on
+        # (user_id, income_type) WHERE person_id IS NULL, so this can't race a concurrent
+        # verification into a duplicate row the way a separate pre-check + insert could.
+        verified_amount = None
+        if payload.verified_fields and "monthly_amount" in payload.verified_fields:
+            try:
+                verified_amount = decimal.Decimal(str(local_raw_data["monthly_amount"]))
+            except (decimal.InvalidOperation, KeyError, TypeError, ValueError):
+                verified_amount = None
+
+        insert_stmt = (
+            pg_insert(IncomeEntries)
+            .values(
+                user_id=user.id,
+                person_id=None,
+                income_type=IncomeTypeType.PENSION,
+                monthly_amount=verified_amount,
+            )
+            .on_conflict_do_nothing(
+                index_elements=[IncomeEntries.user_id, IncomeEntries.income_type],
+                index_where=IncomeEntries.person_id.is_(None),
+            )
+        )
+        db.execute(insert_stmt)
+
+        if verified_amount is not None:
+            db.query(IncomeEntries).filter(
+                IncomeEntries.user_id == user.id,
+                IncomeEntries.person_id.is_(None),
+                IncomeEntries.income_type == IncomeTypeType.PENSION,
+                IncomeEntries.monthly_amount.is_(None),
+            ).update({"monthly_amount": verified_amount})
 
     db.commit()
 

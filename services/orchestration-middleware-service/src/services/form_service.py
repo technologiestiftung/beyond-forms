@@ -73,12 +73,29 @@ def _collect_identifier_roots(node: Any, out: set[str]) -> None:
             _collect_identifier_roots(value, out)
 
 
+# Derived keys that carry a money grid's optional free-text extras.
+# A fully answered profile still leaves all of these empty, so counting
+# them would put a floor under the readiness ratio that no profile could ever clear.
+_OPTIONAL_CONTEXT_FIELDS = frozenset(
+    {
+        "documents",
+        "income_office",
+        "income_reference",
+        "expense_notes",
+        "asset_descriptions",
+        "pending_benefit_claims",
+        "expected_one_time_payments",
+    }
+)
+
+
 def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set[str]:
     """
     Collects the top-level context keys a mapping's JEXL expressions read from,
     used to judge whether a user's profile carries enough data to fill this form.
-    Fields under the `documents.*` namespace are excluded: those come from verified
-    document uploads rather than the profile, and aren't required to check readiness.
+    Keys in _OPTIONAL_CONTEXT_FIELDS are excluded: the `documents.*` namespace comes from
+    verified uploads rather than the profile, and the money grids' free-text extras are
+    optional even for a fully answered profile - neither is required to check readiness.
     """
     fields: set[str] = set()
     for val in mapping.values():
@@ -90,8 +107,7 @@ def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set
             except Exception:
                 continue
             _collect_identifier_roots(tree, fields)
-    fields.discard("documents")
-    return fields
+    return fields - _OPTIONAL_CONTEXT_FIELDS
 
 
 def _is_context_value_filled(value: Any) -> bool:
@@ -246,10 +262,13 @@ class FormService:
     def _build_base_context(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], Optional[UserApplications]]:
         """
         Builds the JEXL context from `Users` columns merged with the matching
-        application's `form_data`. Falls back to the user's most recently updated
-        application when no row has this exact `form_type` — older accounts were
-        written with form_type="grundsicherung" while exports ask for
-        "antrag_grundsicherung".
+        application's `form_data`. When no row has this exact `form_type`:
+        for "antrag_grundsicherung_im_alter" specifically, first checks the legacy
+        form_type="grundsicherung" (older accounts were written under that name)
+        before falling back further, so a newer, unrelated application can't shadow
+        the legacy Grundsicherung data. Otherwise (or if that legacy lookup also
+        misses), falls back to the user's most recently updated application of any
+        form_type.
 
         Does not include the `documents` namespace; `fill_form` layers that on top
         using the returned application, since it's the only caller that needs it.
@@ -278,6 +297,22 @@ class FormService:
                 .order_by(UserApplications.updated_at.desc())
                 .first()
             )
+            if application is None and form_type == "antrag_grundsicherung_im_alter":
+                application = (
+                    self.db.query(UserApplications)
+                    .filter(
+                        UserApplications.fk_user_id == user.id,
+                        UserApplications.form_type == "grundsicherung",
+                    )
+                    .order_by(UserApplications.updated_at.desc())
+                    .first()
+                )
+                if application:
+                    logger.info(
+                        "No application with form_type=%r; found legacy form_type='grundsicherung' application %s",
+                        form_type,
+                        application.application_id,
+                    )
             if application is None:
                 application = (
                     self.db.query(UserApplications)
@@ -300,7 +335,13 @@ class FormService:
             logger.warning("Database is currently not reachable")
 
         context = user_dict.copy()
-        context.update(derived_context(user_dict, user.associated_persons))
+        money_entries = [
+            *user.income_entries,
+            *user.expense_entries,
+            *user.asset_entries,
+            *user.benefit_claim_entries,
+        ]
+        context.update(derived_context(user_dict, user.associated_persons, money_entries))
         for k, v in form_data.items():
             if k in context:
                 logger.warning(f"Key collision for {k}. Skipping document value and keeping user profile value.")

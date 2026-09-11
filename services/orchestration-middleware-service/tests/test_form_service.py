@@ -13,8 +13,18 @@ from src.services.form_service import (
     _extract_required_context_fields,
     _is_context_value_filled,
 )
-from src.services.form_context import age_context, derived_context, person_context
-from src.models import AssociatedPersons, AssociationType, MaritalStatusType, Users
+from src.services.form_context import age_context, derived_context, money_context, person_context, row_to_dict
+from src.models import (
+    AssetEntries,
+    AssociatedPersons,
+    AssociationType,
+    BenefitClaimEntries,
+    BenefitClaimKindType,
+    ExpenseEntries,
+    IncomeEntries,
+    MaritalStatusType,
+    Users,
+)
 from src.schemas import UserInformationUpdateSchema, UserProfileValidationSchema
 
 
@@ -426,7 +436,7 @@ async def test_fill_form_resolves_dis_type_from_a_slot_id_document(form_service,
     Documents are stored under frontend slot ids (`id_card`), but the TOML mappings
     reference document-intelligence registry names (`documents.identity_document.*`).
     The two vocabularies overlap on `pension_notice` alone, so before the dual-key
-    registration every `documents.*` reference in antrag_grundsicherung.toml resolved
+    registration every `documents.*` reference in antrag_grundsicherung_im_alter.toml resolved
     to nothing.
     """
     _set_application_query(form_service, _mock_application({}))
@@ -442,7 +452,7 @@ async def test_fill_form_resolves_dis_type_from_a_slot_id_document(form_service,
         patch("httpx.AsyncClient.post") as mock_post,
     ):
         mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
-        await form_service.fill_form("antrag_grundsicherung", mock_user)
+        await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
 
         assert mock_post.call_args.kwargs["json"]["field_values"]["p1_id_valid"] == "2030-05-19"
 
@@ -463,7 +473,7 @@ async def test_fill_form_still_resolves_the_stored_slot_id(form_service, mock_us
         patch("httpx.AsyncClient.post") as mock_post,
     ):
         mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
-        await form_service.fill_form("antrag_grundsicherung", mock_user)
+        await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
 
         assert mock_post.call_args.kwargs["json"]["field_values"]["p1_authority"] == "Bezirksamt Mitte"
 
@@ -472,7 +482,7 @@ async def test_fill_form_still_resolves_the_stored_slot_id(form_service, mock_us
 async def test_fill_form_falls_back_when_form_type_does_not_match(form_service, mock_user):
     """
     `get_or_create_user_application` used to write form_type="grundsicherung" while
-    exports are requested as "antrag_grundsicherung". Legacy rows still exist, so
+    exports are requested as "antrag_grundsicherung_im_alter". Legacy rows still exist, so
     the exact match can miss and we fall back to the most recently updated application.
     """
     application = _mock_application({"cost_of_rent": decimal.Decimal("1200.00")})
@@ -488,9 +498,55 @@ async def test_fill_form_falls_back_when_form_type_does_not_match(form_service, 
         patch("httpx.AsyncClient.post") as mock_post,
     ):
         mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
-        await form_service.fill_form("antrag_grundsicherung", mock_user)
+        await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
 
         assert mock_post.call_args.kwargs["json"]["field_values"]["p1_cost_of_rent"] == "1200.00"
+
+
+def _application_query_side_effect(by_form_type: dict, generic_result):
+    """Routes `.query(UserApplications).filter(...)` by the `form_type` literal in the
+    filter's second condition (absent for the generic, form_type-agnostic fallback query),
+    so a test can tell the legacy-form_type lookup apart from the generic fallback even
+    though both go through the same mocked `db.query(...)` chain."""
+
+    def filter_side_effect(*args):
+        query = MagicMock()
+        if len(args) >= 2:
+            result = by_form_type.get(args[1].right.value)
+        else:
+            result = generic_result
+        query.order_by.return_value.first.return_value = result
+        return query
+
+    return filter_side_effect
+
+
+@pytest.mark.asyncio
+async def test_fill_form_prefers_legacy_grundsicherung_over_newer_unrelated_application(form_service, mock_user):
+    """
+    The generic fallback (most recently updated application of any form_type) used to run
+    even for antrag_grundsicherung_im_alter, so a newer, unrelated application (e.g. a
+    freshly started antrag_kinderzuschlag) could shadow a legacy form_type="grundsicherung"
+    row's data. The legacy form_type must be checked first for this form.
+    """
+    legacy_app = _mock_application({"cost_of_rent": decimal.Decimal("500.00")})
+    newer_unrelated_app = _mock_application({"cost_of_rent": decimal.Decimal("999.00")})
+    form_service.db.query.return_value.filter.side_effect = _application_query_side_effect(
+        by_form_type={"grundsicherung": legacy_app},
+        generic_result=newer_unrelated_app,
+    )
+    _set_documents_query(form_service, [])
+
+    mock_mapping = {"p1_cost_of_rent": "{{ cost_of_rent }}"}
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch("httpx.AsyncClient.post") as mock_post,
+    ):
+        mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
+        await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
+
+        assert mock_post.call_args.kwargs["json"]["field_values"]["p1_cost_of_rent"] == "500.00"
 
 
 def test_document_refs_in_the_grundsicherung_mapping_resolve_in_the_registry():
@@ -505,7 +561,7 @@ def test_document_refs_in_the_grundsicherung_mapping_resolve_in_the_registry():
 
     from beyondforms.document_schemas.document_registry import document_registry
 
-    mapping_path = Path(__file__).resolve().parents[3] / "forms" / "mappings" / "antrag_grundsicherung.toml"
+    mapping_path = Path(__file__).resolve().parents[3] / "forms" / "mappings" / "antrag_grundsicherung_im_alter.toml"
     if not mapping_path.is_file():
         pytest.skip(f"{mapping_path} not available")
 
@@ -568,7 +624,7 @@ async def test_fill_form_interpolates_dates_in_german_format(form_service, mock_
         patch("httpx.AsyncClient.post") as mock_post,
     ):
         mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
-        await form_service.fill_form("antrag_grundsicherung", mock_user)
+        await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
 
         assert mock_post.call_args.kwargs["json"]["field_values"]["p1_period"] == "01.10.2019 bis unbefristet"
 
@@ -587,7 +643,7 @@ async def test_fill_form_survives_an_unevaluable_mapping_entry(form_service, moc
         patch("httpx.AsyncClient.post") as mock_post,
     ):
         mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
-        await form_service.fill_form("antrag_grundsicherung", mock_user)
+        await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
 
         field_values = mock_post.call_args.kwargs["json"]["field_values"]
         assert field_values["p1_broken"] == ""
@@ -664,8 +720,8 @@ async def test_get_completeness_no_mapped_fields_returns_zero_total(form_service
 
 @pytest.mark.asyncio
 async def test_get_completeness_counts_application_form_data(form_service, mock_user):
-    _set_application_query(form_service, _mock_application({"income_sources": ["employment"]}))
-    mock_mapping = {"p1_income": "{{ income_sources }}"}
+    _set_application_query(form_service, _mock_application({"city": "Berlin"}))
+    mock_mapping = {"p1_city": "{{ city }}"}
 
     with patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")):
         filled, total = await form_service.get_completeness("test_form", mock_user)
@@ -767,3 +823,155 @@ def test_write_schemas_only_accept_writable_user_fields(schema, ignored):
     }
     offered = set(schema.model_fields) - ignored
     assert not offered - writable, f"{schema.__name__} accepts non-persistable fields: {sorted(offered - writable)}"
+
+
+def _money_rows(person_id=None):
+    return [
+        IncomeEntries(
+            person_id=person_id,
+            income_type="Pension",
+            monthly_amount=decimal.Decimal("650.00"),
+            awarding_office="DRV Bund",
+            reference_no="12 345678 K 001",
+        ),
+        IncomeEntries(person_id=person_id, income_type="Child Benefit", monthly_amount=decimal.Decimal("250.00")),
+        ExpenseEntries(
+            person_id=person_id, expense_type="Health Insurance", monthly_amount=decimal.Decimal("120.50")
+        ),
+        AssetEntries(
+            person_id=person_id, asset_type="Securities", amount=decimal.Decimal("3000"), description="Fondsanteile"
+        ),
+        BenefitClaimEntries(
+            person_id=person_id,
+            claim_kind=BenefitClaimKindType.PENDING_APPLICATION,
+            sort_order=0,
+            benefit_type="Wohngeld",
+            event_date=datetime.date(2026, 8, 1),
+            office_reference="Wohngeldstelle Mitte / WG-4711",
+        ),
+    ]
+
+
+def test_money_context_keys_grids_by_their_form_row():
+    """Pages 4 to 8 of the Grundsicherung are grids of ~24 income and ~21 expense lines
+    asked once per person. Keying by the enum the form row is named after is what lets a
+    mapping address one line without knowing its row index."""
+    ctx = money_context(_money_rows(), None)
+
+    assert ctx["income"]["Pension"] == decimal.Decimal("650.00")
+    assert ctx["income_office"]["Pension"] == "DRV Bund"
+    assert ctx["income_reference"]["Pension"] == "12 345678 K 001"
+    assert ctx["expenses"]["Health Insurance"] == decimal.Decimal("120.50")
+    assert ctx["assets"]["Securities"] == decimal.Decimal("3000")
+    assert ctx["asset_descriptions"]["Securities"] == "Fondsanteile"
+    assert ctx["has_any_income"] is True
+    # A line the citizen has no row for is absent, which every mapping's guard reads as
+    # falsy - the same contract as an unuploaded document.
+    assert ctx["income"].get("Capital Income") is None
+
+
+def test_money_context_income_list_is_ordered_and_german():
+    """Wohngeld prints a numbered "n. Art der Einnahme" list instead of a fixed row per
+    kind, so the same rows are also exposed ordered, with the wording to print."""
+    rows = money_context(_money_rows(), None)["income_list"]
+
+    assert [row["income_type"] for row in rows] == ["Child Benefit", "Pension"]
+    assert [row["income_type_de"] for row in rows] == ["Kindergeld", "Rente/Pension"]
+
+
+def test_money_context_separates_the_applicant_from_each_person():
+    """`person_id IS NULL` is the applicant's own column. Reading a partner's grid off the
+    applicant's rows would print the wrong person's income."""
+    partner_id = uuid.uuid4()
+    rows = _money_rows() + _money_rows(person_id=partner_id)
+    rows.append(
+        IncomeEntries(person_id=partner_id, income_type="Alimony", monthly_amount=decimal.Decimal("300.00"))
+    )
+
+    assert money_context(rows, None)["income"].get("Alimony") is None
+    assert money_context(rows, partner_id)["income"]["Alimony"] == decimal.Decimal("300.00")
+
+
+def test_derived_context_attaches_each_persons_own_money_grid():
+    partner_id = uuid.uuid4()
+    partner = AssociatedPersons(
+        id=partner_id,
+        association_type=AssociationType.SPOUSE,
+        lives_in_household=True,
+        sort_order=0,
+        first_name="Ingrid",
+    )
+    rows = _money_rows() + [
+        IncomeEntries(person_id=partner_id, income_type="Pension", monthly_amount=decimal.Decimal("520.00"))
+    ]
+
+    ctx = derived_context({"date_of_birth": datetime.date(1959, 1, 20)}, [partner], rows)
+    jexl = JEXL()
+
+    assert jexl.evaluate("income.Pension", ctx) == decimal.Decimal("650.00")
+    assert jexl.evaluate("partner.income.Pension", ctx) == decimal.Decimal("520.00")
+    assert jexl.evaluate("household_members[0].income.Pension", ctx) == decimal.Decimal("520.00")
+    assert jexl.evaluate("pending_benefit_claims[0].benefit_type", ctx) == "Wohngeld"
+
+
+def test_derived_context_money_grids_are_empty_not_missing():
+    """A citizen with no financial rows still has to evaluate: `income.Pension` must
+    resolve to None under the guard, not raise for want of an `income` key."""
+    ctx = derived_context({}, [])
+    jexl = JEXL()
+
+    assert jexl.evaluate("income.Pension ? income.Pension : ''", ctx) == ""
+    assert jexl.evaluate("expenses['Health Insurance'] ? 'x' : ''", ctx) == ""
+    assert jexl.evaluate("income_list[0] ? 'x' : ''", ctx) == ""
+    assert jexl.evaluate("pending_benefit_claims[0] ? 'x' : ''", ctx) == ""
+    assert jexl.evaluate("has_any_income ? 'Nein' : 'Ja'", ctx) == "Ja"
+
+
+def test_person_context_exposes_everyone_not_just_the_household():
+    """The Grundsicherung alimony blocks ask about children and parents who need not live
+    with the applicant, so `associated_persons` keeps everyone."""
+    elsewhere = AssociatedPersons(
+        association_type=AssociationType.CHILD, lives_in_household=False, sort_order=1, first_name="Jonas"
+    )
+    at_home = AssociatedPersons(
+        association_type=AssociationType.SPOUSE, lives_in_household=True, sort_order=0, first_name="Ingrid"
+    )
+
+    ctx = person_context([elsewhere, at_home])
+
+    assert [p["first_name"] for p in ctx["associated_persons"]] == ["Ingrid", "Jonas"]
+    assert ctx["associated_persons_count"] == 2
+    assert [p["first_name"] for p in ctx["household_members"]] == ["Ingrid"]
+
+
+def test_expense_total_is_reachable_per_person():
+    """The form's per-person "Ausgaben monatlich Betrag" is a sum over the expense grid,
+    which pyjexl cannot compute - there is no reduce. It is stored on the owning row by
+    the trg_expense_entries_refresh_total trigger instead, so a mapping only has to read
+    it. This checks the *contract* a mapping depends on, not the trigger itself (that is
+    Postgres's job): the column reaches the JEXL context for the applicant and for each
+    person, and is absent rather than raising when nothing has been summed yet."""
+    partner = AssociatedPersons(
+        id=uuid.uuid4(),
+        association_type=AssociationType.SPOUSE,
+        lives_in_household=True,
+        sort_order=0,
+        first_name="Ingrid",
+        monthly_expenses_total=decimal.Decimal("99.00"),
+    )
+    user = Users(monthly_expenses_total=decimal.Decimal("195.75"))
+
+    ctx = {**row_to_dict(user), **derived_context(row_to_dict(user), [partner])}
+    jexl = JEXL()
+
+    assert jexl.evaluate("monthly_expenses_total", ctx) == decimal.Decimal("195.75")
+    assert jexl.evaluate("partner.monthly_expenses_total", ctx) == decimal.Decimal("99.00")
+
+    empty = Users()
+    empty_ctx = {**row_to_dict(empty), **derived_context(row_to_dict(empty), [])}
+    assert jexl.evaluate("monthly_expenses_total ? monthly_expenses_total : ''", empty_ctx) == ""
+    assert (
+        jexl.evaluate("partner && partner.monthly_expenses_total ? partner.monthly_expenses_total : ''", empty_ctx)
+        == ""
+    )
+

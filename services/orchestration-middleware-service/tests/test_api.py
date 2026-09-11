@@ -120,7 +120,11 @@ def test_list_files_unauthenticated():
 
 def test_upload_invalid_file_type(mock_db, mock_conv_service):
     file = io.BytesIO(b"some content")
-    response = client.post("/upload", files={"file": ("test.txt", file, "text/plain")})
+    response = client.post(
+        "/upload",
+        files={"file": ("test.txt", file, "text/plain")},
+        data={"application_id": str(uuid.uuid4())},
+    )
 
     assert response.status_code == 400
     assert "Invalid file type" in response.json()["detail"]
@@ -134,6 +138,7 @@ def test_upload_file_too_large(mock_storage_client, mock_db, mock_conv_service):
     response = client.post(
         "/upload",
         files={"file": ("test.png", file, "image/png")},
+        data={"application_id": str(uuid.uuid4())},
     )
 
     assert response.status_code == 400
@@ -152,6 +157,7 @@ def test_upload_gcs_failure(mock_storage_client, mock_db, mock_conv_service):
     response = client.post(
         "/upload",
         files={"file": ("test.png", file, "image/png")},
+        data={"application_id": str(uuid.uuid4())},
     )
 
     assert response.status_code == 500
@@ -176,6 +182,7 @@ def test_upload_db_error_rollback(mock_storage_client, _mock_publish_event, mock
     response = client.post(
         "/upload",
         files={"file": ("test.png", file, "image/png")},
+        data={"application_id": str(uuid.uuid4())},
     )
 
     assert response.status_code == 500

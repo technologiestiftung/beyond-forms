@@ -107,7 +107,7 @@ describe("DashboardView", () => {
 		).toBeInTheDocument();
 		expect(
 			screen.getAllByRole("button", { name: "Antrag generieren" }),
-		).toHaveLength(3);
+		).toHaveLength(5);
 	});
 
 	it("renders anonymous greeting when firstName is empty or whitespace", async () => {

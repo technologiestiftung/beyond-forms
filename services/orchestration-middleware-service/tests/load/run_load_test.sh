@@ -79,7 +79,7 @@ STATS_CSV="$REPORT_DIR/metrics_stats.csv"
 if [ -f "$STATS_CSV" ]; then
     echo "⚖️  Verifying Performance Budgets..."
 
-    # Extract 95th percentile latency for PDF generation (GET /export/antrag_grundsicherung)
+    # Extract 95th percentile latency for PDF generation (GET /export/antrag_grundsicherung_im_alter)
     EXPORT_95TH=$(grep -i "GET /export/" "$STATS_CSV" | awk -F',' '{print $19}' | sed 's/"//g' || echo "0")
     # Extract total error count and request count to calculate exact error rate
     TOTAL_STATS=$(tail -n 1 "$STATS_CSV")
@@ -93,7 +93,7 @@ if [ -f "$STATS_CSV" ]; then
 
     ERROR_RATE=$(( (TOTAL_FAILS * 100) / TOTAL_REQS ))
 
-    echo "  - GET /export/antrag_grundsicherung 95% Latency: ${EXPORT_95TH}ms (Limit: 5000ms)"
+    echo "  - GET /export/antrag_grundsicherung_im_alter 95% Latency: ${EXPORT_95TH}ms (Limit: 5000ms)"
     echo "  - Total Requests: $TOTAL_REQS"
     echo "  - Total Failures: $TOTAL_FAILS (Error Rate: $ERROR_RATE%, Limit: 1%)"
 

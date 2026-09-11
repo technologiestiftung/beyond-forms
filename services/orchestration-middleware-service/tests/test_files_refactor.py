@@ -129,7 +129,11 @@ def test_upload_file_db_failure_deletes_gcs_blob(mock_storage_client, mock_publi
     file_content = b"pdf content"
     file = io.BytesIO(file_content)
 
-    response = client.post("/upload", files={"file": ("test.pdf", file, "application/pdf")})
+    response = client.post(
+        "/upload",
+        files={"file": ("test.pdf", file, "application/pdf")},
+        data={"application_id": str(uuid.uuid4())},
+    )
     assert response.status_code == 500
 
     # Ensure blob delete was called to clean up
@@ -214,7 +218,11 @@ def test_upload_file_pubsub_deferred_after_commit(mock_storage_client, mock_publ
     file_content = b"pdf content"
     file = io.BytesIO(file_content)
 
-    response = client.post("/upload", files={"file": ("test.pdf", file, "application/pdf")})
+    response = client.post(
+        "/upload",
+        files={"file": ("test.pdf", file, "application/pdf")},
+        data={"application_id": str(uuid.uuid4())},
+    )
     assert response.status_code == 200
 
     # Assert correct order
@@ -274,6 +282,10 @@ def test_upload_file_no_extension(mock_storage_client, mock_db):
     file_content = b"content"
     file = io.BytesIO(file_content)
 
-    response = client.post("/upload", files={"file": ("my_id_card", file, "application/octet-stream")})
+    response = client.post(
+        "/upload",
+        files={"file": ("my_id_card", file, "application/octet-stream")},
+        data={"application_id": str(uuid.uuid4())},
+    )
     assert response.status_code == 400
     assert "Invalid file type" in response.json()["detail"]

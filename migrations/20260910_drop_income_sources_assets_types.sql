@@ -1,0 +1,2 @@
+ALTER TABLE users DROP COLUMN IF EXISTS income_sources;
+ALTER TABLE users DROP COLUMN IF EXISTS assets_types;

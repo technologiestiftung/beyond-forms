@@ -17,6 +17,7 @@ from src.services.user_service import (
     UserService,
     apply_profile_key,
     get_user_service,
+    ordered_profile_items,
 )
 from src.services.berlin_districts import sync_berlin_district
 from src.utils import get_google_id_token
@@ -103,7 +104,7 @@ def update_user_profile(
     logger.info(f"[DEBUG] update_user_profile payload: {payload.model_dump(exclude_unset=True)}")
     exclude_keys = {"validate_entire_form"}
     address_changed = False
-    for key, value in payload.model_dump(exclude_unset=True).items():
+    for key, value in ordered_profile_items(payload.model_dump(exclude_unset=True)):
         if key not in exclude_keys:
             if key in RELATION_KEYS:
                 # Already validated by the request schema, so hand over the model

@@ -1,0 +1,2353 @@
+# Run 'uv run --package orchestration-middleware-service forms/scripts/validate_mappings.py'
+# to verify substitutions. Expressions wrapped in {{ }} are treated as JEXL.
+# See JEXL syntax: https://commons.apache.org/proper/commons-jexl/reference/syntax.html
+
+["p1_antrag_auf_leistungen"]
+type = "checkbox"
+description = "Antrag auf Leistungen"
+value = "{{ true }}"
+
+["p1_bezirksamt"]
+type = "choice"
+description = "Bezirksamt"
+options = [
+  " ",
+  "Charlottenburg-Wilmersdorf",
+  "Friedrichshain-Kreuzberg",
+  "Lichtenberg",
+  "Marzahn-Hellersdorf",
+  "Mitte",
+  "Neukölln",
+  "Pankow",
+  "Reinickendorf",
+  "Spandau",
+  "Steglitz-Zehlendorf",
+  "Tempelhof-Schöneberg",
+  "Treptow-Köpenick"
+]
+value = "{{ district ? district : ' ' }}"
+
+["p1_geschäftsbereich"]
+type = "choice"
+description = "Geschäftsbereich"
+options = [
+  " ",
+  "Soziales"
+]
+value = "Soziales"
+
+["p1_personenziffer_2_antragsteller"]
+type = "checkbox"
+description = "Personenziffer 2 Antragsteller"
+value = "{{ false }}"
+
+["p1_personenziffer_1_name,_gegebenenfalls_geburtsname_und_vorname"]
+type = "string"
+description = "Personenziffer 1 Name, gegebenenfalls Geburtsname und Vorname"
+value = "{{ last_name && first_name ? last_name + (birth_name ? ' (' + birth_name + ')' : '') + ', ' + first_name : '' }}"
+
+["p1_personenziffer_2_ehegatte_nicht_getrennt_lebend"]
+type = "radio"
+description = "Personenziffer 2 Ehegatte nicht getrennt leben"
+options = [
+  "Ja"
+]
+value = "{{ partner && partner.association_type == 'Spouse' && partner.lives_in_household ? 'Ja' : '' }}"
+
+["p1_personenziffer_2_partner(_in)_in_eheähnlicher_gemeinschaft"]
+type = "radio"
+description = "Personenziffer 2 Partner( in) in eheähnlicher Gemeinschaft"
+options = [
+  "0"
+]
+value = "{{ partner && partner.association_type == 'Cohabiting Partner' ? '0' : '' }}"
+
+["p1_personenziffer_1_geburtsdatum"]
+type = "string"
+description = "Personenziffer 1 Geburtsdatum"
+value = "{{ date_of_birth ? date_of_birth : '' }}"
+
+["p1_personenziffer_1_geburtsort,_kreis,_land"]
+type = "string"
+description = "Personenziffer 1 Geburtsort/Kreis/Land"
+value = "{{ place_of_birth ? place_of_birth : '' }}"
+
+["p1_personenziffer_1_geschlecht_männlich"]
+type = "radio"
+description = "Personenziffer 1 Geschlecht männlich"
+options = [
+  "Ja"
+]
+value = "{{ legal_gender == 'Male' ? 'Ja' : '' }}"
+
+["p1_personenziffer_2_lebenspartner_nicht_getrennt_lebend"]
+type = "radio"
+description = "Personenziffer 2 Lebenspartner nicht getrennt lebend"
+options = [
+  "Ja"
+]
+value = "{{ partner && partner.association_type == 'Registered Partner' && partner.lives_in_household ? 'Ja' : '' }}"
+
+["p1_personenziffer_1_geschlecht_weiblich"]
+type = "radio"
+description = "Personenziffer 1 Geschlecht weiblich"
+options = [
+  "Ja"
+]
+value = "{{ legal_gender == 'Female' ? 'Ja' : '' }}"
+
+["p1_personenziffer_1_geschlecht_divers"]
+type = "radio"
+description = "Personenziffer 1 Geschlecht divers"
+options = [
+  "Ja"
+]
+value = "{{ legal_gender == 'Diverse' ? 'Ja' : '' }}"
+
+["p1_personenziffer_2_geschlecht_männlich"]
+type = "radio"
+description = "Personenziffer 2 Geschlecht männlich"
+options = [
+  "Ja"
+]
+value = "{{ partner && partner.legal_gender == 'Male' ? 'Ja' : '' }}"
+
+["p1_personenziffer_2_geschlecht_weiblich"]
+type = "radio"
+description = "Personenziffer 2 Geschlecht weiblich"
+options = [
+  "Ja"
+]
+value = "{{ partner && partner.legal_gender == 'Female' ? 'Ja' : '' }}"
+
+["p1_personenziffer_2_geschlecht_divers"]
+type = "radio"
+description = "Personenziffer 2 Geschlecht divers"
+options = [
+  "Ja"
+]
+value = "{{ partner && partner.legal_gender == 'Diverse' ? 'Ja' : '' }}"
+
+["p1_personenziffer_2_name,_gegebenenfalls_geburtsname,_vorname"]
+type = "string"
+description = "Personenziffer 2 Name, gegebenenfalls Geburtsname, Vorname"
+value = "{{ partner && partner.last_name && partner.first_name ? partner.last_name + (partner.birth_name && partner.birth_name != partner.last_name ? ' (' + partner.birth_name + ')' : '') + ', ' + partner.first_name : '' }}"
+
+["p1_personenziffer_1_familienstand"]
+type = "radio"
+description = "Personenziffer 1 Familienstand "
+options = [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6"
+]
+option_labels = { "0" = "ledig verheiratet seit Bitte", "1" = "eheähnliche verheiratet dauernd seit Bitte Anlage 1", "2" = "verheiratet seit Bitte", "3" = "dauernd getrennt lebend seit Bitte Anlage 1", "4" = "eingetragene getrennt lebend geschieden   Buchstabe A ausfüllen", "5" = "geschieden  verwitwet  Buchstabe A ausfüllen", "6" = "verwitwet  ausfüllen" }
+value = "{{ marital_status == 'Single' ? '0' : marital_status == 'Cohabiting' ? '1' : marital_status == 'Married' ? '2' : marital_status == 'Permanently Separated' ? '3' : marital_status == 'Registered Civil Partnership' ? '4' : marital_status == 'Divorced' ? '5' : marital_status == 'Widowed' ? '6' : '0' }}"
+
+["p1_personenziffer_2_geburtsort/kreis/land"]
+type = "string"
+description = "Personenziffer 2 Geburtsort/Kreis/Land"
+value = "{{ partner && partner.place_of_birth ? partner.place_of_birth : '' }}"
+
+["p1_personenziffer_1_familienstand_seit"]
+type = "string"
+description = "Personenziffer 1 Familienstand seit"
+value = "{{ married_since ? married_since : '' }}"
+
+["p1_personenziffer_2_geburtsdatum"]
+type = "string"
+description = "Personenziffer 2 Geburtsdatum"
+value = "{{ partner && partner.date_of_birth ? partner.date_of_birth : '' }}"
+
+["p1_personenziffer_1_staatsangehörigkeit_deutsch"]
+type = "checkbox"
+description = "Personenziffer 1 Staatsangehörigkeit deutsch"
+value = "{{ is_german_citizen == true }}"
+
+["p1_personenziffer_1_andere_staatsangehörigkeit"]
+type = "checkbox"
+description = "Personenziffer 1 andere Staatsangehörigkeit"
+value = "{{ is_german_citizen == false }}"
+
+["p1_personenziffer_1_name_der_anderen_staatsangehörigkeit"]
+type = "string"
+description = "Personenziffer 1 Name der anderen Staatsangehörigkeit"
+value = "{{ nationality ? nationality : '' }}"
+
+["p1_personenziffer_2_staatsangehörigkeit_deutsch"]
+type = "checkbox"
+description = "Personenziffer 2 Staatsangehörigkeit deutsch"
+value = "{{ partner && (partner.is_german_citizen == true || partner.nationality == 'DE') }}"
+
+["p1_personenziffer_2_andere_staatsangehörigkeit"]
+type = "checkbox"
+description = "Personenziffer 2 andere Staatsangehörigkeit"
+value = "{{ partner && partner.nationality && partner.nationality != 'DE' }}"
+
+["p1_personenziffer_2_name_der_anderen_staatsangehörigkeit"]
+type = "string"
+description = "Personenziffer 2 Name der anderen Staatsangehörigkeit"
+value = "{{ partner && partner.nationality && partner.nationality != 'DE' ? partner.nationality_de : '' }}"
+
+["p1_personenziffer_1_personaldokument_ausgestellt_von_(dienststelle)"]
+type = "string"
+description = "Personenziffer 1 Personaldokument ausgestellt von (Dienststelle)"
+value = "{{ documents.identity_document && documents.identity_document.issuing_authority ? documents.identity_document.issuing_authority : '' }}"
+
+["p1_personenziffer_2_pesonaldokument_ausgestellt_von_dienststelle"]
+type = "string"
+description = "Personenziffer 2 Peronaldokument ausgestellt von Dienststelle"
+value = "{{ partner && partner.id_document_issuing_authority ? partner.id_document_issuing_authority : '' }}"
+
+["p1_personenziffer_1_personaldokument_gültig_bis"]
+type = "string"
+description = "Personenziffer 1 Personaldokument gültig bis"
+value = "{{ documents.identity_document && documents.identity_document.valid_until ? documents.identity_document.valid_until : '' }}"
+
+["p1_personenziffer_2_personaldokument_gültig_bis"]
+type = "string"
+description = "Personenziffer 2 Personaldokument gültig bis"
+value = "{{ partner && partner.id_document_valid_until ? partner.id_document_valid_until : '' }}"
+
+["p1_personenziffer_1_bisher_keine_leistungen_erhalten"]
+type = "radio"
+description = "Personenziffer 1 bisher keine Leistungen erhalten"
+options = [
+  "Ja"
+]
+value = "{{ has_received_previous_benefits == false ? 'Ja' : '' }}"
+
+["p1_personenziffer_2_bisher_keine_leistungen_erhalten"]
+type = "radio"
+description = "Personenziffer 2 bisher keine Leistungen erhalten"
+options = [
+  "Ja"
+]
+value = "{{ partner && partner.has_received_previous_benefits == false ? 'Ja' : '' }}"
+
+["p1_personenziffer_1_bereits_leistungen_erhalten"]
+type = "radio"
+description = "Personenziffer 1 bereits Leistungen erhalten"
+options = [
+  "Ja"
+]
+value = "{{ has_received_previous_benefits == true ? 'Ja' : '' }}"
+
+["p1_personenziffer_2_bereits_leistungen_erhalten"]
+type = "radio"
+description = "Personenziffer 2 bereits Leistungen erhalten"
+options = [
+  "Ja"
+]
+value = "{{ partner && partner.has_received_previous_benefits == true ? 'Ja' : '' }}"
+
+["p1_personenziffer_1_von_(dienststelle)"]
+type = "string"
+description = "Personenziffer 1 von (Dienststelle)"
+value = "{{ previous_benefits_authority ? previous_benefits_authority : '' }}"
+
+["p1_personenziffer_2__von_(dienststelle)"]
+type = "string"
+description = "Personenziffer 2  von (Dienststelle)"
+value = "{{ partner && partner.previous_benefits_authority ? partner.previous_benefits_authority : '' }}"
+
+["p1_personenziffer_1_leistungen_erhalten_bis"]
+type = "string"
+description = "Personenziffer 1 Leistungen erhalten bis"
+value = "{{ previous_benefits_period ? previous_benefits_period : '' }}"
+
+["p1_personenziffer_1_geschäftszeichen"]
+type = "string"
+description = "1. Person Geschäftszeichen"
+value = "{{ previous_benefits_ref_no ? previous_benefits_ref_no : '' }}"
+
+["p1_personenziffer_2__leistungen_erhalten_bis"]
+type = "string"
+description = "Personenziffer 2  Leistungen erhalten bis"
+value = "{{ partner && partner.previous_benefits_period ? partner.previous_benefits_period : '' }}"
+
+["p1_personenziffer_2_geschäftszeichen"]
+type = "string"
+description = "Personenziffer 2 Geschäftszeichen "
+value = "{{ partner && partner.previous_benefits_ref_no ? partner.previous_benefits_ref_no : '' }}"
+
+["p1_personenziffer_1_es_besteht_eine_betreuung"]
+type = "checkbox"
+description = "Personenziffer 1 es besteht eine Betreuung"
+value = "{{ has_guardian == true }}"
+
+["p1_personenziffer_2__es_besteht_eine_betreuung"]
+type = "checkbox"
+description = "Personenziffer 2 Es besteht eine Betreuung"
+value = "{{ partner && partner.has_guardian == true }}"
+
+["p1_personenziffer_1_es_besteht_eine_beistandschaft"]
+type = "checkbox"
+description = "Personenziffer 1 es besteht eine Beistandschaft"
+value = "{{ has_custodian == true }}"
+
+["p1_personenziffer_2_es_besteht_eine_beistandschaft"]
+type = "checkbox"
+description = "Personenziffer 2 Es besteht eine Beistandschaft"
+value = "{{ partner && partner.has_custodian == true }}"
+
+["p1_personenziffer_1_heimatvertriebene/r_(aussiedler/in)_ausweis_a"]
+type = "checkbox"
+description = "Personenziffer 1 Heimatvertriebene/r (Aussiedler/in) Ausweis A"
+value = "{{ displaced_status == 'Expellee (Resettler)' }}"
+
+["p1_personenziffer_2_heimatvertriebene/r_(aussiedler/in)_ausweis_a"]
+type = "checkbox"
+description = "Personenziffer 2 Heimatvertriebene/r (Aussiedler/in)Ausweis A"
+value = "{{ partner && partner.displaced_status == 'Expellee (Resettler)' }}"
+
+["p1_personenziffer_1_vertriebene/r_(aussiedler/in)_ausweis_b"]
+type = "checkbox"
+description = "Personenziffer 1 Vertriebene/r (Aussiedler/in) Ausweis B"
+value = "{{ displaced_status == 'Displaced Person (Resettler)' }}"
+
+["p1_personenziffer_1_ausgestellt_am"]
+type = "string"
+description = "Personenziffer 1 ausgestellt am"
+value = "{{ displaced_issued_on ? displaced_issued_on : '' }}"
+
+["p1_personenziffer_2_vertriebene/r_(aussiedler/in)_ausweis_b"]
+type = "checkbox"
+description = "Personenziffer 2 Vertriebene/r (Aussiedler/in) Ausweis B"
+value = "{{ partner && partner.displaced_status == 'Displaced Person (Resettler)' }}"
+
+["p1_personenziffer_2_ausgestellt_am_2"]
+type = "string"
+description = "Personenziffer 2 ausgestellt am_2"
+value = "{{ partner && partner.displaced_issued_on ? partner.displaced_issued_on : '' }}"
+
+["p1_personenziffer_1_spätaussiedler/in"]
+type = "checkbox"
+description = "Personenziffer 1 Spätaussiedler/in"
+value = "{{ displaced_status == 'Late Resettler' }}"
+
+["p1_personenziffer_2_spätaussiedler/in"]
+type = "checkbox"
+description = "Personenziffer 2 Spätaussiedler/in"
+value = "{{ partner && partner.displaced_status == 'Late Resettler' }}"
+
+["p1_personenziffer_1_ehegatte_oder_abkömmling_eines_spätaussiedlers/in"]
+type = "checkbox"
+description = "Personenziffer 1 Ehegatte oder Abkömmling eines Spätaussiedlers/in"
+value = "{{ displaced_status == 'Spouse or Descendant of a Late Resettler' }}"
+
+["p1_personenziffer_1_ausgestellt_von_(dienststelle)"]
+type = "string"
+description = "Personenziffer 1 ausgestellt von (Dienststelle)"
+value = "{{ displaced_issued_by ? displaced_issued_by : '' }}"
+
+["p1_personenziffer_2_ehegatte_oder_abkömmling_eines_spätaussiedlers/in"]
+type = "checkbox"
+description = "Personenziffer 2 Ehegatte oder Abkömmling eines Spätaussiedlers/in"
+value = "{{ partner && partner.displaced_status == 'Spouse or Descendant of a Late Resettler' }}"
+
+["p1_personenziffer_2_ausgestellt_von_(dienststelle)"]
+type = "string"
+description = "Personenziffer 2 ausgestellt von (Dienststelle)"
+value = "{{ partner && partner.displaced_issued_by ? partner.displaced_issued_by : '' }}"
+
+["p1_personenziffer_1_sowjetzonenflüchtling_ausweis_c"]
+type = "checkbox"
+description = "Personenziffer 1 Sowjetzonenflüchtling Ausweis C"
+value = "{{ displaced_status == 'Soviet Zone Refugee' }}"
+
+["p1_personenziffer_2_sowjetzonenflüchtling_ausweis_c"]
+type = "checkbox"
+description = "Personenziffer 2 Sowjetzonenflüchtling Ausweis C"
+value = "{{ partner && partner.displaced_status == 'Soviet Zone Refugee' }}"
+
+["p2_personenziffer_1_schwerbehindertenausweis_gültig_bis_3"]
+type = "string"
+description = "Personenziffer 1 Schwerbehindertenausweis gültig bis_3"
+value = "{{ disability_valid_until ? disability_valid_until : '' }}"
+
+["p2_personenziffer_1_merkzeichen_g,_ag"]
+type = "string"
+description = "Personenziffer 1 Merkzeichen G, aG"
+value = "{{ merkzeichen ? merkzeichen : '' }}"
+
+["p2_personenziffer_2_schwerbehindertenausweis_gültig_bis"]
+type = "string"
+description = "Personenziffer 2 Schwerbehindertenausweis gültig bis"
+value = "{{ partner && partner.disability_valid_until ? partner.disability_valid_until : '' }}"
+
+["p2_personenziffer_2_merkzeichen_g,_ag"]
+type = "string"
+description = "Personenziffer 2 Merkzeichen G, aG "
+value = "{{ partner && partner.merkzeichen ? partner.merkzeichen : '' }}"
+
+["p2_personenziffer_1_antrag_gestellt?"]
+type = "radio"
+description = "Personenziffer 1 Antrag gestellt?"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja Nein Antrag gestellt? Ja Nein", "Nein" = "Nein Antrag gestellt? Ja Nein" }
+value = "{{ disability_application_pending == true ? 'Ja' : disability_application_pending == false ? 'Nein' : '' }}"
+
+["p2_personenziffer_2_antrag_gestellt?"]
+type = "radio"
+description = "Personenziffer 2 Antrag gestellt?"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja Nein", "Nein" = "Nein" }
+value = "{{ partner && partner.disability_application_pending == true ? 'Ja' : (partner && partner.disability_application_pending == false ? 'Nein' : '') }}"
+
+["p2_personenziffer_1_sozialversicherung_keine_(begründung_auf_seite_6_x)"]
+type = "radio"
+description = "Personenziffer 1 Sozialversicherung keine (Begründung auf Seite 6 X)"
+options = [
+  "Nein"
+]
+value = "{{ social_security_type == 'None' ? 'Nein' : '' }}"
+
+["p2_personenziffer_1_krankenversichert_bei"]
+type = "string"
+description = "Personenziffer 1 Krankenversichert bei"
+value = "{{ health_insurance_provider ? health_insurance_provider : '' }}"
+
+["p2_personenziffer_2_sozialversicherung_keine_(begründung_auf_seite_6_x)"]
+type = "radio"
+description = "Personenziffer 2 Sozialversicherung keine (Begründung auf Seite 6 X)"
+options = [
+  "Ja"
+]
+value = "{{ partner && partner.social_security_type == 'None' ? 'Ja' : '' }}"
+
+["p2_personenziffer_2_krankenversichert_bei"]
+type = "string"
+description = "Personenziffer 2 Krankenversichert bei"
+value = "{{ partner && partner.health_insurance_provider ? partner.health_insurance_provider : '' }}"
+
+["p2_personenziffer_1_rentenversicherung"]
+type = "radio"
+description = "Personenziffer 1 Rentenversicherung"
+options = [
+  "Ja"
+]
+value = "{{ social_security_type == 'Pension Insurance' ? 'Ja' : '' }}"
+
+["p2_personenziffer_2_rentenversicherung"]
+type = "radio"
+description = "Personenziffer 2 Rentenversicherung"
+options = [
+  "Ja"
+]
+value = "{{ partner && partner.social_security_type == 'Pension Insurance' ? 'Ja' : '' }}"
+
+["p2_personenziffer_1_pflegeversicherung"]
+type = "checkbox"
+description = "Personenziffer 1 Pflegeversicherung"
+value = "{{ social_security_type == 'Long-term Care Insurance' }}"
+
+["p2_personenziffer_1_rentenversichert_bei"]
+type = "string"
+description = "Personenziffer 1 Rentenversichert bei"
+value = "{{ pension_insurance_provider ? pension_insurance_provider : '' }}"
+
+["p2_personenziffer_2_pflegeversicherung"]
+type = "checkbox"
+description = "Personenziffer 2 Pflegeversicherung"
+value = "{{ partner && partner.social_security_type == 'Long-term Care Insurance' }}"
+
+["p2_personenziffer_2_rentenversichert_bei"]
+type = "string"
+description = "Personenziffer 2 Rentenversichert bei"
+value = "{{ partner && partner.pension_insurance_provider ? partner.pension_insurance_provider : '' }}"
+
+["p2_personenziffer_1_rentenversicherungsnummer"]
+type = "string"
+description = "1. Person Rentenversicherungsnummer"
+value = "{{ pension_insurance_no ? pension_insurance_no : '' }}"
+
+["p2_personenziffer_2_rentenversicherungsnummer"]
+type = "string"
+description = "Personenziffer 2 Rentenversicherungsnummer"
+value = "{{ partner && partner.pension_insurance_no ? partner.pension_insurance_no : '' }}"
+
+["p2_personenziffer_1_art_der_krankenversicherung"]
+type = "radio"
+description = "Personenziffer 1 Art der Krankenversicherung"
+options = [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4"
+]
+option_labels = { "0" = "Pflichtversicherung Pflichtversicherung", "1" = "Freiwillige Versicherung Freiwillige Versicherung", "2" = "Familienversicherung (1) Familienversicherung (1)", "3" = "Private Versicherung Private Versicherung", "4" = "Betreuung der Krankenkassen nach § 264 SGB V Betreuung der Krankenkassen" }
+value = "{{ health_insurance_status == 'Compulsory Insurance' ? '0' : health_insurance_status == 'Voluntary Insurance' ? '1' : health_insurance_status == 'Family Insurance' ? '2' : health_insurance_status == 'Private Insurance' ? '3' : health_insurance_status == 'Care by Health Funds under § 264 SGB V' ? '4' : '' }}"
+
+["p2_personenziffer_2_art_der_krankenversicherung"]
+type = "radio"
+description = "Personenziffer 2 Art der Krankenversicherung"
+options = [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4"
+]
+option_labels = { "0" = "Pflichtversicherung", "1" = "Freiwillige Versicherung", "2" = "Familienversicherung (1)", "3" = "Private Versicherung", "4" = "Betreuung der Krankenkassen nach § 264 SGB V" }
+value = "{{ partner && partner.health_insurance_status == 'Compulsory Insurance' ? '0' : (partner && partner.health_insurance_status == 'Voluntary Insurance' ? '1' : (partner && partner.health_insurance_status == 'Family Insurance' ? '2' : (partner && partner.health_insurance_status == 'Private Insurance' ? '3' : (partner && partner.health_insurance_status == 'Care by Health Funds under § 264 SGB V' ? '4' : '')))) }}"
+
+["p2_personenziffer_1__sind_sie_pflegebedürftig?"]
+type = "radio"
+description = "Personenziffer 1  Sind Sie pflegebedürftig?"
+options = [
+  "Ja",
+  "3"
+]
+option_labels = { "Ja" = "Nein Nein", "3" = "Ja Stufe: Ja Stufe:" }
+value = "{{ is_care_dependent == true ? '3' : is_care_dependent == false ? 'Ja' : '' }}"
+
+["p2_personenziffer_2__sind_sie_pflegebedürftig?"]
+type = "radio"
+description = "Personenziffer 2 Sind Sie pflegebedürftig?"
+options = [
+  "0",
+  "1"
+]
+option_labels = { "0" = "Nein", "1" = "Ja Stufe:" }
+value = "{{ partner && partner.is_care_dependent == true ? '1' : (partner && partner.is_care_dependent == false ? '0' : '') }}"
+
+["p2_personenziffer_1_stufe_der_pflegebedürftigkeit"]
+type = "string"
+description = "Personenziffer 1 Stufe der Pflegebedürftigkeit"
+value = "{{ documents.care_level_notice && documents.care_level_notice.care_level ? documents.care_level_notice.care_level : '' }}"
+
+["p2_personenziffer_2_stufe_der_pflegebedürftigkeit"]
+type = "string"
+description = "Personenziffer 2 Stufe der Pflegebedürftigkeit "
+value = "{{ partner && partner.care_level ? partner.care_level : '' }}"
+
+["p2_personenziffer_1_unterbringung_in_stationärer_einrichtung?"]
+type = "radio"
+description = "Personenziffer 1 Unterbringung in stationärer Einrichtung?"
+options = [
+  "Ja",
+  "1"
+]
+option_labels = { "Ja" = "Nein Ja, Zuweisung Nein Ja, Zuweisung", "1" = "Ja, Zuweisung Nein Ja, Zuweisung" }
+value = "{{ has_inpatient_facility_accommodation == true ? '1' : has_inpatient_facility_accommodation == false ? 'Ja' : '' }}"
+
+["p2_personenziffer_2_unterbringung_in_stationärer_einrichtung?"]
+type = "radio"
+description = "Personenziffer 2 Unterbringung in stationärer Einrichtung?"
+options = [
+  "Ja",
+  "1"
+]
+option_labels = { "Ja" = "Nein Ja, Zuweisung", "1" = "Ja, Zuweisung" }
+value = "{{ partner && partner.has_inpatient_facility_accommodation == true ? '1' : (partner && partner.has_inpatient_facility_accommodation == false ? 'Ja' : '') }}"
+
+["p2_personenziffer_1_zuweisung_vom"]
+type = "string"
+description = "Personenziffer 1 Zuweisung vom"
+value = "{{ inpatient_facility_move_in_date ? inpatient_facility_move_in_date : '' }}"
+
+["p2_personenziffer_1_zuweisung_bis"]
+type = "string"
+description = "Personenziffer 1  Zuweisung bis"
+value = "{{ inpatient_facility_assigned_until ? inpatient_facility_assigned_until : '' }}"
+
+["p2_personenziffer_2_zuweisung_vom"]
+type = "string"
+description = "Personenziffer 2 Zuweisung  vom"
+value = "{{ partner && partner.inpatient_facility_assigned_from ? partner.inpatient_facility_assigned_from : '' }}"
+
+["p2_personenziffer_2_zuweisung_bis"]
+type = "string"
+description = "Personenziffer 2 Zuweisung bis"
+value = "{{ partner && partner.inpatient_facility_assigned_until ? partner.inpatient_facility_assigned_until : '' }}"
+
+["p2_personenziffer_1_liegt_bei_ihnen_eine_bereits_begutachtete_volle_erwerbsminderung_vor?"]
+type = "radio"
+description = "Personenziffer 1 Liegt bei Ihnen eine bereits begutachtete volle Erwerbsminderung vor?"
+options = [
+  "Nein",
+  "Ja"
+]
+option_labels = { "Nein" = "Nein, dann bitte alle weiteren Nein, dann bitte alle weiteren", "Ja" = "Ja, weiter bei Punkt III Ja, weiter bei Punkt III" }
+value = "{{ has_permanent_reduction_in_earning_capacity == true ? 'Ja' : has_permanent_reduction_in_earning_capacity == false ? 'Nein' : '' }}"
+
+["p2_personenziffer_2_liegt_bei_ihnen_eine_bereits_begutachtete_volle_erwerbsminderung_vor?"]
+type = "radio"
+description = "Personenziffer 2 Liegt bei Ihnen eine bereits begutachtete volle Erwerbsminderung vor?"
+options = [
+  "Nein",
+  "Ja"
+]
+option_labels = { "Nein" = "Nein, dann bitte alle weiteren", "Ja" = "Ja, weiter bei Punkt III" }
+value = "{{ partner && partner.has_permanent_reduction_in_earning_capacity == true ? 'Ja' : (partner && partner.has_permanent_reduction_in_earning_capacity == false ? 'Nein' : '') }}"
+
+["p2_personenziffer_1_unbefristete_erwerbsminderung?"]
+type = "radio"
+description = "Personenziffer 1 Unbefristete Erwerbsminderung?"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja Ja", "Nein" = "Nein Nein" }
+value = "{{ documents.disability_decision && documents.disability_decision.is_permanent == true ? 'Ja' : documents.disability_decision && documents.disability_decision.is_permanent == false ? 'Nein' : '' }}"
+
+["p2_personenziffer_2_unbefristete_erwerbsminderung?"]
+type = "radio"
+description = "Personenziffer 2 Unbefristete Erwerbsminderung?"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja", "Nein" = "Nein" }
+value = "{{ partner && partner.reduced_work_capacity_is_permanent == true ? 'Ja' : (partner && partner.reduced_work_capacity_is_permanent == false ? 'Nein' : '') }}"
+
+["p2_personenziffer_1_für_welchen_zeitraum?"]
+type = "string"
+description = "Personenziffer 1 für welchen Zeitraum?"
+value = "{{ reduced_work_capacity_start_date ? reduced_work_capacity_start_date : '' }}{{ reduced_work_capacity_start_date && reduced_work_capacity_end_date ? ' bis ' : '' }}{{ reduced_work_capacity_end_date ? reduced_work_capacity_end_date : '' }}"
+
+["p2_personenziffer_2_für_welchen_zeitraum?"]
+type = "string"
+description = "Personenziffer 2 für welchen Zeitraum?"
+value = "{{ partner && partner.reduced_work_capacity_start_date ? partner.reduced_work_capacity_start_date : '' }}{{ partner && partner.reduced_work_capacity_start_date && partner.reduced_work_capacity_end_date ? ' bis ' : '' }}{{ partner && partner.reduced_work_capacity_end_date ? partner.reduced_work_capacity_end_date : '' }}"
+
+["p3_personenziffer_1_einschätzung_zum_umfang_der_erwerbstätigkeit_von_mindestens_3_stunden_täglich_auf_dem_arbeitsmarkt"]
+type = "radio"
+description = "Personenziffer 1 Einschätzung zum Umfang der Erwerbstätigkeit von mindestens 3 Stunden täglich auf dem Arbeitsmarkt"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja Ja", "Nein" = "Nein, weil Nein, weil" }
+value = "{{ can_work_at_least_3h_daily == true ? 'Ja' : (can_work_at_least_3h_daily == false ? 'Nein' : '') }}"
+
+["p3_personenziffer_2_einschätzung_zum_umfang_der_erwerbstätigkeit_von_mindestens_3_stunden_täglich_auf_dem_arbeitsmarkt"]
+type = "radio"
+description = "Personenziffer 2 Einschätzung zum Umfang der Erwerbstätigkeit von mindestens 3 Stunden täglich auf dem Arbeitsmarkt"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja", "Nein" = "Nein, weil" }
+value = "{{ partner && partner.can_work_at_least_3h_daily == true ? 'Ja' : (partner && partner.can_work_at_least_3h_daily == false ? 'Nein' : '') }}"
+
+["p3_personenziffer_1_nein,_weil_(begründung)"]
+type = "string"
+description = "Personenziffer 1 Nein, weil (Begründung)"
+value = "{{ reduced_work_capacity_reason ? reduced_work_capacity_reason : '' }}"
+
+["p3_personenziffer_2_nein,_weil_(begründung)"]
+type = "string"
+description = "Personenziffer 2 Nein, weil (Begründung)"
+value = "{{ partner && partner.reduced_work_capacity_reason ? partner.reduced_work_capacity_reason : '' }}"
+
+["p3_personenziffer_1_umfang_und_art_der_tätigkeit"]
+type = "string"
+description = "Personenziffer 1 Umfang und Art der Tätigkeit"
+value = "{{ work_scope_and_type ? work_scope_and_type : '' }}"
+
+["p3_personenziffer_2_umfang_und_art_der_tätigkeit"]
+type = "string"
+description = "Personenziffer 2 Umfang und Art der Tätigkeit"
+value = "{{ partner && partner.work_scope_and_type ? partner.work_scope_and_type : '' }}"
+
+["p3_personenziffer_1_arbeitgeber"]
+type = "string"
+description = "Personenziffer 1 Arbeitgeber"
+value = "{{ employer_name ? employer_name : '' }}"
+
+["p3_personenziffer_2_arbeitgeber"]
+type = "string"
+description = "Personenziffer 2 Arbeitgeber"
+value = "{{ partner && partner.employer_name ? partner.employer_name : '' }}"
+
+["p3_personenziffer_1_auszubildender_oder_student?"]
+type = "radio"
+description = "Personenziffer 1 Auszubildender oder Student?"
+options = [
+  "Nein",
+  "Ja"
+]
+option_labels = { "Nein" = "Nein, Ja, in Nein, Ja, in", "Ja" = "Ja, in Nein, Ja, in" }
+value = "{{ is_student_or_trainee == true ? 'Ja' : is_student_or_trainee == false ? 'Nein' : '' }}"
+
+["p3_personenziffer_2_auszubildender_oder_student?"]
+type = "radio"
+description = "Personenziffer 2 Auszubildender oder Student?"
+options = [
+  "Nein",
+  "Ja"
+]
+option_labels = { "Nein" = "Nein, Ja, in", "Ja" = "Ja, in" }
+value = "{{ partner && partner.is_student_or_trainee == true ? 'Ja' : (partner && partner.is_student_or_trainee == false ? 'Nein' : '') }}"
+
+["p3_personenziffer_1_ausbildung_oder_studium_als"]
+type = "string"
+description = "Personenziffer 1 Ausbildung oder Studium als"
+value = "{{ education_or_study_subject ? education_or_study_subject : '' }}"
+
+["p3_personenziffer_2_ausbildung_oder_studium_als"]
+type = "string"
+description = "Personenziffer 2 Ausbildung oder Studium als"
+value = "{{ partner && partner.education_or_study_subject ? partner.education_or_study_subject : '' }}"
+
+["p3_personenziffer_1_haben_sie_leistungen_nach_dem_sgb_ii_beantragt?"]
+type = "radio"
+description = "Personenziffer 2 Haben Sie Leistungen nach dem SGB II beantragt?"
+options = [
+  "Ja",
+  "0"
+]
+option_labels = { "Ja" = "Ja Nein Ja Nein", "0" = "Nein Ja Nein" }
+value = "{{ receives_other_transfer_benefits == true ? 'Ja' : receives_other_transfer_benefits == false ? '0' : '' }}"
+
+["p3_personenziffer_2_haben_sie_leistungen_nach_dem_sgb_ii_beantragt?"]
+type = "radio"
+description = "Personenziffer 2 Haben Sie Leistungen nach dem SGB II beantragt?"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja Nein", "Nein" = "Nein" }
+value = "{{ partner && partner.has_applied_for_sgb2_benefits == true ? 'Ja' : (partner && partner.has_applied_for_sgb2_benefits == false ? 'Nein' : '') }}"
+
+["p3_personenziffer_1_kunden-nr._der_agentur_für_arbeit_(falls_vorhanden)"]
+type = "string"
+description = "Personenziffer 1 Kunden-Nr. der Agentur für Arbeit (falls vorhanden)"
+value = "{{ employment_office_customer_number ? employment_office_customer_number : '' }}"
+
+["p3_personenziffer_2_kunden-nr._der_agentur_für_arbeit_(falls_vorhanden)"]
+type = "string"
+description = "Personenziffer 2 Kunden-Nr. der Agentur für Arbeit (falls vorhanden)"
+value = "{{ partner && partner.employment_office_customer_number ? partner.employment_office_customer_number : '' }}"
+
+["p3_personenziffer_1_mögliche_ausschlussgründe_für_die_grundsicherung"]
+type = "radio"
+description = "Personenziffer 1 Mögliche Ausschlussgründe für die Grundsicherung"
+options = [
+  "Nein",
+  "Ja"
+]
+option_labels = { "Nein" = "Nein Nein", "Ja" = "Ja Ja" }
+# office-only, never the filler's to answer.
+value = ""
+
+["p3_personenziffer_2_mögliche_ausschlussgründe_für_die_grundsicherung"]
+type = "radio"
+description = "Personenziffer 2 Mögliche Ausschlussgründe für die Grundsicherung"
+options = [
+  "Nein",
+  "Ja"
+]
+option_labels = { "Nein" = "Nein", "Ja" = "Ja" }
+# office-only, never the filler's to answer.
+value = ""
+
+["p3_geldinstitut"]
+type = "string"
+description = "Geldinstitut"
+value = "{{ bank_name ? bank_name : '' }}"
+
+["p3_bankleitzahl"]
+type = "string"
+description = "Bankleitzahl"
+value = "{{ blz ? blz : '' }}"
+
+["p3_kontonummer"]
+type = "string"
+description = "Kontonummer"
+value = "{{ documents.bank_details && documents.bank_details.iban ? documents.bank_details.iban : documents.bank_statements && documents.bank_statements.iban ? documents.bank_statements.iban : (iban ? iban : '') }}"
+
+["p3_kontoinhaber"]
+type = "string"
+description = "Kontoinhaber/in"
+value = "{{ documents.bank_details ? documents.bank_details.account_holder : (account_holder ? account_holder : (last_name && first_name ? last_name + ', ' + first_name : '')) }}"
+
+["p3_iban_-_nummer"]
+type = "string"
+description = "IBAN - Nummer"
+value = "{{ documents.bank_details ? documents.bank_details.iban : (documents.bank_statements ? documents.bank_statements.iban : (iban ? iban : '')) }}"
+
+["p3_bic_-_swift_-_code"]
+type = "string"
+description = "BIC - Swift - Code"
+value = "{{ bic ? bic : '' }}"
+
+["p3_anschrift"]
+type = "string"
+description = "Anschrift"
+value = "{{ street && house_number && zip_code && city ? street + ' ' + house_number + ', ' + zip_code + ' ' + city : '' }}"
+
+["p3_lage_der_wohnung,_etage"]
+type = "string"
+description = "Lage der Wohnung/Etage"
+value = "{{ apartment_floor_location ? apartment_floor_location : '' }}"
+
+["p3_telefonnummer"]
+type = "string"
+description = "Telefonnummer (freiwillige Angabe)"
+value = "{{ phone_number ? phone_number : '' }}"
+
+["p3_in_berlin_seit"]
+type = "string"
+description = "in Berlin seit"
+value = "{{ resident_in_berlin_since ? resident_in_berlin_since : '' }}"
+
+["p3_im_bezirk_seit"]
+type = "string"
+description = "im Bezirk seit"
+value = "{{ resident_in_district_since ? resident_in_district_since : '' }}"
+
+["p3_zuletzt_wohnhaft"]
+type = "string"
+description = "zuletzt wohnhaft"
+value = "{{ previous_address ? previous_address : '' }}"
+
+["p3_art_der_unterkunft"]
+type = "radio"
+description = "Art der Unterkunft"
+options = [
+  "0",
+  "1",
+  "2"
+]
+option_labels = { "0" = "Mietwohnung  Eigenheim", "1" = "Eigenheim  Bitte", "2" = "Eigentumswohnung  Anlage 3" }
+value = "{{ accomodation_type == 'Rental Apartment' ? '0' : accomodation_type == 'Own Home' ? '1' : accomodation_type == 'Condominium' ? '2' : '' }}"
+
+["p3_name_und_anschrift_des_vermieters"]
+type = "string"
+description = "Name und Anschrift des Vermieters"
+value = "{{ landlord_name ? landlord_name : '' }}{{ landlord_name && landlord_address ? ', ' : '' }}{{ landlord_address ? landlord_address : '' }}"
+
+["p3_haupt-_oder_untermiete"]
+type = "radio"
+description = "Haupt- oder Untermiete"
+options = [
+  "0",
+  "1"
+]
+option_labels = { "0" = "Hauptmieter/in verwandt Name des Hauptmieters", "1" = "Untermieter/in  schaft" }
+value = "{{ tenancy_status == 'Main Tenant' ? '0' : tenancy_status == 'Subtenant' ? '1' : '' }}"
+
+["p3_verhältnis_zum_hauptmieter"]
+type = "radio"
+description = "Verhältnis zum Hauptmieter"
+options = [
+  "Ja",
+  "3"
+]
+option_labels = { "Ja" = "verwandt ausfüllen,", "3" = "Wirtschaftsgemein- dann" }
+value = "{{ related_to_landlord == true ? 'Ja' : '' }}"
+
+["p3_name_des_hauptmieters"]
+type = "string"
+description = "Name des Hauptmieters"
+value = "{{ tenancy_status == 'Subtenant' && main_tenant_name ? main_tenant_name : '' }}"
+
+["p3_miete_insgesamt_in_euro_pro_monat"]
+type = "string"
+description = "Miete insgesamt in Euro pro Monat"
+# housing_costs_form.base_rent is the Kaltmiete and must not feed a "Miete insgesamt" field.
+value = "{{ documents.rental_contract && documents.rental_contract.monthly_total_rent ? documents.rental_contract.monthly_total_rent : (rent_total ? rent_total : '') }}"
+
+["p3_warmwasserkosten_in_euro_pro_monat"]
+type = "string"
+description = "Warmwasserkosten (EUR/mtl.)"
+value = "{{ hot_water_costs ? hot_water_costs : '' }}"
+
+["p3_miete_bezahlt_bis"]
+type = "string"
+description = "Miete bezahlt bis"
+value = "{{ rent_paid_until ? rent_paid_until : '' }}"
+
+["p3_mietrückstände_von_bis"]
+type = "string"
+description = "Mietrückstände von bis"
+value = "{{ rent_arrears_period ? rent_arrears_period : '' }}"
+
+["p3_mietrückstände_in_euro"]
+type = "string"
+description = "Mietrückstände in Euro"
+value = "{{ rent_arrears_amount ? rent_arrears_amount : '' }}"
+
+["p3_heizkostenvorschuss_in_euro_pro_monat"]
+type = "string"
+description = "Heizkostenvorschuss in Euro pro Monat"
+value = "{{ heating_costs ? heating_costs : '' }}"
+
+["p3_kabelfernsehen_in_euro_pro_monat"]
+type = "string"
+description = "Kabelfernsehen in Euro pro Monat"
+value = "{{ cable_tv_costs ? cable_tv_costs : '' }}"
+
+["p3_bitte_nachweis_beifügen_anzahl_der_personen_in_der_wohnung"]
+type = "string"
+description = "Anzahl der Personen in der Wohnung"
+value = "{{ persons_in_household_count ? persons_in_household_count : '' }}"
+
+["p3_gekündigt_zum"]
+type = "string"
+description = "gekündigt zum"
+value = "{{ tenancy_terminated_on ? tenancy_terminated_on : '' }}"
+
+["p4_wohngeldzahlung"]
+type = "radio"
+description = "Wohngeldzahlung"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Wohngeld wird gezahlt Bescheid", "Nein" = "Wohngeld wird nicht beifügen" }
+value = "{{ receives_wohngeld_for_other_dwelling == true ? 'Ja' : 'Nein' }}"
+
+["p4_zimmeranzahl"]
+type = "string"
+description = "Zimmeranzahl ohne Küche/Bad"
+value = "{{ number_of_rooms ? number_of_rooms : '' }}"
+
+["p4_gesamtwohnfläche"]
+type = "string"
+description = "Gesamtwohnfläche in Quadratmetern"
+value = "{{ living_area ? living_area : '' }}"
+
+["p4_sammelheizung"]
+type = "checkbox"
+description = "Sammelheizung"
+value = "{{ heating_type == 'Sammelheizung' }}"
+
+["p4_zentrale_warmwasserversorgung"]
+type = "checkbox"
+description = "Zentrale Warmwasserversorgung"
+value = ""
+
+["p4_ofenheizung"]
+type = "checkbox"
+description = "Ofenheizung"
+value = "{{ heating_type == 'Ofenheizung' }}"
+
+["p4_nachtstrom"]
+type = "checkbox"
+description = "Nachtstrom"
+value = "{{ heating_type == 'Nachtstrom' }}"
+
+["p4_gasheizung"]
+type = "checkbox"
+description = "Gasheizung"
+value = "{{ heating_type == 'Gas' || heating_type == 'Gasheizung' }}"
+
+["p4_wohnraumuntervermietung"]
+type = "radio"
+description = "Wohnraumuntervermietung"
+options = [
+  "0",
+  "1",
+  "2"
+]
+option_labels = { "0" = "Wohnraum wird  Zahl vermieteter Miete (EUR/mtl.) Zahl möbliert", "1" = "Wohnraum kann", "2" = "Wohnraum kann nicht  Grund" }
+value = "{{ sublet_room_count && sublet_room_count > 0 ? '0' : (sublet_unrentable_reason ? '2' : '') }}"
+
+["p4_zahl_vermieteter_leerzimmer"]
+type = "string"
+description = "Zahl vermieteter Leerzimmer"
+value = "{{ sublet_room_count ? sublet_room_count : '' }}"
+
+["p4_miete_in_euro_monatlich"]
+type = "string"
+description = "Miete in Euro monatlich"
+value = "{{ sublet_rent_income ? sublet_rent_income : '' }}"
+
+["p4_zahl_vermieteter_möblierter_zimmer"]
+type = "string"
+description = "Zahl vermieteter möblierter Zimmer"
+value = "{{ sublet_room_count ? sublet_room_count : '' }}"
+
+["p4_miete_für_möblierte_zimmer_in_euro_monatlich"]
+type = "string"
+description = "Miete für möblierte Zimmer in Euro monatlich"
+value = "{{ sublet_rent_income ? sublet_rent_income : '' }}"
+
+["p4_grund"]
+type = "string"
+description = "Grund der Nichtvermietbarkeit"
+value = "{{ sublet_unrentable_reason ? sublet_unrentable_reason : '' }}"
+
+["p4_freies_wohnrecht_bei_name"]
+type = "string"
+description = "freies Wohnrecht bei Name"
+value = "{{ free_housing_right_holder ? free_housing_right_holder : '' }}"
+
+["p4_freies_wohnrecht_bei_vorname"]
+type = "string"
+description = "freies Wohnrecht bei Vorname"
+value = "{{ free_housing_right_holder ? free_housing_right_holder : '' }}"
+
+["p4_freies_wohnrecht"]
+type = "checkbox"
+description = "freies Wohnrecht"
+value = false
+
+["p4_personenziffer_1_wohnanschrift/_aufenthalt_vor_aufnahme_in_die_einrichtung"]
+type = "string"
+description = "Personenziffer 1 Wohnanschrift/ Aufenthalt vor Aufnahme in die Einrichtung"
+value = "{{ inpatient_facility_last_residence ? inpatient_facility_last_residence : '' }}"
+
+["p4_personenziffer_2_wohnanschrift/_aufenthalt_vor_aufnahme_in_die_einrichtung"]
+type = "string"
+description = "Personenziffer 2 Wohnanschrift/ Aufenthalt vor Aufnahme in die Einrichtung"
+value = "{{ partner && partner.inpatient_facility_last_residence ? partner.inpatient_facility_last_residence : '' }}"
+
+["p4_personenziffer_1_verfügt_eines_ihrer_kinder_über_erhebliches_einkommen?"]
+type = "radio"
+description = "Personenziffer 1 Verfügt eines Ihrer Kinder über erhebliches Einkommen?"
+options = [
+  "0",
+  "1"
+]
+option_labels = { "0" = "Ja Nein Ja Nein", "1" = "Nein Ja Nein" }
+value = "{{ has_child_with_substantial_income == true ? '0' : (has_child_with_substantial_income == false ? '1' : '') }}"
+
+["p4_personenziffer_2_verfügt_eines_ihrer_kinder_über_erhebliches_einkommen?"]
+type = "radio"
+description = "Personenziffer 2 Verfügt eines Ihrer Kinder über erhebliches Einkommen?"
+options = [
+  "0",
+  "Ja"
+]
+option_labels = { "0" = "Ja Nein", "Ja" = "Nein" }
+value = "{{ partner && partner.has_child_with_substantial_income == true ? '0' : (partner && partner.has_child_with_substantial_income == false ? 'Ja' : '') }}"
+
+["p4_personenziffer_1_verfügen_ihre_eltern_gemeinsam_über_erhebliches_einkommen?"]
+type = "radio"
+description = "Personenziffer 1 Verfügen Ihre Eltern gemeinsam über erhebliches Einkommen?"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja Nein Ja Nein", "Nein" = "Nein Ja Nein" }
+value = "{{ have_parents_substantial_joint_income == true ? 'Ja' : (have_parents_substantial_joint_income == false ? 'Nein' : '') }}"
+
+["p4_personenziffer_2_verfügen_ihre_eltern_gemeinsam_über_erhebliches_einkommen?"]
+type = "radio"
+description = "Personenziffer 2 Verfügen Ihre Eltern gemeinsam über erhebliches Einkommen?"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja Nein", "Nein" = "Nein" }
+value = "{{ partner && partner.have_parents_substantial_joint_income == true ? 'Ja' : (partner && partner.have_parents_substantial_joint_income == false ? 'Nein' : '') }}"
+
+["p4_bewilligungsstelle,_nichtselbstständige_tätigkeit"]
+type = "string"
+description = "Bewilligungsstelle, Nichtselbstständige Tätigkeit"
+value = "{{ income_office.Employment ? income_office.Employment : '' }}"
+
+["p4_geschäftszeichen,_rentenabrechnungsnummer,_aus_nichtselbstständige_tätigkeit"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Nichtselbstständige Tätigkeit"
+value = "{{ income_reference.Employment ? income_reference.Employment : '' }}"
+
+["p4_personenziffer_1,_nichtselbstständige_tätigkeit"]
+type = "string"
+description = "Personenziffer 1, Nichtselbstständige Tätigkeit"
+value = "{{ income.Employment ? income.Employment : '' }}"
+
+["p4_personenziffer_2,_nichtselbstständige_tätigkeit"]
+type = "string"
+description = "Personenziffer 2, Nichtselbstständige Tätigkeit"
+value = "{{ partner && partner.income.Employment ? partner.income.Employment : '' }}"
+
+["p4_bewilligungsstelle,_leistungen_der_krankenkasse"]
+type = "string"
+description = "Bewilligungsstelle, Leistungen der Krankenkasse "
+value = "{{ health_insurance_provider ? health_insurance_provider : '' }}"
+
+["p4_geschäftszeichen,_rentenabrechnungsnummer,_der_krankenkasse"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, der Krankenkasse"
+value = "{{ income_reference && income_reference['Health Insurance Benefits'] ? income_reference['Health Insurance Benefits'] : '' }}"
+
+["p4_personenziffer_1,_leistungen_der_krankenkasse"]
+type = "string"
+description = "Personenziffer 1, Leistungen der Krankenkasse"
+value = "{{ income['Health Insurance Benefits'] ? income['Health Insurance Benefits'] : '' }}"
+
+["p4_personenziffer_2,_leistungen_der_krankenkasse"]
+type = "string"
+description = "Personenziffer 2, Leistungen der Krankenkasse"
+value = "{{ partner && partner.income['Health Insurance Benefits'] ? partner.income['Health Insurance Benefits'] : '' }}"
+
+["p4_bewilligungsstelle,_gewerbebetrieb"]
+type = "string"
+description = "Bewilligungsstelle, Gewerbebetrieb"
+value = "{{ income_office.Business ? income_office.Business : '' }}"
+
+["p4_geschäftszeichen,_rentenabrechnungsnummer,_aus_gewerbebetrieb"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Gewerbebetrieb"
+value = "{{ income_reference.Business ? income_reference.Business : '' }}"
+
+["p4_personenziffer_1,__gewerbebetrieb"]
+type = "string"
+description = "Personenziffer 1, Gewerbebetrieb"
+value = "{{ income.Business ? income.Business : '' }}"
+
+["p4_personenziffer_2,_gewerbebetrieb"]
+type = "string"
+description = "Personenziffer 2, Gewerbebetrieb"
+value = "{{ partner && partner.income.Business ? partner.income.Business : '' }}"
+
+["p4_bewilligungsstelle,_land-_und_forstwirtschaft"]
+type = "string"
+description = "Bewilligungsstelle, Land- und Forstwirtschaft"
+value = "{{ income_office['Agriculture and Forestry'] ? income_office['Agriculture and Forestry'] : '' }}"
+
+["p4_geschäftszeichen,_rentenabrechnungsnummer,_aus_land-_und_forstwirtschaft"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Land- und Forstwirtschaft"
+value = "{{ income_reference['Agriculture and Forestry'] ? income_reference['Agriculture and Forestry'] : '' }}"
+
+["p4_personenziffer_1,_land-_und_forstwirtschaft"]
+type = "string"
+description = "Personenziffer 1, Land- und Forstwirtschaft"
+value = "{{ income['Agriculture and Forestry'] ? income['Agriculture and Forestry'] : '' }}"
+
+["p4_personenziffer_2,_land-_und_forstwirtschaft"]
+type = "string"
+description = "Personenziffer 2, Land- und Forstwirtschaft"
+value = "{{ partner && partner.income['Agriculture and Forestry'] ? partner.income['Agriculture and Forestry'] : '' }}"
+
+["p5_bewilligungsstelle,_sonstige_selbstständige_tätigkeiten"]
+type = "string"
+description = "Bewilligungsstelle, Sonstige selbstständige Tätigkeiten"
+value = "{{ income_office['Other Self-Employment'] ? income_office['Other Self-Employment'] : '' }}"
+
+["p5_geschäftszeichen,_rentenabrechnungsnummer,_aus_sonstigen_selbstständigen_tätigkeiten"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus sonstigen selbstständigen Tätigkeiten"
+value = "{{ income_reference['Other Self-Employment'] ? income_reference['Other Self-Employment'] : '' }}"
+
+["p5_personenziffer_1,_sonstige_selbstständige_tätigkeiten"]
+type = "string"
+description = "Personenziffer 1, Sonstige selbstständige Tätigkeiten"
+value = "{{ income['Other Self-Employment'] ? income['Other Self-Employment'] : '' }}"
+
+["p5_personenziffer_2,_sonstige_selbstständige_tätigkeiten"]
+type = "string"
+description = "Personenziffer 2, Sonstige selbstständige Tätigkeiten"
+value = "{{ partner && partner.income['Other Self-Employment'] ? partner.income['Other Self-Employment'] : '' }}"
+
+["p5_bewilligungsstelle,_vermietung_und_verpachtung"]
+type = "string"
+description = "Bewilligungsstelle, Vermietung und Verpachtung"
+value = "{{ income_office['Rental and Leasing'] ? income_office['Rental and Leasing'] : '' }}"
+
+["p5_geschäftszeichen,_rentenabrechnungsnummer,_aus_vermietung_und_verpachtung"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Vermietung und Verpachtung"
+value = "{{ income_reference['Rental and Leasing'] ? income_reference['Rental and Leasing'] : '' }}"
+
+["p5_personenziffer_1,_vermietung_und_verpachtung"]
+type = "string"
+description = "Personenziffer 1, Vermietung und Verpachtung"
+value = "{{ income['Rental and Leasing'] ? income['Rental and Leasing'] : '' }}"
+
+["p5_personenziffer_2,_vermietung_und_verpachtung"]
+type = "string"
+description = "Personenziffer 2, Vermietung und Verpachtung"
+value = "{{ partner && partner.income['Rental and Leasing'] ? partner.income['Rental and Leasing'] : '' }}"
+
+["p5_bewilligungsstelle,_wohngeld/lastenzuschuss"]
+type = "string"
+description = "Bewilligungsstelle, Wohngeld/Lastenzuschuss"
+value = "{{ income_office['Housing Benefit'] ? income_office['Housing Benefit'] : '' }}"
+
+["p5_geschäftszeichen,_rentenabrechnungsnummer,_aus_wohngeld/lastenzuschuss"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Wohngeld/Lastenzuschuss"
+value = "{{ income_reference['Housing Benefit'] ? income_reference['Housing Benefit'] : '' }}"
+
+["p5_personenziffer_1,_wohngeld/lastenzuschuss"]
+type = "string"
+description = "Personenziffer 1, Wohngeld/Lastenzuschuss"
+value = "{{ income['Housing Benefit'] ? income['Housing Benefit'] : '' }}"
+
+["p5_personenziffer_2,_wohngeld/lastenzuschuss"]
+type = "string"
+description = "Personenziffer 2, Wohngeld/Lastenzuschuss"
+value = "{{ partner && partner.income['Housing Benefit'] ? partner.income['Housing Benefit'] : '' }}"
+
+["p5_bewilligungsstelle,_renten/pensionen"]
+type = "string"
+description = "Bewilligungsstelle, Renten/Pensionen"
+value = "{{ pension_insurance_provider ? pension_insurance_provider : '' }}"
+
+["p5_geschäftszeichen,_rentenabrechnungsnummer,_aus_renten/pensionen"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Renten/Pensionen"
+value = "{{ pension_insurance_no ? pension_insurance_no : '' }}"
+
+["p5_personenziffer_1,_renten/pensionen"]
+type = "string"
+description = "Personenziffer 1, Renten/Pensionen"
+value = "{{ income.Pension ? income.Pension : '' }}"
+
+["p5_personenziffer_2,_renten/pensionen"]
+type = "string"
+description = "Personenziffer 2, Renten/Pensionen"
+value = "{{ partner && partner.income.Pension ? partner.income.Pension : '' }}"
+
+["p5_bewilligungsstelle,_sozialhilfeleistungen"]
+type = "string"
+description = "Bewilligungsstelle, Sozialhilfeleistungen"
+value = "{{ income_office['Social Assistance'] ? income_office['Social Assistance'] : '' }}"
+
+["p5_geschäftszeichen,_rentenabrechnungsnummer,_aus_sozialhilfeleistungen"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Sozialhilfeleistungen"
+value = "{{ income_reference['Social Assistance'] ? income_reference['Social Assistance'] : '' }}"
+
+["p5_personenziffer_1,_sozialhilfeleistungen"]
+type = "string"
+description = "Personenziffer 1, Sozialhilfeleistungen"
+value = "{{ income['Social Assistance'] ? income['Social Assistance'] : '' }}"
+
+["p5_personenziffer_2,_sozialhilfeleistungen"]
+type = "string"
+description = "Personenziffer 2, Sozialhilfeleistungen"
+value = "{{ partner && partner.income['Social Assistance'] ? partner.income['Social Assistance'] : '' }}"
+
+["p5_bewilligungsstelle,_grundsicherungsleistungen"]
+type = "string"
+description = "Bewilligungsstelle, Grundsicherungsleistungen"
+value = "{{ income_office['Basic Security Benefits'] ? income_office['Basic Security Benefits'] : '' }}"
+
+["p5_geschäftszeichen,_rentenabrechnungsnummer,_aus_grundsicherungsleistungen"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Grundsicherungsleistungen"
+value = "{{ income_reference['Basic Security Benefits'] ? income_reference['Basic Security Benefits'] : '' }}"
+
+["p5_personenziffer_1,_grundsicherungsleistungen"]
+type = "string"
+description = "Personenziffer 1, Grundsicherungsleistungen"
+value = "{{ income['Basic Security Benefits'] ? income['Basic Security Benefits'] : '' }}"
+
+["p5_personenziffer_2,_grundsicherungsleistungen"]
+type = "string"
+description = "Personenziffer 2, Grundsicherungsleistungen"
+value = "{{ partner && partner.income['Basic Security Benefits'] ? partner.income['Basic Security Benefits'] : '' }}"
+
+["p5_bewilligungsstelle,_asylbewerberleistung"]
+type = "string"
+description = "Bewilligungsstelle, Asylbewerberleistung"
+value = "{{ income_office['Asylum Seeker Benefits'] ? income_office['Asylum Seeker Benefits'] : '' }}"
+
+["p5_geschäftszeichen,_rentenabrechnungsnummer,_aus_asylbewerberleistung"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Asylbewerberleistung "
+value = "{{ income_reference['Asylum Seeker Benefits'] ? income_reference['Asylum Seeker Benefits'] : '' }}"
+
+["p5_personenziffer_1,_asylbewerberleistung"]
+type = "string"
+description = "Personenziffer 1, Asylbewerberleistung"
+value = "{{ income['Asylum Seeker Benefits'] ? income['Asylum Seeker Benefits'] : '' }}"
+
+["p5_personenziffer_2,_asylbewerberleistung"]
+type = "string"
+description = "Personenziffer 2, Asylbewerberleistung"
+value = "{{ partner && partner.income['Asylum Seeker Benefits'] ? partner.income['Asylum Seeker Benefits'] : '' }}"
+
+["p5_bewilligungsstelle,_leistungen_nach_dem_bundesversorgungsgesetz"]
+type = "string"
+description = "Bewilligungsstelle, Leistungen nach dem Bundesversorgungsgesetz"
+value = "{{ income_office['Federal War Victims Relief'] ? income_office['Federal War Victims Relief'] : '' }}"
+
+["p5_geschäftszeichen,_rentenabrechnungsnummer,_aus_leistungen_nach_dem_bundesversorgungsgesetz"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Leistungen nach dem Bundesversorgungsgesetz"
+value = "{{ income_reference['Federal War Victims Relief'] ? income_reference['Federal War Victims Relief'] : '' }}"
+
+["p5_personenziffer_1,_leistungen_nach_dem_bundesversorgungsgesetz"]
+type = "string"
+description = "Personenziffer 1, Leistungen nach dem Bundesversorgungsgesetz"
+value = "{{ income['Federal War Victims Relief'] ? income['Federal War Victims Relief'] : '' }}"
+
+["p5_personenziffer_2,_leistungen_nach_dem_bundesversorgungsgesetz"]
+type = "string"
+description = "Personenziffer 2, Leistungen nach dem Bundesversorgungsgesetz"
+value = "{{ partner && partner.income['Federal War Victims Relief'] ? partner.income['Federal War Victims Relief'] : '' }}"
+
+["p5_bewilligungsstelle,_leistungen_des_lastenausgleichsamtes"]
+type = "string"
+description = "Bewilligungsstelle, Leistungen des Lastenausgleichsamtes"
+value = "{{ income_office['Equalisation of Burdens'] ? income_office['Equalisation of Burdens'] : '' }}"
+
+["p5_geschäftszeichen,_rentenabrechnungsnummer,_aus_leistungen_des_lastenausgleichsamtes"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Leistungen des Lastenausgleichsamtes"
+value = "{{ income_reference['Equalisation of Burdens'] ? income_reference['Equalisation of Burdens'] : '' }}"
+
+["p5_personenziffer_1,__leistungen_des_lastenausgleichsamtes"]
+type = "string"
+description = "Personenziffer 1,  Leistungen des Lastenausgleichsamtes"
+value = "{{ income['Equalisation of Burdens'] ? income['Equalisation of Burdens'] : '' }}"
+
+["p5_personenziffer_2,_leistungen_des_lastenausgleichsamtes"]
+type = "string"
+description = "Personenziffer 2, Leistungen des Lastenausgleichsamtes"
+value = "{{ partner && partner.income['Equalisation of Burdens'] ? partner.income['Equalisation of Burdens'] : '' }}"
+
+["p6_bewilligungsstelle,_leistungen_der_agentur_für_arbeit"]
+type = "string"
+description = "Bewilligungsstelle, Leistungen der Agentur für Arbeit"
+value = "{{ income_office['Employment Agency Benefits'] ? income_office['Employment Agency Benefits'] : '' }}"
+
+["p6_geschäftszeichen,_rentenabrechnungsnummer,_aus_leistungen_der_agentur_für_arbeit"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Leistungen der Agentur für Arbeit"
+value = "{{ income_reference['Employment Agency Benefits'] ? income_reference['Employment Agency Benefits'] : '' }}"
+
+["p6_personenziffer_1,_leistungen_der_agentur_für_arbeit"]
+type = "string"
+description = "Personenziffer 1, Leistungen der Agentur für Arbeit"
+value = "{{ income['Employment Agency Benefits'] ? income['Employment Agency Benefits'] : '' }}"
+
+["p6_personenziffer_2,_leistungen_der_agentur_für_arbeit"]
+type = "string"
+description = "Personenziffer 2, Leistungen der Agentur für Arbeit"
+value = "{{ partner && partner.income['Employment Agency Benefits'] ? partner.income['Employment Agency Benefits'] : '' }}"
+
+["p6_bewilligungsstelle,_kindergeld"]
+type = "string"
+description = "Bewilligungsstelle, Kindergeld"
+value = "{{ income_office['Child Benefit'] ? income_office['Child Benefit'] : '' }}"
+
+["p6_geschäftszeichen,_rentenabrechnungsnummer,_aus_kindergeld"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Kindergeld"
+value = "{{ income_reference['Child Benefit'] ? income_reference['Child Benefit'] : '' }}"
+
+["p6_personenziffer_1,_kindergeld"]
+type = "string"
+description = "Personenziffer 1, Kindergeld"
+value = "{{ income['Child Benefit'] ? income['Child Benefit'] : '' }}"
+
+["p6_personenziffer_2,_kindergeld"]
+type = "string"
+description = "Personenziffer 2, Kindergeld"
+value = "{{ partner && partner.income['Child Benefit'] ? partner.income['Child Benefit'] : '' }}"
+
+["p6_bewilligungsstelle,_kindergeldzuschlag"]
+type = "string"
+description = "Bewilligungsstelle, Kindergeldzuschlag"
+value = "{{ income_office['Child Benefit Supplement'] ? income_office['Child Benefit Supplement'] : '' }}"
+
+["p6_geschäftszeichen,_rentenabrechnungsnummer,_aus_kindergeldzuschlag"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Kindergeldzuschlag"
+value = "{{ income_reference['Child Benefit Supplement'] ? income_reference['Child Benefit Supplement'] : '' }}"
+
+["p6_personenziffer_1,_kindergeldzuschlag"]
+type = "string"
+description = "Personenziffer 1, Kindergeldzuschlag"
+value = "{{ income['Child Benefit Supplement'] ? income['Child Benefit Supplement'] : '' }}"
+
+["p6_personenziffer_2,_kindergeldzuschlag"]
+type = "string"
+description = "Personenziffer 2, Kindergeldzuschlag"
+value = "{{ partner && partner.income['Child Benefit Supplement'] ? partner.income['Child Benefit Supplement'] : '' }}"
+
+["p6_bewilligungsstelle,_elterngeld"]
+type = "string"
+description = "Bewilligungsstelle, Elterngeld"
+value = "{{ income_office['Parental Allowance'] ? income_office['Parental Allowance'] : '' }}"
+
+["p6_geschäftszeichen,_rentenabrechnungsnummer,_aus_elterngeld"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Elterngeld"
+value = "{{ income_reference['Parental Allowance'] ? income_reference['Parental Allowance'] : '' }}"
+
+["p6_personenziffer_1,_elterngeld"]
+type = "string"
+description = "Personenziffer 1, Elterngeld"
+value = "{{ income['Parental Allowance'] ? income['Parental Allowance'] : '' }}"
+
+["p6_personenziffer_2,_elterngeld"]
+type = "string"
+description = "Personenziffer 2, Elterngeld"
+value = "{{ partner && partner.income['Parental Allowance'] ? partner.income['Parental Allowance'] : '' }}"
+
+["p6_bewilligungsstelle,_ausbildungsförderung"]
+type = "string"
+description = "Bewilligungsstelle, Ausbildungsförderung"
+value = "{{ income_office['Education Grant'] ? income_office['Education Grant'] : '' }}"
+
+["p6_geschäftszeichen,_rentenabrechnungsnummer,_aus_ausbildungsförderung"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Ausbildungsförderung"
+value = "{{ income_reference['Education Grant'] ? income_reference['Education Grant'] : '' }}"
+
+["p6_personenziffer_1,_ausbildungsförderung"]
+type = "string"
+description = "Personenziffer 1, Ausbildungsförderung"
+value = "{{ income['Education Grant'] ? income['Education Grant'] : '' }}"
+
+["p6_personenziffer_2,_ausbildungsförderung"]
+type = "string"
+description = "Personenziffer 2, Ausbildungsförderung"
+value = "{{ partner && partner.income['Education Grant'] ? partner.income['Education Grant'] : '' }}"
+
+["p6_bewilligungsstelle,_unterhalt"]
+type = "string"
+description = "Bewilligungsstelle, Unterhalt"
+value = "{{ income_office.Alimony ? income_office.Alimony : '' }}"
+
+["p6_geschäftszeichen,_rentenabrechnungsnummer,_aus_unterhalt"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Unterhalt"
+value = "{{ income_reference.Alimony ? income_reference.Alimony : '' }}"
+
+["p6_personenziffer_1,_unterhalt"]
+type = "string"
+description = "Personenziffer 1, Unterhalt"
+value = "{{ income.Alimony ? income.Alimony : '' }}"
+
+["p6_personenziffer_2,_unterhalt"]
+type = "string"
+description = "Personenziffer 2, Unterhalt"
+value = "{{ partner && partner.income.Alimony ? partner.income.Alimony : '' }}"
+
+["p6_bewilligungsstelle,_unterhaltsvorschuss"]
+type = "string"
+description = "Bewilligungsstelle, Unterhaltsvorschuss"
+value = "{{ income_office['Alimony Advance'] ? income_office['Alimony Advance'] : '' }}"
+
+["p6_geschäftszeichen,_rentenabrechnungsnummer,_aus_unterhaltsvorschuss"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Unterhaltsvorschuss"
+value = "{{ income_reference['Alimony Advance'] ? income_reference['Alimony Advance'] : '' }}"
+
+["p6_personenziffer_1,_unterhaltsvorschuss"]
+type = "string"
+description = "Personenziffer 1, Unterhaltsvorschuss"
+value = "{{ income['Alimony Advance'] ? income['Alimony Advance'] : '' }}"
+
+["p6_personenziffer_2,_unterhaltsvorschuss"]
+type = "string"
+description = "Personenziffer 2, Unterhaltsvorschuss"
+value = "{{ partner && partner.income['Alimony Advance'] ? partner.income['Alimony Advance'] : '' }}"
+
+["p6_bewilligungsstelle,_privatrechtliche_geldwerte_ansprüche"]
+type = "string"
+description = "Bewilligungsstelle, Privatrechtliche geldwerte Ansprüche"
+value = "{{ income_office['Private Monetary Claims'] ? income_office['Private Monetary Claims'] : '' }}"
+
+["p6_geschäftszeichen,_rentenabrechnungsnummer,_aus_privatrechtlichen_geldwerten_ansprüchen"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Privatrechtlichen geldwerten Ansprüchen"
+value = "{{ income_reference['Private Monetary Claims'] ? income_reference['Private Monetary Claims'] : '' }}"
+
+["p6_personenziffer_1,_privatrechtliche_geldwerte_ansprüche"]
+type = "string"
+description = "Personenziffer 1, Privatrechtliche geldwerte Ansprüche"
+value = "{{ income['Private Monetary Claims'] ? income['Private Monetary Claims'] : '' }}"
+
+["p6_personenziffer_2,_privatrechtliche_geldwerte_ansprüche"]
+type = "string"
+description = "Personenziffer 2, Privatrechtliche geldwerte Ansprüche"
+value = "{{ partner && partner.income['Private Monetary Claims'] ? partner.income['Private Monetary Claims'] : '' }}"
+
+["p6_bewilligungsstelle,_steuererstattung"]
+type = "string"
+description = "Bewilligungsstelle, Steuererstattung"
+value = "{{ income_office['Tax Refund'] ? income_office['Tax Refund'] : '' }}"
+
+["p6_geschäftszeichen,_rentenabrechnungsnummer,_aus_steuererstattung"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Steuererstattung"
+value = "{{ income_reference['Tax Refund'] ? income_reference['Tax Refund'] : '' }}"
+
+["p6_personenziffer_1,_steuererstattung"]
+type = "string"
+description = "Personenziffer 1, Steuererstattung"
+value = "{{ income['Tax Refund'] ? income['Tax Refund'] : '' }}"
+
+["p6_personenziffer_2,_steuererstattung"]
+type = "string"
+description = "Personenziffer 2, Steuererstattung"
+value = "{{ partner && partner.income['Tax Refund'] ? partner.income['Tax Refund'] : '' }}"
+
+["p6_bewilligungsstelle,_kapitalerträge"]
+type = "string"
+description = "Bewilligungsstelle, Kapitalerträge"
+value = "{{ income_office['Capital Income'] ? income_office['Capital Income'] : '' }}"
+
+["p6_geschäftszeichen,_rentenabrechnungsnummer,_aus_kapitalerträgen"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus Kapitalerträgen"
+value = "{{ income_reference['Capital Income'] ? income_reference['Capital Income'] : '' }}"
+
+["p6_personenziffer_1,_kapitalerträge"]
+type = "string"
+description = "Personenziffer 1, Kapitalerträge"
+value = "{{ income['Capital Income'] ? income['Capital Income'] : '' }}"
+
+["p6_personenziffer_2,_kapitalerträge"]
+type = "string"
+description = "Personenziffer 2, Kapitalerträge"
+value = "{{ partner && partner.income['Capital Income'] ? partner.income['Capital Income'] : '' }}"
+
+["p6_bewilligungsstelle,_sonstige_einkünfte"]
+type = "string"
+description = "Bewilligungsstelle, Sonstige Einkünfte"
+value = "{{ income_office['Other Income'] ? income_office['Other Income'] : '' }}"
+
+["p6_geschäftszeichen,_rentenabrechnungsnummer,_aus_sonstigen_einkünften"]
+type = "string"
+description = "Geschäftszeichen, Rentenabrechnungsnummer, aus sonstigen Einkünften"
+value = "{{ income_reference['Other Income'] ? income_reference['Other Income'] : '' }}"
+
+["p6_personenziffer_1,_sonstige_einkünfte"]
+type = "string"
+description = "Personenziffer 1, Sonstige Einkünfte"
+value = "{{ income['Other Income'] ? income['Other Income'] : '' }}"
+
+["p6_personenziffer_2,_sonstige_einkünfte"]
+type = "string"
+description = "Personenziffer 2, Sonstige Einkünfte"
+value = "{{ partner && partner.income['Other Income'] ? partner.income['Other Income'] : '' }}"
+
+["p6_personenziffer_1,_kein_einkommen"]
+type = "radio"
+description = "Personenziffer 1, Kein Einkommen"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja Ja", "Nein" = "Nein Nein" }
+value = "{{ has_any_income ? 'Nein' : 'Ja' }}"
+
+["p6_personenziffer_2,_kein_einkommen"]
+type = "radio"
+description = "Personenziffer 2, Kein Einkommen"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja", "Nein" = "Nein" }
+value = "{{ partner && partner.has_any_income ? 'Nein' : 'Ja' }}"
+
+["p6_leistungen_nach_nr._vii_beantragt?"]
+type = "radio"
+description = "Leistungen nach Nr. VII beantragt?"
+options = [
+  "Nein",
+  "Ja"
+]
+option_labels = { "Nein" = "Nein Ja", "Ja" = "Ja" }
+value = "{{ pending_benefit_claims[0] ? 'Ja' : 'Nein' }}"
+
+["p6_personenziffer_1,_antragsdatum,_zeile_1"]
+type = "string"
+description = "Personenziffer 1, Antragsdatum, Zeile 1"
+value = "{{ pending_benefit_claims[0] && pending_benefit_claims[0].event_date ? pending_benefit_claims[0].event_date : '' }}"
+
+["p6_personenziffer_1,_art_der_leistung,_zeile_1"]
+type = "string"
+description = "Personenziffer 1, Art der Leistung, Zeile 1"
+value = "{{ pending_benefit_claims[0] && pending_benefit_claims[0].benefit_type ? pending_benefit_claims[0].benefit_type : '' }}"
+
+["p6_personenziffer_1,_dienststelle_und_geschäftszeichen,_zeile_1"]
+type = "string"
+description = "Personenziffer 1, Dienststelle und Geschäftszeichen, Zeile 1"
+value = "{{ pending_benefit_claims[0] && pending_benefit_claims[0].office_reference ? pending_benefit_claims[0].office_reference : '' }}"
+
+["p6_personenziffer_2,_antragsdatum,_zeile_1"]
+type = "string"
+description = "Personenziffer 2, Antragsdatum, Zeile 1"
+value = "{{ partner && partner.pending_benefit_claims[0] && partner.pending_benefit_claims[0].event_date ? partner.pending_benefit_claims[0].event_date : '' }}"
+
+["p6_personenziffer_2,_art_der_leistung,_zeile_1"]
+type = "string"
+description = "Personenziffer 2, Art der Leistung, Zeile 1"
+value = "{{ partner && partner.pending_benefit_claims[0] && partner.pending_benefit_claims[0].benefit_type ? partner.pending_benefit_claims[0].benefit_type : '' }}"
+
+["p6_personenziffer_2,_dienststelle_und_geschäftszeichen,_zeile_1"]
+type = "string"
+description = "Personenziffer 2, Dienststelle und Geschäftszeichen, Zeile 1"
+value = "{{ partner && partner.pending_benefit_claims[0] && partner.pending_benefit_claims[0].office_reference ? partner.pending_benefit_claims[0].office_reference : '' }}"
+
+["p6_personenziffer_1,_antragsdatum,_zeile_2"]
+type = "string"
+description = "Personenziffer 1, Antragsdatum, Zeile 2"
+value = "{{ pending_benefit_claims[1] && pending_benefit_claims[1].event_date ? pending_benefit_claims[1].event_date : '' }}"
+
+["p6_personenziffer_1,_art_der_leistung,_zeile_2"]
+type = "string"
+description = "Personenziffer 1, Art der Leistung, Zeile 2"
+value = "{{ pending_benefit_claims[1] && pending_benefit_claims[1].benefit_type ? pending_benefit_claims[1].benefit_type : '' }}"
+
+["p6_personenziffer_1,_dienststelle_und_geschäftszeichen,_zeile_2"]
+type = "string"
+description = "Personenziffer 1, Dienststelle und Geschäftszeichen, Zeile 2"
+value = "{{ pending_benefit_claims[1] && pending_benefit_claims[1].office_reference ? pending_benefit_claims[1].office_reference : '' }}"
+
+["p6_personenziffer_2,_antragsdatum,_zeile_2"]
+type = "string"
+description = "Personenziffer 2, Antragsdatum, Zeile 2"
+value = "{{ partner && partner.pending_benefit_claims[1] && partner.pending_benefit_claims[1].event_date ? partner.pending_benefit_claims[1].event_date : '' }}"
+
+["p6_personenziffer_2,_art_der_leistung,_zeile_2"]
+type = "string"
+description = "Personenziffer 2, Art der Leistung, Zeile 2"
+value = "{{ partner && partner.pending_benefit_claims[1] && partner.pending_benefit_claims[1].benefit_type ? partner.pending_benefit_claims[1].benefit_type : '' }}"
+
+["p6_personenziffer_2,_dienststelle_und_geschäftszeichen,_zeile_2"]
+type = "string"
+description = "Personenziffer 2, Dienststelle und Geschäftszeichen, Zeile 2"
+value = "{{ partner && partner.pending_benefit_claims[1] && partner.pending_benefit_claims[1].office_reference ? partner.pending_benefit_claims[1].office_reference : '' }}"
+
+["p6_personenziffer_1,_antragsdatum,_zeile_3"]
+type = "string"
+description = "Personenziffer 1, Antragsdatum, Zeile 3"
+value = "{{ pending_benefit_claims[2] && pending_benefit_claims[2].event_date ? pending_benefit_claims[2].event_date : '' }}"
+
+["p6_personenziffer_1,_art_der_leistung,_zeile_3"]
+type = "string"
+description = "Personenziffer 1, Art der Leistung, Zeile 3"
+value = "{{ pending_benefit_claims[2] && pending_benefit_claims[2].benefit_type ? pending_benefit_claims[2].benefit_type : '' }}"
+
+["p6_personenziffer_1,_dienststelle_und_geschäftszeichen,_zeile_3"]
+type = "string"
+description = "Personenziffer 1, Dienststelle und Geschäftszeichen, Zeile 3"
+value = "{{ pending_benefit_claims[2] && pending_benefit_claims[2].office_reference ? pending_benefit_claims[2].office_reference : '' }}"
+
+["p6_personenziffer_2,_antragsdatum,_zeile_3"]
+type = "string"
+description = "Personenziffer 2, Antragsdatum, Zeile 3"
+value = "{{ partner && partner.pending_benefit_claims[2] && partner.pending_benefit_claims[2].event_date ? partner.pending_benefit_claims[2].event_date : '' }}"
+
+["p6_personenziffer_2,_art_der_leistung,_zeile_3"]
+type = "string"
+description = "Personenziffer 2, Art der Leistung, Zeile 3"
+value = "{{ partner && partner.pending_benefit_claims[2] && partner.pending_benefit_claims[2].benefit_type ? partner.pending_benefit_claims[2].benefit_type : '' }}"
+
+["p6_personenziffer_2,_dienststelle_und_geschäftszeichen,_zeile_3"]
+type = "string"
+description = "Personenziffer 2, Dienststelle und Geschäftszeichen, Zeile 3"
+value = "{{ partner && partner.pending_benefit_claims[2] && partner.pending_benefit_claims[2].office_reference ? partner.pending_benefit_claims[2].office_reference : '' }}"
+
+["p7_einmalige_leistungen?"]
+type = "radio"
+description = "Einmalige Leistungen?"
+options = [
+  "Nein",
+  "Ja"
+]
+option_labels = { "Nein" = "Nein Ja", "Ja" = "Ja" }
+value = "{{ expected_one_time_payments[0] ? 'Ja' : 'Nein' }}"
+
+["p7_personenziffer_1,_art_der_einmaligen_leistung,_zeile_1"]
+type = "string"
+description = "Personenziffer 1, Art der einmaligen Leistung, Zeile 1"
+value = "{{ expected_one_time_payments[0] && expected_one_time_payments[0].benefit_type ? expected_one_time_payments[0].benefit_type : '' }}"
+
+["p7_personenziffer_1,_zeitpunkt_der_einmaligen_leistung,_zeile_1"]
+type = "string"
+description = "Personenziffer 1, Zeitpunkt der einmaligen Leistung, Zeile 1"
+value = "{{ expected_one_time_payments[0] && expected_one_time_payments[0].event_date ? expected_one_time_payments[0].event_date : '' }}"
+
+["p7_personenziffer_1,_höhe__der_einmaligen_leistung_in_euro,_zeile_1"]
+type = "string"
+description = "Personenziffer 1, Höhe  der einmaligen Leistung in Euro, Zeile 1"
+value = "{{ expected_one_time_payments[0] && expected_one_time_payments[0].amount ? expected_one_time_payments[0].amount : '' }}"
+
+["p7_personenziffer_2,_art_der_einmaligen_leistung,_zeile_1"]
+type = "string"
+description = "Personenziffer 2, Art der einmaligen Leistung, Zeile 1"
+value = "{{ partner && partner.expected_one_time_payments[0] && partner.expected_one_time_payments[0].benefit_type ? partner.expected_one_time_payments[0].benefit_type : '' }}"
+
+["p7_personenziffer_2,_zeitpunkt_der_einmaligen_leistung,_zeile_1"]
+type = "string"
+description = "Personenziffer 2, Zeitpunkt der einmaligen Leistung, Zeile 1"
+value = "{{ partner && partner.expected_one_time_payments[0] && partner.expected_one_time_payments[0].event_date ? partner.expected_one_time_payments[0].event_date : '' }}"
+
+["p7_personenziffer_2,_höhe__der_einmaligen_leistung_in_euro,_zeile_1"]
+type = "string"
+description = "Personenziffer 2, Höhe  der einmaligen Leistung in Euro, Zeile 1"
+value = "{{ partner && partner.expected_one_time_payments[0] && partner.expected_one_time_payments[0].amount ? partner.expected_one_time_payments[0].amount : '' }}"
+
+["p7_personenziffer_1,_art_der_einmaligen_leistung,_zeile_2"]
+type = "string"
+description = "Personenziffer 1, Art der einmaligen Leistung, Zeile 2"
+value = "{{ expected_one_time_payments[1] && expected_one_time_payments[1].benefit_type ? expected_one_time_payments[1].benefit_type : '' }}"
+
+["p7_personenziffer_1,_zeitpunkt_der_einmaligen_leistung,_zeile_2"]
+type = "string"
+description = "Personenziffer 1, Zeitpunkt der einmaligen Leistung, Zeile 2"
+value = "{{ expected_one_time_payments[1] && expected_one_time_payments[1].event_date ? expected_one_time_payments[1].event_date : '' }}"
+
+["p7_personenziffer_1,_höhe__der_einmaligen_leistung_in_euro,_zeile_2"]
+type = "string"
+description = "Personenziffer 1, Höhe  der einmaligen Leistung in Euro, Zeile 2"
+value = "{{ expected_one_time_payments[1] && expected_one_time_payments[1].amount ? expected_one_time_payments[1].amount : '' }}"
+
+["p7_personenziffer_2,_art_der_einmaligen_leistung,_zeile_2"]
+type = "string"
+description = "Personenziffer 2, Art der einmaligen Leistung, Zeile 2"
+value = "{{ partner && partner.expected_one_time_payments[1] && partner.expected_one_time_payments[1].benefit_type ? partner.expected_one_time_payments[1].benefit_type : '' }}"
+
+["p7_personenziffer_2,_zeitpunkt_der_einmaligen_leistung,_zeile_2"]
+type = "string"
+description = "Personenziffer 2, Zeitpunkt der einmaligen Leistung, Zeile 2"
+value = "{{ partner && partner.expected_one_time_payments[1] && partner.expected_one_time_payments[1].event_date ? partner.expected_one_time_payments[1].event_date : '' }}"
+
+["p7_personenziffer_2,_höhe__der_einmaligen_leistung_in_euro,_zeile_2"]
+type = "string"
+description = "Personenziffer 2, Höhe  der einmaligen Leistung in Euro, Zeile 2"
+value = "{{ partner && partner.expected_one_time_payments[1] && partner.expected_one_time_payments[1].amount ? partner.expected_one_time_payments[1].amount : '' }}"
+
+["p7_personenziffer_1,_ausgaben__monatlich_betrag"]
+type = "string"
+description = "Personenziffer 1, Ausgaben  monatlich Betrag"
+value = "{{ monthly_expenses_total ? monthly_expenses_total : '' }}"
+
+["p7_personenziffer_2,_ausgaben__monatlich_betrag"]
+type = "string"
+description = "Personenziffer 2, Ausgaben  monatlich Betrag"
+value = "{{ partner && partner.monthly_expenses_total ? partner.monthly_expenses_total : '' }}"
+
+["p7_personenziffer_1,_einkommenssteuer"]
+type = "string"
+description = "Personenziffer 1, Einkommenssteuer"
+value = "{{ expenses['Income Tax'] ? expenses['Income Tax'] : '' }}"
+
+["p7_personenziffer_2,_einkommenssteuer"]
+type = "string"
+description = "Personenziffer 2, Einkommenssteuer"
+value = "{{ partner && partner.expenses['Income Tax'] ? partner.expenses['Income Tax'] : '' }}"
+
+["p7_personenziffer_1,_krankenversicherung"]
+type = "string"
+description = "Personenziffer 1, Krankenversicherung"
+value = "{{ documents.bank_statements && documents.bank_statements.amount_health_insurance ? documents.bank_statements.amount_health_insurance : '' }}"
+
+["p7_personenziffer_2,_krankenversicherung"]
+type = "string"
+description = "Personenziffer 2, Krankenversicherung"
+value = "{{ partner && partner.expenses['Health Insurance'] ? partner.expenses['Health Insurance'] : '' }}"
+
+["p7_personenziffer_1,_pflegeversicherung"]
+type = "string"
+description = "Personenziffer 1, Pflegeversicherung"
+value = "{{ expenses['Care Insurance'] ? expenses['Care Insurance'] : '' }}"
+
+["p7_personenziffer_2,_pflegeversicherung"]
+type = "string"
+description = "Personenziffer 2, Pflegeversicherung"
+value = "{{ partner && partner.expenses['Care Insurance'] ? partner.expenses['Care Insurance'] : '' }}"
+
+["p7_personenziffer_1,_arbeitslosenversicherung"]
+type = "string"
+description = "Personenziffer 1, Arbeitslosenversicherung"
+value = "{{ expenses['Unemployment Insurance'] ? expenses['Unemployment Insurance'] : '' }}"
+
+["p7_personenziffer_2,_arbeitslosenversicherung"]
+type = "string"
+description = "Personenziffer 2, Arbeitslosenversicherung"
+value = "{{ partner && partner.expenses['Unemployment Insurance'] ? partner.expenses['Unemployment Insurance'] : '' }}"
+
+["p7_personenziffer_1,_rentenversicherung"]
+type = "string"
+description = "Personenziffer 1, Rentenversicherung"
+value = "{{ expenses['Pension Insurance'] ? expenses['Pension Insurance'] : '' }}"
+
+["p7_personenziffer_2,_rentenversicherung"]
+type = "string"
+description = "Personenziffer 2, Rentenversicherung"
+value = "{{ partner && partner.expenses['Pension Insurance'] ? partner.expenses['Pension Insurance'] : '' }}"
+
+["p7_personenziffer_1,_kirchensteuer"]
+type = "string"
+description = "Personenziffer 1, Kirchensteuer"
+value = "{{ expenses['Church Tax'] ? expenses['Church Tax'] : '' }}"
+
+["p7_personenziffer_2,_kirchensteuer"]
+type = "string"
+description = "Personenziffer 2, Kirchensteuer"
+value = "{{ partner && partner.expenses['Church Tax'] ? partner.expenses['Church Tax'] : '' }}"
+
+["p7_personenziffer_1,_unfallversicherung"]
+type = "string"
+description = "Personenziffer 1, Unfallversicherung"
+value = "{{ expenses['Accident Insurance'] ? expenses['Accident Insurance'] : '' }}"
+
+["p7_personenziffer_2,_unfallversicherung"]
+type = "string"
+description = "Personenziffer 2, Unfallversicherung"
+value = "{{ partner && partner.expenses['Accident Insurance'] ? partner.expenses['Accident Insurance'] : '' }}"
+
+["p7_personenziffer_1,_altersvorsorgebeiträge"]
+type = "string"
+description = "Personenziffer 1, Altersvorsorgebeiträge"
+value = "{{ expenses['Retirement Provision'] ? expenses['Retirement Provision'] : '' }}"
+
+["p7_personenziffer_2,_altersvorsorgebeiträge"]
+type = "string"
+description = "Personenziffer 2, Altersvorsorgebeiträge"
+value = "{{ partner && partner.expenses['Retirement Provision'] ? partner.expenses['Retirement Provision'] : '' }}"
+
+["p7_personenziffer_1,_hausratversicherung"]
+type = "string"
+description = "Personenziffer 1, Hausratversicherung"
+value = "{{ expenses['Household Contents Insurance'] ? expenses['Household Contents Insurance'] : '' }}"
+
+["p7_personenziffer_2,_hausratversicherung"]
+type = "string"
+description = "Personenziffer 2, Hausratversicherung"
+value = "{{ partner && partner.expenses['Household Contents Insurance'] ? partner.expenses['Household Contents Insurance'] : '' }}"
+
+["p7_personenziffer_1,_sterbeversicherung"]
+type = "string"
+description = "Personenziffer 1, Sterbeversicherung"
+value = "{{ expenses['Funeral Insurance'] ? expenses['Funeral Insurance'] : '' }}"
+
+["p7_personenziffer_2,_sterbeversicherung"]
+type = "string"
+description = "Personenziffer 2, Sterbeversicherung"
+value = "{{ partner && partner.expenses['Funeral Insurance'] ? partner.expenses['Funeral Insurance'] : '' }}"
+
+["p7_personenziffer_1,_lebensversicherung"]
+type = "string"
+description = "Personenziffer 1, Lebensversicherung"
+value = "{{ expenses['Life Insurance'] ? expenses['Life Insurance'] : '' }}"
+
+["p7_personenziffer_2,_lebensversicherung"]
+type = "string"
+description = "Personenziffer 2, Lebensversicherung"
+value = "{{ partner && partner.expenses['Life Insurance'] ? partner.expenses['Life Insurance'] : '' }}"
+
+["p7_personenziffer_1,_haftpflichtversicherung"]
+type = "string"
+description = "Personenziffer 1, Haftpflichtversicherung"
+value = "{{ expenses['Liability Insurance'] ? expenses['Liability Insurance'] : '' }}"
+
+["p7_personenziffer_2,_haftpflichtversicherung"]
+type = "string"
+description = "Personenziffer 2, Haftpflichtversicherung"
+value = "{{ partner && partner.expenses['Liability Insurance'] ? partner.expenses['Liability Insurance'] : '' }}"
+
+["p7_personenziffer_1,_aufwendungen_für_arbeitsmittel"]
+type = "string"
+description = "Personenziffer 1, Aufwendungen für Arbeitsmittel"
+value = "{{ expenses['Work Equipment'] ? expenses['Work Equipment'] : '' }}"
+
+["p7_personenziffer_2,_aufwendungen_für_arbeitsmittel"]
+type = "string"
+description = "(Personenziffer 2, Aufwendungen für Arbeitsmittel)"
+value = "{{ partner && partner.expenses['Work Equipment'] ? partner.expenses['Work Equipment'] : '' }}"
+
+["p7_personenziffer_1,_beiträge_für_berufsverbände"]
+type = "string"
+description = "Personenziffer 1, Beiträge für Berufsverbände"
+value = "{{ expenses['Professional Association Fees'] ? expenses['Professional Association Fees'] : '' }}"
+
+["p7_personenziffer_2,_beiträge_für_berufsverbände"]
+type = "string"
+description = "(Personenziffer 2, Beiträge für Berufsverbände)"
+value = "{{ partner && partner.expenses['Professional Association Fees'] ? partner.expenses['Professional Association Fees'] : '' }}"
+
+["p7_personenziffer_1,_mehraufwendungen_für_doppelte_haushaltsführung"]
+type = "string"
+description = "Personenziffer 1, Mehraufwendungen für doppelte Haushaltsführung"
+value = "{{ expenses['Double Household'] ? expenses['Double Household'] : '' }}"
+
+["p7_personenziffer_2,_mehraufwendungen_für_doppelte_haushaltsführung"]
+type = "string"
+description = "(Personenziffer 2, Mehraufwendungen für doppelte Haushaltsführung)"
+value = "{{ partner && partner.expenses['Double Household'] ? partner.expenses['Double Household'] : '' }}"
+
+["p7_personenziffer_1,_entfernung_zwischen_wohnung_und_arbeitsstelle"]
+type = "string"
+description = "Personenziffer 1, Entfernung zwischen Wohnung und Arbeitsstelle"
+value = "{{ commute_distance_km ? commute_distance_km : '' }}"
+
+["p7_personenziffer_2,_entfernung_zwischen_wohnung_und_arbeitsstelle"]
+type = "string"
+description = "Personenziffer 2, Entfernung zwischen Wohnung und Arbeitsstelle"
+value = "{{ partner && partner.commute_distance_km ? partner.commute_distance_km : '' }}"
+
+["p7_personenziffer_1,_fahrkosten_mit_öffentlichen_verkehrsmitteln"]
+type = "string"
+description = "Personenziffer 1, Fahrkosten mit öffentlichen Verkehrsmitteln"
+value = "{{ expenses['Commute Public Transport'] ? expenses['Commute Public Transport'] : '' }}"
+
+["p7_personenziffer_2,_fahrkosten_mit_öffentlichen_verkehrsmitteln"]
+type = "string"
+description = "Personenziffer 2, Fahrkosten mit öffentlichen Verkehrsmitteln"
+value = "{{ partner && partner.expenses['Commute Public Transport'] ? partner.expenses['Commute Public Transport'] : '' }}"
+
+["p7_personenziffer_1,_fahrkosten_mit_pkw"]
+type = "string"
+description = "Personenziffer 1, Fahrkosten mit Pkw"
+value = "{{ expenses['Commute Car'] ? expenses['Commute Car'] : '' }}"
+
+["p7_personenziffer_2,_fahrkosten_mit_pkw"]
+type = "string"
+description = "Personenziffer 2, Fahrkosten mit Pkw"
+value = "{{ partner && partner.expenses['Commute Car'] ? partner.expenses['Commute Car'] : '' }}"
+
+["p7_personenziffer_1,_fahrkosten_mit_kleinst-pkw"]
+type = "string"
+description = "Personenziffer 1, Fahrkosten mit Kleinst-Pkw"
+value = "{{ expenses['Commute Small Car'] ? expenses['Commute Small Car'] : '' }}"
+
+["p7_personenziffer_2,_fahrkosten_mit_kleinst-pkw"]
+type = "string"
+description = "Personenziffer 2, Fahrkosten mit Kleinst-Pkw"
+value = "{{ partner && partner.expenses['Commute Small Car'] ? partner.expenses['Commute Small Car'] : '' }}"
+
+["p7_personenziffer_1,_fahrkosten_mit_motorrad"]
+type = "string"
+description = "Personenziffer 1, Fahrkosten mit Motorrad "
+value = "{{ expenses['Commute Motorcycle'] ? expenses['Commute Motorcycle'] : '' }}"
+
+["p7_personenziffer_2,_fahrkosten_mit_motorrad"]
+type = "string"
+description = "Personenziffer 2, Fahrkosten mit Motorrad"
+value = "{{ partner && partner.expenses['Commute Motorcycle'] ? partner.expenses['Commute Motorcycle'] : '' }}"
+
+["p7_personenziffer_1,_fahrkosten_mit_mofa"]
+type = "string"
+description = "Personenziffer 1, Fahrkosten mit Mofa "
+value = "{{ expenses['Commute Moped'] ? expenses['Commute Moped'] : '' }}"
+
+["p7_personenziffer_2,_fahrkosten_mit_mofa"]
+type = "string"
+description = "Personenziffer 2, Fahrkosten mit Mofa"
+value = "{{ partner && partner.expenses['Commute Moped'] ? partner.expenses['Commute Moped'] : '' }}"
+
+["p7_personenziffer_1,_fahrkosten_mit_sonstigem"]
+type = "string"
+description = "Personenziffer 1, Fahrkosten mit Sonstigem "
+value = "{{ expenses['Commute Other'] ? expenses['Commute Other'] : '' }}"
+
+["p7_personenziffer_2,_fahrkosten_mit_sonstigem"]
+type = "string"
+description = "Personenziffer 2, Fahrkosten mit Sonstigem"
+value = "{{ partner && partner.expenses['Commute Other'] ? partner.expenses['Commute Other'] : '' }}"
+
+["p7_personenziffer_1,_nähere_begründung_zu_sonstiges"]
+type = "string"
+description = "Personenziffer 1, Nähere Begründung zu Sonstiges "
+value = "{{ expense_notes['Commute Other'] ? expense_notes['Commute Other'] : '' }}"
+
+["p7_personenziffer_2,_nähere_begründung_zu_sonstiges"]
+type = "string"
+description = "Personenziffer 2, Nähere Begründung zu Sonstiges"
+value = "{{ partner && partner.expense_notes['Commute Other'] ? partner.expense_notes['Commute Other'] : '' }}"
+
+["p8_sparguthaben_und_bargeld"]
+type = "radio"
+description = "Sparguthaben und Bargeld"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja", "Nein" = "Nein" }
+value = "{{ has_assets == true ? 'Ja' : has_assets == false ? 'Nein' : '' }}"
+
+["p8_personenziffer_1,_sparguthaben_und_bargeld"]
+type = "string"
+description = "Personenziffer 1, Sparguthaben und Bargeld"
+value = "{{ assets['Savings and Cash'] ? assets['Savings and Cash'] : '' }}"
+
+["p8_personenziffer_2,_sparguthaben_und_bargeld"]
+type = "string"
+description = "Personenziffer 2, Sparguthaben und Bargeld "
+value = "{{ partner && partner.assets['Savings and Cash'] ? partner.assets['Savings and Cash'] : '' }}"
+
+["p8_wertpapiere"]
+type = "radio"
+description = "Wertpapiere"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja ", "Nein" = "Nein" }
+value = "{{ assets.Securities || asset_descriptions.Securities ? 'Ja' : '' }}"
+
+["p8_personenziffer_1,_wertpapiere"]
+type = "string"
+description = "Personenziffer 1, Wertpapiere "
+value = "{{ assets.Securities ? assets.Securities : '' }}"
+
+["p8_personenziffer_2,_wertpapiere"]
+type = "string"
+description = "Personenziffer 2, Wertpapiere "
+value = "{{ partner && partner.assets.Securities ? partner.assets.Securities : '' }}"
+
+["p8_sachwerte"]
+type = "radio"
+description = "Sachwerte"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja Art", "Nein" = "Nein" }
+value = "{{ assets.Valuables || asset_descriptions.Valuables ? 'Ja' : '' }}"
+
+["p8_art_der_sachwerte"]
+type = "string"
+description = "Art der Sachwerte"
+value = "{{ asset_descriptions.Valuables ? asset_descriptions.Valuables : '' }}"
+
+["p8_personenziffer_1,_sachwerte"]
+type = "string"
+description = "Personenziffer 1, Sachwerte "
+value = "{{ assets.Valuables ? assets.Valuables : '' }}"
+
+["p8_personenziffer_2,_sachwerte"]
+type = "string"
+description = "Personenziffer 2, Sachwerte "
+value = "{{ partner && partner.assets.Valuables ? partner.assets.Valuables : '' }}"
+
+["p8_verschenktes_vermögen"]
+type = "radio"
+description = "Verschenktes Vermögen"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja Art", "Nein" = "Nein" }
+value = "{{ gave_away_assets_last_10_years == true ? 'Ja' : gave_away_assets_last_10_years == false ? 'Nein' : '' }}"
+
+["p8_art_des_verschenkten_vermögens_innerhalb_der_letzen_10_jahre_(auch_grundvermögen)"]
+type = "string"
+description = "Art des verschenkten Vermögens innerhalb der letzen 10 Jahre (auch Grundvermögen)"
+value = "{{ asset_descriptions['Gifted Assets'] ? asset_descriptions['Gifted Assets'] : '' }}"
+
+["p8_personenziffer_1,_verschenktes_vermögen"]
+type = "string"
+description = "Personenziffer 1, Verschenktes Vermögen "
+value = "{{ assets['Gifted Assets'] ? assets['Gifted Assets'] : '' }}"
+
+["p8_personenziffer_2,_verschenktes_vermögen"]
+type = "string"
+description = "Personenziffer 2, Verschenktes Vermögen "
+value = "{{ partner && partner.assets['Gifted Assets'] ? partner.assets['Gifted Assets'] : '' }}"
+
+["p8_weiteres_verschenktes_vermögen"]
+type = "radio"
+description = "Weiteres verschenktes Vermögen"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja Art", "Nein" = "Nein" }
+value = "{{ gave_away_assets_last_10_years == true ? 'Ja' : gave_away_assets_last_10_years == false ? 'Nein' : '' }}"
+
+["p8_art_des_weiteren_verschenkten_vermögens_innerhalb_der_letzen_10_jahre_(auch_grundvermögen)"]
+type = "string"
+description = "Art des weiteren verschenkten Vermögens innerhalb der letzen 10 Jahre (auch Grundvermögen)"
+value = "{{ asset_descriptions && asset_descriptions['Gifted Assets'] ? asset_descriptions['Gifted Assets'] : '' }}"
+
+["p8_personenziffer_1,_weiteres_verschenktes_vermögen"]
+type = "string"
+description = "Personenziffer 1,  Weiteres verschenktes Vermögen "
+value = "{{ assets['Gifted Assets'] ? assets['Gifted Assets'] : '' }}"
+
+["p8_personenziffer_2,_weiteres_verschenktes_vermögen"]
+type = "string"
+description = "Personenziffer 2, Weiteres verschenktes Vermögen "
+value = "{{ partner && partner.assets['Gifted Assets'] ? partner.assets['Gifted Assets'] : '' }}"
+
+["p8_kraftfahrzeug"]
+type = "radio"
+description = "Kraftfahrzeug"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja  amtl.", "Nein" = "Nein" }
+value = "{{ license_plate ? 'Ja' : 'Nein' }}"
+
+["p8_amtliches_kennzeichen"]
+type = "string"
+description = "amtliches Kennzeichen"
+value = "{{ license_plate ? license_plate : '' }}"
+
+["p8_personenziffer_1,_kraftfahrzeug"]
+type = "string"
+description = "Personenziffer 1, Kraftfahrzeug "
+value = "{{ assets['Motor Vehicle'] ? assets['Motor Vehicle'] : '' }}"
+
+["p8_personenziffer_2,_kraftfahrzeug"]
+type = "string"
+description = "Personenziffer 2, Kraftfahrzeug "
+value = "{{ partner && partner.assets['Motor Vehicle'] ? partner.assets['Motor Vehicle'] : '' }}"
+
+["p8_baujahr"]
+type = "string"
+description = "Baujahr"
+value = "{{ vehicle_year ? vehicle_year : '' }}"
+
+["p8_halter"]
+type = "string"
+description = "Halter"
+value = "{{ last_name && first_name ? last_name + ', ' + first_name : '' }}"
+
+["p8_personenziffer_1,_ergänzende_angaben_(z.b._geschätzter_wert)_zum_kfz"]
+type = "string"
+description = "Personenziffer 1, Ergänzende Angaben (z.B. geschätzter Wert) zum Kfz"
+value = "{{ asset_descriptions['Motor Vehicle'] ? asset_descriptions['Motor Vehicle'] : '' }}"
+
+["p8_personenziffer_2,_ergänzende_angaben_(z.b._geschätzter_wert)_zum_kfz"]
+type = "string"
+description = "Personenziffer 2, Ergänzende Angaben (z.B. geschätzter Wert) zum Kfz "
+value = "{{ partner && partner.asset_descriptions['Motor Vehicle'] ? partner.asset_descriptions['Motor Vehicle'] : '' }}"
+
+["p8_fabrikat"]
+type = "string"
+description = "Fabrikat"
+value = "{{ vehicle_make ? vehicle_make : '' }}"
+
+["p8_hauseigentum_oder_grundbesitz"]
+type = "radio"
+description = "Hauseigentum oder Grundbesitz"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja ", "Nein" = "Nein" }
+value = "{{ assets['Real Estate'] || asset_descriptions['Real Estate'] ? 'Ja' : 'Nein' }}"
+
+["p8_personenziffer_1,_hauseigentum_oder_grundbesitz"]
+type = "string"
+description = "Personenziffer 1, Hauseigentum oder Grundbesitz"
+value = "{{ assets['Real Estate'] ? assets['Real Estate'] : '' }}"
+
+["p8_personenziffer_2,_hauseigentum_oder_grundbesitz"]
+type = "string"
+description = "Personenziffer 2, Hauseigentum oder Grundbesitz"
+value = "{{ partner && partner.assets['Real Estate'] ? partner.assets['Real Estate'] : '' }}"
+
+["p8_staatlich_geförderte_private_altersvorsorge"]
+type = "radio"
+description = "Staatlich geförderte private Altersvorsorge"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja ", "Nein" = "Nein" }
+value = "{{ assets['Subsidised Private Pension'] || asset_descriptions['Subsidised Private Pension'] ? 'Ja' : 'Nein' }}"
+
+["p8_personenziffer_1,_staatlich_geförderte_private_altersvorsorge"]
+type = "string"
+description = "Personenziffer 1, Staatlich geförderte private Altersvorsorge"
+value = "{{ assets['Subsidised Private Pension'] ? assets['Subsidised Private Pension'] : '' }}"
+
+["p8_personenziffer_2,_staatlich_geförderte_private_altersvorsorge"]
+type = "string"
+description = "Personenziffer 2, Staatlich geförderte private Altersvorsorge "
+value = "{{ partner && partner.assets['Subsidised Private Pension'] ? partner.assets['Subsidised Private Pension'] : '' }}"
+
+["p8_personenziffer_1,_ansprüche_aus_übertragsverträgen"]
+type = "string"
+description = "Personenziffer 1, Ansprüche aus Übertragsverträgen"
+value = "{{ assets['Transfer Contract Claims'] ? assets['Transfer Contract Claims'] : '' }}"
+
+["p8_personenziffer_2,_ansprüche_aus_übertragsverträgen"]
+type = "string"
+description = "Personenziffer 2, Ansprüche aus Übertragsverträgen"
+value = "{{ partner && partner.assets['Transfer Contract Claims'] ? partner.assets['Transfer Contract Claims'] : '' }}"
+
+["p8_ansprüche_aus_übertragsverträgen"]
+type = "radio"
+description = "Ansprüche aus Übertragsverträgen"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja ", "Nein" = "Nein" }
+value = "{{ assets['Transfer Contract Claims'] || asset_descriptions['Transfer Contract Claims'] ? 'Ja' : 'Nein' }}"
+
+["p8_sonstiges_vermögen"]
+type = "radio"
+description = "Sonstiges Vermögen"
+options = [
+  "Ja",
+  "Nein"
+]
+option_labels = { "Ja" = "Ja ", "Nein" = "Nein" }
+value = "{{ assets['Other Assets'] || asset_descriptions['Other Assets'] ? 'Ja' : 'Nein' }}"
+
+["p8_personenziffer_1,_sonstiges_vermögen"]
+type = "string"
+description = "Personenziffer 1, Sonstiges Vermögen"
+value = "{{ assets['Other Assets'] ? assets['Other Assets'] : '' }}"
+
+["p8_personenziffer_2,_sonstiges_vermögen"]
+type = "string"
+description = "Personenziffer 2, Sonstiges Vermögen "
+value = "{{ partner && partner.assets['Other Assets'] ? partner.assets['Other Assets'] : '' }}"
+
+["p8_sonstige_angaben"]
+type = "string"
+description = "Sonstige Angaben"
+value = ""
+
+["p9_für_werdende_mütter_nach_der_12_schwangerschaftswoche"]
+type = "checkbox"
+description = "Für werdende Mütter nach der 12. Schwangerschaftswoche"
+value = "{{ documents.pregnancy_certificate ? true : false }}"
+
+["p9_name"]
+type = "string"
+description = "Name"
+value = "{{ documents.pregnancy_certificate && last_name ? last_name : '' }}"
+
+["p9_vorname"]
+type = "string"
+description = "Vorname"
+value = "{{ documents.pregnancy_certificate && first_name ? first_name : '' }}"
+
+["p9_voraussichtlicher_geburtstermin"]
+type = "string"
+description = "voraussichtlicher Geburtstermin"
+value = "{{ documents.pregnancy_certificate && documents.pregnancy_certificate.expected_due_date ? documents.pregnancy_certificate.expected_due_date : '' }}"
+
+["p9_kostenaufwendige_ernährung_aus_medizinischen_gründen"]
+type = "checkbox"
+description = "Kostenaufwendige Ernährung aus medizinischen Gründen"
+value = "{{ has_costly_medical_nutrition == true ? true : false }}"
+
+["p9_name_der_im_haushalt_lebenden_person,_die_eine_kostenaufwendige_ernährung_benötigt"]
+type = "string"
+description = "Name der im Haushalt lebenden Person, die eine kostenaufwendige Ernährung benötigt"
+value = "{{ has_costly_medical_nutrition == true ? last_name : '' }}"
+
+["p9_vorname_der_im_haushalt_lebenden_person,_die_eine_kostenaufwendige_ernährung_benötigt"]
+type = "string"
+description = "Vorname der im Haushalt lebenden Person, die eine kostenaufwendige Ernährung benötigt"
+value = "{{ has_costly_medical_nutrition == true ? first_name : '' }}"
+
+["p9_name_der_weiteren_im_haushalt_lebenden_person,_die_eine_kostenaufwendige_ernährung_benötigt_2"]
+type = "string"
+description = "Name der weiteren im Haushalt lebenden Person, die eine kostenaufwendige Ernährung benötigt_2"
+value = "{{ household_members[1] ? household_members[1].last_name : '' }}"
+
+["p9_vorname_der_weiteren_im_haushalt_lebenden_person,_die_eine_kostenaufwendige_ernährung_benötigt_2"]
+type = "string"
+description = "Vorname der weiteren im Haushalt lebenden Person, die eine kostenaufwendige Ernährung benötigt_2"
+value = "{{ household_members[1] ? household_members[1].first_name : '' }}"
+
+["p9_kunden-nummer_der_agentur_für_arbeit_(falls_vorhanden)"]
+type = "string"
+description = "Kunden-Nummer der Agentur für Arbeit (falls vorhanden)"
+value = "{{ employment_office_customer_number ? employment_office_customer_number : '' }}"
+
+["p9_kunden-nummer_der_agentur_für_arbeit_(falls_vorhanden)_1"]
+type = "string"
+description = "Kunden-Nummer der Agentur für Arbeit (falls vorhanden)_1"
+value = "{{ partner && partner.employment_office_customer_number ? partner.employment_office_customer_number : '' }}"
+
+["p9_kunden-nummer_der_agentur_für_arbeit_(falls_vorhanden)_2"]
+type = "string"
+description = "Kunden-Nummer der Agentur für Arbeit (falls vorhanden)_2"
+value = "{{ household_members[0] && household_members[0].employment_office_customer_number ? household_members[0].employment_office_customer_number : '' }}"
+
+["p9_1_-_unterhalt"]
+type = "checkbox"
+description = "1 - Unterhalt"
+value = "{{ pays_child_or_spousal_support == true || receives_support_from_others == true }}"
+
+["p9_2_-_ausländer"]
+type = "checkbox"
+description = "2 - Ausländer"
+value = "{{ is_german_citizen == false }}"
+
+["p9_3_-_grundbesitz"]
+type = "checkbox"
+description = "3 - Grundbesitz"
+value = "{{ assets['Real Estate'] || asset_descriptions['Real Estate'] ? true : false }}"
+
+["p9_4_–_eingliederungshilfe"]
+type = "checkbox"
+description = "4 – Eingliederungshilfe"
+value = ""
+
+["p9_6_-_mietschulden"]
+type = "checkbox"
+description = "6 - Mietschulden"
+value = "{{ rent_arrears_amount ? true : false }}"
+
+["p9_weitere_anlage"]
+type = "checkbox"
+description = "weitere Anlage"
+value = ""
+
+["p9_name_der_weiteren_anlage"]
+type = "string"
+description = "Name der weiteren Anlage"
+value = ""
+
+["p9_beigefügte_unterlagen"]
+type = "string"
+description = "Beigefügte Unterlagen"
+value = ""
+
+["p10_ausfüllen_der_angaben"]
+type = "radio"
+description = "Ausfüllen der Angaben"
+options = [
+  "0",
+  "1"
+]
+option_labels = { "0" = "habe ich ausgefüllt, weil mir Vollmacht erteilt wurde und die Richtigkeit mit meiner Unters", "1" = "haben diese Personen ihre Angaben selbst in den vorstehenden Antrag oder in einen" }
+value = "{{ has_guardian == true ? '0' : has_custodian == true ? '0' : '' }}"
+
+["p10_richtigkeit_bestätigt"]
+type = "checkbox"
+description = "Richtigkeit bestätigt"
+value = true
+
+["px_personenziffer_1_kunden-nr"]
+type = "unknown"
+value = "{{ employment_office_customer_number ? employment_office_customer_number : '' }}"
+
+["px_personenziffer_2_kunden-nr"]
+type = "unknown"
+value = "{{ partner && partner.employment_office_customer_number ? partner.employment_office_customer_number : '' }}"
+
+["px_leistungen_nach_nr"]
+type = "unknown"
+value = ""
+
+["px_personenziffer_1,_ergänzende_angaben_(z"]
+type = "unknown"
+value = ""
+
+["px_personenziffer_1,_ergänzende_angaben_(z.b"]
+type = "unknown"
+value = ""
+
+["px_personenziffer_2,_ergänzende_angaben_(z"]
+type = "unknown"
+value = ""
+
+["px_personenziffer_2,_ergänzende_angaben_(z.b"]
+type = "unknown"
+value = ""
+

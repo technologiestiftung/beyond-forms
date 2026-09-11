@@ -132,7 +132,38 @@ export const DashboardView: React.FC = () => {
 						)}
 						formType="antrag_wohngeld"
 					/>
+
+					<SimpleApplicationCard
+						title={t(
+							"sections.applications.basic_income.title",
+							"Grundsicherungsgeld",
+						)}
+						description={t(
+							"sections.applications.basic_income.description",
+							"Beantrage Grundsicherungsgeld direkt mit Deinen hinterlegten Angaben.",
+						)}
+						formType="antrag_grundsicherungsgeld"
+					/>
+
+					<SimpleApplicationCard
+						title={t(
+							"sections.applications.child_allowance.title",
+							"Kinderzuschlag",
+						)}
+						description={t(
+							"sections.applications.child_allowance.description",
+							"Beantrage Kinderzuschlag direkt mit Deinen hinterlegten Angaben.",
+						)}
+						formType="antrag_kinderzuschlag"
+					/>
 				</div>
+
+				{/*
+				Commented out for now as we don't want to use tutorials yet
+				<DashboardTutorials
+					tutorials={tutorials}
+					activeLanguage={activeLanguage}
+				/>*/}
 
 				{/*
 				Commented out for now as we don't have an emergency info panel yet

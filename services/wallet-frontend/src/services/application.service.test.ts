@@ -71,21 +71,21 @@ describe("applicationService: Guest Data Sync", () => {
 			});
 		});
 
-		it("maps old age pension to income source", () => {
+		it("maps old age pension to an income entry", () => {
 			const payload = mapEligibilityToProfilePayload({
 				pension: PensionStatus.OLD_AGE,
 			});
 			expect(payload).toEqual({
-				income_sources: ["Altersrente"],
+				income_entries: [{ income_type: "Pension" }],
 			});
 		});
 
-		it("maps reduced earning capacity pension to income source and work capability status", () => {
+		it("maps reduced earning capacity pension to an income entry and work capability status", () => {
 			const payload = mapEligibilityToProfilePayload({
 				pension: PensionStatus.REDUCED_EARNING_CAPACITY,
 			});
 			expect(payload).toEqual({
-				income_sources: ["Erwerbsminderungsrente"],
+				income_entries: [{ income_type: "Pension" }],
 				ability_to_work: "Permanently disabled",
 				has_permanent_reduction_in_earning_capacity: true,
 			});
