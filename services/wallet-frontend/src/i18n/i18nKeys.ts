@@ -7,7 +7,6 @@ export const i18nKeys = {
 		back: "back",
 		cancel: "cancel",
 		confirm: "confirm",
-		startOver: "outcome.start_over",
 	},
 	aria: {
 		welcome: "aria.welcome",
@@ -34,8 +33,7 @@ export const i18nKeys = {
 		questionTitle: (key: string) => `questions.${key}.title`,
 		questionTip: (key: string) => `questions.${key}.tip`,
 		questionCategory: (key: string) => `questions.${key}.category`,
-		outcomeTitle: (key: string) => `outcome.${key}.title`,
-		outcomeDesc: (key: string) => `outcome.${key}.description`,
-		outcomeCTA: (key: string) => `outcome.${key}.cta`,
+		dateTooEarly: "date_error.too_early",
+		dateInFuture: "date_error.future",
 	},
 } as const;

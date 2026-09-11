@@ -94,7 +94,11 @@ async function fetchGrundsicherungExport(): Promise<ExportUrls> {
 		}
 		const blob = new Blob([bytes], { type: "application/pdf" });
 		const url = URL.createObjectURL(blob);
-		return { signed_open_url: url, signed_download_url: url, expires_in_seconds: 60 };
+		return {
+			signed_open_url: url,
+			signed_download_url: url,
+			expires_in_seconds: 60,
+		};
 	}
 
 	const response = await authenticatedFetch(
@@ -107,7 +111,8 @@ async function fetchGrundsicherungExport(): Promise<ExportUrls> {
 	const headers = response.headers as unknown as Record<string, string>;
 	const contentType =
 		(typeof response.headers.get === "function"
-			? response.headers.get("content-type") || response.headers.get("Content-Type")
+			? response.headers.get("content-type") ||
+				response.headers.get("Content-Type")
 			: headers["content-type"] || headers["Content-Type"]) || "";
 
 	if (contentType.includes("application/json")) {
@@ -116,13 +121,17 @@ async function fetchGrundsicherungExport(): Promise<ExportUrls> {
 
 	const blob = await response.blob();
 	const url = URL.createObjectURL(blob);
-	return { signed_open_url: url, signed_download_url: url, expires_in_seconds: 60 };
+	return {
+		signed_open_url: url,
+		signed_download_url: url,
+		expires_in_seconds: 60,
+	};
 }
 
-const GenerateButtonLabel: React.FC<{ isGenerating: boolean; label: string }> = ({
-	isGenerating,
-	label,
-}) => (
+const GenerateButtonLabel: React.FC<{
+	isGenerating: boolean;
+	label: string;
+}> = ({ isGenerating, label }) => (
 	<>
 		{isGenerating && <Loader2 className="size-5 animate-spin mr-2 shrink-0" />}
 		{label}
@@ -212,63 +221,63 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 		return null;
 	}
 	return (
-	<div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-110 flex items-center justify-center p-4 animate-fadeIn">
-		<div
-			role="dialog"
-			aria-modal="true"
-			aria-labelledby="confirm-modal-title"
-			className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl border border-slate-100 animate-scaleUp text-left"
-		>
-			<div className="flex items-start justify-between gap-4">
-				<div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center shrink-0 border border-amber-200 shadow-sm">
-					<AlertTriangle className="w-6 h-6 text-amber-600" />
+		<div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-110 flex items-center justify-center p-4 animate-fadeIn">
+			<div
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="confirm-modal-title"
+				className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl border border-slate-100 animate-scaleUp text-left"
+			>
+				<div className="flex items-start justify-between gap-4">
+					<div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center shrink-0 border border-amber-200 shadow-sm">
+						<AlertTriangle className="w-6 h-6 text-amber-600" />
+					</div>
+					<button
+						onClick={onClose}
+						className="p-2 -mr-2 text-brand-grey hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
+						aria-label={t("overview.close_modal_button", "Schließen")}
+					>
+						<X className="w-5 h-5" />
+					</button>
 				</div>
-				<button
-					onClick={onClose}
-					className="p-2 -mr-2 text-brand-grey hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
-					aria-label={t("overview.close_modal_button", "Schließen")}
-				>
-					<X className="w-5 h-5" />
-				</button>
-			</div>
 
-			<div className="flex flex-col gap-2">
-				<h3
-					id="confirm-modal-title"
-					className="text-xl font-extrabold text-slate-900 tracking-tight"
-				>
-					{t("overview.warning_modal_title", "Antrag unvollständig")}
-				</h3>
-				<p className="text-slate-600 leading-relaxed">
-					{t(
-						"overview.warning_modal_description",
-						"Du hast noch nicht alle empfohlenen Felder ausgefüllt. Ein unvollständiger Antrag kann die Bearbeitung durch das Amt verzögern. Möchtest du den Antrag trotzdem jetzt schon generieren?",
-					)}
-				</p>
-			</div>
+				<div className="flex flex-col gap-2">
+					<h3
+						id="confirm-modal-title"
+						className="text-xl font-extrabold text-slate-900 tracking-tight"
+					>
+						{t("overview.warning_modal_title", "Antrag unvollständig")}
+					</h3>
+					<p className="text-slate-600 leading-relaxed">
+						{t(
+							"overview.warning_modal_description",
+							"Du hast noch nicht alle empfohlenen Felder ausgefüllt. Ein unvollständiger Antrag kann die Bearbeitung durch das Amt verzögern. Möchtest du den Antrag trotzdem jetzt schon generieren?",
+						)}
+					</p>
+				</div>
 
-			<div className="flex flex-col sm:flex-row gap-3 pt-2">
-				<button
-					type="button"
-					onClick={onClose}
-					className="px-5 py-3 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition-colors cursor-pointer w-full"
-				>
-					{t("overview.warning_modal_cancel", "Zurück zum Antrag")}
-				</button>
-				<PrimaryButton
-					data-testid="confirm-modal-submit"
-					onClick={onConfirm}
-					disabled={isGenerating}
-					className="w-full bg-amber-600 hover:bg-amber-700 focus-visible:ring-amber-500"
-				>
-					{isGenerating && (
-						<Loader2 className="size-5 animate-spin mr-2 shrink-0" />
-					)}
-					{t("overview.warning_modal_confirm", "Trotzdem generieren")}
-				</PrimaryButton>
+				<div className="flex flex-col sm:flex-row gap-3 pt-2">
+					<button
+						type="button"
+						onClick={onClose}
+						className="px-5 py-3 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition-colors cursor-pointer w-full"
+					>
+						{t("overview.warning_modal_cancel", "Zurück zum Antrag")}
+					</button>
+					<PrimaryButton
+						data-testid="confirm-modal-submit"
+						onClick={onConfirm}
+						disabled={isGenerating}
+						className="w-full bg-amber-600 hover:bg-amber-700 focus-visible:ring-amber-500"
+					>
+						{isGenerating && (
+							<Loader2 className="size-5 animate-spin mr-2 shrink-0" />
+						)}
+						{t("overview.warning_modal_confirm", "Trotzdem generieren")}
+					</PrimaryButton>
+				</div>
 			</div>
 		</div>
-	</div>
 	);
 };
 

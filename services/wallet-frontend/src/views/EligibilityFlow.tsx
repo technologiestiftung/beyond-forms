@@ -1,63 +1,89 @@
 import React, { useEffect, useRef } from "react";
 import { Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-	ELIGIBILITY_TOTAL_STEPS,
-	useEligibilityStore,
-} from "../store/useEligibilityStore";
+import { useBenefitCheckStore } from "../store/useBenefitCheckStore";
 import { ProgressBar } from "../components/Eligibility/ProgressBar";
 import { QuestionCard } from "../components/Eligibility/QuestionCard";
 import { DateOfBirthCard } from "../components/Eligibility/DateOfBirthCard";
+import { NumberCard } from "../components/Eligibility/NumberCard";
+import { ChildrenCard } from "../components/Eligibility/ChildrenCard";
 import { StepLayout } from "../components/Layout/StepLayout";
-import { AppRoutes, getEligibilityRoute } from "../constants/routes";
-import { useEligibilityNavigation } from "../hooks/useEligibilityNavigation";
+import { getEligibilityRoute } from "../constants/routes";
+import { useBenefitCheckNavigation } from "../hooks/useBenefitCheckNavigation";
+import { BINARY_OPTIONS } from "../store/benefits/questionCatalogue";
+import { isCouple } from "../store/benefits/derive";
 import { i18nKeys } from "../i18n/i18nKeys";
-import type { EligibilityCheck } from "../schemas/eligibility.schema";
+import type { BenefitCheckAnswers } from "../schemas/benefitCheck.schema";
+
+/**
+ * QuestionCard works on option strings, so a boolean answer has to travel as YES/NO.
+ * Unanswered stays undefined — a false answer and no answer must not look the same.
+ */
+const toBinaryOption = (value: unknown): string | undefined => {
+	if (value === undefined) {
+		return undefined;
+	}
+	return value ? "YES" : "NO";
+};
 
 export const EligibilityFlow: React.FC = () => {
 	const { t } = useTranslation();
-	const answers = useEligibilityStore((s) => s.answers);
-	const setAnswer = useEligibilityStore((s) => s.setAnswer);
-	const clearAnswer = useEligibilityStore((s) => s.clearAnswer);
-	const validationError = useEligibilityStore((s) => s.validationError);
+	const answers = useBenefitCheckStore((s) => s.answers);
+	const setAnswer = useBenefitCheckStore((s) => s.setAnswer);
+	const clearAnswer = useBenefitCheckStore((s) => s.clearAnswer);
+	const validationError = useBenefitCheckStore((s) => s.validationError);
+	const maxDepthReached = useBenefitCheckStore((s) => s.maxDepthReached);
 	const {
-		currentQuestionNode,
-		currentIndexInPath,
-		validPath,
-		isTerminal,
+		question,
+		indexInPath,
+		path,
+		totalActive,
 		navigateNext,
 		navigateBack,
-	} = useEligibilityNavigation();
+	} = useBenefitCheckNavigation();
 
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		window.scrollTo(0, 0);
 		containerRef.current?.focus();
-	}, [currentQuestionNode?.id]);
+	}, [question?.id]);
 
-	if (
-		!currentQuestionNode ||
-		currentIndexInPath === -1 ||
-		currentQuestionNode.type === "result"
-	) {
-		if (isTerminal) {
-			return <Navigate to={AppRoutes.EligibilityResult} replace />;
-		}
-		return <Navigate to={getEligibilityRoute(validPath[0])} replace />;
+	// Unknown id, or a question the current answers skip. The path always ends on the
+	// first unanswered question, so that is where someone belongs — the old flow sent
+	// them back to question one, which threw away their place.
+	if (!question || indexInPath === -1) {
+		const open = path[path.length - 1];
+		return <Navigate to={getEligibilityRoute(open.id)} replace />;
 	}
 
-	const handleAnswerChange = <K extends keyof EligibilityCheck>(
-		key: K,
-		val: EligibilityCheck[K],
-	) => {
-		setAnswer(key, val);
+	const copy = (part: string) => t(`questions.${question.id}.${part}`);
+	const optionalCopy = (part: string) =>
+		t(`questions.${question.id}.${part}`, { defaultValue: "" }) || undefined;
+
+	/**
+	 * Several questions read differently to someone living alone than to a couple — asking
+	 * a single person what "Dein Haushalt" earns, or explaining that a partner's income
+	 * counts, makes the check sound like it was written for somebody else. Question one
+	 * already told us which it is, so the copy follows it where a variant exists.
+	 */
+	const title =
+		optionalCopy(
+			answers.householdComposition && isCouple(answers.householdComposition)
+				? "title_couple"
+				: "title_single",
+		) ?? copy("title");
+
+	const header = {
+		id: question.id,
+		question: title,
+		category: copy("category"),
+		tip: optionalCopy("tip"),
 	};
 
-	const questionKey = currentQuestionNode.key;
-	if (!questionKey) {
-		return <Navigate to={getEligibilityRoute(validPath[0])} replace />;
-	}
+	const write = <K extends keyof BenefitCheckAnswers>(
+		value: BenefitCheckAnswers[K],
+	) => setAnswer(question.field as K, value);
 
 	return (
 		<div
@@ -72,8 +98,9 @@ export const EligibilityFlow: React.FC = () => {
 				colorVariant="blue"
 			>
 				<ProgressBar
-					current={currentIndexInPath + 1}
-					total={ELIGIBILITY_TOTAL_STEPS}
+					current={indexInPath + 1}
+					total={totalActive}
+					maxDepthReached={maxDepthReached}
 				/>
 
 				{validationError && (
@@ -85,38 +112,61 @@ export const EligibilityFlow: React.FC = () => {
 					</div>
 				)}
 
-				{currentQuestionNode.type === "date" ? (
-					<DateOfBirthCard
-						key={currentQuestionNode.id}
-						id={questionKey}
-						question={t(i18nKeys.eligibility.questionTitle(questionKey))}
-						category={t(i18nKeys.eligibility.questionCategory(questionKey))}
-						tip={t(i18nKeys.eligibility.questionTip(questionKey))}
-						value={answers[questionKey] as string | undefined}
-						onChange={(val) =>
-							handleAnswerChange(
-								questionKey,
-								val as EligibilityCheck[typeof questionKey],
-							)
-						}
-						onClear={() => clearAnswer(questionKey)}
+				{question.input === "choice" && (
+					<QuestionCard
+						key={question.id}
+						{...header}
+						options={question.options ?? []}
+						value={answers[question.field] as string | undefined}
+						onChange={(raw) => write(raw as never)}
 						onNext={navigateNext}
 					/>
-				) : (
+				)}
+
+				{question.input === "boolean" && (
 					<QuestionCard
-						key={currentQuestionNode.id}
-						id={questionKey}
-						question={t(i18nKeys.eligibility.questionTitle(questionKey))}
-						category={t(i18nKeys.eligibility.questionCategory(questionKey))}
-						tip={t(i18nKeys.eligibility.questionTip(questionKey))}
-						options={currentQuestionNode.options ?? []}
-						value={answers[questionKey] as string | undefined}
-						onChange={(val) =>
-							handleAnswerChange(
-								questionKey,
-								val as EligibilityCheck[typeof questionKey],
-							)
-						}
+						key={question.id}
+						{...header}
+						options={BINARY_OPTIONS}
+						value={toBinaryOption(answers[question.field])}
+						onChange={(raw) => write((raw === "YES") as never)}
+						onNext={navigateNext}
+					/>
+				)}
+
+				{question.input === "date" && (
+					<DateOfBirthCard
+						key={question.id}
+						{...header}
+						value={answers[question.field] as string | undefined}
+						onChange={(raw) => write(raw as never)}
+						onClear={() => clearAnswer(question.field)}
+						onNext={navigateNext}
+					/>
+				)}
+
+				{question.input === "number" && (
+					<NumberCard
+						key={question.id}
+						{...header}
+						unitLabel={copy("unit")}
+						hint={optionalCopy("hint")}
+						value={answers[question.field] as number | undefined}
+						onChange={(raw) => write(raw as never)}
+						onClear={() => clearAnswer(question.field)}
+						onNext={navigateNext}
+					/>
+				)}
+
+				{question.input === "children" && (
+					<ChildrenCard
+						key={question.id}
+						{...header}
+						addLabel={copy("add")}
+						removeLabel={copy("remove")}
+						childLabel={copy("child_label")}
+						value={answers.children}
+						onChange={(raw) => write(raw as never)}
 						onNext={navigateNext}
 					/>
 				)}

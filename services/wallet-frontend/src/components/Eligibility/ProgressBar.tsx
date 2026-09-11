@@ -1,22 +1,23 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { i18nKeys } from "../../i18n/i18nKeys";
-import { useEligibilityStore } from "../../store/useEligibilityStore";
 import { ProgressBar as SharedProgressBar } from "../ui/ProgressBar";
 
 interface ProgressBarProps {
 	current: number;
 	total: number;
+	/** Highest step reached so far, so the bar never runs backwards. */
+	maxDepthReached: number;
 }
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({ current, total }) => {
+export const ProgressBar: React.FC<ProgressBarProps> = ({
+	current,
+	total,
+	maxDepthReached,
+}) => {
 	const { t } = useTranslation();
-	const maxDepthReached = useEligibilityStore((state) => state.maxDepthReached);
 	const visualDepth = Math.max(current, maxDepthReached);
-	const progressText = t(i18nKeys.eligibility.progressAria, {
-		current,
-		total,
-	});
+	const progressText = t(i18nKeys.eligibility.progressAria, { current, total });
 
 	return (
 		<div className="w-full mb-6 font-sans flex flex-col gap-3">

@@ -6,7 +6,11 @@ import { AppRoutes } from "../../constants/routes";
 import { PageContainer } from "../../components/Layout/PageContainer";
 
 type WizardCategory =
-	"about_me" | "housing" | "income_assets" | "health" | "household";
+	| "about_me"
+	| "housing"
+	| "income_assets"
+	| "health"
+	| "household";
 
 const CategoryIntroRoutes: Record<WizardCategory, string> = {
 	about_me: AppRoutes.ApplicationAboutMeIntro,

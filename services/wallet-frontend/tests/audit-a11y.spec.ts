@@ -1,4 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
+import { completeEligibilityCheck } from "./helpers/eligibility";
 import { test, expect, type Page } from "@playwright/test";
 import { testWithAuthenticatedUser } from "./fixtures/test-with-authenticated-user";
 import { waitForFadeInAnimations, waitForPageReady } from "./helpers/a11y";
@@ -24,21 +25,8 @@ async function assertNoViolationsIn(page: Page, selector: string) {
 }
 
 async function completeEligibilityFlow(page: Page) {
-	await page.getByTestId("start-button").click();
-	await page.getByTestId("option-german").click();
-	await page.getByTestId("next-button").click();
-	await page.getByTestId("option-yes").click();
-	await page.getByTestId("next-button").click();
-	await page.getByTestId("dob-date-input").fill("1955-01-01");
-	await page.getByTestId("next-button").click();
-	await page.getByTestId("option-old_age").click();
-	await page.getByTestId("next-button").click();
-	await page.getByTestId("option-not_sufficient").click();
-	await page.getByTestId("next-button").click();
-	await page.getByTestId("option-no").click();
-	await page.getByTestId("next-button").click();
-	await expect(page.getByTestId("outcome-title")).toBeVisible();
-	await waitForFadeInAnimations(page, "outcome-title");
+	await completeEligibilityCheck(page);
+	await waitForFadeInAnimations(page, "result-disclaimer");
 }
 
 test.describe("Deep Accessibility Audit - WCAG 2.1 AA", () => {
@@ -59,19 +47,22 @@ test.describe("Deep Accessibility Audit - WCAG 2.1 AA", () => {
 		await assertNoViolations(page);
 	});
 
+	/** One audit per input type: choice, date and number all render differently. */
 	test("Eligibility Flow: Deep Question Audit", async ({ page }) => {
 		await page.getByTestId("start-button").click();
 		await assertNoViolations(page);
 
-		await page.getByTestId("option-german").click();
+		await page.getByTestId("option-single").click();
+		await page.getByTestId("next-button").click();
+		await assertNoViolations(page);
+
+		await page.getByTestId("dob-date-input").fill("01.01.1955");
 		await page.getByTestId("next-button").click();
 		await assertNoViolations(page);
 
 		await page.getByTestId("option-yes").click();
 		await page.getByTestId("next-button").click();
-		await assertNoViolations(page);
-
-		await page.getByTestId("dob-date-input").fill("1955-01-01");
+		await page.getByTestId("option-yes").click();
 		await page.getByTestId("next-button").click();
 		await assertNoViolations(page);
 	});

@@ -1,19 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useId, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Info } from "lucide-react";
+import { ChevronDown, Info } from "lucide-react";
 import { useProfile } from "../../hooks/useProfile";
 import {
 	MAX_MILESTONE_LEVEL,
 	useProfileStore,
 } from "../../store/useProfileStore";
-import { useTutorialStore } from "../../store/useTutorialStore";
 import { DashboardSkeleton } from "./DashboardSkeleton";
 import { PageContainer } from "../../components/Layout/PageContainer";
 import { PrimaryButton } from "../../components/ui/PrimaryButton";
 import { ApplicationCard } from "./ApplicationCard";
 import { SimpleApplicationCard } from "./SimpleApplicationCard";
 import profileIllustration from "../../assets/illustrations/profile.svg";
-import { DEFAULT_LOCALE } from "../../constants/locale";
+import { partitionDashboardCards } from "./dashboardCards";
+import type { DashboardCardSpec } from "./dashboardCards";
+import { profileToBenefitAnswers } from "../../store/benefits/fromProfile";
+import { evaluateBenefitCheck } from "../../store/benefits/evaluate";
+import { todayIsoDate } from "../../utils/date";
 
 function applicationCardStatusForMilestone(
 	milestoneLevel?: number,
@@ -28,7 +31,7 @@ function applicationCardStatusForMilestone(
 }
 
 export const DashboardView: React.FC = () => {
-	const { i18n, t } = useTranslation("dashboard");
+	const { t } = useTranslation("dashboard");
 
 	const {
 		profileData,
@@ -49,6 +52,23 @@ export const DashboardView: React.FC = () => {
 	});
 
 	const setMilestoneLevel = useProfileStore((s) => s.setMilestoneLevel);
+
+	const [showHidden, setShowHidden] = useState(false);
+	const hiddenGroupId = useId();
+
+	/**
+	 * Which benefits fit is worked out from the profile on every render rather than read
+	 * from a stored verdict, so it follows the profile as it changes — someone who corrects
+	 * their income or their ability to work sees the dashboard change with it.
+	 */
+	const { visible, hidden } = useMemo(() => {
+		if (!profileData) {
+			return partitionDashboardCards(undefined);
+		}
+		const answers = profileToBenefitAnswers(profileData);
+		const { assessments } = evaluateBenefitCheck(answers, todayIsoDate());
+		return partitionDashboardCards(assessments);
+	}, [profileData]);
 
 	const milestoneLevel =
 		rawMilestoneLevel === 0 && (hasCompletedOnboarding || !!profileData)
@@ -87,12 +107,29 @@ export const DashboardView: React.FC = () => {
 		);
 	}
 
-	const activeLanguage = i18n.language || DEFAULT_LOCALE;
 	const trimmedFirstName = profileData?.personalData?.firstName?.trim() ?? "";
 
 	const greetingHeadline = trimmedFirstName
 		? t("onboarding.checklist.greeting_named", { name: trimmedFirstName })
 		: t("onboarding.checklist.greeting_anonymous");
+
+	const renderCard = (card: DashboardCardSpec) =>
+		card.kind === "guided" ? (
+			// ApplicationCard carries its own form type and derives its copy from the
+			// milestone, so it cannot go through the generic title/description lookup.
+			<ApplicationCard
+				key={card.id}
+				status={appCardStatus}
+				level={milestoneLevel}
+			/>
+		) : (
+			<SimpleApplicationCard
+				key={card.id}
+				title={t(`sections.applications.${card.id}.title`)}
+				description={t(`sections.applications.${card.id}.description`)}
+				formType={card.formType as string}
+			/>
+		);
 
 	return (
 		<PageContainer
@@ -118,55 +155,42 @@ export const DashboardView: React.FC = () => {
 					</p>
 				</div>
 
-				<ApplicationCard status={appCardStatus} level={milestoneLevel} />
+				{visible.map(renderCard)}
 
-				<SimpleApplicationCard
-					title={t(
-						"sections.applications.parking_permit.title",
-						"Bewohnerparkausweis",
-					)}
-					description={t(
-						"sections.applications.parking_permit.description",
-						"Beantrage Deinen Bewohnerparkausweis direkt mit Deinen hinterlegten Angaben.",
-					)}
-					formType="antrag_bewohnerparkausweis"
-				/>
-
-				<SimpleApplicationCard
-					title={t(
-						"sections.applications.housing_allowance.title",
-						"Wohngeld",
-					)}
-					description={t(
-						"sections.applications.housing_allowance.description",
-						"Beantrage Wohngeld für Deine Miete direkt mit Deinen hinterlegten Angaben.",
-					)}
-					formType="antrag_wohngeld"
-				/>
-
-				<SimpleApplicationCard
-					title={t(
-						"sections.applications.basic_income.title",
-						"Grundsicherungsgeld",
-					)}
-					description={t(
-						"sections.applications.basic_income.description",
-						"Beantrage Grundsicherungsgeld direkt mit Deinen hinterlegten Angaben.",
-					)}
-					formType="antrag_grundsicherungsgeld"
-				/>
-
-				<SimpleApplicationCard
-					title={t(
-						"sections.applications.child_allowance.title",
-						"Kinderzuschlag",
-					)}
-					description={t(
-						"sections.applications.child_allowance.description",
-						"Beantrage Kinderzuschlag direkt mit Deinen hinterlegten Angaben.",
-					)}
-					formType="antrag_kinderzuschlag"
-				/>
+				{hidden.length > 0 && (
+					<div className="w-full">
+						<button
+							type="button"
+							aria-expanded={showHidden}
+							aria-controls={hiddenGroupId}
+							onClick={() => setShowHidden((open) => !open)}
+							data-testid="dashboard-hidden-toggle"
+							className="flex w-full items-center gap-2 py-2 text-left text-sm text-brand-grey"
+						>
+							<ChevronDown
+								aria-hidden
+								className={`size-4 shrink-0 transition-transform ${
+									showHidden ? "rotate-180" : ""
+								}`}
+							/>
+							{t("sections.applications.hidden_group.count", {
+								count: hidden.length,
+							})}
+						</button>
+						{showHidden && (
+							<div
+								id={hiddenGroupId}
+								data-testid="dashboard-hidden-list"
+								className="mt-2 flex flex-col gap-6"
+							>
+								<p className="text-sm text-brand-grey">
+									{t("sections.applications.hidden_group.description")}
+								</p>
+								{hidden.map(renderCard)}
+							</div>
+						)}
+					</div>
+				)}
 
 				{/*
 				Commented out for now as we don't want to use tutorials yet

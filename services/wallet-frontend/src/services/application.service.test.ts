@@ -1,136 +1,302 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+	AssetsBand,
+	Citizenship,
+	HouseholdComposition,
+	WorkCapacity,
+} from "../schemas/benefitCheck.schema";
+import type { PartialBenefitCheckAnswers } from "../schemas/benefitCheck.schema";
 import {
 	applicationService,
 	mapEligibilityToProfilePayload,
+	mergeChildren,
 } from "./application.service";
-import {
-	Binary,
-	NationalityStatus,
-	PensionStatus,
-} from "../schemas/eligibility.schema";
-import { env } from "../config/env.config";
+import type { AssociatedPersonRow } from "./application.service";
 
-describe("applicationService: Guest Data Sync", () => {
-	let originalMocks: boolean;
-	let originalMockAuth: boolean;
+/**
+ * env.config parses import.meta.env once at module scope, and vitest.setup.ts stubs
+ * VITE_USE_MOCKS=true before any module loads — so syncGuestData would return before it
+ * ever fetches. vi.stubEnv cannot undo that after the fact; the module has to be mocked.
+ */
+vi.mock("../config/env.config", () => ({
+	env: {
+		VITE_API_URL: "/api",
+		VITE_AUTH_URL: "/auth-proxy",
+		VITE_USE_MOCKS: false,
+		VITE_USE_MOCK_AUTH: false,
+		VITE_BYPASS_AUTH: false,
+	},
+}));
+
+describe("mapEligibilityToProfilePayload", () => {
+	it("is empty for an empty answer set", () => {
+		expect(mapEligibilityToProfilePayload({})).toEqual({});
+	});
+
+	it("maps the date of birth straight through", () => {
+		expect(
+			mapEligibilityToProfilePayload({ dateOfBirth: "1994-01-15" }),
+		).toEqual({ date_of_birth: "1994-01-15" });
+	});
+
+	it("maps residence in Germany to a boolean", () => {
+		expect(mapEligibilityToProfilePayload({ livesInGermany: true })).toEqual({
+			is_resident_in_germany: true,
+		});
+	});
+
+	it("maps EU citizenship onto the three profile fields", () => {
+		expect(
+			mapEligibilityToProfilePayload({ citizenship: Citizenship.DE_EU }),
+		).toEqual({
+			is_german_citizen: true,
+			nationality: "DE",
+			residence_status: "Citizen",
+		});
+	});
+
+	it("maps non-EU citizenship with secure status", () => {
+		expect(
+			mapEligibilityToProfilePayload({
+				citizenship: Citizenship.NON_EU,
+				hasSecureResidenceStatus: true,
+			}),
+		).toEqual({
+			is_german_citizen: false,
+			residence_status: "PermanentResident",
+		});
+	});
+
+	it("maps work capacity onto ability_to_work", () => {
+		expect(
+			mapEligibilityToProfilePayload({
+				workCapacity: WorkCapacity.PERMANENTLY_REDUCED,
+			}),
+		).toEqual({
+			ability_to_work: "Permanently disabled",
+			has_permanent_reduction_in_earning_capacity: true,
+		});
+		expect(
+			mapEligibilityToProfilePayload({ workCapacity: WorkCapacity.FULL }),
+		).toEqual({ ability_to_work: "Fully able" });
+	});
+
+	it("maps the asset band onto the has_assets boolean", () => {
+		expect(
+			mapEligibilityToProfilePayload({ assetsBand: AssetsBand.UNDER_5000 }),
+		).toEqual({ has_assets: false });
+		expect(
+			mapEligibilityToProfilePayload({
+				assetsBand: AssetsBand.FROM_5000_TO_15000,
+			}),
+		).toEqual({ has_assets: true });
+	});
+
+	it("maps the household composition onto marital status and head count", () => {
+		expect(
+			mapEligibilityToProfilePayload({
+				householdComposition: HouseholdComposition.SINGLE,
+				children: [],
+			}),
+		).toEqual({ marital_status: "Single", persons_in_household_count: 1 });
+	});
+
+	it("counts children into the household size", () => {
+		expect(
+			mapEligibilityToProfilePayload({
+				householdComposition: HouseholdComposition.COUPLE_WITH_CHILDREN,
+				children: [{ dateOfBirth: "2019-04-02" }],
+			}),
+		).toEqual({ marital_status: "Cohabiting", persons_in_household_count: 3 });
+	});
+
+	it("maps the net household income", () => {
+		expect(
+			mapEligibilityToProfilePayload({ monthlyNetHouseholdIncome: 1100 }),
+		).toEqual({ monthly_income: 1100 });
+	});
+
+	it("does not send the fields the profile schema has no column for", () => {
+		const payload = mapEligibilityToProfilePayload({
+			monthlyGrossIncome: 1400,
+			assetsBand: AssetsBand.OVER_25000,
+			monthlyWarmRent: 650,
+		});
+		expect(payload).not.toHaveProperty("monthly_gross_income");
+		expect(payload).not.toHaveProperty("assets_band");
+		expect(payload).not.toHaveProperty("rent_total");
+	});
+});
+
+describe("syncGuestData: children", () => {
+	const CHILD_ANSWERS: PartialBenefitCheckAnswers = {
+		householdComposition: HouseholdComposition.SINGLE_PARENT,
+		children: [{ dateOfBirth: "2020-02-11" }],
+	};
+
+	let fetchMock: ReturnType<typeof vi.fn>;
 
 	beforeEach(() => {
-		originalMocks = env.VITE_USE_MOCKS;
-		originalMockAuth = env.VITE_USE_MOCK_AUTH;
-		env.VITE_USE_MOCKS = false;
-		env.VITE_USE_MOCK_AUTH = false;
-
-		vi.stubGlobal(
-			"fetch",
-			vi.fn().mockImplementation(() => {
-				return Promise.resolve({
-					ok: true,
-					status: 200,
-					json: () => Promise.resolve({ status: "success" }),
-				});
-			}),
-		);
+		fetchMock = vi.fn();
+		// authenticatedFetch wraps the global fetch and reads the auth store for a
+		// bearer token; stubbing fetch is the right level and needs no token.
+		vi.stubGlobal("fetch", fetchMock);
 	});
 
 	afterEach(() => {
-		env.VITE_USE_MOCKS = originalMocks;
-		env.VITE_USE_MOCK_AUTH = originalMockAuth;
 		vi.unstubAllGlobals();
 	});
 
-	describe("mapEligibilityToProfilePayload", () => {
-		it("maps nationality German to correct profile flags", () => {
-			const payload = mapEligibilityToProfilePayload({
-				nationality: NationalityStatus.GERMAN,
-			});
-			expect(payload).toEqual({
-				is_german_citizen: true,
-				nationality: "DE",
-				residence_status: "Citizen",
-			});
-		});
+	const jsonResponse = (body: unknown) =>
+		Promise.resolve({
+			ok: true,
+			status: 200,
+			json: () => Promise.resolve(body),
+		} as Response);
 
-		it("maps nationality EU_5_PLUS to PermanentResident", () => {
-			const payload = mapEligibilityToProfilePayload({
-				nationality: NationalityStatus.EU_5_PLUS,
-			});
-			expect(payload).toEqual({
-				is_german_citizen: false,
-				nationality: "EU",
-				residence_status: "PermanentResident",
-			});
-		});
+	const bodyOfLastPost = (): Record<string, unknown> => {
+		const post = fetchMock.mock.calls.find(
+			(call) => (call[1] as Parameters<typeof fetch>[1])?.method === "POST",
+		);
+		const init = post?.[1] as Parameters<typeof fetch>[1];
+		if (!init?.body) {
+			throw new Error("no POST with a body was made");
+		}
+		return JSON.parse(init.body as string);
+	};
 
-		it("maps nationality RESIDENCE_PERMIT to Other", () => {
-			const payload = mapEligibilityToProfilePayload({
-				nationality: NationalityStatus.RESIDENCE_PERMIT,
-			});
-			expect(payload).toEqual({
-				is_german_citizen: false,
-				residence_status: "Other",
-			});
-		});
+	it("merges the children into the existing collection", async () => {
+		fetchMock
+			.mockImplementationOnce(() =>
+				jsonResponse({
+					associated_persons: [
+						{
+							association_type: "Spouse",
+							first_name: "Ingrid",
+							sort_order: 0,
+							lives_in_household: true,
+						},
+					],
+				}),
+			)
+			.mockImplementationOnce(() => jsonResponse({}));
 
-		it("maps old age pension to an income entry", () => {
-			const payload = mapEligibilityToProfilePayload({
-				pension: PensionStatus.OLD_AGE,
-			});
-			expect(payload).toEqual({
-				income_entries: [{ income_type: "Pension" }],
-			});
-		});
+		await applicationService.syncGuestData(CHILD_ANSWERS);
 
-		it("maps reduced earning capacity pension to an income entry and work capability status", () => {
-			const payload = mapEligibilityToProfilePayload({
-				pension: PensionStatus.REDUCED_EARNING_CAPACITY,
-			});
-			expect(payload).toEqual({
-				income_entries: [{ income_type: "Pension" }],
-				ability_to_work: "Permanently disabled",
-				has_permanent_reduction_in_earning_capacity: true,
-			});
-		});
-
-		it("maps assets above threshold correctly", () => {
-			const payload = mapEligibilityToProfilePayload({
-				hasAssetsAboveThreshold: Binary.YES,
-			});
-			expect(payload).toEqual({
-				has_assets: true,
-			});
-		});
+		const persons = bodyOfLastPost().associated_persons as Array<
+			Record<string, unknown>
+		>;
+		expect(persons).toHaveLength(2);
+		expect(persons[0].first_name).toBe("Ingrid");
+		expect(persons[1].association_type).toBe("Child");
 	});
 
-	describe("syncGuestData", () => {
-		it("sends mapped payload to profile endpoint", async () => {
-			const answers = {
-				dateOfBirth: "1960-01-01",
-				livesInGermany: Binary.YES,
-				nationality: NationalityStatus.GERMAN,
-			};
+	it("still sends everything else when the profile cannot be read", async () => {
+		fetchMock
+			.mockImplementationOnce(() => Promise.reject(new Error("offline")))
+			.mockImplementationOnce(() => jsonResponse({}));
 
-			const result = await applicationService.syncGuestData(answers);
-			expect(result.success).toBe(true);
-
-			expect(fetch).toHaveBeenCalledWith(
-				`${env.VITE_API_URL}/profile`,
-				expect.objectContaining({
-					method: "POST",
-					body: JSON.stringify({
-						date_of_birth: "1960-01-01",
-						is_resident_in_germany: true,
-						is_german_citizen: true,
-						nationality: "DE",
-						residence_status: "Citizen",
-					}),
-				}),
-			);
+		const result = await applicationService.syncGuestData({
+			...CHILD_ANSWERS,
+			dateOfBirth: "1997-05-02",
 		});
 
-		it("skips post request if mapped payload is empty", async () => {
-			const result = await applicationService.syncGuestData({});
-			expect(result.success).toBe(true);
-			expect(fetch).not.toHaveBeenCalled();
+		expect(result.success).toBe(true);
+		const body = bodyOfLastPost();
+		expect(body).not.toHaveProperty("associated_persons");
+		expect(body.date_of_birth).toBe("1997-05-02");
+	});
+
+	/**
+	 * The questionnaire writes `children: []` by itself when the household is childless,
+	 * so a merge here would let "I live alone" delete someone's children.
+	 */
+	it("never reads or writes the collection for a childless household", async () => {
+		fetchMock.mockImplementation(() => jsonResponse({}));
+
+		await applicationService.syncGuestData({
+			householdComposition: HouseholdComposition.SINGLE,
+			children: [],
 		});
+
+		expect(
+			fetchMock.mock.calls.filter(
+				(call) => (call[1] as Parameters<typeof fetch>[1])?.method !== "POST",
+			),
+		).toHaveLength(0);
+		expect(bodyOfLastPost()).not.toHaveProperty("associated_persons");
+	});
+});
+
+const spouse: AssociatedPersonRow = {
+	association_type: "Spouse",
+	lives_in_household: true,
+	first_name: "Ingrid",
+	date_of_birth: "1957-08-14",
+};
+
+const childRow = (
+	dateOfBirth: string,
+	firstName?: string,
+): AssociatedPersonRow => ({
+	association_type: "Child",
+	lives_in_household: true,
+	date_of_birth: dateOfBirth,
+	...(firstName ? { first_name: firstName } : {}),
+});
+
+describe("mergeChildren", () => {
+	it("creates a row when the collection is empty", () => {
+		expect(mergeChildren([], [{ dateOfBirth: "2020-02-11" }])).toEqual([
+			{
+				association_type: "Child",
+				lives_in_household: true,
+				date_of_birth: "2020-02-11",
+			},
+		]);
+	});
+
+	it("leaves a spouse untouched and appends the child after them", () => {
+		const merged = mergeChildren([spouse], [{ dateOfBirth: "2020-02-11" }]);
+		expect(merged).toHaveLength(2);
+		expect(merged[0]).toEqual(spouse);
+		expect(merged[1].association_type).toBe("Child");
+	});
+
+	it("keeps an existing child's name when the date of birth matches", () => {
+		const merged = mergeChildren(
+			[childRow("2020-02-11", "Mia")],
+			[{ dateOfBirth: "2020-02-11" }],
+		);
+		expect(merged).toHaveLength(1);
+		expect(merged[0].first_name).toBe("Mia");
+	});
+
+	it("keeps a child the questionnaire did not list again", () => {
+		const merged = mergeChildren(
+			[childRow("2020-02-11", "Mia"), childRow("2015-03-01", "Jonas")],
+			[{ dateOfBirth: "2020-02-11" }],
+		);
+		expect(merged.map((row) => row.first_name)).toEqual(["Mia", "Jonas"]);
+	});
+
+	it("keeps every existing row when the questionnaire lists no children", () => {
+		const merged = mergeChildren([spouse, childRow("2015-03-01")], []);
+		expect(merged).toHaveLength(2);
+	});
+
+	it("adds the second twin when only one is already recorded", () => {
+		const merged = mergeChildren(
+			[childRow("2020-02-11", "Mia")],
+			[{ dateOfBirth: "2020-02-11" }, { dateOfBirth: "2020-02-11" }],
+		);
+		expect(merged).toHaveLength(2);
+		expect(merged[0].first_name).toBe("Mia");
+		expect(merged[1].first_name).toBeUndefined();
+	});
+
+	it("sets no sort_order, which the server assigns by position", () => {
+		const merged = mergeChildren([spouse], [{ dateOfBirth: "2020-02-11" }]);
+		expect(merged[1]).not.toHaveProperty("sort_order");
 	});
 });

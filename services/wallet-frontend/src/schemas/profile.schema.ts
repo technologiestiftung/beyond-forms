@@ -6,6 +6,8 @@ export type GenderType = z.infer<typeof GenderEnum>;
 const MaritalStatusEnum = z.enum([
 	"Single",
 	"Married",
+	"Cohabiting",
+	"Permanently Separated",
 	"Divorced",
 	"Widowed",
 	"Registered Civil Partnership",

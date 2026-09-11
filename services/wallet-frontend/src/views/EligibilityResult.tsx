@@ -1,128 +1,187 @@
-import React from "react";
+import React, { useId, useMemo, useState } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, Navigate } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
 import { StepLayout } from "../components/Layout/StepLayout";
+import { BenefitAssessmentCard } from "../components/Eligibility/BenefitAssessmentCard";
+import { useBenefitCheckStore } from "../store/useBenefitCheckStore";
+import { evaluateBenefitCheck } from "../store/benefits/evaluate";
+import { firstOpenQuestion } from "../store/benefits/questionPath";
+import { BenefitStatus } from "../schemas/benefitCheck.schema";
 import {
 	AppRoutes,
 	URL_PARAMS,
 	getEligibilityRoute,
 } from "../constants/routes";
-import { i18nKeys } from "../i18n/i18nKeys";
-import { useRootStore } from "../store/useRootStore";
-import { useEligibilityOutcome } from "../hooks/useEligibilityOutcome";
 import { EXTERNAL_LINKS } from "../config/externalLinks";
-import { PrimaryButton } from "../components/ui/PrimaryButton";
-import { ResultProfile } from "../schemas/eligibility.schema";
+import { todayIsoDate } from "../utils/date";
 
-const profileFromEligibilityPath = `${AppRoutes.Profile}?${URL_PARAMS.ORIGIN}=${URL_PARAMS.ORIGIN_ELIGIBILITY}`;
+/**
+ * ProtectedRoute forwards an unauthenticated visitor to Auth and keeps the query string,
+ * so this is what makes AuthView run the guest sync. Changing the target silently turns
+ * the transfer off.
+ */
+const CONTINUE_PATH = `${AppRoutes.Profile}?${URL_PARAMS.ORIGIN}=${URL_PARAMS.ORIGIN_ELIGIBILITY}`;
 
-const getExternalLink = (key: string): string | null => {
-	switch (key) {
-		case "sozialamt":
-			return EXTERNAL_LINKS.SOZIALAMT;
-		default:
-			return null;
-	}
-};
-
-const OutcomeView: React.FC<{
-	translationKey: string;
-	isEligible: boolean;
-}> = ({ translationKey, isEligible }) => {
-	const { t } = useTranslation();
-	const navigate = useNavigate();
-	const externalLink = isEligible ? null : getExternalLink(translationKey);
-	const hasExternalLink = !!externalLink;
-
-	const ctaContent = t(i18nKeys.eligibility.outcomeCTA(translationKey));
-
-	return (
-		<div className="flex flex-col items-center gap-9 w-full">
-			<div className="flex flex-col items-center gap-5 text-start">
-				<h1
-					data-testid="outcome-title"
-					className="text-h1 font-bold text-brand-black leading-tight"
-				>
-					{t(i18nKeys.eligibility.outcomeTitle(translationKey))}
-				</h1>
-
-				<p className="text-body-lg text-brand-black leading-relaxed">
-					{t(i18nKeys.eligibility.outcomeDesc(translationKey))}
-				</p>
-			</div>
-
-			{hasExternalLink ? (
-				<a
-					href={externalLink}
-					target="_blank"
-					rel="noopener noreferrer"
-					data-testid="outcome-cta"
-					className="text-body-lg text-primary-blue-400 font-medium underline decoration-solid hover:text-primary-blue-500 transition-colors cursor-pointer"
-				>
-					{ctaContent}
-				</a>
-			) : (
-				<PrimaryButton
-					onClick={() => navigate(profileFromEligibilityPath)}
-					data-testid="outcome-cta"
-				>
-					{ctaContent}
-				</PrimaryButton>
-			)}
-		</div>
-	);
+/**
+ * Display order. NOT_APPLICABLE ranks last and is then split off entirely: those are
+ * category mismatches, not rejections, and the domain spec §8 asks that they not read
+ * like one.
+ */
+const STATUS_RANK: Record<BenefitStatus, number> = {
+	[BenefitStatus.LIKELY_YES]: 0,
+	[BenefitStatus.CHECK_ADVISED]: 1,
+	[BenefitStatus.LIKELY_NO]: 2,
+	[BenefitStatus.NOT_APPLICABLE]: 3,
 };
 
 export const EligibilityResult: React.FC = () => {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
-	const { resetAll } = useRootStore();
-	const shouldReduceMotion = useReducedMotion();
+	const answers = useBenefitCheckStore((s) => s.answers);
+	const [showNotApplicable, setShowNotApplicable] = useState(false);
+	const notApplicableId = useId();
+	// Input-side clock only; the engine takes `today` as an argument so it stays testable.
+	const today = todayIsoDate();
+	const openQuestion = useMemo(
+		() => firstOpenQuestion(answers, today),
+		[answers, today],
+	);
+	const result = useMemo(
+		() => evaluateBenefitCheck(answers, today),
+		[answers, today],
+	);
 
-	const { profile, hasError, translationKey, path } = useEligibilityOutcome();
-	const isEligible = profile === ResultProfile.ELIGIBLE;
-
-	if (hasError || !profile) {
-		return <Navigate to={AppRoutes.Home} replace />;
+	// An unfinished check has no result worth showing — every card would read "Angaben
+	// fehlen". Send the visitor to the question that is actually waiting for them.
+	if (openQuestion) {
+		return <Navigate to={getEligibilityRoute(openQuestion.id)} replace />;
 	}
 
-	const handleStartOver = () => {
-		resetAll();
-		navigate(AppRoutes.Home);
-	};
+	const nothingMatches = !result.assessments.some(
+		(assessment) =>
+			assessment.status === BenefitStatus.LIKELY_YES ||
+			assessment.status === BenefitStatus.CHECK_ADVISED,
+	);
 
-	const handleBack = () => {
-		if (path.length > 1) {
-			const lastQuestionId = path[path.length - 2];
-			navigate(getEligibilityRoute(lastQuestionId));
-		} else {
-			navigate(AppRoutes.Home);
-		}
-	};
+	/**
+	 * Sort is stable in every engine this ships to, so benefits of the same status keep
+	 * the order the engine produced them in — the list stays reproducible.
+	 */
+	const ranked = [...result.assessments].sort(
+		(a, b) => STATUS_RANK[a.status] - STATUS_RANK[b.status],
+	);
+	const listed = ranked.filter(
+		(assessment) => assessment.status !== BenefitStatus.NOT_APPLICABLE,
+	);
+	const notApplicable = ranked.filter(
+		(assessment) => assessment.status === BenefitStatus.NOT_APPLICABLE,
+	);
 
 	return (
-		<StepLayout
-			onBack={handleBack}
-			backTestId="back-button"
-			backAriaLabel={t(i18nKeys.common.back)}
-		>
-			<motion.div
-				initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.4, ease: "easeOut" }}
-				className="w-full flex flex-col items-center gap-6 pt-4"
-			>
-				<OutcomeView translationKey={translationKey} isEligible={isEligible} />
+		<StepLayout>
+			<div className="w-full font-sans flex flex-col gap-6">
+				<h1 className="text-h1 font-bold text-brand-black leading-tight">
+					{t("result.title")}
+				</h1>
 
-				<button
-					type="button"
-					onClick={handleStartOver}
-					className="text-body-lg text-primary-blue-400 font-medium underline decoration-solid hover:text-primary-blue-500 transition-colors cursor-pointer"
+				<ul className="flex flex-col gap-3 list-none p-0 m-0">
+					{listed.map((assessment) => (
+						<BenefitAssessmentCard
+							key={assessment.benefit}
+							assessment={assessment}
+							applyPath={CONTINUE_PATH}
+						/>
+					))}
+				</ul>
+
+				{notApplicable.length > 0 && (
+					<div>
+						<button
+							type="button"
+							aria-expanded={showNotApplicable}
+							aria-controls={notApplicableId}
+							onClick={() => setShowNotApplicable((open) => !open)}
+							data-testid="not-applicable-toggle"
+							className="flex w-full items-center gap-2 py-2 text-left text-sm text-brand-grey"
+						>
+							<ChevronDown
+								aria-hidden="true"
+								className={`size-4 shrink-0 transition-transform ${
+									showNotApplicable ? "rotate-180" : ""
+								}`}
+							/>
+							{t("result.not_applicable_group", {
+								count: notApplicable.length,
+							})}
+						</button>
+						{showNotApplicable && (
+							<ul
+								id={notApplicableId}
+								data-testid="not-applicable-list"
+								className="mt-2 flex flex-col gap-3 list-none p-0"
+							>
+								{notApplicable.map((assessment) => (
+									<BenefitAssessmentCard
+										key={assessment.benefit}
+										assessment={assessment}
+										applyPath={CONTINUE_PATH}
+									/>
+								))}
+							</ul>
+						)}
+					</div>
+				)}
+
+				{nothingMatches && (
+					<div
+						data-testid="result-referral"
+						className="rounded-xl border border-brand-border-subtle bg-brand-bg p-4"
+					>
+						<p className="font-semibold text-brand-black">
+							{t("result.referral.title")}
+						</p>
+						<p className="mt-1 text-base text-brand-grey">
+							{t("result.referral.description")}
+						</p>
+						<a
+							href={EXTERNAL_LINKS.SOZIALAMT}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="mt-2 inline-block text-base font-medium text-primary-blue-400 underline"
+						>
+							{t("result.referral.link")}
+						</a>
+					</div>
+				)}
+
+				{result.hints.length > 0 && (
+					<ul
+						data-testid="result-hints"
+						className="flex flex-col gap-2 list-none p-0 m-0"
+					>
+						{result.hints.map((hint) => (
+							<li key={hint} className="text-sm text-brand-grey">
+								{t(`result.hint.${hint}`)}
+							</li>
+						))}
+					</ul>
+				)}
+
+				<Link
+					to={CONTINUE_PATH}
+					data-testid="result-cta"
+					className="w-full rounded-full bg-primary-blue-500 px-6 py-3 text-center font-bold text-white"
 				>
-					{t(i18nKeys.common.startOver)}
-				</button>
-			</motion.div>
+					{t("result.cta")}
+				</Link>
+
+				<p
+					data-testid="result-disclaimer"
+					className="text-xs text-brand-grey leading-relaxed"
+				>
+					{t("result.disclaimer")}
+				</p>
+			</div>
 		</StepLayout>
 	);
 };

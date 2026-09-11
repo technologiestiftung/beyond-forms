@@ -5,6 +5,7 @@ import {
 	isRemoteEnvironment,
 	openManualPhoneForm,
 } from "./helpers/auth";
+import { completeEligibilityCheck } from "./helpers/eligibility";
 import { gotoWithRetry } from "./helpers/navigation";
 
 test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
@@ -28,27 +29,8 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 
 	test("Happy Path: New User Registration with Data Sync", async ({ page }) => {
 		await gotoWithRetry(page, "/");
-		await page.getByTestId("start-button").click();
-
-		await page.getByTestId("option-german").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-yes").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("dob-date-input").fill("1955-01-01");
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-old_age").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-not_sufficient").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-no").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("outcome-cta").click();
+		await completeEligibilityCheck(page, { dateOfBirth: "01.01.1955" });
+		await page.getByTestId("result-cta").click();
 		await expect(page).toHaveURL(/\/auth\?origin=eligibility/);
 
 		const randomPhone = generateRandomTestPhoneNumber();

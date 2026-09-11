@@ -4,9 +4,10 @@ import { useTranslation } from "react-i18next";
 import { StepLayout } from "../components/Layout/StepLayout";
 import * as Icons from "../components/ui/Icons";
 import { AppRoutes, getEligibilityRoute } from "../constants/routes";
+import { QUESTION_CATALOGUE } from "../store/benefits/questionCatalogue";
 import { i18nKeys } from "../i18n/i18nKeys";
 
-import { useEligibilityStore } from "../store/useEligibilityStore";
+import { useBenefitCheckStore } from "../store/useBenefitCheckStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { PrimaryButton } from "../components/ui/PrimaryButton";
 import { IntroCarousel } from "../components/Eligibility/IntroCarousel";
@@ -15,7 +16,7 @@ import { SecondaryButton } from "../components/ui/SecondaryButton";
 export const EligibilityStart: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	const resetEligibility = useEligibilityStore((s) => s.resetForm);
+	const resetEligibility = useBenefitCheckStore((s) => s.resetForm);
 	const isAuthenticated = !!useAuthStore((s) => s.token);
 
 	React.useEffect(() => {
@@ -27,7 +28,7 @@ export const EligibilityStart: React.FC = () => {
 	}, [isAuthenticated, navigate, resetEligibility]);
 
 	const handleGoToCheck = () => {
-		navigate(getEligibilityRoute("nationality"));
+		navigate(getEligibilityRoute(QUESTION_CATALOGUE[0].id));
 	};
 
 	const handleGoToLogin = () => {
@@ -53,11 +54,11 @@ export const EligibilityStart: React.FC = () => {
 				<p className="text-brand-black text-body-lg leading-relaxed w-full mb-4">
 					{t(i18nKeys.start.desc)}
 				</p>
-				<ul className="text-brand-black text-body-lg leading-relaxed w-full mb-4 ml-2">
+				<ul className="text-brand-black text-body-lg leading-relaxed w-full mb-4 ml-2 pl-5">
 					{t(i18nKeys.start.descList)
 						.split("\n")
 						.map((item: string) => (
-							<li key={item} className="list-disc list-inside">
+							<li key={item} className="list-disc list-outside">
 								{item}
 							</li>
 						))}

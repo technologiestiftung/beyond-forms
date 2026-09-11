@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useAuthStore, type AuthStatus } from "../store/useAuthStore";
-import { useEligibilityStore } from "../store/useEligibilityStore";
+import { useBenefitCheckStore } from "../store/useBenefitCheckStore";
 import { applicationService } from "../services/application.service";
 import { PhoneNumberForm } from "../components/Auth/PhoneNumberForm";
 import { OTPForm } from "../components/Auth/OTPForm";
@@ -24,7 +24,7 @@ export const AuthView: React.FC = () => {
 
 	const status: AuthStatus = useAuthStore((s) => s.status);
 	const currentPhoneNumber = useAuthStore((s) => s.phoneNumber);
-	const answers = useEligibilityStore((s) => s.answers);
+	const answers = useBenefitCheckStore((s) => s.answers);
 	// Defaults to true if a phone number is already set on mount (e.g. after a
 	// page reload mid manual entry) so that state isn't stranded behind the
 	// picker; a fresh session always starts at the picker.

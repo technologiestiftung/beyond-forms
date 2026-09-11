@@ -1,11 +1,11 @@
-import { useEligibilityStore } from "./useEligibilityStore";
+import { useBenefitCheckStore } from "./useBenefitCheckStore";
 import { useAuthStore } from "./useAuthStore";
 
 export const useRootStore = () => {
-	const eligibilityStore = useEligibilityStore();
+	const benefitCheckStore = useBenefitCheckStore();
 
 	const resetAll = () => {
-		eligibilityStore.resetForm();
+		benefitCheckStore.resetForm();
 		useAuthStore.getState().logout();
 
 		const lng = localStorage.getItem("i18nextLng");

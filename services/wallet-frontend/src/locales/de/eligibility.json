@@ -10,15 +10,19 @@
 	"language_switcher_toggle_open": "Sprachauswahl öffnen",
 	"language_switcher_toggle_close": "Sprachauswahl schließen",
 	"language_selection_region": "Sprachauswahl",
+	"date_error": {
+		"too_early": "Bitte gib ein Jahr ab 1900 ein.",
+		"future": "Das Datum darf nicht in der Zukunft liegen."
+	},
 	"application_title": "Anspruch prüfen",
 	"aria": {
 		"welcome": "Willkommen auf der Startseite",
 		"questionnaire": "Fragebogen zur Prüfung"
 	},
 	"start_screen": {
-		"title": "Schnell und einfach Deinen Anspruch auf Grundsicherung prüfen",
-		"description": "Mit Klaro findest Du in nur 5 Minuten heraus, ob Du Grundsicherung beantragen kannst.",
-		"description_list": "Schnelltest in nur 5 Minuten\nEinfach und verständlich erklärt\nKostenlos für alle",
+		"title": "Schnell und einfach Deinen Anspruch auf Sozialleistungen prüfen",
+		"description": "Mit Klaro findest Du heraus, welche Sozialleistungen für Dich infrage kommen. Danach begleitet Dich Klaro Schritt für Schritt durch den Antrag.",
+		"description_list": "Erste Einschätzung in wenigen Minuten\nEinfach und verständlich erklärt\nKostenlos für alle",
 		"feature_cards": {
 			"quick_check": {
 				"title": "Schnell prüfen",
@@ -39,9 +43,9 @@
 			"description": "Mit Klaro kannst Du aktuell prüfen, ob Grundsicherung für Dich infrage kommt, und Dich Schritt-für-Schritt auf den Antrag vorbereiten. Weitere Services folgen später."
 		},
 		"promo_card": {
-			"title": "Direkt zur Grundsicherung",
-			"description": "Melde Dich an und starte direkt mit Deinem Antrag zur Grundsicherung. Klaro begleitet Dich Schritt für Schritt.",
-			"cta": "Jetzt Antrag starten"
+			"title": "Direkt zum Profil",
+			"description": "Du weißt schon, was Du brauchst? Melde Dich an und arbeite direkt in Deinem Profil weiter.",
+			"cta": "Jetzt anmelden"
 		},
 		"intro_cards": {
 			"section_title": "So funktioniert Klaro",
@@ -53,8 +57,8 @@
 				"description": "Klaro ist ein kostenloses Angebot. Klaro hilft Dir dabei, soziale Unterstützung besser zu verstehen."
 			},
 			"2": {
-				"title": "Hier geht es um Grundsicherung",
-				"description": "Klaro hilft Dir zuerst beim Thema Grundsicherung. Du kannst prüfen, ob diese Unterstützung für Dich passen könnte."
+				"title": "Du musst Dich nicht auskennen",
+				"description": "Es gibt viele Sozialleistungen. Klaro hilft Dir, die zu finden, die zu Deiner Situation passen."
 			},
 			"3": {
 				"title": "Beantworte ein paar kurze Fragen",
@@ -62,83 +66,177 @@
 			},
 			"4": {
 				"title": "Starte jetzt die Prüfung",
-				"description": "Die Prüfung dauert nur wenige Minuten. Du kannst direkt starten und brauchst noch kein Konto."
+				"description": "Die Prüfung dauert nur wenige Minuten. Danach hilft Dir Klaro beim Antrag. Du kannst direkt starten und brauchst noch kein Konto."
 			}
 		},
-		"cta": "Jetzt Schnelltest starten"
+		"cta": "Jetzt Anspruch prüfen"
 	},
 	"questions": {
-		"nationality": {
-			"category": "Staatsangehörigkeit und Aufenthaltsstatus",
-			"title": "Was trifft auf Dich zu?",
-			"tip": "Das ist wichtig, weil je nach Aufenthaltsstatus unterschiedliche Gesetze gelten. Wenn Du neu in Deutschland bist oder Dich im Asylverfahren befindest, gibt es ein spezielles Unterstützungssystem.",
+		"household": {
+			"category": "Haushalt",
+			"title": "Wer lebt in Deinem Haushalt?",
 			"options": {
-				"GERMAN": "Ich habe die deutsche Staatsangehörigkeit.",
-				"EU_5_PLUS": "Ich bin EU-Bürger:in und lebe seit mindestens 5 Jahren in Deutschland.",
-				"RESIDENCE_PERMIT": "Ich habe einen gültigen Aufenthaltstitel für Deutschland.",
-				"NONE": "Nichts trifft zu."
+				"SINGLE": "Ich lebe allein.",
+				"SINGLE_PARENT": "Ich bin alleinerziehend.",
+				"COUPLE_NO_CHILDREN": "Wir sind ein Paar, ohne Kinder im Haushalt.",
+				"COUPLE_WITH_CHILDREN": "Wir sind ein Paar, mit Kindern im Haushalt."
 			}
 		},
-		"livesInGermany": {
-			"category": "Wohnsitz und Aufenthalt",
+		"children": {
+			"category": "Kinder im Haushalt",
+			"title": "Wann sind Deine Kinder geboren?",
+			"tip": "Das Alter der Kinder ist wichtig, weil für Kinder eigene Beträge gelten. Manche Leistungen gibt es nur für Kinder unter 18 oder unter 25 Jahren.",
+			"add": "Kind hinzufügen",
+			"remove": "Kind {{index}} entfernen",
+			"child_label": "Kind {{index}}"
+		},
+		"birthdate": {
+			"category": "Geburtsdatum",
+			"title": "Wann bist Du geboren?"
+		},
+		"germany": {
+			"category": "Wohnsitz",
 			"title": "Wohnst Du in Deutschland?",
-			"tip": "Grundsicherung kannst Du nur bekommen, wenn Du dauerhaft in Deutschland lebst.",
+			"tip": "Die Leistungen, die Klaro prüft, gibt es nur, wenn Du dauerhaft in Deutschland lebst.",
 			"options": {
 				"YES": "Ja, ich wohne in Deutschland.",
 				"NO": "Nein, ich wohne nicht in Deutschland."
 			}
 		},
-		"dateOfBirth": {
-			"category": "Geburtsdatum",
-			"title": "Wann bist Du geboren?",
-			"tip": "Grundsicherung kann für Dich infrage kommen, wenn Du:\n• die Regelaltersgrenze erreicht hast oder\n• mindestens 18 Jahre alt und dauerhaft voll erwerbsgemindert bist."
-		},
-		"pension": {
-			"category": "Rente",
-			"title": "Bekommst Du eine Rente?",
-			"tip": "Ab der Regelaltersgrenze kann Grundsicherung im Alter für Dich infrage kommen. Wann Du diese Altersgrenze erreichst, hängt von Deinem Geburtsjahr ab.",
+		"work-capacity": {
+			"category": "Arbeiten können",
+			"title": "Kannst Du mindestens drei Stunden am Tag arbeiten?",
+			"tip": "Manche Menschen arbeiten zum Beispiel in einer Werkstatt und gelten trotzdem als erwerbsgemindert. Deshalb fragen wir das auch, wenn Du arbeitest.",
 			"options": {
-				"OLD_AGE": "Ich bekomme eine Altersrente.",
-				"REDUCED_EARNING_CAPACITY": "Ich bekomme eine Erwerbsminderungsrente. Der Grund ist, dass ich  nicht mehr voll arbeiten kann.",
-				"NONE": "Ich bekomme keine Rente."
+				"FULL": "Ja, mindestens drei Stunden am Tag.",
+				"TEMPORARILY_REDUCED": "Im Moment nicht, aber vielleicht später wieder.",
+				"PERMANENTLY_REDUCED": "Nein, dauerhaft nicht."
 			}
 		},
-		"income": {
-			"category": "Einkommensprüfung",
-			"title": "Was trifft auf Dich zu?",
-			"tip": "Manchmal reicht das Geld für Essen, aber nicht für die Wohnung. Dann kannst Du vielleicht Wohngeld bekommen.",
+		"employment": {
+			"category": "Arbeit",
 			"options": {
-				"NOT_SUFFICIENT": "Mein Einkommen reicht im Moment nicht aus.",
-				"SOON_INSUFFICIENT": "Ich mache mir Sorgen. Mein Einkommen reicht bald vielleicht nicht mehr aus.",
-				"SUFFICIENT": "Mein Einkommen reicht aus. Ich kann alles bezahlen."
+				"YES": "Ja, ich arbeite.",
+				"NO": "Nein, im Moment nicht."
+			},
+			"title_single": "Arbeitest Du im Moment?",
+			"title_couple": "Arbeitest Du oder Dein Partner oder Deine Partnerin im Moment?"
+		},
+		"gross-income": {
+			"category": "Arbeit",
+			"title": "Wie hoch ist Dein Bruttoeinkommen im Monat?",
+			"tip": "Brutto heißt: der Betrag vor Steuern und Abgaben. Du findest ihn auf Deiner Lohnabrechnung. Wenn Du nicht arbeitest, trage 0 ein.",
+			"unit": "Euro"
+		},
+		"net-income": {
+			"category": "Einkommen",
+			"tip": "Zähle alles zusammen, was jeden Monat reinkommt: Lohn nach Abzügen, Rente, Kindergeld, Unterhalt, andere Leistungen.",
+			"unit": "Euro",
+			"title_single": "Wie viel Geld hast Du im Monat insgesamt zur Verfügung?",
+			"title_couple": "Wie viel Geld hat Dein Haushalt im Monat insgesamt zur Verfügung?",
+			"hint": "Ein ungefährer Betrag genügt."
+		},
+		"warm-rent": {
+			"category": "Wohnen",
+			"title": "Wie hoch ist Deine Warmmiete im Monat?",
+			"tip": "Warmmiete heißt: Miete plus Nebenkosten plus Heizkosten. Der Betrag steht in Deinem Mietvertrag oder auf dem Kontoauszug.",
+			"unit": "Euro",
+			"hint": "Der Betrag steht in Deinem Mietvertrag."
+		},
+		"assets": {
+			"category": "Ersparnisse",
+			"tip": "Gemeint ist alles, was zurückgelegt wurde: Konto, Sparbuch, Bargeld, Wertpapiere. Einen Teil darfst Du behalten — wie viel, hängt von Deinem Alter ab.",
+			"options": {
+				"UNDER_5000": "Weniger als 5.000 Euro.",
+				"FROM_5000_TO_15000": "Zwischen 5.000 und 15.000 Euro.",
+				"FROM_15000_TO_25000": "Zwischen 15.000 und 25.000 Euro.",
+				"OVER_25000": "Mehr als 25.000 Euro."
+			},
+			"title_single": "Wie viel Geld hast Du gespart?",
+			"title_couple": "Wie viel Geld habt Ihr zusammen gespart?",
+			"hint": "Eine grobe Schätzung genügt."
+		},
+		"benefits": {
+			"category": "Laufende Leistungen",
+			"title": "Bekommst Du schon eine Sozialleistung?",
+			"tip": "Gemeint sind zum Beispiel Grundsicherungsgeld, Grundsicherung im Alter oder Wohngeld.",
+			"options": {
+				"YES": "Ja, ich bekomme schon eine Leistung.",
+				"NO": "Nein, im Moment nicht."
 			}
 		},
-		"hasAssetsAboveThreshold": {
-			"category": "Vermögensprüfung",
-			"title": "Wie viel Vermögen hast Du ungefähr?",
-			"tip": "Keine Sorge, viele Menschen erhalten Hilfe trotz Ersparnissen. Im ersten Jahr liegt die Grenze jedoch bei 10.000 € für eine Person. Damit sind Bargeld, Wertgegenstände oder zum Beispiel Dein Auto gemeint.",
+		"citizenship": {
+			"category": "Staatsangehörigkeit",
+			"title": "Hast Du die deutsche Staatsangehörigkeit oder die eines EU-Landes?",
 			"options": {
-				"YES": "Ich habe mehr als 10.000 € Vermögen.",
-				"NO": "Ich habe weniger als 10.000 € Vermögen."
+				"DE_EU": "Ja, deutsch oder aus einem EU-Land.",
+				"NON_EU": "Nein, aus einem anderen Land."
 			}
+		},
+		"residence-status": {
+			"category": "Aufenthalt",
+			"title": "Hast Du einen gesicherten Aufenthaltstitel?",
+			"tip": "Gesichert heißt zum Beispiel: Niederlassungserlaubnis, unbefristete Aufenthaltserlaubnis oder Anerkennung als Flüchtling. Bist Du noch im Asylverfahren, gibt es ein eigenes System — Klaro weist Dich am Ende darauf hin.",
+			"options": {
+				"YES": "Ja, ich habe einen gesicherten Aufenthaltstitel.",
+				"NO": "Nein, oder ich bin mir nicht sicher."
+			}
+		},
+		"partner-gross-income": {
+			"category": "Arbeit",
+			"title": "Wie hoch ist das Bruttoeinkommen Deines Partners oder Deiner Partnerin im Monat?",
+			"tip": "Auch hier der Betrag vor Steuern und Abgaben. Wenn Dein Partner oder Deine Partnerin nicht arbeitet, trage 0 ein.",
+			"unit": "Euro"
 		}
 	},
-	"outcome": {
-		"eligible": {
-			"title": "Du könntest Anspruch auf Grundsicherung haben.",
-			"description": "Das ist eine erste Einschätzung. Klaro hilft Dir dabei Deinen Antrag Schritt-für-Schritt auszufüllen. Das geht einfach, digital und ist kostenlos.",
-			"cta": "Jetzt Antrag ausfüllen"
+	"result": {
+		"title": "Deine Ersteinschätzung",
+		"cta": "Konto erstellen und weitermachen",
+		"disclaimer": "Das ist eine automatische Ersteinschätzung ohne Rechtsverbindlichkeit. Sie ersetzt keine Beratung durch Jobcenter, Sozialamt oder eine unabhängige Sozialberatung.",
+		"apply": "Jetzt beantragen",
+		"check_now": "Jetzt Anspruch prüfen",
+		"not_applicable_group_one": "1 Leistung betrifft Deine Situation nicht",
+		"not_applicable_group_other": "{{count}} Leistungen betreffen Deine Situation nicht",
+		"referral": {
+			"title": "Im Moment passt keine der geprüften Leistungen",
+			"description": "Das heißt nicht, dass es keine Unterstützung für Dich gibt. Das Sozialamt in Deinem Bezirk kann Dir sagen, was für Deine Situation infrage kommt.",
+			"link": "Sozialamt in Deinem Bezirk finden"
 		},
-		"not_eligible": {
-			"title": "Grundsicherung passt im Moment eher nicht...",
-			"description": "Du kannst trotzdem ein Konto erstellen und Deine Angaben sicher speichern. So kannst Du Klaro später weiter nutzen, wenn sich Deine Situation ändert oder Du Unterstützung bei weiteren Schritten brauchst. Später werden wir weitere Anträge anbieten!",
-			"cta": "Konto erstellen"
+		"benefit": {
+			"SGB_II_BASIC_INCOME": "Grundsicherungsgeld",
+			"SGB_XII_OLD_AGE_REDUCED_CAPACITY": "Grundsicherung im Alter und bei Erwerbsminderung",
+			"HOUSING_BENEFIT": "Wohngeld",
+			"CHILD_SUPPLEMENT": "Kinderzuschlag"
 		},
-		"sozialamt": {
-			"title": "Bitte wende Dich an das zuständige Sozialamt",
-			"description": "Nach Deinen Antworten trifft keiner der qualifizierenden Aufenthaltsstatus zu. Bitte wende Dich an das zuständige Sozialamt, um zu erfahren, welche Unterstützung für Dich infrage kommt.",
-			"cta": "Sozialamt finden"
+		"status": {
+			"LIKELY_YES": "Das lohnt sich",
+			"CHECK_ADVISED": "Das solltest Du prüfen lassen",
+			"LIKELY_NO": "Trifft bei Dir vermutlich nicht zu",
+			"NOT_APPLICABLE": "Betrifft Deine Situation nicht"
 		},
-		"start_over": "Von vorne anfangen"
+		"reason": {
+			"INSUFFICIENT_DATA": "Dazu fehlen noch Angaben.",
+			"RETIREMENT_AGE_REACHED": "Du hast die Regelaltersgrenze erreicht.",
+			"RETIREMENT_AGE_NOT_REACHED": "Du hast die Regelaltersgrenze noch nicht erreicht.",
+			"WORK_CAPACITY_NOT_FULL": "Du kannst nicht mindestens drei Stunden am Tag arbeiten.",
+			"RESIDENCE_STATUS_UNCLEAR": "Dein Aufenthaltsstatus muss im Einzelfall geprüft werden.",
+			"ALREADY_RECEIVING_BENEFITS": "Du bekommst laut Deinen Angaben schon eine vergleichbare Leistung.",
+			"BENEFITS_TAKE_PRECEDENCE": "Wer schon eine Grundsicherung bekommt, kann diese Leistung meist nicht zusätzlich bekommen.",
+			"INCOME_BELOW_NEEDS": "Dein Einkommen deckt den geschätzten Bedarf nicht.",
+			"INCOME_COVERS_NEEDS": "Dein Einkommen deckt den geschätzten Bedarf.",
+			"INCOME_BELOW_SUBSISTENCE": "Dein Einkommen reicht nicht einmal ohne Miete zum Leben. Dann kommt eher eine Grundsicherung infrage.",
+			"ASSETS_BELOW_ALLOWANCE": "Deine Ersparnisse liegen unter dem Freibetrag.",
+			"ASSETS_SPAN_ALLOWANCE": "Deine Ersparnisse liegen im Bereich des Freibetrags. Der genaue Betrag entscheidet.",
+			"ASSETS_ABOVE_ALLOWANCE": "Deine Ersparnisse liegen über dem Freibetrag.",
+			"COUPLE_ASSET_ALLOWANCE_UNKNOWN": "Bei Paaren gilt der Freibetrag pro Person. Wie viel Ihr zusammen behalten dürft, muss die zuständige Stelle prüfen.",
+			"RENT_BURDEN_HIGH": "Deine Miete ist im Verhältnis zu Deinem Einkommen hoch.",
+			"RENT_BURDEN_NORMAL": "Deine Miete ist im Verhältnis zu Deinem Einkommen unauffällig.",
+			"NO_ELIGIBLE_CHILDREN": "In Deinem Haushalt leben keine Kinder, für die diese Leistung gilt.",
+			"KIZ_MIN_INCOME_MET": "Dein Bruttoeinkommen erreicht die Mindestgrenze.",
+			"KIZ_MIN_INCOME_NOT_MET": "Dein Bruttoeinkommen erreicht die Mindestgrenze nicht. Dann kommt eher Grundsicherungsgeld für die Kinder infrage."
+		},
+		"hint": {
+			"ASYLUM_BENEFITS_REFERRAL": "Ist Dein Aufenthalt noch nicht gesichert, gelten für Dich möglicherweise Asylbewerberleistungen statt der hier geprüften. Eine Beratungsstelle kann Dir sagen, was für Dich gilt."
+		}
 	}
 }

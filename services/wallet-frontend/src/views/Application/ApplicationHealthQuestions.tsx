@@ -797,7 +797,8 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									onChange={(e) =>
 										setMerkzeichen(
 											(e.target.value || undefined) as
-												DisabilityMerkzeichenType | undefined,
+												| DisabilityMerkzeichenType
+												| undefined,
 										)
 									}
 									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all bg-white"
