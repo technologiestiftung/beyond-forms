@@ -59,7 +59,7 @@ export const DocumentDropTarget: React.FC<DocumentDropTargetProps> = ({
 				})}
 			</p>
 
-			<p className="text-xs text-primary-blue-300">
+			<p className="text-xs text-primary-blue-400">
 				{t("personal.upload.formats", "PDF, JPG, PNG or HEIC (max. 10MB)")}
 			</p>
 			<PrimaryButton onClick={onOpen} className="lg:w-fit mt-2">

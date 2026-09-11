@@ -117,7 +117,7 @@ export const SettingsView: React.FC = () => {
 					</button>
 
 					<div className="bg-red-50 border-[1.5px] border-red-600 rounded-2xl p-7 flex flex-col gap-3.5">
-						<h2 className="text-body-lg font-bold text-red-600">
+						<h2 className="text-body-lg font-bold text-red-700">
 							{t("actions.delete_account", "Mein Klaro Konto löschen")}
 						</h2>
 						<p className="text-[15px] text-brand-black">
@@ -130,7 +130,7 @@ export const SettingsView: React.FC = () => {
 							type="button"
 							onClick={() => setShowDeleteModal(true)}
 							data-testid="delete-account-trigger"
-							className="self-start border-2 border-red-600 text-red-600 font-medium rounded-full px-5.5 py-2.5 cursor-pointer hover:bg-red-100 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+							className="self-start border-2 border-red-700 text-red-700 font-medium rounded-full px-5.5 py-2.5 cursor-pointer hover:bg-red-700 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
 						>
 							{t("actions.delete_account", "Mein Klaro Konto löschen")}
 						</button>
