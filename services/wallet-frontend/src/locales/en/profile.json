@@ -598,8 +598,10 @@
 		},
 		"account": {
 			"phone_label": "Your login number",
-			"phone_hint": "Remember this number so you can log back in later."
-		}
+			"phone_hint": "Remember this number so you can log back in later.",
+			"delete_hint": "All your details and uploaded documents will be deleted permanently. You will no longer be able to see applications in progress. This cannot be undone."
+		},
+		"subtitle": "Manage your access to Klaro here."
 	},
 	"housing": {
 		"question": "What is your living situation?",

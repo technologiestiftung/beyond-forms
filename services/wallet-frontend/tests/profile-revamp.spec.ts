@@ -134,10 +134,8 @@ test.describe("Automated E2E Integration & Accessibility Audits - Profile Revamp
 			page.getByRole("heading", { name: "Einstellungen" }),
 		).toBeVisible();
 
-		// Trigger delete account modal
-		await page
-			.getByRole("button", { name: "Mein Klaro Konto löschen" })
-			.click();
+		// Trigger delete account modal (desktop and mobile label the button differently)
+		await page.getByTestId("delete-account-trigger").click();
 		await expect(
 			page.getByRole("heading", { name: "Konto unwiderruflich löschen?" }),
 		).toBeVisible();

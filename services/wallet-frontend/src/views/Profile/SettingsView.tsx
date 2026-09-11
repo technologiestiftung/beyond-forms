@@ -8,6 +8,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useProfileStore } from "../../store/useProfileStore";
 import { profileService } from "../../services/profile";
 import { useLogout, clearSessionAndStorage } from "../../hooks/useLogout";
+import { useIsDesktop } from "../../hooks/useIsDesktop";
 
 export const SettingsView: React.FC = () => {
 	const navigate = useNavigate();
@@ -17,6 +18,7 @@ export const SettingsView: React.FC = () => {
 	const phoneNumber = useAuthStore((s) => s.phoneNumber);
 	const resetProfileStore = useProfileStore((s) => s.reset);
 	const handleLogout = useLogout();
+	const isDesktop = useIsDesktop();
 
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -64,60 +66,133 @@ export const SettingsView: React.FC = () => {
 					</button>
 				),
 				showLanguageSwitcher: true,
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
 			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
 		>
-			<div className="w-full max-w-md text-center mb-6">
-				<h1 className="text-2xl font-extrabold text-slate-900">
-					{t("settings.title", "Einstellungen")}
-				</h1>
-			</div>
+			{isDesktop ? (
+				<div className="w-full max-w-[660px] flex flex-col gap-5">
+					<div className="flex flex-col gap-2">
+						<h1 className="text-[32px] leading-10 font-bold text-brand-black">
+							{t("settings.title", "Einstellungen")}
+						</h1>
+						<p className="text-body-lg text-brand-grey">
+							{t(
+								"settings.subtitle",
+								"Hier verwaltest Du Deinen Zugang zu Klaro.",
+							)}
+						</p>
+					</div>
 
-			{phoneNumber && (
-				<div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-4 mb-4">
-					<p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
-						{t("settings.account.phone_label", "Deine Anmeldenummer")}
-					</p>
-					<p
-						className="text-base font-bold text-slate-900"
-						data-testid="settings-phone-number"
+					{phoneNumber && (
+						<div className="bg-white rounded-2xl border border-brand-border-subtle shadow-cards p-7 flex flex-col gap-1.5">
+							<p className="text-xs font-bold text-primary-blue-300 uppercase tracking-wide">
+								{t("settings.account.phone_label", "Deine Anmeldenummer")}
+							</p>
+							<p
+								className="text-[26px] leading-9 font-bold text-brand-black"
+								data-testid="settings-phone-number"
+							>
+								{phoneNumber}
+							</p>
+							<p className="text-[15px] text-primary-blue-300">
+								{t(
+									"settings.account.phone_hint",
+									"Merke Dir diese Nummer, um Dich später wieder anzumelden.",
+								)}
+							</p>
+						</div>
+					)}
+
+					<button
+						type="button"
+						onClick={() => void handleLogout()}
+						data-testid="logout-trigger"
+						className="w-full bg-white rounded-2xl border border-brand-border-subtle shadow-cards px-7 py-5 flex items-center gap-3.5 text-left cursor-pointer hover:bg-brand-bg transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-blue-500"
 					>
-						{phoneNumber}
-					</p>
-					<p className="text-xs text-slate-500 mt-1">
-						{t(
-							"settings.account.phone_hint",
-							"Merke Dir diese Nummer, um Dich später wieder anzumelden.",
-						)}
-					</p>
-				</div>
-			)}
-
-			{/* Stacked Action Buttons at bottom */}
-			<div className="flex flex-col gap-3 w-full max-w-md">
-				<button
-					type="button"
-					onClick={() => void handleLogout()}
-					className="w-full h-14 bg-white border border-slate-200 text-slate-800 font-bold text-base rounded-2xl shadow-sm flex items-center px-5 justify-between hover:bg-slate-50 active:scale-98 focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all lg:hidden"
-				>
-					<div className="flex items-center space-x-3">
-						<LogOut className="w-5 h-5 text-slate-500" />
-						<span>{t("actions.logout", "Bei Klaro ausloggen")}</span>
-					</div>
-				</button>
-
-				<button
-					type="button"
-					onClick={() => setShowDeleteModal(true)}
-					className="w-full h-14 bg-white border border-red-100 text-red-600 font-bold text-base rounded-2xl shadow-sm flex items-center px-5 justify-between hover:bg-red-50/30 active:scale-98 focus:outline-none focus:ring-4 focus:ring-red-100 transition-all"
-				>
-					<div className="flex items-center space-x-3">
-						<Trash2 className="w-5 h-5 text-red-500" />
-						<span>
-							{t("actions.delete_account", "Mein Klaro Konto löschen")}
+						<LogOut className="size-6 text-primary-blue-500" />
+						<span className="text-body-lg font-bold text-brand-black">
+							{t("actions.logout", "Bei Klaro ausloggen")}
 						</span>
+					</button>
+
+					<div className="bg-red-50 border-[1.5px] border-red-600 rounded-2xl p-7 flex flex-col gap-3.5">
+						<h2 className="text-body-lg font-bold text-red-600">
+							{t("actions.delete_account", "Mein Klaro Konto löschen")}
+						</h2>
+						<p className="text-[15px] text-brand-black">
+							{t(
+								"settings.account.delete_hint",
+								"Alle Deine Angaben und hochgeladenen Dokumente werden dauerhaft gelöscht. Laufende Anträge kannst Du danach nicht mehr einsehen. Das lässt sich nicht rückgängig machen.",
+							)}
+						</p>
+						<button
+							type="button"
+							onClick={() => setShowDeleteModal(true)}
+							data-testid="delete-account-trigger"
+							className="self-start border-2 border-red-600 text-red-600 font-medium rounded-full px-5.5 py-2.5 cursor-pointer hover:bg-red-100 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+						>
+							{t("actions.delete_account", "Mein Klaro Konto löschen")}
+						</button>
 					</div>
-				</button>
-			</div>
+				</div>
+			) : (
+				<>
+					<div className="w-full max-w-md text-center mb-6">
+						<h1 className="text-2xl font-extrabold text-slate-900">
+							{t("settings.title", "Einstellungen")}
+						</h1>
+					</div>
+
+					{phoneNumber && (
+						<div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-4 mb-4">
+							<p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
+								{t("settings.account.phone_label", "Deine Anmeldenummer")}
+							</p>
+							<p
+								className="text-base font-bold text-slate-900"
+								data-testid="settings-phone-number"
+							>
+								{phoneNumber}
+							</p>
+							<p className="text-xs text-slate-500 mt-1">
+								{t(
+									"settings.account.phone_hint",
+									"Merke Dir diese Nummer, um Dich später wieder anzumelden.",
+								)}
+							</p>
+						</div>
+					)}
+
+					<div className="flex flex-col gap-3 w-full max-w-md">
+						<button
+							type="button"
+							onClick={() => void handleLogout()}
+							data-testid="logout-trigger"
+							className="w-full h-14 bg-white border border-slate-200 text-slate-800 font-bold text-base rounded-2xl shadow-sm flex items-center px-5 justify-between hover:bg-slate-50 active:scale-98 focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all"
+						>
+							<div className="flex items-center space-x-3">
+								<LogOut className="w-5 h-5 text-slate-500" />
+								<span>{t("actions.logout", "Bei Klaro ausloggen")}</span>
+							</div>
+						</button>
+
+						<button
+							type="button"
+							onClick={() => setShowDeleteModal(true)}
+							data-testid="delete-account-trigger"
+							className="w-full h-14 bg-white border border-red-100 text-red-600 font-bold text-base rounded-2xl shadow-sm flex items-center px-5 justify-between hover:bg-red-50/30 active:scale-98 focus:outline-none focus:ring-4 focus:ring-red-100 transition-all"
+						>
+							<div className="flex items-center space-x-3">
+								<Trash2 className="w-5 h-5 text-red-500" />
+								<span>
+									{t("actions.delete_account", "Mein Klaro Konto löschen")}
+								</span>
+							</div>
+						</button>
+					</div>
+				</>
+			)}
 
 			{/* MODAL: Delete Account Confirmation */}
 			{showDeleteModal && (

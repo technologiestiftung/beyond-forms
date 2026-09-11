@@ -32,7 +32,11 @@ export const DocumentDropTarget: React.FC<DocumentDropTargetProps> = ({
 				event.preventDefault();
 				setIsDraggedOver(true);
 			}}
-			onDragLeave={() => setIsDraggedOver(false)}
+			onDragLeave={(event) => {
+				if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+					setIsDraggedOver(false);
+				}
+			}}
 			onDrop={handleDrop}
 			className={`w-full flex flex-col items-center gap-2 px-5 py-5 rounded-2xl border-2 border-dashed text-center transition-colors ${
 				isDraggedOver

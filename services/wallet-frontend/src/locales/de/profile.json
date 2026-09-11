@@ -598,8 +598,10 @@
 		},
 		"account": {
 			"phone_label": "Deine Anmeldenummer",
-			"phone_hint": "Merke Dir diese Nummer, um Dich später wieder anzumelden."
-		}
+			"phone_hint": "Merke Dir diese Nummer, um Dich später wieder anzumelden.",
+			"delete_hint": "Alle Deine Angaben und hochgeladenen Dokumente werden dauerhaft gelöscht. Laufende Anträge kannst Du danach nicht mehr einsehen. Das lässt sich nicht rückgängig machen."
+		},
+		"subtitle": "Hier verwaltest Du Deinen Zugang zu Klaro."
 	},
 	"housing": {
 		"question": "Wie ist Deine Wohnsituation?",

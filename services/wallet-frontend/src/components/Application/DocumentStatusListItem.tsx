@@ -133,6 +133,13 @@ export const DocumentStatusListItem = ({
 	// Without this the row reads out as "<slot> Dokument Hinzufügen", repeating
 	// the card's own "Dokument hinzufügen" action.
 	const getRowAriaLabel = () => {
+		// Processing and failed rows announce their own status text instead.
+		if (
+			isProcessing ||
+			uploadedFile?.status === ProcessingStatusEnum.enum.FAILED
+		) {
+			return undefined;
+		}
 		if (isVerified) {
 			return t("docs.view_slot_aria", {
 				title: slotTitle,
