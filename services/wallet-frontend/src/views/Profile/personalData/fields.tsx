@@ -63,7 +63,7 @@ export const FormField: React.FC<FieldProps> = ({
 				/>
 				<button
 					type="button"
-					aria-label={`${label} bearbeiten`}
+					aria-label={t("common.edit_field", { field: label })}
 					onClick={() => document.getElementById(id)?.focus()}
 					className="absolute right-0 min-w-[44px] min-h-[44px] size-11 bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:border-slate-300 cursor-pointer transition-all active:scale-95 shadow-sm shrink-0 focus-visible:outline-2 focus-visible:outline-brand-primary"
 				>

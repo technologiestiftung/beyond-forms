@@ -70,6 +70,18 @@ describe("DashboardView", () => {
 		});
 	});
 
+	it("renders the loading skeleton inside the shared top bar", () => {
+		mockProfileReturn.isLoading = true;
+
+		render(
+			<MemoryRouter>
+				<DashboardView />
+			</MemoryRouter>,
+		);
+
+		expect(screen.getByRole("banner")).toBeInTheDocument();
+	});
+
 	it("renders checklist copy, application card, and language switcher", async () => {
 		render(
 			<MemoryRouter>

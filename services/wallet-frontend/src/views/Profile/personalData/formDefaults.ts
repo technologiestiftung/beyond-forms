@@ -150,6 +150,10 @@ export const FIELD_SECTION: Record<string, keyof Profile> = {
 	oneTimePaymentsExpectedType: "financial",
 	oneTimePaymentsExpectedAmount: "financial",
 	oneTimePaymentsExpectedDate: "financial",
+	bankName: "financial",
+	accountHolder: "financial",
+	iban: "financial",
+	bic: "financial",
 	// health
 	hasDisabilityId: "health",
 	disabilityValidUntil: "health",

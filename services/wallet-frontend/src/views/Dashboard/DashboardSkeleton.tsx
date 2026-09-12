@@ -8,12 +8,16 @@ import { PageContainer } from "../../components/Layout/PageContainer";
  */
 export const DashboardSkeleton: React.FC = () => {
 	return (
-		<PageContainer contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16">
-			<div
-				className="absolute top-6 right-6 h-9 w-24 rounded-xl bg-slate-200/90"
-				aria-hidden
-			/>
-
+		<PageContainer
+			topBarProps={{
+				showLanguageSwitcher: false,
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
+				rightElement: (
+					<div className="h-9 w-24 rounded-xl bg-slate-200/90" aria-hidden />
+				),
+			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
+		>
 			<div className="flex flex-col items-start max-w-md w-full min-w-0 gap-6 lg:max-w-none lg:gap-8">
 				<div className="flex flex-col items-start gap-4 w-full min-w-0 lg:gap-6">
 					<div className="flex flex-row items-center gap-4 w-full min-w-0">

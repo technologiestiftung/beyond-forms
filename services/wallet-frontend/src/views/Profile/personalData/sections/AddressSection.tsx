@@ -40,6 +40,7 @@ export const AddressSection: React.FC<SectionProps> = ({
 				id="state"
 				label={t("personal.fields.state")}
 				register={register("state")}
+				onBlur={() => handleFieldBlur("state")}
 				placeholderText={`-- ${t("common.please_select", "Bitte auswählen")} --`}
 				options={[{ code: "Berlin", name: "Berlin" }]}
 			/>
