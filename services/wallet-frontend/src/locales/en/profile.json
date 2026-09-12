@@ -229,7 +229,7 @@
 		},
 		"upload": {
 			"drag_drop": "Click to upload or drag and drop",
-			"formats": "PDF, JPG or PNG (max. 10MB)",
+			"formats": "PDF, JPG, PNG or HEIC (max. 10 MB)",
 			"start_upload": "Upload Document",
 			"start_camera": "Open Camera",
 			"uploading": "Uploading...",
@@ -583,7 +583,9 @@
 		"lastName_required": "Last name is required",
 		"placeOfBirth_required": "Place of birth is required",
 		"upload_failed": "Upload failed",
-		"system_error": "A system error occurred"
+		"system_error": "A system error occurred",
+		"file_type_invalid": "This file format is not supported. Allowed formats are PDF, JPG, PNG and HEIC.",
+		"file_too_large": "This file is too large. The maximum size is 10 MB."
 	},
 	"logout": "Logout",
 	"settings": {

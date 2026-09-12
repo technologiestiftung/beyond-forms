@@ -229,7 +229,7 @@
 		},
 		"upload": {
 			"drag_drop": "Klicken oder Datei hierher ziehen",
-			"formats": "PDF, JPG oder PNG (max. 10MB)",
+			"formats": "PDF, JPG, PNG oder HEIC (max. 10 MB)",
 			"start_upload": "Dokument hochladen",
 			"start_camera": "Kamera öffnen",
 			"uploading": "Wird hochgeladen...",
@@ -583,7 +583,9 @@
 		"lastName_required": "Nachname ist erforderlich",
 		"placeOfBirth_required": "Geburtsort ist erforderlich",
 		"upload_failed": "Upload fehlgeschlagen",
-		"system_error": "Ein Systemfehler ist aufgetreten"
+		"system_error": "Ein Systemfehler ist aufgetreten",
+		"file_type_invalid": "Dieses Dateiformat wird nicht unterstützt. Erlaubt sind PDF, JPG, PNG oder HEIC.",
+		"file_too_large": "Die Datei ist zu groß. Erlaubt sind maximal 10 MB."
 	},
 	"logout": "Abmelden",
 	"settings": {

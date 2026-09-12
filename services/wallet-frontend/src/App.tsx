@@ -13,6 +13,7 @@ import { AppShell } from "./components/Layout/AppShell";
 import { AppRoutes } from "./constants/routes";
 import { routeConfig } from "./config/routeConfig";
 import { DocumentFlowDialog } from "./views/Profile/documents/DocumentFlowDialog";
+import { BACKGROUND_ROUTES_ID } from "./constants/dom";
 import { ErrorBoundary } from "./components/Error/ErrorBoundary";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import { ScrollToTop } from "./components/Layout/ScrollToTop";
@@ -112,33 +113,39 @@ function AppContent() {
 				key={(flowBackground || location).pathname}
 				resetStrategy="reload"
 			>
-				<Suspense
-					fallback={
-						<main className="flex min-h-screen items-center justify-center bg-brand-bg">
-							<h1 className="sr-only">{t("loading_app")}</h1>
-							<div className="size-12 border-4 border-brand-black/30 border-t-brand-black rounded-full animate-spin" />
-						</main>
-					}
-				>
-					<Routes location={flowBackground || location}>
-						<Route element={<AppShell />}>
-							{routeConfig.map((route) => {
-								const element = renderRouteElement(
-									route.component,
-									route.metadata.requiresAuth,
-								);
+				<div id={BACKGROUND_ROUTES_ID}>
+					<Suspense
+						fallback={
+							<main className="flex min-h-screen items-center justify-center bg-brand-bg">
+								<h1 className="sr-only">{t("loading_app")}</h1>
+								<div className="size-12 border-4 border-brand-black/30 border-t-brand-black rounded-full animate-spin" />
+							</main>
+						}
+					>
+						<Routes location={flowBackground || location}>
+							<Route element={<AppShell />}>
+								{routeConfig.map((route) => {
+									const element = renderRouteElement(
+										route.component,
+										route.metadata.requiresAuth,
+									);
 
-								return (
-									<Route key={route.path} path={route.path} element={element} />
-								);
-							})}
-							<Route
-								path="*"
-								element={<Navigate to={AppRoutes.Home} replace />}
-							/>
-						</Route>
-					</Routes>
-				</Suspense>
+									return (
+										<Route
+											key={route.path}
+											path={route.path}
+											element={element}
+										/>
+									);
+								})}
+								<Route
+									path="*"
+									element={<Navigate to={AppRoutes.Home} replace />}
+								/>
+							</Route>
+						</Routes>
+					</Suspense>
+				</div>
 
 				{flowBackground && (
 					<Routes>

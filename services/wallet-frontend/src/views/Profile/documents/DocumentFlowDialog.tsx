@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { usePendingUploadStore } from "../../../store/usePendingUploadStore";
+import { BACKGROUND_ROUTES_ID } from "../../../constants/dom";
 
 const FOCUSABLE_SELECTOR =
 	'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -118,6 +119,22 @@ export const DocumentFlowDialog: React.FC<DocumentFlowDialogProps> = ({
 
 	// Captured while rendering, before the effects above move focus into the dialog.
 	useEffect(() => () => triggerRef.current?.focus?.(), []);
+
+	// Keeps the page behind the dialog out of reach of pointer, focus and AT.
+	useEffect(() => {
+		const backgroundRoot = document.getElementById(BACKGROUND_ROUTES_ID);
+		if (!backgroundRoot) {
+			return undefined;
+		}
+
+		const wasInert = backgroundRoot.hasAttribute("inert");
+		backgroundRoot.setAttribute("inert", "");
+		return () => {
+			if (!wasInert) {
+				backgroundRoot.removeAttribute("inert");
+			}
+		};
+	}, []);
 
 	useEffect(() => {
 		const { overflow } = document.body.style;

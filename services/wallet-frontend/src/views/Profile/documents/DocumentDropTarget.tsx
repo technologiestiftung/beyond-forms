@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import type { TFunction } from "i18next";
-import { Upload } from "lucide-react";
+import { AlertCircle, Upload } from "lucide-react";
 import { PrimaryButton } from "../../../components/ui/PrimaryButton";
+import { validateDocumentFile } from "../../../utils/fileValidation";
 
 export interface DocumentDropTargetProps {
 	onFile: (file: File) => void;
@@ -15,14 +16,23 @@ export const DocumentDropTarget: React.FC<DocumentDropTargetProps> = ({
 	t,
 }) => {
 	const [isDraggedOver, setIsDraggedOver] = useState(false);
+	const [rejection, setRejection] = useState<string | null>(null);
 
 	const handleDrop = (event: React.DragEvent) => {
 		event.preventDefault();
 		setIsDraggedOver(false);
 		const file = event.dataTransfer.files?.[0];
-		if (file) {
-			onFile(file);
+		if (!file) {
+			return;
 		}
+
+		const reason = validateDocumentFile(file);
+		if (reason) {
+			setRejection(reason);
+			return;
+		}
+		setRejection(null);
+		onFile(file);
 	};
 
 	return (
@@ -54,14 +64,25 @@ export const DocumentDropTarget: React.FC<DocumentDropTargetProps> = ({
 			<p className="text-sm text-brand-grey">
 				{t("docs.dropzone_hint", {
 					ns: "application",
-					defaultValue:
-						"oder wähle eine Datei von Deinem Computer aus. PDF, JPG oder PNG (max. 10 MB)",
+					defaultValue: "oder wähle eine Datei von Deinem Computer aus.",
 				})}
 			</p>
 
 			<p className="text-xs text-primary-blue-400">
-				{t("personal.upload.formats", "PDF, JPG, PNG or HEIC (max. 10MB)")}
+				{t("personal.upload.formats", "PDF, JPG, PNG oder HEIC (max. 10 MB)")}
 			</p>
+
+			{rejection && (
+				<p
+					role="alert"
+					data-testid="document-drop-target-error"
+					className="flex items-center gap-2 text-sm font-medium text-red-700"
+				>
+					<AlertCircle className="size-4 shrink-0" aria-hidden="true" />
+					{t(`errors.${rejection}`)}
+				</p>
+			)}
+
 			<PrimaryButton onClick={onOpen} className="lg:w-fit mt-2">
 				{t("docs.add_document", {
 					ns: "application",

@@ -217,6 +217,7 @@ describe("DocumentDropzone", () => {
 			() => {
 				expect(mockNavigate).toHaveBeenCalledWith(
 					"/profile/documents/mock-doc-id/review?origin=hub",
+					{ replace: true },
 				);
 			},
 			{ timeout: 2500 },
@@ -259,7 +260,9 @@ describe("DocumentDropzone", () => {
 		// Timeout duration is configured to be 1000ms in test environment
 		await waitFor(
 			() => {
-				expect(mockNavigate).toHaveBeenCalledWith("/profile/documents");
+				expect(mockNavigate).toHaveBeenCalledWith("/profile/documents", {
+					replace: true,
+				});
 			},
 			{ timeout: 1500 },
 		);
@@ -330,7 +333,9 @@ describe("DocumentDropzone", () => {
 		fireEvent.click(screen.getByTestId("upload-confirm-button"));
 
 		await waitFor(() => {
-			expect(mockNavigate).toHaveBeenCalledWith(AppRoutes.Auth);
+			expect(mockNavigate).toHaveBeenCalledWith(AppRoutes.Auth, {
+				replace: true,
+			});
 		});
 	});
 
@@ -386,6 +391,7 @@ describe("DocumentDropzone", () => {
 		fireEvent.click(cancelBtn);
 		expect(mockNavigate).toHaveBeenCalledWith(
 			"/profile/documents/category/identity",
+			{ replace: true },
 		);
 	});
 
@@ -423,6 +429,7 @@ describe("DocumentDropzone", () => {
 			() => {
 				expect(mockNavigate).toHaveBeenCalledWith(
 					"/profile/documents/category/identity",
+					{ replace: true },
 				);
 			},
 			{ timeout: 1500 },
@@ -480,6 +487,7 @@ describe("DocumentDropzone", () => {
 			() => {
 				expect(mockNavigate).toHaveBeenCalledWith(
 					"/profile/documents/mock-doc-id/review?origin=hub&category=identity",
+					{ replace: true },
 				);
 			},
 			{ timeout: 2500 },
@@ -630,6 +638,7 @@ describe("DocumentDropzone", () => {
 				expect(mockNavigate).toHaveBeenCalledWith(
 					"/dashboard/application/about-me/questions",
 					{
+						replace: true,
 						state: {
 							extractedData: {
 								given_names: "Helmut",
@@ -697,6 +706,7 @@ describe("DocumentDropzone", () => {
 				expect(mockNavigate).toHaveBeenCalledWith(
 					"/dashboard/application/about-me/questions",
 					{
+						replace: true,
 						state: {
 							extractedData: {
 								given_names: "Max",
