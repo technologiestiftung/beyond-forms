@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 
 const MAX_ATTEMPTS = 3;
 
@@ -29,4 +29,24 @@ export async function gotoWithRetry(page: Page, url: string) {
 			await page.waitForTimeout(1000);
 		}
 	}
+}
+
+/**
+ * Clicks a client-side navigation target until the URL settles on `urlPattern`.
+ * A click dispatched while the freshly rendered route is still settling lands on
+ * an element React then replaces, so it never reaches a handler and no
+ * navigation follows — which surfaces in CI as a lone `waitForURL` timeout.
+ */
+export async function clickUntilUrl(
+	page: Page,
+	locator: Locator,
+	urlPattern: RegExp,
+) {
+	await expect(async () => {
+		if (urlPattern.test(page.url())) {
+			return;
+		}
+		await locator.click({ timeout: 5000 });
+		await page.waitForURL(urlPattern, { timeout: 5000 });
+	}).toPass({ timeout: 30000 });
 }

@@ -610,6 +610,9 @@ export const DocumentReviewView: React.FC = () => {
 				// Refresh profile files store state instantly
 				const files = await fileService.getFiles();
 				setDocuments(files);
+				// The desktop flow runs in a dialog over the documents page, which
+				// therefore never remounts to refetch the verified document.
+				void queryClient.invalidateQueries({ queryKey: ["profile"] });
 				const categoryParam = category ? `&category=${category}` : "";
 				navigate(
 					`${AppRoutes.ProfileDocumentSuccess.replace(":documentId", documentId)}?origin=${origin}${categoryParam}`,

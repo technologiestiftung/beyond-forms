@@ -7,6 +7,7 @@ import {
 	openManualPhoneForm,
 	registerAuthBypassRoute,
 } from "./helpers/auth";
+import { clickUntilUrl } from "./helpers/navigation";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -114,8 +115,7 @@ test.describe("MVP Citizen Document Preview & E2E Visual Audit", () => {
 			.or(page.getByRole("link", { name: /Profil/i }))
 			.filter({ visible: true })
 			.first();
-		await profileLink.click();
-		await page.waitForURL(/\/profile/);
+		await clickUntilUrl(page, profileLink, /\/profile/);
 
 		const myDocsCard = page
 			.getByTestId("section-documents")
@@ -125,8 +125,7 @@ test.describe("MVP Citizen Document Preview & E2E Visual Audit", () => {
 				}),
 			)
 			.first();
-		await myDocsCard.click();
-		await page.waitForURL(/\/profile\/documents/);
+		await clickUntilUrl(page, myDocsCard, /\/profile\/documents/);
 
 		// 3. Upload a PDF Document (Bank Statement)
 		await page
