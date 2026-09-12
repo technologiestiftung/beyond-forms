@@ -62,7 +62,11 @@ function AppContent() {
 	);
 
 	// Derived while rendering so the dialog arrives with its step, not a frame later.
-	if (requestedBackground && requestedBackground.key !== flowBackground?.key) {
+	if (
+		requestedBackground &&
+		isDocumentFlowRoute &&
+		requestedBackground.key !== flowBackground?.key
+	) {
 		setFlowBackground(requestedBackground);
 	} else if (flowBackground && !isDocumentFlowRoute) {
 		setFlowBackground(null);

@@ -156,6 +156,38 @@ describe("DocumentsOverview", () => {
 		);
 	});
 
+	it("opens the review flow over the documents view for an unassigned document", () => {
+		(useProfile as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+			profileData: {},
+			documents: [
+				{
+					id: "unassigned-1",
+					name: "quittung.pdf",
+					type: "OTHER",
+					status: "READY_FOR_REVIEW",
+					uploadDate: "2026-01-05T10:00:00.000Z",
+				},
+			],
+			isLoading: false,
+			isError: false,
+			refetch: mockRefetch,
+		});
+
+		renderWithRouter(<DocumentsOverview />);
+
+		const workspace = within(screen.getByTestId("documents-workspace"));
+		fireEvent.click(workspace.getByText("docs.review"));
+
+		expect(mockNavigate).toHaveBeenCalledWith(
+			"/profile/documents/unassigned-1/review?origin=hub",
+			expect.objectContaining({
+				state: expect.objectContaining({
+					backgroundLocation: expect.anything(),
+				}),
+			}),
+		);
+	});
+
 	it("hands a dropped file to the upload flow", () => {
 		renderWithRouter(<DocumentsOverview />);
 

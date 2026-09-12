@@ -187,6 +187,32 @@ describe("DocumentFlowDialog", () => {
 		backgroundRoot.remove();
 	});
 
+	it("restores focus to a trigger inside the background once it is interactive", () => {
+		const backgroundRoot = document.createElement("div");
+		backgroundRoot.id = BACKGROUND_ROUTES_ID;
+		const trigger = document.createElement("button");
+		backgroundRoot.appendChild(trigger);
+		document.body.appendChild(backgroundRoot);
+		trigger.focus();
+
+		let inertWhenRefocused: boolean | null = null;
+		const nativeFocus = trigger.focus.bind(trigger);
+		vi.spyOn(trigger, "focus").mockImplementation(() => {
+			inertWhenRefocused = backgroundRoot.hasAttribute("inert");
+			nativeFocus();
+		});
+
+		const { unmount } = renderDialog(uploadStep);
+		unmount();
+
+		// jsdom does not enforce inert, so assert the ordering a browser needs:
+		// the background has to be interactive again before focus returns to it.
+		expect(inertWhenRefocused).toBe(false);
+		expect(trigger).toHaveFocus();
+
+		backgroundRoot.remove();
+	});
+
 	it("leaves an already inert background inert when it closes", () => {
 		const backgroundRoot = document.createElement("div");
 		backgroundRoot.id = BACKGROUND_ROUTES_ID;

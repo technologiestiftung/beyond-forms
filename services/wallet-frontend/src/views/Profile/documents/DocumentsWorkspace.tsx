@@ -1,5 +1,4 @@
-import React, { useCallback, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { APPLICATION_DOCUMENT_GROUPS } from "../../../config/applicationConfig";
 import { AppRoutes } from "../../../constants/routes";
@@ -10,6 +9,7 @@ import { usePendingUploadStore } from "../../../store/usePendingUploadStore";
 import { DocumentCategoryNavigation } from "./DocumentCategoryNavigation";
 import { DocumentDropTarget } from "./DocumentDropTarget";
 import { getCategoryDocumentCounts } from "./categories";
+import { useOpenDocumentFlow } from "./useOpenDocumentFlow";
 
 export interface DocumentsWorkspaceProps {
 	activeCategoryId: string;
@@ -26,16 +26,7 @@ export const DocumentsWorkspace: React.FC<DocumentsWorkspaceProps> = ({
 	children,
 }) => {
 	const { t } = useTranslation(["profile", "application"]);
-	const navigate = useNavigate();
-	const location = useLocation();
-
-	// The carried location keeps this view rendered underneath the flow's dialog.
-	const openFlow = useCallback(
-		(path: string) => {
-			navigate(path, { state: { backgroundLocation: location } });
-		},
-		[location, navigate],
-	);
+	const openFlow = useOpenDocumentFlow();
 
 	const categoryCounts = useMemo(
 		() => getCategoryDocumentCounts(documents),

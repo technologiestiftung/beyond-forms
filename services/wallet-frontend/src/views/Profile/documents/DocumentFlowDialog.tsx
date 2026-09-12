@@ -117,9 +117,6 @@ export const DocumentFlowDialog: React.FC<DocumentFlowDialogProps> = ({
 		return () => dialog.removeEventListener("keydown", handleTab);
 	}, []);
 
-	// Captured while rendering, before the effects above move focus into the dialog.
-	useEffect(() => () => triggerRef.current?.focus?.(), []);
-
 	// Keeps the page behind the dialog out of reach of pointer, focus and AT.
 	useEffect(() => {
 		const backgroundRoot = document.getElementById(BACKGROUND_ROUTES_ID);
@@ -135,6 +132,11 @@ export const DocumentFlowDialog: React.FC<DocumentFlowDialogProps> = ({
 			}
 		};
 	}, []);
+
+	// Captured while rendering, before the effects above move focus into the dialog.
+	// Declared after the inert effect so that cleanup, which runs in declaration
+	// order, has already made the background focusable again by this point.
+	useEffect(() => () => triggerRef.current?.focus?.(), []);
 
 	useEffect(() => {
 		const { overflow } = document.body.style;

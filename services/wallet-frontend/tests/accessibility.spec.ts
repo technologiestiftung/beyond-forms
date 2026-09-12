@@ -28,11 +28,7 @@ test.describe("Accessibility Audits - Profile Workspace", () => {
 		// Navigate to Personal Data Edit
 		await page.getByTestId("section-personal").click();
 
-		const firstNameInput = page.getByTestId("field-firstName-input");
-		await expect(firstNameInput).toBeVisible();
-		// The form resets once the profile fetch lands, discarding anything typed
-		// before it. Seeded values in the fields mean that reset has already run.
-		await expect(firstNameInput).not.toHaveValue("");
+		await expect(page.getByTestId("field-firstName-input")).toBeVisible();
 
 		// Desktop reveals one category at a time via the sidebar
 		const addressNav = page.getByTestId("category-nav-address");
@@ -40,13 +36,16 @@ test.describe("Accessibility Audits - Profile Workspace", () => {
 			await addressNav.click();
 		}
 
-		// Trigger validation error by entering an invalid ZIP code length
+		// Trigger validation error by entering an invalid ZIP code length.
+		// The form resets once the profile fetch lands, which discards anything
+		// typed before it, so retry the entry until the error actually sticks.
 		const zipInput = page.getByTestId("field-zipCode-input");
-		await zipInput.fill("123456789012345");
-		await zipInput.blur();
-
-		// Wait for zipCode error message to be fully visible
-		await expect(page.getByTestId("field-zipCode-error")).toBeVisible();
+		const zipError = page.getByTestId("field-zipCode-error");
+		await expect(async () => {
+			await zipInput.fill("123456789012345");
+			await zipInput.blur();
+			await expect(zipError).toBeVisible({ timeout: 1000 });
+		}).toPass({ timeout: 15000 });
 
 		const results = await new AxeBuilder({ page })
 			.withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])

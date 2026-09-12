@@ -10,6 +10,7 @@ import { useIsDesktop } from "../../hooks/useIsDesktop";
 import { Origins } from "../../constants/origin";
 import { APPLICATION_DOCUMENT_GROUPS } from "../../config/applicationConfig";
 import { DocumentsWorkspace } from "./documents/DocumentsWorkspace";
+import { useOpenDocumentFlow } from "./documents/useOpenDocumentFlow";
 import {
 	DOCUMENT_CATEGORY_ICONS,
 	getCategoryDocumentCounts,
@@ -23,6 +24,7 @@ export const DocumentsOverview: React.FC = () => {
 		refetchOnMount: "always",
 	});
 	const isDesktop = useIsDesktop();
+	const openFlow = useOpenDocumentFlow();
 	const [activeCategoryId, setActiveCategoryId] = useState(
 		APPLICATION_DOCUMENT_GROUPS[0].id,
 	);
@@ -115,6 +117,7 @@ export const DocumentsOverview: React.FC = () => {
 							showUnassigned={true}
 							slotIds={[]}
 							origin={Origins.HUB}
+							onOpenFlow={openFlow}
 						/>
 					</DocumentsWorkspace>
 				) : (
