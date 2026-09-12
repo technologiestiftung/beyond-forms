@@ -28,7 +28,11 @@ test.describe("Accessibility Audits - Profile Workspace", () => {
 		// Navigate to Personal Data Edit
 		await page.getByTestId("section-personal").click();
 
-		await expect(page.getByTestId("field-firstName-input")).toBeVisible();
+		const firstNameInput = page.getByTestId("field-firstName-input");
+		await expect(firstNameInput).toBeVisible();
+		// The form resets once the profile fetch lands, discarding anything typed
+		// before it. Seeded values in the fields mean that reset has already run.
+		await expect(firstNameInput).not.toHaveValue("");
 
 		// Desktop reveals one category at a time via the sidebar
 		const addressNav = page.getByTestId("category-nav-address");

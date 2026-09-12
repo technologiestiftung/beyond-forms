@@ -54,7 +54,9 @@ export const DocumentReviewSuccessView: React.FC = () => {
 				{/* Return Target Action Trigger Button */}
 				<PrimaryButton
 					onClick={() => {
-						navigate(getTargetExitRoute(origin, category, "review_success"));
+						navigate(getTargetExitRoute(origin, category, "review_success"), {
+							replace: true,
+						});
 					}}
 				>
 					{t("success.back_action", "Weiter")}

@@ -4,6 +4,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Routes, Route, type Location } from "react-router-dom";
 import { DocumentFlowDialog } from "./DocumentFlowDialog";
 import { usePendingUploadStore } from "../../../store/usePendingUploadStore";
+import { BACKGROUND_ROUTES_ID } from "../../../constants/dom";
 
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async () => {
@@ -170,5 +171,33 @@ describe("DocumentFlowDialog", () => {
 
 		unmount();
 		expect(document.body.style.overflow).toBe("");
+	});
+
+	it("makes the page behind it inert and interactive again on close", () => {
+		const backgroundRoot = document.createElement("div");
+		backgroundRoot.id = BACKGROUND_ROUTES_ID;
+		document.body.appendChild(backgroundRoot);
+
+		const { unmount } = renderDialog();
+		expect(backgroundRoot).toHaveAttribute("inert");
+
+		unmount();
+		expect(backgroundRoot).not.toHaveAttribute("inert");
+
+		backgroundRoot.remove();
+	});
+
+	it("leaves an already inert background inert when it closes", () => {
+		const backgroundRoot = document.createElement("div");
+		backgroundRoot.id = BACKGROUND_ROUTES_ID;
+		backgroundRoot.setAttribute("inert", "");
+		document.body.appendChild(backgroundRoot);
+
+		const { unmount } = renderDialog();
+		unmount();
+
+		expect(backgroundRoot).toHaveAttribute("inert");
+
+		backgroundRoot.remove();
 	});
 });
