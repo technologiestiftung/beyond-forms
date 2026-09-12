@@ -268,6 +268,11 @@ testWithAuthenticatedUser.describe(
 				await page.goto("/profile/personal/edit");
 				await expect(page.getByTestId("field-firstName-input")).toBeVisible();
 
+				const addressNav = page.getByTestId("category-nav-address");
+				if (await addressNav.isVisible()) {
+					await addressNav.click();
+				}
+
 				const zipInput = page.getByTestId("field-zipCode-input");
 				await zipInput.fill("123456789012345");
 				await zipInput.blur();
@@ -290,10 +295,10 @@ testWithAuthenticatedUser.describe(
 					.filter({ visible: true })
 					.first();
 				await chatToggle.click();
-				await expect(page.locator('[role="dialog"]')).toBeVisible();
+				await expect(page.getByTestId("chat-panel")).toBeVisible();
 				await expect(page.getByTestId("chat-input")).toBeVisible();
 
-				await assertNoViolationsIn(page, '[role="dialog"]');
+				await assertNoViolationsIn(page, '[data-testid="chat-panel"]');
 			},
 		);
 	},

@@ -9,6 +9,7 @@ export const AppRoutes = {
 
 	Auth: "/auth",
 	Dashboard: "/dashboard",
+	Chat: "/chat",
 	ApplicationOverview: "/dashboard/application/overview",
 	TutorialViewer: "/tutorial/:slug",
 	Profile: "/profile",

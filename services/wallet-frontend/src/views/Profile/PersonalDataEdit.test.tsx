@@ -92,6 +92,44 @@ describe("PersonalDataEdit - Simplified Layout", () => {
 		});
 	});
 
+	it("auto-saves bank fields into the financial section", async () => {
+		mockUpdateSection.mockResolvedValue({ success: true });
+		renderWithRouter(<PersonalDataEdit />);
+
+		const ibanInput = screen.getByTestId("field-iban-input");
+		fireEvent.change(ibanInput, {
+			target: { value: "DE02120300000000202051" },
+		});
+		fireEvent.blur(ibanInput);
+
+		await waitFor(() => {
+			expect(mockUpdateSection).toHaveBeenCalledWith({
+				section: "financial",
+				data: expect.objectContaining({
+					bankDetails: { iban: "DE02120300000000202051" },
+				}),
+			});
+		});
+	});
+
+	// "Berlin" is the form's default state, so clearing it is the one change the
+	// single-option select can make.
+	it("auto-saves a changed state select into the address section", async () => {
+		mockUpdateSection.mockResolvedValue({ success: true });
+		renderWithRouter(<PersonalDataEdit />);
+
+		const stateSelect = screen.getByTestId("field-state-select");
+		fireEvent.change(stateSelect, { target: { value: "" } });
+		fireEvent.blur(stateSelect);
+
+		await waitFor(() => {
+			expect(mockUpdateSection).toHaveBeenCalledWith({
+				section: "address",
+				data: expect.objectContaining({ state: "" }),
+			});
+		});
+	});
+
 	it("shows saving status during background synchronization", async () => {
 		(useProfile as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
 			profileData: { personalData: { firstName: "Sandor" } },

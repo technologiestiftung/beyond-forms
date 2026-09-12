@@ -9,6 +9,8 @@ interface StepLayoutProps {
 	colorVariant?: LanguageSwitcherVariant;
 	backAriaLabel?: string;
 	backTestId?: string;
+	contentClassName?: string;
+	topBarClassName?: string;
 }
 
 /**
@@ -22,17 +24,20 @@ export const StepLayout: React.FC<StepLayoutProps> = ({
 	colorVariant = "default",
 	backAriaLabel,
 	backTestId = "tutorial-back",
+	contentClassName = "",
+	topBarClassName = "",
 }) => {
 	return (
 		<PageContainer
 			maxWidth="sm"
-			contentClassName="flex flex-col flex-grow"
+			contentClassName={`flex flex-col flex-grow ${contentClassName}`}
 			topBarProps={{
 				onBack,
 				showLanguageSwitcher,
 				colorVariant,
 				backAriaLabel,
 				backTestId,
+				className: topBarClassName,
 			}}
 		>
 			<div className="w-full flex flex-col items-center flex-grow">

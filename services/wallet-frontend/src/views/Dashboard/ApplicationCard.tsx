@@ -39,7 +39,10 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 		activeLevel = 2;
 	} else {
 		activeLevel = Math.max(0, Math.min(3, Math.floor(currentLevel))) as
-			0 | 1 | 2 | 3;
+			| 0
+			| 1
+			| 2
+			| 3;
 	}
 
 	if (status === "not_started") {
@@ -62,7 +65,7 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 			className="bg-white border border-brand-border-subtle rounded-2xl p-6 flex flex-col gap-6 shadow-sm cursor-pointer hover:border-brand-border transition-all"
 		>
 			<div className="flex flex-col gap-3 min-w-0 flex-1">
-				<h2 className="font-semibold text-brand-black text-h2 min-w-0 wrap-break-word pr-2">
+				<h2 className="font-semibold text-brand-black text-h2 min-w-0 wrap-break-word pr-2 lg:text-xl/7">
 					{t("sections.applications.basic_security.title")}
 				</h2>
 
@@ -74,7 +77,7 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 					<img
 						src={fillingFormIllustration}
 						alt=""
-						className="max-w-32 max-h-32 shrink-0"
+						className="max-w-32 max-h-32 shrink-0 lg:hidden"
 						aria-hidden
 					/>
 				</div>
@@ -94,10 +97,7 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 							"sections.applications.basic_security.actions.start",
 							"Los geht's",
 						)
-					: t(
-							"sections.applications.basic_security.actions.continue",
-							"Fortfahren",
-						)}
+					: t("sections.applications.generate_button", "Antrag generieren")}
 			</PrimaryButton>
 		</div>
 	);

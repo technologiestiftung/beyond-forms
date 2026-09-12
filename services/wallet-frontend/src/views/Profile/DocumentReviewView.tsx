@@ -215,7 +215,7 @@ export const DocumentReviewView: React.FC = () => {
 
 	useEffect(() => {
 		if (!documentId || documentId === "undefined") {
-			navigate(AppRoutes.ProfileDocuments);
+			navigate(AppRoutes.ProfileDocuments, { replace: true });
 		}
 	}, [documentId, navigate]);
 
@@ -492,6 +492,7 @@ export const DocumentReviewView: React.FC = () => {
 		const categoryParam = category ? `&category=${category}` : "";
 		navigate(
 			`${AppRoutes.ProfileDocumentSuccess.replace(":documentId", documentId as string)}?origin=${origin}${categoryParam}`,
+			{ replace: true },
 		);
 		return;
 	};
@@ -610,9 +611,13 @@ export const DocumentReviewView: React.FC = () => {
 				// Refresh profile files store state instantly
 				const files = await fileService.getFiles();
 				setDocuments(files);
+				// The desktop flow runs in a dialog over the documents page, which
+				// therefore never remounts to refetch the verified document.
+				void queryClient.invalidateQueries({ queryKey: ["profile"] });
 				const categoryParam = category ? `&category=${category}` : "";
 				navigate(
 					`${AppRoutes.ProfileDocumentSuccess.replace(":documentId", documentId)}?origin=${origin}${categoryParam}`,
+					{ replace: true },
 				);
 			} else {
 				const fallbackMsg = t(
@@ -660,7 +665,9 @@ export const DocumentReviewView: React.FC = () => {
 		setShowDeleteModal(false);
 		try {
 			await deleteDocument(documentId);
-			navigate(getTargetExitRoute(origin, category, "upload"));
+			navigate(getTargetExitRoute(origin, category, "upload"), {
+				replace: true,
+			});
 		} catch (err) {
 			console.error("Failed to delete document:", err);
 		}
@@ -677,7 +684,10 @@ export const DocumentReviewView: React.FC = () => {
 	return (
 		<PageContainer
 			topBarProps={{
-				onBack: () => navigate(getTargetExitRoute(origin, category, "upload")),
+				onBack: () =>
+					navigate(getTargetExitRoute(origin, category, "upload"), {
+						replace: true,
+					}),
 				middleElement: (
 					<span className="text-sm font-extrabold text-slate-800 tracking-wide uppercase truncate">
 						{t("review.title", "Daten prüfen")}
@@ -687,7 +697,9 @@ export const DocumentReviewView: React.FC = () => {
 					<button
 						type="button"
 						onClick={() =>
-							navigate(getTargetExitRoute(origin, category, "upload"))
+							navigate(getTargetExitRoute(origin, category, "upload"), {
+								replace: true,
+							})
 						}
 						className="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-all"
 					>

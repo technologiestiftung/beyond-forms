@@ -24,6 +24,7 @@ import { Origins, type OriginType } from "../../constants/origin";
 
 import { useAuthStore } from "../../store/useAuthStore";
 import { useProfileStore } from "../../store/useProfileStore";
+import { usePendingUploadStore } from "../../store/usePendingUploadStore";
 import { useUIStore } from "../../store/useUIStore";
 import { useProfile } from "../../hooks/useProfile";
 import { useScrollToTop } from "../../utils/scroll";
@@ -35,6 +36,10 @@ import {
 } from "../../utils/profile";
 import { env } from "../../config/env.config";
 import { authenticatedFetch } from "../../utils/apiClient";
+import {
+	DOCUMENT_ACCEPT_ATTRIBUTE,
+	validateDocumentFile,
+} from "../../utils/fileValidation";
 
 export const DocumentDropzone: React.FC = () => {
 	const { t } = useTranslation("profile");
@@ -65,6 +70,7 @@ export const DocumentDropzone: React.FC = () => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const addPageInputRef = useRef<HTMLInputElement>(null);
 	const { documents } = useProfile();
+	const pendingFile = usePendingUploadStore((state) => state.pendingFile);
 	const processingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
 		null,
 	);
@@ -138,6 +144,7 @@ export const DocumentDropzone: React.FC = () => {
 
 				if (category === "about_me") {
 					navigate(AppRoutes.ApplicationAboutMeQuestions, {
+						replace: true,
 						state: {
 							extractedData: {
 								given_names: mockFirstName,
@@ -149,6 +156,7 @@ export const DocumentDropzone: React.FC = () => {
 					});
 				} else if (category === "housing") {
 					navigate(AppRoutes.ApplicationHousingQuestions, {
+						replace: true,
 						state: {
 							extractedData: {
 								accomodation_type: "Rental Apartment",
@@ -164,7 +172,7 @@ export const DocumentDropzone: React.FC = () => {
 						},
 					});
 				} else {
-					navigate(AppRoutes.ApplicationOverview);
+					navigate(AppRoutes.ApplicationOverview, { replace: true });
 				}
 			} catch (err) {
 				console.error("Mock auto verify failed:", err);
@@ -212,22 +220,26 @@ export const DocumentDropzone: React.FC = () => {
 
 				if (category === "about_me") {
 					navigate(AppRoutes.ApplicationAboutMeQuestions, {
+						replace: true,
 						state: { extractedData: rawData },
 					});
 				} else if (category === "housing") {
 					navigate(AppRoutes.ApplicationHousingQuestions, {
+						replace: true,
 						state: { extractedData: rawData },
 					});
 				} else if (category === "income_assets") {
 					navigate(AppRoutes.ApplicationIncomeAssetsQuestions, {
+						replace: true,
 						state: { extractedData: rawData },
 					});
 				} else if (category === "health") {
 					navigate(AppRoutes.ApplicationHealthQuestions, {
+						replace: true,
 						state: { extractedData: rawData },
 					});
 				} else {
-					navigate(AppRoutes.ApplicationOverview);
+					navigate(AppRoutes.ApplicationOverview, { replace: true });
 				}
 			} catch (err) {
 				console.error("Auto verify failed:", err);
@@ -252,14 +264,16 @@ export const DocumentDropzone: React.FC = () => {
 				if (origin === "wizard") {
 					if (category === "about_me") {
 						navigate(AppRoutes.ApplicationAboutMeQuestions, {
+							replace: true,
 							state: { extractedData },
 						});
 					} else if (category === "housing") {
 						navigate(AppRoutes.ApplicationHousingQuestions, {
+							replace: true,
 							state: { extractedData },
 						});
 					} else {
-						navigate(AppRoutes.ApplicationOverview);
+						navigate(AppRoutes.ApplicationOverview, { replace: true });
 					}
 				} else {
 					navigate(
@@ -267,6 +281,7 @@ export const DocumentDropzone: React.FC = () => {
 							":documentId",
 							docId,
 						)}?origin=${origin}${category ? `&category=${category}` : ""}`,
+						{ replace: true },
 					);
 				}
 			}
@@ -296,6 +311,7 @@ export const DocumentDropzone: React.FC = () => {
 									":documentId",
 									uploadedDocId,
 								)}?origin=${origin}${category ? `&category=${category}` : ""}`,
+								{ replace: true },
 							);
 						}
 					}, successDelay);
@@ -328,6 +344,22 @@ export const DocumentDropzone: React.FC = () => {
 		category,
 		handleAutoVerify,
 	]);
+
+	// Every entry point (drop, picker, hand-off, upload) goes through this gate.
+	const acceptFile = React.useCallback(
+		(file: File) => {
+			const reason = validateDocumentFile(file);
+			if (reason) {
+				setStatus("ERROR");
+				setErrorMessage(t(`errors.${reason}`));
+				return false;
+			}
+			return true;
+		},
+		[t],
+	);
+
+	const hasValidSelection = () => files.length > 0 && files.every(acceptFile);
 
 	const handlePreviewFile = async (file: File, isAdd: boolean) => {
 		let url = "";
@@ -370,9 +402,24 @@ export const DocumentDropzone: React.FC = () => {
 		}
 	};
 
+	// A file dropped on the documents view is handed over instead of re-picked.
+	React.useEffect(() => {
+		if (!pendingFile) {
+			return;
+		}
+		usePendingUploadStore.getState().takePendingFile();
+		if (!acceptFile(pendingFile)) {
+			return;
+		}
+		setFiles([pendingFile]);
+		void handlePreviewFile(pendingFile, false);
+		setStatus("IDLE");
+		setErrorMessage(null);
+	}, [pendingFile, acceptFile]);
+
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const selectedFile = e.target.files?.[0];
-		if (selectedFile) {
+		if (selectedFile && acceptFile(selectedFile)) {
 			setFiles([selectedFile]);
 			void handlePreviewFile(selectedFile, false);
 			setStatus("IDLE");
@@ -383,7 +430,7 @@ export const DocumentDropzone: React.FC = () => {
 
 	const handleAddPage = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const selectedFile = e.target.files?.[0];
-		if (selectedFile) {
+		if (selectedFile && acceptFile(selectedFile)) {
 			setFiles((prev) => [...prev, selectedFile]);
 			void handlePreviewFile(selectedFile, true);
 			setStatus("IDLE");
@@ -401,7 +448,7 @@ export const DocumentDropzone: React.FC = () => {
 		e.preventDefault();
 		e.stopPropagation();
 		const droppedFile = e.dataTransfer.files?.[0];
-		if (droppedFile) {
+		if (droppedFile && acceptFile(droppedFile)) {
 			setFiles([droppedFile]);
 			void handlePreviewFile(droppedFile, false);
 			setStatus("IDLE");
@@ -410,13 +457,13 @@ export const DocumentDropzone: React.FC = () => {
 	};
 
 	const handleUpload = async () => {
-		if (files.length === 0) {
+		if (!hasValidSelection()) {
 			return;
 		}
 
 		const token = useAuthStore.getState().token;
 		if (!token) {
-			navigate(AppRoutes.Auth);
+			navigate(AppRoutes.Auth, { replace: true });
 			return;
 		}
 
@@ -471,11 +518,11 @@ export const DocumentDropzone: React.FC = () => {
 						title: t("personal.upload.background_processing_title"),
 						message: t("personal.upload.background_processing_desc"),
 					});
-					navigate(getTargetExitRoute());
+					navigate(getTargetExitRoute(), { replace: true });
 				}, timeoutDuration);
 			} else {
 				if (!useAuthStore.getState().token) {
-					navigate(AppRoutes.Auth);
+					navigate(AppRoutes.Auth, { replace: true });
 					return;
 				}
 				setStatus("ERROR");
@@ -488,7 +535,7 @@ export const DocumentDropzone: React.FC = () => {
 				return;
 			}
 			if (!useAuthStore.getState().token) {
-				navigate(AppRoutes.Auth);
+				navigate(AppRoutes.Auth, { replace: true });
 				return;
 			}
 			setStatus("ERROR");
@@ -666,7 +713,10 @@ export const DocumentDropzone: React.FC = () => {
 						{t("personal.upload.drag_drop")}
 					</p>
 					<p className="text-sm text-brand-black/70">
-						{t("personal.upload.formats", "PDF, JPG, PNG or HEIC (max. 10MB)")}
+						{t(
+							"personal.upload.formats",
+							"PDF, JPG, PNG oder HEIC (max. 10 MB)",
+						)}
 					</p>
 				</div>
 			</div>
@@ -758,9 +808,7 @@ export const DocumentDropzone: React.FC = () => {
 						ref={fileInputRef}
 						onChange={handleFileChange}
 						onClick={(e) => e.stopPropagation()}
-						accept={
-							mode === "camera" ? "image/*" : ".pdf,.jpg,.jpeg,.png,.heic,.heif"
-						}
+						accept={mode === "camera" ? "image/*" : DOCUMENT_ACCEPT_ATTRIBUTE}
 						capture={mode === "camera" ? "environment" : undefined}
 						className="hidden"
 					/>
@@ -793,7 +841,9 @@ export const DocumentDropzone: React.FC = () => {
 	};
 
 	return (
-		<StepLayout onBack={() => navigate(getTargetExitRoute())}>
+		<StepLayout
+			onBack={() => navigate(getTargetExitRoute(), { replace: true })}
+		>
 			<div className="max-w-md w-full mx-auto">{renderContent()}</div>
 		</StepLayout>
 	);

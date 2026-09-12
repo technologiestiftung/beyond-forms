@@ -310,6 +310,44 @@ describe("DocumentReviewView - Validation & Smart Error Handling", () => {
 		});
 	});
 
+	// The desktop flow verifies inside a dialog over the documents page, so that
+	// page never remounts to refetch — only this invalidation refreshes it.
+	it("invalidates the profile query after a successful verification", async () => {
+		(
+			authenticatedFetch as unknown as ReturnType<typeof vi.fn>
+		).mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({
+				raw_data: {
+					first_name: "Helmut",
+					date_of_birth: "1959-01-20",
+				},
+			}),
+		});
+
+		renderWithRouter(<DocumentReviewView />);
+
+		await waitFor(() => {
+			expect(screen.getByText("review.confirm_all")).toBeInTheDocument();
+		});
+
+		(
+			authenticatedFetch as unknown as ReturnType<typeof vi.fn>
+		).mockResolvedValueOnce({
+			ok: true,
+			status: 200,
+			json: async () => ({ status: "success" }),
+		});
+
+		fireEvent.click(screen.getByText("review.confirm_all"));
+
+		await waitFor(() => {
+			expect(mockInvalidateQueries).toHaveBeenCalledWith({
+				queryKey: ["profile"],
+			});
+		});
+	});
+
 	it("enables direct click-to-edit on extracted field value text spans", async () => {
 		(
 			authenticatedFetch as unknown as ReturnType<typeof vi.fn>

@@ -15,7 +15,9 @@
 	"nav": {
 		"dashboard": "Applications",
 		"chat": "Chat",
-		"my_account": "Profile"
+		"my_account": "Profile",
+		"logged_in": "Signed in",
+		"logout": "Log out"
 	},
 	"save_next": "Save and continue",
 	"save_close": "Save and close",

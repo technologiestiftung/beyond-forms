@@ -1,10 +1,12 @@
-import React from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { MainNavigation } from "../Navigation/MainNavigation";
 import { ChatBottomSheet } from "../../components/Chat/ChatBottomSheet";
 import { getRouteMetadata } from "../../config/routeConfig";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useUIStore } from "../../store/useUIStore";
+import { useIsDesktop } from "../../hooks/useIsDesktop";
+import { AppRoutes } from "../../constants/routes";
 
 export const AppShell: React.FC = () => {
 	const location = useLocation();
@@ -12,7 +14,17 @@ export const AppShell: React.FC = () => {
 	const isAuthenticated = !!useAuthStore((s) => s.token);
 	const isStepLayout = metadata?.layout === "step";
 	const isHome = location.pathname === "/";
-	const { isChatOpen } = useUIStore();
+	const { isChatOpen, closeChat } = useUIStore();
+	const isDesktop = useIsDesktop();
+	const navigate = useNavigate();
+
+	// Desktop has a chat page, so a sheet opened on a narrow screen moves there.
+	useEffect(() => {
+		if (isDesktop && isChatOpen) {
+			closeChat();
+			navigate(AppRoutes.Chat);
+		}
+	}, [isDesktop, isChatOpen, closeChat, navigate]);
 
 	const showNav =
 		isAuthenticated &&

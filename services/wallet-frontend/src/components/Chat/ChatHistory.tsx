@@ -1,8 +1,14 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-export const ChatHistory: React.FC<{ closeChatHistory: () => void }> = ({
+interface ChatHistoryProps {
+	closeChatHistory: () => void;
+	showBackToChat?: boolean;
+}
+
+export const ChatHistory: React.FC<ChatHistoryProps> = ({
 	closeChatHistory,
+	showBackToChat = true,
 }) => {
 	const { t } = useTranslation("chat");
 	return (
@@ -13,13 +19,15 @@ export const ChatHistory: React.FC<{ closeChatHistory: () => void }> = ({
 			<p className="text-body text-brand-black max-w-[280px]">
 				{t("history.placeholder")}
 			</p>
-			<button
-				type="button"
-				onClick={closeChatHistory}
-				className="px-4 py-2 bg-primary-green-500 text-primary-blue-500 rounded-full text-[13px] font-medium cursor-pointer hover:bg-primary-green-500/85 transition-colors"
-			>
-				{t("history.hide")}
-			</button>
+			{showBackToChat && (
+				<button
+					type="button"
+					onClick={closeChatHistory}
+					className="px-4 py-2 bg-primary-green-500 text-primary-blue-500 rounded-full text-[13px] font-medium cursor-pointer hover:bg-primary-green-500/85 transition-colors"
+				>
+					{t("history.hide")}
+				</button>
+			)}
 		</div>
 	);
 };

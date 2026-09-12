@@ -11,7 +11,10 @@ import {
 	APPLICATION_DOCUMENT_GROUPS,
 } from "../../config/applicationConfig";
 import { AppRoutes } from "../../constants/routes";
-import { DocumentStatusListItem } from "./DocumentStatusListItem";
+import {
+	DocumentStatusListItem,
+	type DocumentStatusListItemVariant,
+} from "./DocumentStatusListItem";
 import {
 	doesDocumentMatchSlot,
 	sanitizeFileName,
@@ -29,6 +32,9 @@ interface DocumentStatusListProps {
 	showUnassigned?: boolean;
 	showDelete?: boolean;
 	origin?: OriginType;
+	className?: string;
+	variant?: DocumentStatusListItemVariant;
+	onOpenFlow?: (path: string) => void;
 }
 
 export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
@@ -38,9 +44,13 @@ export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
 	showUnassigned = false,
 	showDelete = true,
 	origin = Origins.WIZARD,
+	className = "",
+	variant = "card",
+	onOpenFlow,
 }) => {
 	const { t } = useTranslation("application");
 	const navigate = useNavigate();
+	const openRoute: (path: string) => void = onOpenFlow ?? navigate;
 	const { deleteDocument, profileData } = useProfile();
 	const [deleteDocId, setDeleteDocId] = useState<string | null>(null);
 
@@ -134,7 +144,7 @@ export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
 									<button
 										type="button"
 										onClick={() =>
-											navigate(
+											openRoute(
 												`${AppRoutes.ProfileDocumentReview.replace(
 													":documentId",
 													file.id,
@@ -181,7 +191,11 @@ export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
 		const filteredSlots = visibleSlots.filter((s) => slotIds.includes(s.id));
 		return (
 			<div
-				className="flex flex-col gap-4 w-full min-w-0 max-w-md mx-auto"
+				className={`flex flex-col w-full min-w-0 ${
+					variant === "row"
+						? "divide-y divide-brand-border"
+						: "gap-4 max-w-md mx-auto"
+				} ${className}`}
 				data-testid="document-status-list"
 			>
 				{filteredSlots.flatMap((slot) => {
@@ -192,6 +206,8 @@ export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
 								slot={slot}
 								showDelete={showDelete}
 								origin={origin}
+								variant={variant}
+								onOpenFlow={onOpenFlow}
 							/>,
 						];
 					}
@@ -204,6 +220,8 @@ export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
 							}}
 							showDelete={showDelete}
 							origin={origin}
+							variant={variant}
+							onOpenFlow={onOpenFlow}
 						/>
 					));
 				})}

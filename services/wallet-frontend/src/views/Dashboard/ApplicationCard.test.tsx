@@ -20,7 +20,7 @@ describe("ApplicationCard i18n", () => {
 			),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText("sections.applications.basic_security.actions.continue"),
+			screen.getByText("sections.applications.generate_button"),
 		).toBeInTheDocument();
 	});
 

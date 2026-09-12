@@ -14,6 +14,36 @@ import { ConfirmationModal } from "../ui/ConfirmationModal";
 import { DocumentPreviewModal } from "../ui/DocumentPreviewModal";
 import { type OriginType } from "../../constants/origin";
 
+export type DocumentStatusListItemVariant = "card" | "row";
+
+const VARIANT_STYLES: Record<
+	DocumentStatusListItemVariant,
+	{
+		wrapper: string;
+		button: string;
+		hover: string;
+		title: string;
+		badge: string;
+	}
+> = {
+	card: {
+		wrapper:
+			"flex items-center w-full bg-white rounded-xl border border-brand-border-subtle shadow-cards overflow-hidden gap-2 pr-2",
+		button: "p-3.5 items-start",
+		hover: "hover:bg-primary-blue-20/50",
+		title: "",
+		badge: "px-2 py-0.5 bg-primary-blue-20 rounded-full text-xs text-slate-600",
+	},
+	row: {
+		wrapper: "flex items-center w-full gap-2",
+		button: "py-4 -mx-3 px-3 rounded-xl items-center",
+		hover: "cursor-pointer hover:bg-brand-bg",
+		title: "transition-colors group-hover:text-primary-blue-500",
+		badge:
+			"px-3 py-0.5 bg-slate-100 rounded-[10px] text-[11px] text-slate-700 transition-colors group-hover:bg-white",
+	},
+};
+
 interface DocumentStatusListItemProps {
 	slot: RequiredDocumentSlot & {
 		matchedFiles: WalletDocument[];
@@ -21,12 +51,17 @@ interface DocumentStatusListItemProps {
 	};
 	showDelete?: boolean;
 	origin: OriginType;
+	variant?: DocumentStatusListItemVariant;
+	/** Opens the upload/review step in place instead of navigating to it. */
+	onOpenFlow?: (path: string) => void;
 }
 
 export const DocumentStatusListItem = ({
 	slot,
 	showDelete = true,
 	origin,
+	variant = "card",
+	onOpenFlow,
 }: DocumentStatusListItemProps) => {
 	const { t } = useTranslation("application");
 	const navigate = useNavigate();
@@ -35,6 +70,10 @@ export const DocumentStatusListItem = ({
 	const [previewDocId, setPreviewDocId] = useState<string | null>(null);
 	const [deleteError, setDeleteError] = useState<string | null>(null);
 
+	const isRow = variant === "row";
+	const styles = VARIANT_STYLES[variant];
+	const slotTitle = t(slot.titleKey, slot.defaultTitle);
+	const openRoute: (path: string) => void = onOpenFlow ?? navigate;
 	const hasUploadedFile = slot.matchedFiles.length > 0;
 	const uploadedFile = slot.matchedFiles[0];
 	const isProcessing =
@@ -52,7 +91,7 @@ export const DocumentStatusListItem = ({
 		if (hasUploadedFile) {
 			// Prevent navigating to review screen if document OCR processing failed
 			if (uploadedFile.status === ProcessingStatusEnum.enum.FAILED) {
-				navigate(
+				openRoute(
 					`${AppRoutes.ProfilePersonalDataUpload}?origin=${origin}&type=${slot.id}`,
 				);
 				return;
@@ -61,7 +100,7 @@ export const DocumentStatusListItem = ({
 			if (isVerified) {
 				setPreviewDocId(uploadedFile.id);
 			} else {
-				navigate(
+				openRoute(
 					`${AppRoutes.ProfileDocumentReview.replace(
 						":documentId",
 						uploadedFile.id,
@@ -69,7 +108,7 @@ export const DocumentStatusListItem = ({
 				);
 			}
 		} else {
-			navigate(
+			openRoute(
 				`${AppRoutes.ProfilePersonalDataUpload}?origin=${origin}&type=${slot.id}`,
 			);
 		}
@@ -91,6 +130,34 @@ export const DocumentStatusListItem = ({
 		}
 	};
 
+	// Without this the row reads out as "<slot> Dokument Hinzufügen", repeating
+	// the card's own "Dokument hinzufügen" action.
+	const getRowAriaLabel = () => {
+		// Processing and failed rows announce their own status text instead.
+		if (
+			isProcessing ||
+			uploadedFile?.status === ProcessingStatusEnum.enum.FAILED
+		) {
+			return undefined;
+		}
+		if (isVerified) {
+			return t("docs.view_slot_aria", {
+				title: slotTitle,
+				defaultValue: `${slotTitle} ansehen`,
+			});
+		}
+		if (hasUploadedFile) {
+			return t("docs.review_slot_aria", {
+				title: slotTitle,
+				defaultValue: `${slotTitle} prüfen`,
+			});
+		}
+		return t("docs.add_slot_aria", {
+			title: slotTitle,
+			defaultValue: `${slotTitle} hinzufügen`,
+		});
+	};
+
 	const renderStatusIndicator = () => {
 		if (isProcessing) {
 			return (
@@ -109,6 +176,16 @@ export const DocumentStatusListItem = ({
 		if (isVerified) {
 			return <CheckCircleIcon className="size-5 text-primary-blue-500" />;
 		}
+		if (isRow) {
+			return (
+				<span className="flex items-center gap-3 font-bold text-primary-blue-500">
+					{hasUploadedFile
+						? t("docs.review", "Prüfen")
+						: t("docs.add_short", "Hinzufügen")}
+					<ChevronRight className="size-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
+				</span>
+			);
+		}
 		return (
 			<ChevronRight className="size-5 text-brand-grey shrink-0 transition-transform duration-200" />
 		);
@@ -124,7 +201,7 @@ export const DocumentStatusListItem = ({
 					{deleteError}
 				</div>
 			)}
-			<div className="flex items-center w-full bg-white rounded-xl border border-brand-border-subtle shadow-cards overflow-hidden gap-2 pr-2">
+			<div className={styles.wrapper}>
 				<button
 					type="button"
 					onClick={isProcessing ? undefined : handleClick}
@@ -132,19 +209,20 @@ export const DocumentStatusListItem = ({
 					data-testid={
 						isVerified ? `preview-doc-btn-${slot.id}` : `slot-btn-${slot.id}`
 					}
-					className={`p-3.5 flex justify-between items-start flex-1 text-left min-w-0 transition-colors ${
-						isProcessing ? "cursor-not-allowed" : "hover:bg-primary-blue-20/50"
-					}`}
+					aria-label={isRow ? getRowAriaLabel() : undefined}
+					className={`group flex justify-between flex-1 text-left min-w-0 gap-4 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-blue-500 ${
+						styles.button
+					} ${isProcessing ? "cursor-not-allowed" : styles.hover}`}
 				>
 					<div className="flex flex-col gap-1 pr-2 min-w-0 flex-1">
 						<span
 							data-testid={`slot-title-${slot.id}`}
-							className="text-body-lg font-semibold text-brand-black wrap-break-word"
+							className={`text-body-lg font-semibold text-brand-black wrap-break-word ${styles.title}`}
 						>
-							{t(slot.titleKey, slot.defaultTitle)}
+							{slotTitle}
 						</span>
 						<div className="flex items-center gap-2 mt-0.5">
-							<span className="px-2 py-0.5 bg-primary-blue-20 rounded-full text-xs text-slate-600">
+							<span className={styles.badge}>
 								{t(slot.badgeKey, slot.defaultBadge)}
 							</span>
 						</div>

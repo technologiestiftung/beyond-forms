@@ -105,6 +105,7 @@
 		}
 	},
 	"welcome": "Hello {{name}}!",
+	"subtitle": "Here you manage your details, documents and settings. Klaro reuses them for all applications.",
 	"actions": {
 		"logout": "Logout from Klaro",
 		"delete_account": "Delete my Klaro Account"
@@ -124,7 +125,8 @@
 		},
 		"documents": {
 			"title": "My Documents",
-			"desc": "Documents for applications and other services"
+			"desc": "Documents for applications and other services",
+			"subtitle": "Upload your documents once. Klaro then uses them for all matching applications."
 		},
 		"settings": {
 			"title": "Settings",
@@ -134,10 +136,16 @@
 	"status": {
 		"complete": "Complete",
 		"partial": "Partially complete",
-		"missing": "Still missing"
+		"missing": "Still missing",
+		"processing": "Being checked"
 	},
 	"personal": {
 		"title": "Personal Data",
+		"subtitle": "Your details are reused for all applications. You can change them at any time.",
+		"categories": {
+			"nav_label": "Categories",
+			"progress": "{{completed}} of {{total}} categories complete"
+		},
 		"edit_title": "Edit Personal Data",
 		"view_desc": "Here you can view and edit your personal data.",
 		"groups": {
@@ -221,7 +229,7 @@
 		},
 		"upload": {
 			"drag_drop": "Click to upload or drag and drop",
-			"formats": "PDF, JPG or PNG (max. 10MB)",
+			"formats": "PDF, JPG, PNG or HEIC (max. 10 MB)",
 			"start_upload": "Upload Document",
 			"start_camera": "Open Camera",
 			"uploading": "Uploading...",
@@ -252,7 +260,8 @@
 		},
 		"errors": {
 			"update_failed": "Update failed",
-			"system_error": "A system error occurred"
+			"system_error": "A system error occurred",
+			"validation_failed": "Please check the highlighted entries."
 		},
 		"displacedStatus": {
 			"Expellee (Resettler)": "Expellee / resettler",
@@ -334,7 +343,8 @@
 		"save_and_continue": "Save and continue",
 		"remove_file": "Remove",
 		"download": "Download",
-		"edit_field": "Edit {{field}}"
+		"edit_field": "Edit {{field}}",
+		"open": "Open"
 	},
 	"success": {
 		"headline": "Data Accepted",
@@ -573,7 +583,9 @@
 		"lastName_required": "Last name is required",
 		"placeOfBirth_required": "Place of birth is required",
 		"upload_failed": "Upload failed",
-		"system_error": "A system error occurred"
+		"system_error": "A system error occurred",
+		"file_type_invalid": "This file format is not supported. Allowed formats are PDF, JPG, PNG and HEIC.",
+		"file_too_large": "This file is too large. The maximum size is 10 MB."
 	},
 	"logout": "Logout",
 	"settings": {
@@ -588,8 +600,10 @@
 		},
 		"account": {
 			"phone_label": "Your login number",
-			"phone_hint": "Remember this number so you can log back in later."
-		}
+			"phone_hint": "Remember this number so you can log back in later.",
+			"delete_hint": "All your details and uploaded documents will be deleted permanently. You will no longer be able to see applications in progress. This cannot be undone."
+		},
+		"subtitle": "Manage your access to Klaro here."
 	},
 	"housing": {
 		"question": "What is your living situation?",

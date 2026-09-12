@@ -5,6 +5,7 @@ import { SettingsView } from "./SettingsView";
 import { BrowserRouter } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useProfileStore } from "../../store/useProfileStore";
+import { setDesktopViewport } from "../../tests/viewport";
 
 const mockNavigate = vi.fn();
 
@@ -41,6 +42,7 @@ describe("SettingsView - Unified Single Page", () => {
 	const mockResetProfileStore = vi.fn();
 
 	beforeEach(() => {
+		setDesktopViewport(true);
 		vi.clearAllMocks();
 		mockDeleteProfile.mockResolvedValue(undefined);
 
@@ -85,15 +87,35 @@ describe("SettingsView - Unified Single Page", () => {
 		).not.toBeInTheDocument();
 
 		// Asserts account actions are rendered
-		expect(screen.getByText("actions.logout")).toBeInTheDocument();
-		expect(screen.getByText("actions.delete_account")).toBeInTheDocument();
+		expect(screen.getByTestId("logout-trigger")).toBeInTheDocument();
+		expect(screen.getByTestId("delete-account-trigger")).toBeInTheDocument();
+	});
+
+	it("keeps the mobile layout on small screens", () => {
+		setDesktopViewport(false);
+		renderWithRouter(<SettingsView />);
+
+		const deleteTrigger = screen.getByTestId("delete-account-trigger");
+		expect(deleteTrigger).toHaveTextContent("actions.delete_account");
+		expect(screen.queryByText("settings.subtitle")).not.toBeInTheDocument();
+	});
+
+	it("shows the desktop settings cards on wide screens", () => {
+		renderWithRouter(<SettingsView />);
+
+		expect(screen.getByText("settings.subtitle")).toBeInTheDocument();
+		expect(screen.getByTestId("delete-account-trigger")).toHaveTextContent(
+			"actions.delete_account",
+		);
+		expect(
+			screen.getByText("settings.account.delete_hint"),
+		).toBeInTheDocument();
 	});
 
 	it("triggers deep logout and resets stores on click", async () => {
 		renderWithRouter(<SettingsView />);
 
-		const logoutButton = screen.getByText("actions.logout");
-		fireEvent.click(logoutButton);
+		fireEvent.click(screen.getByTestId("logout-trigger"));
 
 		await waitFor(() => {
 			expect(mockLogout).toHaveBeenCalled();
@@ -111,7 +133,7 @@ describe("SettingsView - Unified Single Page", () => {
 		).not.toBeInTheDocument();
 
 		// Click delete button
-		const deleteTrigger = screen.getByText("actions.delete_account");
+		const deleteTrigger = screen.getByTestId("delete-account-trigger");
 		fireEvent.click(deleteTrigger);
 
 		// Dialog is now visible
@@ -138,7 +160,7 @@ describe("SettingsView - Unified Single Page", () => {
 
 		renderWithRouter(<SettingsView />);
 
-		const deleteTrigger = screen.getByText("actions.delete_account");
+		const deleteTrigger = screen.getByTestId("delete-account-trigger");
 		fireEvent.click(deleteTrigger);
 
 		const confirmDeleteBtn = screen.getByRole("button", {

@@ -58,14 +58,14 @@ export const SimpleApplicationCard: React.FC<SimpleApplicationCardProps> = ({
 		<div className="bg-white border border-brand-border-subtle rounded-2xl p-6 flex flex-col gap-6 shadow-sm">
 			<div className="flex flex-col gap-3 min-w-0 flex-1">
 				<div className="flex flex-row justify-between gap-2 min-w-0 items-start">
-					<h2 className="font-semibold text-brand-black text-h2 min-w-0 wrap-break-word pr-2">
+					<h2 className="font-semibold text-brand-black text-h2 min-w-0 wrap-break-word pr-2 lg:text-xl/7">
 						{title}
 					</h2>
 					{illustration && (
 						<img
 							src={illustration}
 							alt=""
-							className="max-w-24 max-h-24 shrink-0"
+							className="max-w-24 max-h-24 shrink-0 lg:hidden"
 							aria-hidden
 						/>
 					)}

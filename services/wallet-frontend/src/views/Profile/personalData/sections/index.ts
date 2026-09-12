@@ -1,0 +1,10 @@
+export { IdentitySection } from "./IdentitySection";
+export { StatusSection } from "./StatusSection";
+export { AddressSection } from "./AddressSection";
+export { ContactSection } from "./ContactSection";
+export { VehicleSection } from "./VehicleSection";
+export { InsuranceSection } from "./InsuranceSection";
+export { HouseholdSection } from "./HouseholdSection";
+export { HousingSection } from "./HousingSection";
+export { FinancialSection } from "./FinancialSection";
+export { HealthSection } from "./HealthSection";

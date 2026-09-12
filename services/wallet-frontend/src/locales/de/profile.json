@@ -105,6 +105,7 @@
 		}
 	},
 	"welcome": "Hallo {{name}}!",
+	"subtitle": "Hier verwaltest Du Deine Angaben, Dokumente und Einstellungen. Klaro übernimmt sie für alle Anträge.",
 	"actions": {
 		"logout": "Bei Klaro ausloggen",
 		"delete_account": "Mein Klaro Konto löschen"
@@ -124,7 +125,8 @@
 		},
 		"documents": {
 			"title": "Meine Dokumente",
-			"desc": "Dokumente für Anträge und andere Services"
+			"desc": "Dokumente für Anträge und andere Services",
+			"subtitle": "Lade Deine Dokumente einmal hoch. Klaro verwendet sie dann für alle passenden Anträge."
 		},
 		"settings": {
 			"title": "Einstellungen",
@@ -134,10 +136,16 @@
 	"status": {
 		"complete": "Vollständig",
 		"partial": "Teilweise vollständig",
-		"missing": "Fehlt noch"
+		"missing": "Fehlt noch",
+		"processing": "Wird geprüft"
 	},
 	"personal": {
 		"title": "Persönliche Daten",
+		"subtitle": "Deine Angaben werden für alle Anträge übernommen. Du kannst sie jederzeit ändern.",
+		"categories": {
+			"nav_label": "Kategorien",
+			"progress": "{{completed}} von {{total}} Kategorien vollständig"
+		},
 		"edit_title": "Persönliche Angaben bearbeiten",
 		"view_desc": "Hier kannst Du Deine persönlichen Daten einsehen und bearbeiten.",
 		"groups": {
@@ -221,7 +229,7 @@
 		},
 		"upload": {
 			"drag_drop": "Klicken oder Datei hierher ziehen",
-			"formats": "PDF, JPG oder PNG (max. 10MB)",
+			"formats": "PDF, JPG, PNG oder HEIC (max. 10 MB)",
 			"start_upload": "Dokument hochladen",
 			"start_camera": "Kamera öffnen",
 			"uploading": "Wird hochgeladen...",
@@ -252,7 +260,8 @@
 		},
 		"errors": {
 			"update_failed": "Aktualisierung fehlgeschlagen",
-			"system_error": "Ein Systemfehler ist aufgetreten"
+			"system_error": "Ein Systemfehler ist aufgetreten",
+			"validation_failed": "Bitte prüfe die markierten Angaben."
 		},
 		"displacedStatus": {
 			"Expellee (Resettler)": "Vertriebene(r) / Spätaussiedler",
@@ -334,7 +343,8 @@
 		"save_and_continue": "Speichern und weiter",
 		"remove_file": "Entfernen",
 		"download": "Herunterladen",
-		"edit_field": "{{field}} bearbeiten"
+		"edit_field": "{{field}} bearbeiten",
+		"open": "Öffnen"
 	},
 	"success": {
 		"headline": "Daten übernommen",
@@ -573,7 +583,9 @@
 		"lastName_required": "Nachname ist erforderlich",
 		"placeOfBirth_required": "Geburtsort ist erforderlich",
 		"upload_failed": "Upload fehlgeschlagen",
-		"system_error": "Ein Systemfehler ist aufgetreten"
+		"system_error": "Ein Systemfehler ist aufgetreten",
+		"file_type_invalid": "Dieses Dateiformat wird nicht unterstützt. Erlaubt sind PDF, JPG, PNG oder HEIC.",
+		"file_too_large": "Die Datei ist zu groß. Erlaubt sind maximal 10 MB."
 	},
 	"logout": "Abmelden",
 	"settings": {
@@ -588,8 +600,10 @@
 		},
 		"account": {
 			"phone_label": "Deine Anmeldenummer",
-			"phone_hint": "Merke Dir diese Nummer, um Dich später wieder anzumelden."
-		}
+			"phone_hint": "Merke Dir diese Nummer, um Dich später wieder anzumelden.",
+			"delete_hint": "Alle Deine Angaben und hochgeladenen Dokumente werden dauerhaft gelöscht. Laufende Anträge kannst Du danach nicht mehr einsehen. Das lässt sich nicht rückgängig machen."
+		},
+		"subtitle": "Hier verwaltest Du Deinen Zugang zu Klaro."
 	},
 	"housing": {
 		"question": "Wie ist Deine Wohnsituation?",

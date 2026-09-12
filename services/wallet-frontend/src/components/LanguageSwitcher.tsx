@@ -110,7 +110,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           ${
 						isBlue
 							? "bg-brand-border-subtle hover:bg-brand-border text-primary-blue-500 transition-colors"
-							: "bg-white text-brand-black"
+							: "bg-white hover:bg-brand-border-subtle text-brand-black transition-colors"
 					}
         `}
 			>

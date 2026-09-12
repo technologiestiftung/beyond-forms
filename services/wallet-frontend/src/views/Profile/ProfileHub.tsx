@@ -8,6 +8,16 @@ import { AppRoutes } from "../../constants/routes";
 import { useProfile } from "../../hooks/useProfile";
 import { PageContainer } from "../../components/Layout/PageContainer";
 import type { PersonalData } from "../../schemas/profile.schema";
+import { doesDocumentMatchSlot } from "../../utils/profile";
+import { REQUIRED_DOCUMENT_SLOTS } from "../../config/applicationConfig";
+import { GreetingHeader } from "../../components/Layout/GreetingHeader";
+
+const STATUS_LABEL: Record<SectionStatus, [string, string]> = {
+	COMPLETE: ["status.complete", "Vollständig"],
+	PARTIAL: ["status.partial", "Teilweise vollständig"],
+	MISSING: ["status.missing", "Fehlt noch"],
+	PROCESSING: ["status.processing", "Wird geprüft"],
+};
 
 export const ProfileHub: React.FC = () => {
 	const { t } = useTranslation("profile");
@@ -16,6 +26,24 @@ export const ProfileHub: React.FC = () => {
 	const personalData: Partial<PersonalData> = profileData?.personalData || {};
 
 	const firstName = personalData.firstName || "User";
+	const openLabel = t("common.open", "Öffnen");
+
+	const getDocumentsStatus = (): SectionStatus => {
+		if (documents.some((doc) => doc.status === "PROCESSING")) {
+			return "PROCESSING";
+		}
+
+		// The same slots the documents page lists, so the card cannot read
+		// "Vollständig" over a page of empty ones.
+		const covered = REQUIRED_DOCUMENT_SLOTS.filter((slot) =>
+			documents.some((doc) => doesDocumentMatchSlot(doc, slot)),
+		).length;
+
+		if (covered === 0) {
+			return "MISSING";
+		}
+		return covered === REQUIRED_DOCUMENT_SLOTS.length ? "COMPLETE" : "PARTIAL";
+	};
 
 	const getPersonalStatus = (): SectionStatus => {
 		const isProcessing = documents.some(
@@ -34,23 +62,28 @@ export const ProfileHub: React.FC = () => {
 	};
 
 	return (
-		<PageContainer topBarProps={{ showLanguageSwitcher: true }}>
-			<div className="flex flex-col items-center gap-4 text-center mb-8">
-				<div className="w-20 h-20 bg-primary-green-500 border border-primary-green-300 rounded-full flex items-center justify-center shadow-sm text-primary-blue-500">
-					<User className="w-10 h-10" />
-				</div>
-				<h1
-					data-testid="profile-name"
-					className="text-3xl font-extrabold text-slate-900"
-				>
-					{t("welcome", {
+		<PageContainer
+			topBarProps={{
+				showLanguageSwitcher: true,
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
+			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
+		>
+			<div className="mb-8 w-full lg:mb-8">
+				<GreetingHeader
+					headingTestId="profile-name"
+					title={t("welcome", {
 						name: firstName,
 						defaultValue: `Hallo ${firstName}!`,
 					})}
-				</h1>
+					subtitle={t(
+						"subtitle",
+						"Hier verwaltest Du Deine Angaben, Dokumente und Einstellungen. Klaro übernimmt sie für alle Anträge.",
+					)}
+				/>
 			</div>
 
-			<div className="flex flex-col gap-4 w-full max-w-md mx-auto">
+			<div className="flex flex-col gap-4 w-full max-w-md mx-auto lg:max-w-none lg:mx-0 lg:grid lg:grid-cols-[repeat(auto-fit,minmax(288px,1fr))] lg:gap-5 lg:items-stretch">
 				<ProfileSectionCard
 					title={t("sections.personal.title", "Persönliche Angaben")}
 					description={t(
@@ -58,6 +91,8 @@ export const ProfileHub: React.FC = () => {
 						"Name, Geburtsdatum und weitere persönliche Angaben",
 					)}
 					status={getPersonalStatus()}
+					statusLabel={t(...STATUS_LABEL[getPersonalStatus()])}
+					actionLabel={openLabel}
 					icon={<User className="size-6" />}
 					onClick={() => navigate(AppRoutes.ProfilePersonalDataEdit)}
 					data-testid="section-personal"
@@ -68,7 +103,9 @@ export const ProfileHub: React.FC = () => {
 						"sections.documents.desc",
 						"Dokumente für Anträge und andere Services",
 					)}
-					status="PARTIAL"
+					status={getDocumentsStatus()}
+					statusLabel={t(...STATUS_LABEL[getDocumentsStatus()])}
+					actionLabel={openLabel}
 					icon={<FileText className="size-6" />}
 					onClick={() => navigate(AppRoutes.ProfileDocuments)}
 					data-testid="section-documents"
@@ -80,7 +117,7 @@ export const ProfileHub: React.FC = () => {
 						"sections.settings.desc",
 						"Sprache, Benachrichtigungen und Wallet",
 					)}
-					status="COMPLETE"
+					actionLabel={openLabel}
 					icon={<Settings className="size-6" />}
 					onClick={() => navigate(AppRoutes.ProfileSettings)}
 					data-testid="section-settings"

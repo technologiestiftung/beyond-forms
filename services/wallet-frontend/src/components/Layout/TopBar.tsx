@@ -37,7 +37,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 		green:
 			"bg-primary-green-500 hover:bg-primary-green-300 text-brand-black shadow-sm",
 		default:
-			"bg-white text-brand-black border border-brand-border-subtle shadow-sm",
+			"bg-white hover:bg-brand-border-subtle text-brand-black border border-brand-border-subtle shadow-sm",
 	};
 
 	const buttonVariantClass =
