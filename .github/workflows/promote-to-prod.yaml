@@ -2,15 +2,11 @@ name: Run Staging E2E Audit & Promote to Production
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: ["CI/CD Orchestrator"]
-    branches: [main]
-    types: [completed]
 
 jobs:
   audit-and-promote:
     name: Run Staging E2E Audit & Promote to Production
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
