@@ -107,7 +107,11 @@ export const DashboardView: React.FC = () => {
 				/>
 
 				<div className="flex flex-col gap-6 w-full min-w-0 lg:grid lg:grid-cols-[repeat(auto-fit,minmax(288px,1fr))] lg:gap-5">
-					<ApplicationCard status={appCardStatus} level={milestoneLevel} />
+					<ApplicationCard
+						status={appCardStatus}
+						level={milestoneLevel}
+						formType="antrag_grundsicherung_im_alter"
+					/>
 
 					<SimpleApplicationCard
 						title={t(

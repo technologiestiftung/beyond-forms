@@ -1,9 +1,11 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 import { AppRoutes } from "../../constants/routes";
 import { MAX_MILESTONE_LEVEL } from "../../store/useProfileStore";
 import { useProfile } from "../../hooks/useProfile";
+import { useGeneratedPdfModal } from "../../hooks/useGeneratedPdfModal";
 import { CompletenessIndicator } from "../../components/Application/CompletenessIndicator";
 import { PrimaryButton } from "../../components/ui/PrimaryButton";
 import fillingFormIllustration from "../../assets/illustrations/filling-form.svg";
@@ -11,14 +13,18 @@ import fillingFormIllustration from "../../assets/illustrations/filling-form.svg
 interface ApplicationCardProps {
 	status: "not_started" | "in_progress" | "completed";
 	level?: number;
+	formType: string;
 }
 
 export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 	status,
 	level,
+	formType,
 }) => {
 	const { t } = useTranslation("dashboard");
 	const navigate = useNavigate();
+	const { handleGenerate, isGenerating, error, modal } =
+		useGeneratedPdfModal(formType);
 
 	const handleClick = () => {
 		navigate(AppRoutes.ApplicationOverview);
@@ -60,45 +66,61 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 	}
 
 	return (
-		<div
-			onClick={handleClick}
-			className="bg-white border border-brand-border-subtle rounded-2xl p-6 flex flex-col gap-6 shadow-sm cursor-pointer hover:border-brand-border transition-all"
-		>
-			<div className="flex flex-col gap-3 min-w-0 flex-1">
-				<h2 className="font-semibold text-brand-black text-h2 min-w-0 wrap-break-word pr-2 lg:text-xl/7">
-					{t("sections.applications.basic_security.title")}
-				</h2>
+		<>
+			<div
+				onClick={handleClick}
+				data-testid="application-card"
+				className="bg-white border border-brand-border-subtle rounded-2xl p-6 flex flex-col gap-6 shadow-sm cursor-pointer hover:border-brand-border transition-all"
+			>
+				<div className="flex flex-col gap-3 min-w-0 flex-1">
+					<h2 className="font-semibold text-brand-black text-h2 min-w-0 wrap-break-word pr-2 lg:text-xl/7">
+						{t("sections.applications.basic_security.title")}
+					</h2>
 
-				<div className="flex flex-row justify-between gap-2 min-w-0 items-start">
-					<p className="text-brand-black text-body-lg leading-relaxed mt-1 min-w-0 wrap-break-word">
-						{t(descKey, fallbackDesc)}
-					</p>
+					<div className="flex flex-row justify-between gap-2 min-w-0 items-start">
+						<p className="text-brand-black text-body-lg leading-relaxed mt-1 min-w-0 wrap-break-word">
+							{t(descKey, fallbackDesc)}
+						</p>
 
-					<img
-						src={fillingFormIllustration}
-						alt=""
-						className="max-w-32 max-h-32 shrink-0 lg:hidden"
-						aria-hidden
-					/>
+						<img
+							src={fillingFormIllustration}
+							alt=""
+							className="max-w-32 max-h-32 shrink-0 lg:hidden"
+							aria-hidden
+						/>
+					</div>
 				</div>
+
+				<CompletenessIndicator level={activeLevel} />
+
+				{error && (
+					<p role="alert" className="text-sm text-rose-600 font-medium">
+						{error}
+					</p>
+				)}
+
+				<PrimaryButton
+					onClick={(e) => {
+						e.stopPropagation();
+						void handleGenerate();
+					}}
+					disabled={isGenerating}
+					data-testid="lets-go-button"
+				>
+					{isGenerating && (
+						<Loader2 className="size-5 animate-spin mr-2 shrink-0" />
+					)}
+					{status === "not_started"
+						? t(
+								"sections.applications.basic_security.actions.start",
+								"Los geht's",
+							)
+						: t("sections.applications.generate_button", "Antrag generieren")}
+				</PrimaryButton>
 			</div>
 
-			<CompletenessIndicator level={activeLevel} />
-
-			<PrimaryButton
-				onClick={(e) => {
-					e.stopPropagation();
-					handleClick();
-				}}
-				data-testid="lets-go-button"
-			>
-				{status === "not_started"
-					? t(
-							"sections.applications.basic_security.actions.start",
-							"Los geht's",
-						)
-					: t("sections.applications.generate_button", "Antrag generieren")}
-			</PrimaryButton>
-		</div>
+			{/* Rendered outside the clickable card so modal clicks don't bubble to the card's navigation onClick */}
+			{modal}
+		</>
 	);
 };

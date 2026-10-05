@@ -2,11 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { PrimaryButton } from "../../components/ui/PrimaryButton";
-import { PdfPreviewModal } from "../../components/Application/PdfPreviewModal";
-import {
-	useGenerateApplication,
-	type GeneratedApplication,
-} from "../../hooks/useGenerateApplication";
+import { useGeneratedPdfModal } from "../../hooks/useGeneratedPdfModal";
 import { useFormCompleteness } from "../../hooks/useFormCompleteness";
 import { CompletenessIndicator } from "../../components/Application/CompletenessIndicator";
 
@@ -32,27 +28,9 @@ export const SimpleApplicationCard: React.FC<SimpleApplicationCardProps> = ({
 	illustration,
 }) => {
 	const { t } = useTranslation("dashboard");
-	const { generate, isGenerating, error } = useGenerateApplication(formType);
+	const { handleGenerate, isGenerating, error, modal } =
+		useGeneratedPdfModal(formType);
 	const { level } = useFormCompleteness(formType);
-	const [application, setApplication] =
-		React.useState<GeneratedApplication | null>(null);
-	const [showPreviewModal, setShowPreviewModal] = React.useState(false);
-
-	const handleGenerate = async () => {
-		const result = await generate();
-		if (result) {
-			setApplication(result);
-			setShowPreviewModal(true);
-		}
-	};
-
-	const closePreview = () => {
-		setShowPreviewModal(false);
-		if (application?.openUrl.startsWith("blob:")) {
-			URL.revokeObjectURL(application.openUrl);
-		}
-		setApplication(null);
-	};
 
 	return (
 		<div className="bg-white border border-brand-border-subtle rounded-2xl p-6 flex flex-col gap-6 shadow-sm">
@@ -94,17 +72,7 @@ export const SimpleApplicationCard: React.FC<SimpleApplicationCardProps> = ({
 				{t("sections.applications.generate_button", "Antrag generieren")}
 			</PrimaryButton>
 
-			{showPreviewModal && application && (
-				<PdfPreviewModal
-					key={application.downloadUrl}
-					onClose={closePreview}
-					pdfUrl={application.openUrl}
-					downloadUrl={application.downloadUrl}
-					downloadFilename={application.filename}
-					onDownloadSuccess={closePreview}
-					downloadButtonTestId={`download-${formType}-button`}
-				/>
-			)}
+			{modal}
 		</div>
 	);
 };

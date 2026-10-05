@@ -7,11 +7,23 @@ vi.mock("../../hooks/useProfile", () => ({
 	useProfile: () => ({ milestoneLevel: 1 }),
 }));
 
+vi.mock("../../hooks/useGeneratedPdfModal", () => ({
+	useGeneratedPdfModal: () => ({
+		handleGenerate: vi.fn(),
+		isGenerating: false,
+		error: null,
+		modal: null,
+	}),
+}));
+
 describe("ApplicationCard i18n", () => {
 	it('renders "in_progress" state with translation keys', () => {
 		render(
 			<MemoryRouter>
-				<ApplicationCard status="in_progress" />
+				<ApplicationCard
+					status="in_progress"
+					formType="antrag_grundsicherung_im_alter"
+				/>
 			</MemoryRouter>,
 		);
 		expect(
@@ -27,7 +39,10 @@ describe("ApplicationCard i18n", () => {
 	it('renders "completed" state with translation keys', () => {
 		render(
 			<MemoryRouter>
-				<ApplicationCard status="completed" />
+				<ApplicationCard
+					status="completed"
+					formType="antrag_grundsicherung_im_alter"
+				/>
 			</MemoryRouter>,
 		);
 		expect(
