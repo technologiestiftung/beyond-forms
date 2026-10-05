@@ -26,14 +26,26 @@ const STATUS_ICON: Record<
 };
 
 /**
- * amber-600 rather than amber-500: on white the lighter tone reaches only about 2.1:1,
- * under the 3:1 that meaningful graphics need. Colour never carries the status alone —
- * the label sits next to every icon.
+ * Icons and labels need different thresholds, so one token cannot serve both.
+ *
+ * A meaningful graphic has to clear 3:1, which these do on white (emerald-600 3.65,
+ * amber-600 3.20, rose-500 3.75). Text has to clear 4.5:1, which none of them do — reusing
+ * the icon tone on the 14px status label is what axe flagged at 3.65 and 3.19.
+ *
+ * Colour never carries the status alone: the label sits next to every icon.
  */
-const STATUS_TONE: Record<BenefitStatus, string> = {
+const STATUS_ICON_TONE: Record<BenefitStatus, string> = {
 	[BenefitStatus.LIKELY_YES]: "text-emerald-600",
 	[BenefitStatus.CHECK_ADVISED]: "text-amber-600",
 	[BenefitStatus.LIKELY_NO]: "text-rose-500",
+	[BenefitStatus.NOT_APPLICABLE]: "text-brand-grey",
+};
+
+/** One step darker, which is what carries these past 4.5:1 (5.36, 5.03, 6.03). */
+const STATUS_TEXT_TONE: Record<BenefitStatus, string> = {
+	[BenefitStatus.LIKELY_YES]: "text-emerald-700",
+	[BenefitStatus.CHECK_ADVISED]: "text-amber-700",
+	[BenefitStatus.LIKELY_NO]: "text-rose-700",
 	[BenefitStatus.NOT_APPLICABLE]: "text-brand-grey",
 };
 
@@ -64,7 +76,7 @@ export const BenefitAssessmentCard: React.FC<BenefitAssessmentCardProps> = ({
 		<>
 			{Icon && (
 				<span data-testid="status-icon" className="shrink-0">
-					<Icon className={`size-5 ${STATUS_TONE[assessment.status]}`} />
+					<Icon className={`size-5 ${STATUS_ICON_TONE[assessment.status]}`} />
 				</span>
 			)}
 			<span className="min-w-0 flex-1 text-left">
@@ -72,7 +84,7 @@ export const BenefitAssessmentCard: React.FC<BenefitAssessmentCardProps> = ({
 					{t(`result.benefit.${assessment.benefit}`)}
 				</span>
 				<span
-					className={`block text-sm font-semibold ${STATUS_TONE[assessment.status]}`}
+					className={`block text-sm font-semibold ${STATUS_TEXT_TONE[assessment.status]}`}
 				>
 					{t(`result.status.${assessment.status}`)}
 				</span>
