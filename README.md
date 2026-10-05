@@ -35,7 +35,7 @@ Services are deployed from the `services/` folder.
 To automate the deployment of a new service, it needs to be added to `ci.yaml`.
 
 - **Staging Deployment**: Once merged to the `main` branch, the service will automatically be built and deployed to the staging environment.
-- **Production Deployment**: Production deployments happen from the `prod` branch. The codebase is automatically promoted from `main` to `prod` (triggering a production rollout) via the `.github/workflows/promote-to-prod.yaml` workflow if the staging E2E audit tests pass. Alternatively, you can manually merge `main` into `prod`.
+- **Production Deployment**: Production deployments happen from the `prod` branch. The codebase is automatically manually from `main` to `prod` (triggering a production rollout) via the `.github/workflows/promote-to-prod.yaml` workflow. Alternatively, you can manually merge `main` into `prod`.
 
 Additionally, a folder named `infrastructure` is mandatory inside each service. This folder must contain a `cloudbuild.yaml` file with a deploy command and the necessary variable names (which are automatically injected from GitHub secrets from this repository). By following this structure, the service will automatically be deployed to Cloud Run with a `bf-stg-` or `bf-prd-` prefix depending on the environment.
 
