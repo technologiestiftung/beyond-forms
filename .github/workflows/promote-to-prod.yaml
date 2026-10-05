@@ -2,11 +2,15 @@ name: Run Staging E2E Audit & Promote to Production
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["CI/CD Orchestrator"]
+    branches: [main]
+    types: [completed]
 
 jobs:
   audit-and-promote:
     name: Run Staging E2E Audit & Promote to Production
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -37,27 +41,3 @@ jobs:
           PROD_TEST_BYPASS_KEY: ${{ secrets.PROD_TEST_BYPASS_KEY }}
         run: npx playwright test --config=playwright.remote.config.ts --project=chromium-mobile
         working-directory: services/wallet-frontend
-
-      - name: Promote Staging to Production
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Staging E2E Audit passed successfully! Promoting main branch to prod branch automatically..."
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Fetch and checkout prod branch
-          git checkout prod
-
-          # Merge main into prod
-          git merge origin/main --no-edit
-
-          # Push back to origin prod
-          git push origin prod
-
-          # Trigger production workflows via GitHub CLI
-          echo "Triggering production CI/CD Orchestrator workflow..."
-          gh workflow run ci.yaml --ref prod
-
-          echo "Triggering production Apply Database Migrations workflow..."
-          gh workflow run run-migrations.yaml --ref prod
