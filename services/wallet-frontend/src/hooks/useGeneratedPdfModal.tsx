@@ -24,11 +24,17 @@ export function useGeneratedPdfModal(
 	const downloadButtonTestId =
 		options?.downloadButtonTestId ?? `download-${formType}-button`;
 
+	React.useEffect(() => {
+		const url = application?.openUrl;
+		return () => {
+			if (url?.startsWith("blob:")) {
+				URL.revokeObjectURL(url);
+			}
+		};
+	}, [application]);
+
 	const closePreview = () => {
 		setShowPreviewModal(false);
-		if (application?.openUrl.startsWith("blob:")) {
-			URL.revokeObjectURL(application.openUrl);
-		}
 		setApplication(null);
 	};
 
