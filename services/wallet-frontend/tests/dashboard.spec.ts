@@ -84,7 +84,9 @@ test.describe("Dashboard View Audit", () => {
 	test("Navigation: Should navigate to application overview from application card", async ({
 		page,
 	}) => {
-		await page.getByTestId("lets-go-button").click();
+		await page.getByTestId("application-card").click({
+			position: { x: 10, y: 10 },
+		}); // clicks on the application card, not the generate button
 		await expect(page).toHaveURL(/\/dashboard\/application\/overview/);
 	});
 });
