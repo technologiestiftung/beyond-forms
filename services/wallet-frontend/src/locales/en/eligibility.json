@@ -124,6 +124,8 @@
 		}
 	},
 	"outcome": {
+		"reason_label": "What this means for you",
+		"heading": "Your result",
 		"eligible": {
 			"title": "You could be entitled to basic income support.",
 			"description": "This is an initial assessment. Klaro helps you fill out your application step-by-step. It is easy, digital, and free.",

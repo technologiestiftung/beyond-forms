@@ -6,6 +6,7 @@ interface ProgressBarProps {
 	total: number;
 	colorVariant?: "blue" | "green";
 	ariaLabel?: string;
+	className?: string;
 }
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
@@ -13,6 +14,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 	total,
 	colorVariant = "blue",
 	ariaLabel,
+	className = "",
 }) => {
 	const percentage = (current / total) * 100;
 	const barColorClass =
@@ -21,7 +23,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 		colorVariant === "green" ? "bg-slate-200" : "bg-primary-blue-100";
 
 	return (
-		<div className="w-full font-sans flex flex-col gap-1.5 mb-6">
+		<div className={`w-full font-sans flex flex-col gap-1.5 mb-6 ${className}`}>
 			<div
 				className={`relative w-full h-2 rounded-full overflow-hidden ${trackColorClass}`}
 				role="progressbar"

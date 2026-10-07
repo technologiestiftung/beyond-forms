@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 test.describe("Eligibility Navigator - Principal Journey Audit", () => {
@@ -216,5 +216,127 @@ test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 		await expect(
 			page.getByTestId("option-german").locator("input"),
 		).not.toBeChecked();
+	});
+});
+
+test.describe("Eligibility Navigator - Desktop layout", () => {
+	test.skip(({ isMobile }) => isMobile, "Desktop-only layout");
+
+	const expectFitsViewport = async (page: Page) => {
+		const metrics = await page.evaluate(() => {
+			const main =
+				document.getElementById("main-content") ?? document.documentElement;
+			const bottomOf = (testId: string) =>
+				document
+					.querySelector(`[data-testid="${testId}"]`)
+					?.getBoundingClientRect().bottom ?? 0;
+			const optionBottoms = Array.from(
+				document.querySelectorAll('[data-testid^="option-"]'),
+			).map((el) => el.getBoundingClientRect().bottom);
+			return {
+				viewportHeight: window.innerHeight,
+				overflowX: main.scrollWidth - main.clientWidth,
+				pageOverflowX:
+					document.documentElement.scrollWidth -
+					document.documentElement.clientWidth,
+				lastOptionBottom: Math.max(0, ...optionBottoms),
+				nextBottom: bottomOf("next-button"),
+				backBottom: bottomOf("back-button"),
+			};
+		});
+
+		expect(metrics.overflowX).toBe(0);
+		expect(metrics.pageOverflowX).toBe(0);
+		expect(metrics.lastOptionBottom).toBeLessThanOrEqual(
+			metrics.viewportHeight,
+		);
+		expect(metrics.nextBottom).toBeLessThanOrEqual(metrics.viewportHeight);
+		expect(metrics.backBottom).toBeLessThanOrEqual(metrics.viewportHeight);
+	};
+
+	for (const viewport of [
+		{ width: 1280, height: 720 },
+		{ width: 1920, height: 1080 },
+	]) {
+		test(`questions and result fit without scrolling at ${viewport.width}px`, async ({
+			page,
+		}) => {
+			await page.setViewportSize(viewport);
+			await page.goto("/");
+			await page.evaluate(() => {
+				window.sessionStorage.clear();
+				window.localStorage.clear();
+			});
+			await page.reload();
+			await page.getByTestId("start-button").click();
+
+			const answers = [
+				"option-eu_5_plus",
+				"option-yes",
+				null,
+				"option-reduced_earning_capacity",
+				"option-soon_insufficient",
+				"option-no",
+			];
+
+			for (const answer of answers) {
+				await expect(page.getByTestId("question-card")).toBeVisible();
+				await expectFitsViewport(page);
+				if (answer) {
+					await page.getByTestId(answer).click();
+				} else {
+					await page.getByTestId("dob-date-input").fill("1955-01-01");
+				}
+				await page.getByTestId("next-button").click();
+			}
+
+			await expect(page).toHaveURL(/\/eligibility-check\/result/);
+			await expect(page.getByTestId("outcome-card")).toBeVisible();
+			const overflowX = await page.evaluate(() => {
+				const main =
+					document.getElementById("main-content") ?? document.documentElement;
+				return main.scrollWidth - main.clientWidth;
+			});
+			expect(overflowX).toBe(0);
+			await expect(
+				page.getByRole("heading", { level: 1, name: "Dein Ergebnis" }),
+			).toBeVisible();
+		});
+	}
+
+	test("focus moves from the top bar through the answers to Weiter", async ({
+		page,
+		browserName,
+	}) => {
+		test.skip(
+			browserName === "webkit",
+			"Safari skips buttons on Tab by default",
+		);
+		await page.setViewportSize({ width: 1280, height: 720 });
+		await page.goto("/");
+		await page.evaluate(() => {
+			window.sessionStorage.clear();
+			window.localStorage.clear();
+		});
+		await page.reload();
+		await page.getByTestId("start-button").click();
+		await page.getByTestId("option-german").click();
+
+		await page.getByTestId("back-button").focus();
+		await page.keyboard.press("Tab");
+		await expect(
+			page.getByTestId("language-switcher").getByRole("button"),
+		).toBeFocused();
+		await page.keyboard.press("Tab");
+		await expect(
+			page.getByTestId("option-german").locator("input"),
+		).toBeFocused();
+		await page.keyboard.press("Tab");
+		await expect(page.getByTestId("next-button")).toBeFocused();
+
+		await page.getByTestId("next-button").click();
+		await expect(page).toHaveURL(/\/eligibility-check\/germany/);
+		await page.getByTestId("back-button").click();
+		await expect(page).toHaveURL(/\/eligibility-check\/nationality/);
 	});
 });

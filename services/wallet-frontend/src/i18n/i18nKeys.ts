@@ -37,5 +37,7 @@ export const i18nKeys = {
 		outcomeTitle: (key: string) => `outcome.${key}.title`,
 		outcomeDesc: (key: string) => `outcome.${key}.description`,
 		outcomeCTA: (key: string) => `outcome.${key}.cta`,
+		outcomeReasonLabel: "outcome.reason_label",
+		resultHeading: "outcome.heading",
 	},
 } as const;

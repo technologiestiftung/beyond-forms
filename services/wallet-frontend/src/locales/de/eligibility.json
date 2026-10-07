@@ -124,6 +124,8 @@
 		}
 	},
 	"outcome": {
+		"reason_label": "Was das für Dich bedeutet",
+		"heading": "Dein Ergebnis",
 		"eligible": {
 			"title": "Du könntest Anspruch auf Grundsicherung haben.",
 			"description": "Das ist eine erste Einschätzung. Klaro hilft Dir dabei Deinen Antrag Schritt-für-Schritt auszufüllen. Das geht einfach, digital und ist kostenlos.",
