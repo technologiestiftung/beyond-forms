@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import deEligibility from "../src/locales/de/eligibility.json" with { type: "json" };
+import enEligibility from "../src/locales/en/eligibility.json" with { type: "json" };
 
 test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 	test.beforeEach(async ({ page }) => {
@@ -11,10 +13,18 @@ test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 		await page.reload();
 	});
 
-	test("Start Screen: Verify content and start action", async ({ page }) => {
+	test("Start Screen: Check path leads to eligibility check", async ({
+		page,
+	}) => {
 		await expect(page.getByTestId("start-button")).toBeVisible();
 		await page.getByTestId("start-button").click();
 		await expect(page).toHaveURL(/\/eligibility-check\/nationality/);
+	});
+
+	test("Start Screen: Direct path leads to login", async ({ page }) => {
+		await expect(page.getByTestId("promo-card-start-button")).toBeVisible();
+		await page.getByTestId("promo-card-start-button").click();
+		await expect(page).toHaveURL(/\/auth\?mode=login/);
 	});
 
 	test("Language Switcher: Toggle between DE and EN on Start Screen", async ({
@@ -23,16 +33,14 @@ test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 		await expect(page.getByTestId("start-button")).toBeVisible();
 		await page.getByTestId("language-switcher").click();
 		await page.getByText("EN", { exact: true }).click();
-		await expect(
-			page.getByText(/Check Grundsicherung easily and quickly/i),
-		).toBeVisible();
+		await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+			enEligibility.start_screen.title,
+		);
 		await page.getByTestId("language-switcher").click();
 		await page.getByText("DE", { exact: true }).click();
-		await expect(
-			page.getByText(
-				/Schnell und einfach Deinen Anspruch auf Grundsicherung prüfen/i,
-			),
-		).toBeVisible();
+		await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+			deEligibility.start_screen.title,
+		);
 	});
 
 	test("Language Switcher: Mid-flow language switching", async ({ page }) => {
