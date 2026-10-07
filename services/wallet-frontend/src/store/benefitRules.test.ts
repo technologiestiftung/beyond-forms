@@ -73,18 +73,33 @@ describe("Grundsicherungsgeld", () => {
 	});
 
 	it("uses the age-tiered savings allowance", () => {
-		const savings = { ...base, assetsBand: AssetsBand.FROM_5000_TO_15000 };
-		// Age 36: 10,000 allowance, so the 5,000–15,000 band straddles it.
+		const savings = { ...base, assetsBand: AssetsBand.FROM_10000_TO_12500 };
+		// Age 36: 10,000 allowance, so the band lies entirely above it.
 		expect(statusOf(savings, Benefit.GRUNDSICHERUNGSGELD)?.status).toBe(
-			BenefitStatus.POSSIBLE,
+			BenefitStatus.NO,
 		);
-		// Age 26: 5,000 allowance, so the band lies entirely above it.
+		// Age 45: 12,500 allowance, so the band lies within it.
 		expect(
 			statusOf(
-				{ ...savings, dateOfBirth: "2000-01-01" },
+				{ ...savings, dateOfBirth: "1981-01-01" },
 				Benefit.GRUNDSICHERUNGSGELD,
 			)?.status,
-		).toBe(BenefitStatus.NO);
+		).toBe(BenefitStatus.LIKELY);
+	});
+
+	it("is only possible when savings straddle a couple's allowance", () => {
+		// Age 45, couple: 2 × 12,500, which the open-ended top band straddles.
+		expect(
+			statusOf(
+				{
+					...base,
+					householdComposition: HouseholdComposition.COUPLE_NO_CHILDREN,
+					dateOfBirth: "1981-01-01",
+					assetsBand: AssetsBand.OVER_20000,
+				},
+				Benefit.GRUNDSICHERUNGSGELD,
+			)?.status,
+		).toBe(BenefitStatus.POSSIBLE);
 	});
 
 	it("is only possible when unable to work for now", () => {
@@ -122,7 +137,7 @@ describe("Grundsicherung im Alter und bei Erwerbsminderung", () => {
 	it("uses the flat 10,000 savings allowance", () => {
 		expect(
 			statusOf(
-				{ ...pensioner, assetsBand: AssetsBand.FROM_15000_TO_25000 },
+				{ ...pensioner, assetsBand: AssetsBand.FROM_10000_TO_12500 },
 				Benefit.GRUNDSICHERUNG_ALTER,
 			)?.status,
 		).toBe(BenefitStatus.NO);

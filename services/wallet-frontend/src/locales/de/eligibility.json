@@ -141,9 +141,10 @@
 			"tip": "Gemeint ist alles, was Du zurückgelegt hast: Konto, Sparbuch, Bargeld, Wertpapiere. Einen Teil darfst Du behalten — wie viel, hängt von Deinem Alter ab. Eine grobe Schätzung genügt.",
 			"options": {
 				"UNDER_5000": "Weniger als 5.000 Euro.",
-				"FROM_5000_TO_15000": "Zwischen 5.000 und 15.000 Euro.",
-				"FROM_15000_TO_25000": "Zwischen 15.000 und 25.000 Euro.",
-				"OVER_25000": "Mehr als 25.000 Euro."
+				"FROM_5000_TO_10000": "Zwischen 5.000 und 10.000 Euro.",
+				"FROM_10000_TO_12500": "Zwischen 10.000 und 12.500 Euro.",
+				"FROM_12500_TO_20000": "Zwischen 12.500 und 20.000 Euro.",
+				"OVER_20000": "Mehr als 20.000 Euro."
 			}
 		},
 		"receivesBenefits": {

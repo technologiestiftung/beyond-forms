@@ -1,8 +1,10 @@
 import {
+	AssetsBand,
 	Binary,
 	Citizenship,
 	WorkCapacity,
 } from "../schemas/eligibility.schema";
+import { EligibilityEngine } from "../store/EligibilityEngine";
 import type { EligibilityCheck } from "../schemas/eligibility.schema";
 import type { AbilityToWorkType } from "../schemas/profile.schema";
 import { authenticatedFetch } from "../utils/apiClient";
@@ -19,9 +21,19 @@ const ABILITY_TO_WORK: Record<WorkCapacity, AbilityToWorkType> = {
 	[WorkCapacity.PERMANENTLY_REDUCED]: "Permanently disabled",
 };
 
+/** The backend fills the form's "assets over 10,000 €" field from has_assets. */
+const ASSETS_OVER_10000: Record<AssetsBand, boolean> = {
+	[AssetsBand.UNDER_5000]: false,
+	[AssetsBand.FROM_5000_TO_10000]: false,
+	[AssetsBand.FROM_10000_TO_12500]: true,
+	[AssetsBand.FROM_12500_TO_20000]: true,
+	[AssetsBand.OVER_20000]: true,
+};
+
 export const mapEligibilityToProfilePayload = (
-	answers: Partial<EligibilityCheck>,
+	allAnswers: Partial<EligibilityCheck>,
 ): Record<string, unknown> => {
+	const answers = EligibilityEngine.answersOnValidPath(allAnswers);
 	const payload: Record<string, unknown> = {};
 
 	if (answers.dateOfBirth) {
@@ -44,6 +56,10 @@ export const mapEligibilityToProfilePayload = (
 		if (answers.workCapacity === WorkCapacity.PERMANENTLY_REDUCED) {
 			payload.has_permanent_reduction_in_earning_capacity = true;
 		}
+	}
+
+	if (answers.assetsBand) {
+		payload.has_assets = ASSETS_OVER_10000[answers.assetsBand];
 	}
 
 	return payload;

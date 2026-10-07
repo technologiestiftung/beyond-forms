@@ -122,9 +122,10 @@ const GRAPH: Record<NodeId, FlowNode> = {
 		key: "assetsBand",
 		options: [
 			AssetsBand.UNDER_5000,
-			AssetsBand.FROM_5000_TO_15000,
-			AssetsBand.FROM_15000_TO_25000,
-			AssetsBand.OVER_25000,
+			AssetsBand.FROM_5000_TO_10000,
+			AssetsBand.FROM_10000_TO_12500,
+			AssetsBand.FROM_12500_TO_20000,
+			AssetsBand.OVER_20000,
 		],
 		next: () => "benefits",
 	},

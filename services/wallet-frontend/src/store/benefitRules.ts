@@ -37,9 +37,10 @@ const WOHNGELD_RENT_SHARE = 0.3;
 
 const ASSET_BAND_RANGE: Record<AssetsBand, { min: number; max: number }> = {
 	[AssetsBand.UNDER_5000]: { min: 0, max: 5_000 },
-	[AssetsBand.FROM_5000_TO_15000]: { min: 5_000, max: 15_000 },
-	[AssetsBand.FROM_15000_TO_25000]: { min: 15_000, max: 25_000 },
-	[AssetsBand.OVER_25000]: { min: 25_000, max: Infinity },
+	[AssetsBand.FROM_5000_TO_10000]: { min: 5_000, max: 10_000 },
+	[AssetsBand.FROM_10000_TO_12500]: { min: 10_000, max: 12_500 },
+	[AssetsBand.FROM_12500_TO_20000]: { min: 12_500, max: 20_000 },
+	[AssetsBand.OVER_20000]: { min: 20_000, max: Infinity },
 };
 
 export const Benefit = {
