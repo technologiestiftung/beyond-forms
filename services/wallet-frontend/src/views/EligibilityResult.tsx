@@ -14,6 +14,7 @@ import { useEligibilityOutcome } from "../hooks/useEligibilityOutcome";
 import { PrimaryButton } from "../components/ui/PrimaryButton";
 import { ResultProfile } from "../schemas/eligibility.schema";
 import { useEligibilityStore } from "../store/useEligibilityStore";
+import { EligibilityEngine } from "../store/EligibilityEngine";
 import {
 	BenefitStatus,
 	assessBenefits,
@@ -69,7 +70,9 @@ const BenefitList: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const answers = useEligibilityStore((s) => s.answers);
-	const assessments = assessBenefits(answers).sort(
+	const assessments = assessBenefits(
+		EligibilityEngine.answersOnValidPath(answers),
+	).sort(
 		(a, b) => STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status),
 	);
 

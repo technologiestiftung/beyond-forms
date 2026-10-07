@@ -200,6 +200,20 @@ export const EligibilityEngine = {
 		return path;
 	},
 
+	/** Drops answers left over from branches the current answers no longer lead through. */
+	answersOnValidPath(
+		answers: Partial<EligibilityCheck>,
+	): Partial<EligibilityCheck> {
+		const onPath: Partial<EligibilityCheck> = {};
+		for (const id of this.getValidPath(answers)) {
+			const key = GRAPH[id].key;
+			if (key && answers[key] !== undefined) {
+				Object.assign(onPath, { [key]: answers[key] });
+			}
+		}
+		return onPath;
+	},
+
 	getNode(id: NodeId): FlowNode {
 		return GRAPH[id];
 	},

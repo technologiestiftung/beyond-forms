@@ -108,6 +108,24 @@ describe("EligibilityEngine", () => {
 		});
 	});
 
+	describe("answersOnValidPath", () => {
+		it("drops a gross income left over from before switching to not working", () => {
+			const answers = EligibilityEngine.answersOnValidPath({
+				...workingSingle,
+				isEmployed: Binary.NO,
+			});
+			expect(answers.monthlyGrossIncome).toBeUndefined();
+			expect(answers.monthlyNetHouseholdIncome).toBe(1100);
+		});
+
+		it("drops answers after the first unanswered question", () => {
+			const { workCapacity: _skipped, ...answers } = workingSingle;
+			const onPath = EligibilityEngine.answersOnValidPath(answers);
+			expect(onPath.monthlyGrossIncome).toBe(1500);
+			expect(onPath.citizenship).toBeUndefined();
+		});
+	});
+
 	describe("getProgress", () => {
 		it("starts at 0 and reaches 1 on the result", () => {
 			expect(EligibilityEngine.getProgress({}, "household")).toBe(0);

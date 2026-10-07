@@ -44,7 +44,7 @@ function ruledOutBenefits(answers: Partial<EligibilityCheck>): Set<Benefit> {
 	}
 	if (profile === ResultProfile.ELIGIBLE) {
 		return new Set(
-			assessBenefits(answers)
+			assessBenefits(EligibilityEngine.answersOnValidPath(answers))
 				.filter((a) => a.status === BenefitStatus.NO)
 				.map((a) => a.benefit),
 		);
