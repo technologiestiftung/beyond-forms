@@ -5,8 +5,8 @@ import {
 } from "./application.service";
 import {
 	Binary,
-	NationalityStatus,
-	PensionStatus,
+	Citizenship,
+	WorkCapacity,
 } from "../schemas/eligibility.schema";
 import { env } from "../config/env.config";
 
@@ -39,31 +39,10 @@ describe("applicationService: Guest Data Sync", () => {
 	});
 
 	describe("mapEligibilityToProfilePayload", () => {
-		it("maps nationality German to correct profile flags", () => {
+		it("maps a non-EU citizen with a secure residence permit", () => {
 			const payload = mapEligibilityToProfilePayload({
-				nationality: NationalityStatus.GERMAN,
-			});
-			expect(payload).toEqual({
-				is_german_citizen: true,
-				nationality: "DE",
-				residence_status: "Citizen",
-			});
-		});
-
-		it("maps nationality EU_5_PLUS to PermanentResident", () => {
-			const payload = mapEligibilityToProfilePayload({
-				nationality: NationalityStatus.EU_5_PLUS,
-			});
-			expect(payload).toEqual({
-				is_german_citizen: false,
-				nationality: "EU",
-				residence_status: "PermanentResident",
-			});
-		});
-
-		it("maps nationality RESIDENCE_PERMIT to Other", () => {
-			const payload = mapEligibilityToProfilePayload({
-				nationality: NationalityStatus.RESIDENCE_PERMIT,
+				citizenship: Citizenship.NON_EU,
+				hasSecureResidenceStatus: Binary.YES,
 			});
 			expect(payload).toEqual({
 				is_german_citizen: false,
@@ -71,33 +50,28 @@ describe("applicationService: Guest Data Sync", () => {
 			});
 		});
 
-		it("maps old age pension to an income entry", () => {
+		it("does not guess German citizenship from DE/EU", () => {
 			const payload = mapEligibilityToProfilePayload({
-				pension: PensionStatus.OLD_AGE,
+				citizenship: Citizenship.DE_EU,
 			});
-			expect(payload).toEqual({
-				income_entries: [{ income_type: "Pension" }],
-			});
+			expect(payload).toEqual({});
 		});
 
-		it("maps reduced earning capacity pension to an income entry and work capability status", () => {
+		it("maps permanently reduced work capacity", () => {
 			const payload = mapEligibilityToProfilePayload({
-				pension: PensionStatus.REDUCED_EARNING_CAPACITY,
+				workCapacity: WorkCapacity.PERMANENTLY_REDUCED,
 			});
 			expect(payload).toEqual({
-				income_entries: [{ income_type: "Pension" }],
 				ability_to_work: "Permanently disabled",
 				has_permanent_reduction_in_earning_capacity: true,
 			});
 		});
 
-		it("maps assets above threshold correctly", () => {
+		it("maps full work capacity", () => {
 			const payload = mapEligibilityToProfilePayload({
-				hasAssetsAboveThreshold: Binary.YES,
+				workCapacity: WorkCapacity.FULL,
 			});
-			expect(payload).toEqual({
-				has_assets: true,
-			});
+			expect(payload).toEqual({ ability_to_work: "Fully able" });
 		});
 	});
 
@@ -106,7 +80,8 @@ describe("applicationService: Guest Data Sync", () => {
 			const answers = {
 				dateOfBirth: "1960-01-01",
 				livesInGermany: Binary.YES,
-				nationality: NationalityStatus.GERMAN,
+				citizenship: Citizenship.NON_EU,
+				hasSecureResidenceStatus: Binary.YES,
 			};
 
 			const result = await applicationService.syncGuestData(answers);
@@ -119,9 +94,8 @@ describe("applicationService: Guest Data Sync", () => {
 					body: JSON.stringify({
 						date_of_birth: "1960-01-01",
 						is_resident_in_germany: true,
-						is_german_citizen: true,
-						nationality: "DE",
-						residence_status: "Citizen",
+						is_german_citizen: false,
+						residence_status: "Other",
 					}),
 				}),
 			);

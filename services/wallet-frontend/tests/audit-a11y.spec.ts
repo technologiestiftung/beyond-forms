@@ -3,6 +3,11 @@ import { test, expect, type Page } from "@playwright/test";
 import { testWithAuthenticatedUser } from "./fixtures/test-with-authenticated-user";
 import { waitForFadeInAnimations, waitForPageReady } from "./helpers/a11y";
 import { openManualPhoneForm } from "./helpers/auth";
+import {
+	answerChoice,
+	answerDate,
+	completePensionerCheck,
+} from "./helpers/eligibility";
 
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
 
@@ -24,19 +29,7 @@ async function assertNoViolationsIn(page: Page, selector: string) {
 }
 
 async function completeEligibilityFlow(page: Page) {
-	await page.getByTestId("start-button").click();
-	await page.getByTestId("option-german").click();
-	await page.getByTestId("next-button").click();
-	await page.getByTestId("option-yes").click();
-	await page.getByTestId("next-button").click();
-	await page.getByTestId("dob-date-input").fill("1955-01-01");
-	await page.getByTestId("next-button").click();
-	await page.getByTestId("option-old_age").click();
-	await page.getByTestId("next-button").click();
-	await page.getByTestId("option-not_sufficient").click();
-	await page.getByTestId("next-button").click();
-	await page.getByTestId("option-no").click();
-	await page.getByTestId("next-button").click();
+	await completePensionerCheck(page);
 	await expect(page.getByTestId("outcome-title")).toBeVisible();
 	await waitForFadeInAnimations(page, "outcome-title");
 }
@@ -63,16 +56,16 @@ test.describe("Deep Accessibility Audit - WCAG 2.1 AA", () => {
 		await page.getByTestId("start-button").click();
 		await assertNoViolations(page);
 
-		await page.getByTestId("option-german").click();
+		await answerChoice(page, "single_parent");
+		await assertNoViolations(page);
+
+		await page.getByTestId("child-date-input-0").fill("2018-03-01");
 		await page.getByTestId("next-button").click();
 		await assertNoViolations(page);
 
-		await page.getByTestId("option-yes").click();
-		await page.getByTestId("next-button").click();
-		await assertNoViolations(page);
-
-		await page.getByTestId("dob-date-input").fill("1955-01-01");
-		await page.getByTestId("next-button").click();
+		await answerDate(page, "1990-05-01");
+		await answerChoice(page, "yes");
+		await answerChoice(page, "yes");
 		await assertNoViolations(page);
 	});
 
