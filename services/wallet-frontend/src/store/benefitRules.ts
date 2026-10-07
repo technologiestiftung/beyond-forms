@@ -5,6 +5,7 @@ import {
 	Citizenship,
 	HouseholdComposition,
 	WorkCapacity,
+	localDateToday,
 } from "../schemas/eligibility.schema";
 
 /** Regelbedarfsstufen 1–6, 2026 */
@@ -67,8 +68,6 @@ export interface BenefitAssessment {
 
 type Answers = Partial<EligibilityCheck>;
 
-const todayIso = (): string => new Date().toISOString().slice(0, 10);
-
 const ageOn = (dateOfBirth: string, today: string): number => {
 	const [by, bm, bd] = dateOfBirth.split("-").map(Number);
 	const [ty, tm, td] = today.split("-").map(Number);
@@ -91,7 +90,7 @@ const retirementAgeInMonths = (birthYear: number): number => {
 
 export const hasReachedRetirementAge = (
 	dateOfBirth: string,
-	today: string = todayIso(),
+	today: string = localDateToday(),
 ): boolean => {
 	const [by, bm, bd] = dateOfBirth.split("-").map(Number);
 	const [ty, tm, td] = today.split("-").map(Number);
@@ -228,7 +227,7 @@ export const needsResidenceHint = (a: Answers): boolean =>
 
 export const assessBenefits = (
 	answers: Answers,
-	today: string = todayIso(),
+	today: string = localDateToday(),
 ): BenefitAssessment[] => {
 	const retired =
 		answers.dateOfBirth !== undefined &&

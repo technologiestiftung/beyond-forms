@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { i18nKeys } from "../../i18n/i18nKeys";
 import { PrimaryButton } from "../ui/PrimaryButton";
 import { Info } from "lucide-react";
+import { localDateToday } from "../../schemas/eligibility.schema";
 
 interface Child {
 	dateOfBirth: string;
@@ -39,7 +40,7 @@ export const ChildrenCard: React.FC<ChildrenCardProps> = ({
 		legendRef.current?.focus();
 	}, [id]);
 
-	const maxDate = useMemo(() => new Date().toISOString().slice(0, 10), []);
+	const maxDate = useMemo(() => localDateToday(), []);
 
 	const update = (next: string[], allValid: boolean) => {
 		setDrafts(next);
