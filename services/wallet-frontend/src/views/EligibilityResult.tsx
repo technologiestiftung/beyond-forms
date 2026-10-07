@@ -11,31 +11,35 @@ import {
 import { i18nKeys } from "../i18n/i18nKeys";
 import { useRootStore } from "../store/useRootStore";
 import { useEligibilityOutcome } from "../hooks/useEligibilityOutcome";
-import { EXTERNAL_LINKS } from "../config/externalLinks";
 import { PrimaryButton } from "../components/ui/PrimaryButton";
 import { ResultProfile } from "../schemas/eligibility.schema";
+import { useEligibilityStore } from "../store/useEligibilityStore";
+import { EligibilityEngine } from "../store/EligibilityEngine";
+import {
+	BenefitStatus,
+	assessBenefits,
+	needsResidenceHint,
+} from "../store/benefitRules";
 
 const profileFromEligibilityPath = `${AppRoutes.Profile}?${URL_PARAMS.ORIGIN}=${URL_PARAMS.ORIGIN_ELIGIBILITY}`;
 
-const getExternalLink = (key: string): string | null => {
-	switch (key) {
-		case "sozialamt":
-			return EXTERNAL_LINKS.SOZIALAMT;
-		default:
-			return null;
-	}
+const STATUS_ORDER = [
+	BenefitStatus.LIKELY,
+	BenefitStatus.POSSIBLE,
+	BenefitStatus.NO,
+];
+
+const STATUS_STYLES: Record<BenefitStatus, string> = {
+	[BenefitStatus.LIKELY]: "bg-primary-green-300 text-primary-blue-500",
+	[BenefitStatus.POSSIBLE]: "bg-primary-blue-50 text-primary-blue-500",
+	[BenefitStatus.NO]: "bg-brand-bg text-brand-black",
 };
 
-const OutcomeView: React.FC<{
-	translationKey: string;
-	isEligible: boolean;
-}> = ({ translationKey, isEligible }) => {
+const OutcomeView: React.FC<{ translationKey: string }> = ({
+	translationKey,
+}) => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	const externalLink = isEligible ? null : getExternalLink(translationKey);
-	const hasExternalLink = !!externalLink;
-
-	const ctaContent = t(i18nKeys.eligibility.outcomeCTA(translationKey));
 
 	return (
 		<div className="flex flex-col items-center gap-9 w-full">
@@ -52,24 +56,72 @@ const OutcomeView: React.FC<{
 				</p>
 			</div>
 
-			{hasExternalLink ? (
-				<a
-					href={externalLink}
-					target="_blank"
-					rel="noopener noreferrer"
-					data-testid="outcome-cta"
-					className="text-body-lg text-primary-blue-400 font-medium underline decoration-solid hover:text-primary-blue-500 transition-colors cursor-pointer"
-				>
-					{ctaContent}
-				</a>
-			) : (
-				<PrimaryButton
-					onClick={() => navigate(profileFromEligibilityPath)}
-					data-testid="outcome-cta"
-				>
-					{ctaContent}
-				</PrimaryButton>
+			<PrimaryButton
+				onClick={() => navigate(profileFromEligibilityPath)}
+				data-testid="outcome-cta"
+			>
+				{t(i18nKeys.eligibility.outcomeCTA(translationKey))}
+			</PrimaryButton>
+		</div>
+	);
+};
+
+const BenefitList: React.FC = () => {
+	const { t } = useTranslation();
+	const navigate = useNavigate();
+	const answers = useEligibilityStore((s) => s.answers);
+	const assessments = assessBenefits(
+		EligibilityEngine.answersOnValidPath(answers),
+	).sort(
+		(a, b) => STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status),
+	);
+
+	return (
+		<div className="flex flex-col gap-6 w-full">
+			<h1
+				data-testid="outcome-title"
+				className="text-h1 font-bold text-brand-black leading-tight"
+			>
+				{t("outcome.eligible.title")}
+			</h1>
+
+			<ul className="flex flex-col gap-4 w-full">
+				{assessments.map(({ benefit, status, reason }) => (
+					<li
+						key={benefit}
+						data-testid={`benefit-${benefit.toLowerCase()}`}
+						data-status={status}
+						className="flex flex-col gap-2 rounded-xl border border-brand-border/40 bg-white p-4"
+					>
+						<h2 className="text-lg font-bold text-brand-black">
+							{t(`outcome.benefits.${benefit}`)}
+						</h2>
+						<span
+							className={`self-start rounded-full px-3 py-1 text-sm font-medium ${STATUS_STYLES[status]}`}
+						>
+							{t(`outcome.status.${status}`)}
+						</span>
+						<p className="text-base text-brand-black">
+							{t(`outcome.reasons.${reason}`)}
+						</p>
+					</li>
+				))}
+			</ul>
+
+			{needsResidenceHint(answers) && (
+				<p className="text-base text-brand-black" data-testid="residence-hint">
+					{t("outcome.residence_hint")}
+				</p>
 			)}
+
+			<p className="text-sm text-brand-grey">{t("outcome.disclaimer")}</p>
+
+			<PrimaryButton
+				onClick={() => navigate(profileFromEligibilityPath)}
+				data-testid="outcome-cta"
+			>
+				{t("outcome.eligible.cta")}
+			</PrimaryButton>
 		</div>
 	);
 };
@@ -113,7 +165,11 @@ export const EligibilityResult: React.FC = () => {
 				transition={{ duration: 0.4, ease: "easeOut" }}
 				className="w-full flex flex-col items-center gap-6 pt-4"
 			>
-				<OutcomeView translationKey={translationKey} isEligible={isEligible} />
+				{isEligible ? (
+					<BenefitList />
+				) : (
+					<OutcomeView translationKey={translationKey} />
+				)}
 
 				<button
 					type="button"

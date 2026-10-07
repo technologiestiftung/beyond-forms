@@ -2,6 +2,12 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import deEligibility from "../src/locales/de/eligibility.json" with { type: "json" };
 import enEligibility from "../src/locales/en/eligibility.json" with { type: "json" };
+import {
+	answerChoice,
+	answerDate,
+	answerNumber,
+	completePensionerCheck,
+} from "./helpers/eligibility";
 
 test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 	test.beforeEach(async ({ page }) => {
@@ -18,7 +24,7 @@ test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 	}) => {
 		await expect(page.getByTestId("start-button")).toBeVisible();
 		await page.getByTestId("start-button").click();
-		await expect(page).toHaveURL(/\/eligibility-check\/nationality/);
+		await expect(page).toHaveURL(/\/eligibility-check\/household/);
 	});
 
 	test("Start Screen: Direct path leads to login", async ({ page }) => {
@@ -47,182 +53,110 @@ test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 		await page.getByTestId("start-button").click();
 
 		await expect(
-			page.getByText(
-				new RegExp(
-					[
-						"Was trifft auf Dich zu\\?",
-						"Which of the following applies to you\\?",
-					].join("|"),
-					"i",
-				),
-			),
+			page.getByText(/Wer lebt in Deinem Haushalt\?/i),
 		).toBeVisible();
 		await page.getByTestId("language-switcher").click();
 		await page.getByText("EN", { exact: true }).click();
 		await expect(
-			page.getByText(/Which of the following applies to you/i),
+			page.getByText(/Who lives in your household\?/i),
 		).toBeVisible();
 
-		await page.getByTestId("option-german").click();
-		await page.getByTestId("next-button").click();
+		await answerChoice(page, "single");
 
-		await expect(page.getByText(/Do you live in Germany/i)).toBeVisible();
+		await expect(page.getByText(/When were you born\?/i)).toBeVisible();
 		await page.getByTestId("language-switcher").click();
 		await page.getByText("DE", { exact: true }).click();
-		await expect(page.getByText(/Wohnst Du in Deutschland/i)).toBeVisible();
+		await expect(page.getByText(/Wann bist Du geboren\?/i)).toBeVisible();
 	});
 
-	const fillDateOfBirth = async ({
-		page,
-		day = "01",
-		month = "01",
-		year = "1955",
-	}: {
-		page: import("@playwright/test").Page;
-		day?: string;
-		month?: string;
-		year?: string;
-	}) => {
-		const isoDate = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-		await page.getByTestId("dob-date-input").fill(isoDate);
-	};
+	test("Persona Journey: Pensioner living alone", async ({ page }) => {
+		await completePensionerCheck(page);
 
-	test("Persona Journey: Sandor (Eligible Senior) - DE Path", async ({
-		page,
-	}) => {
-		await page.getByTestId("start-button").click();
-
-		await page.getByTestId("option-german").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-yes").click();
-		await page.getByTestId("next-button").click();
-
-		await fillDateOfBirth({ page });
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-old_age").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-not_sufficient").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-no").click();
-		await page.getByTestId("next-button").click();
-
-		await expect(page).toHaveURL(/\/eligibility-check\/result/);
 		await expect(page.getByTestId("outcome-title")).toContainText(
-			/Du könntest|You could be entitled/i,
+			/Ersteinschätzung|initial assessment/i,
 		);
+		await expect(
+			page.getByTestId("benefit-grundsicherung_alter"),
+		).toHaveAttribute("data-status", "LIKELY");
+		await expect(
+			page.getByTestId("benefit-grundsicherungsgeld"),
+		).toHaveAttribute("data-status", "NO");
 
 		await page.waitForTimeout(1000);
 		const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
 		expect(accessibilityScanResults.violations).toEqual([]);
 	});
 
-	test("Persona Journey: No pension (Other Benefit Path)", async ({ page }) => {
-		await page.getByTestId("language-switcher").click();
-		await page.getByText("EN", { exact: true }).click();
+	test("Persona Journey: Working single parent", async ({ page }) => {
 		await page.getByTestId("start-button").click();
 
-		await page.getByTestId("option-german").click();
+		await answerChoice(page, "single_parent");
+		await page.getByTestId("child-date-input-0").fill("2018-03-01");
 		await page.getByTestId("next-button").click();
+		await expect(page).toHaveURL(/\/eligibility-check\/birthdate/);
+		await answerDate(page, "1990-05-01");
+		await answerChoice(page, "yes");
+		await answerChoice(page, "yes");
+		await answerNumber(page, 2500);
+		await answerChoice(page, "full");
+		await answerNumber(page, 2000);
+		await answerNumber(page, 900);
+		await answerChoice(page, "under_5000");
+		await answerChoice(page, "no");
+		await answerChoice(page, "non_eu");
+		await answerChoice(page, "no");
 
-		await page.getByTestId("option-yes").click();
-		await page.getByTestId("next-button").click();
+		await expect(page).toHaveURL(/\/eligibility-check\/result/);
+		await expect(page.getByTestId("benefit-kinderzuschlag")).toHaveAttribute(
+			"data-status",
+			"POSSIBLE",
+		);
+		await expect(page.getByTestId("benefit-wohngeld")).toHaveAttribute(
+			"data-status",
+			"POSSIBLE",
+		);
+		await expect(page.getByTestId("residence-hint")).toBeVisible();
+	});
 
-		await fillDateOfBirth({ page });
-		await page.getByTestId("next-button").click();
+	test("Persona Journey: Not living in Germany ends the check", async ({
+		page,
+	}) => {
+		await page.getByTestId("start-button").click();
 
-		await page.getByTestId("option-none").click();
-		await page.getByTestId("next-button").click();
+		await answerChoice(page, "single");
+		await answerDate(page, "1955-01-01");
+		await answerChoice(page, "no");
 
 		await expect(page).toHaveURL(/\/eligibility-check\/result/);
 		await expect(page.getByTestId("outcome-title")).toContainText(
-			/not a good fit|passt im Moment eher nicht/i,
+			/keinen Anspruch|not entitled/i,
 		);
 	});
 
-	test("Persona Journey: Sozialamt referral", async ({ page }) => {
+	test("Changing an answer re-routes the check", async ({ page }) => {
 		await page.getByTestId("start-button").click();
 
-		await page.getByTestId("option-none").click();
-		await page.getByTestId("next-button").click();
-
-		await expect(page).toHaveURL(/\/eligibility-check\/result/);
-		await expect(page.getByTestId("outcome-title")).toContainText(
-			/Sozialamt|Social Services Office/i,
-		);
-
-		const cta = page.getByTestId("outcome-cta");
-		await expect(cta).toHaveAttribute(
-			"href",
-			"https://service.berlin.de/standorte/sozialamt/",
-		);
-		await expect(cta).toHaveAttribute("target", "_blank");
-	});
-
-	test("Empathetic UX: Non-Destructive State (Undo/Redo)", async ({ page }) => {
-		await page.getByTestId("start-button").click();
-
-		await page.getByTestId("option-german").click();
-		await page.getByTestId("next-button").click();
-		await page.getByTestId("option-yes").click();
-		await page.getByTestId("next-button").click();
-		await fillDateOfBirth({ page });
-		await page.getByTestId("next-button").click();
-		await page.getByTestId("option-none").click();
-		await page.getByTestId("next-button").click();
-
-		await expect(page.getByTestId("outcome-title")).toBeVisible();
+		await answerChoice(page, "single_parent");
+		await expect(page).toHaveURL(/\/eligibility-check\/children/);
 
 		await page.getByTestId("back-button").click();
-		await page.getByTestId("back-button").click();
-		await page.getByTestId("back-button").click();
-		await page.getByTestId("back-button").click();
-
-		await page.getByTestId("option-none").click();
-		await page.getByTestId("next-button").click();
-
-		await expect(page.getByTestId("outcome-title")).toContainText(
-			/Sozialamt|Social Services Office/i,
-		);
-
-		await page.getByText(/Von vorne anfangen|Start over/i).click();
-
-		await page.evaluate(() => {
-			window.localStorage.clear();
-			window.sessionStorage.clear();
-		});
-
-		await page.goto("/");
-
-		const landingCta = page.getByTestId("start-button");
-		await expect(landingCta).toBeVisible({ timeout: 15000 });
-		await landingCta.click();
-
-		await expect(page).toHaveURL(/\/eligibility-check\/nationality/);
-
-		await expect(
-			page.getByTestId("option-german").locator("input"),
-		).not.toBeChecked();
+		await answerChoice(page, "single");
+		await expect(page).toHaveURL(/\/eligibility-check\/birthdate/);
 	});
 
 	test("UX: State should reset when starting over from Landing Page", async ({
 		page,
 	}) => {
-		await page.getByTestId("start-button").click();
+		await completePensionerCheck(page);
+		await page.getByText(/Von vorne anfangen|Start over/i).click();
 
-		await page.getByTestId("option-german").click();
+		const landingCta = page.getByTestId("start-button");
+		await expect(landingCta).toBeVisible({ timeout: 15000 });
+		await landingCta.click();
+
+		await expect(page).toHaveURL(/\/eligibility-check\/household/);
 		await expect(
-			page.getByTestId("option-german").locator("input"),
-		).toBeChecked();
-
-		await page.goto("/");
-		await page.getByTestId("start-button").click();
-
-		await expect(
-			page.getByTestId("option-german").locator("input"),
+			page.getByTestId("option-single").locator("input"),
 		).not.toBeChecked();
 	});
 });

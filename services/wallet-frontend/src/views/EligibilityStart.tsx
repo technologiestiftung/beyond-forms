@@ -27,7 +27,7 @@ export const EligibilityStart: React.FC = () => {
 	}, [isAuthenticated, navigate, resetEligibility]);
 
 	const handleGoToCheck = () => {
-		navigate(getEligibilityRoute("nationality"));
+		navigate(getEligibilityRoute("household"));
 	};
 
 	const handleGoToLogin = () => {

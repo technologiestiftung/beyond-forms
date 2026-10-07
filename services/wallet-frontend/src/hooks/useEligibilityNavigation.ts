@@ -1,9 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-	ELIGIBILITY_TOTAL_STEPS,
-	useEligibilityStore,
-} from "../store/useEligibilityStore";
+import { useEligibilityStore } from "../store/useEligibilityStore";
 import { EligibilityEngine, type NodeId } from "../store/EligibilityEngine";
 import { AppRoutes, getEligibilityRoute } from "../constants/routes";
 
@@ -31,12 +28,6 @@ export const useEligibilityNavigation = () => {
 	const navigateNext = useCallback(() => {
 		const nextNodeId = currentQuestionNode?.next?.(answers);
 		if (nextNodeId) {
-			const arrivingStep = Math.min(
-				currentIndexInPath + 2,
-				ELIGIBILITY_TOTAL_STEPS,
-			);
-			useEligibilityStore.getState().recordStepReached(arrivingStep);
-
 			const node = EligibilityEngine.getNode(nextNodeId);
 			const target =
 				node.type === "result"
@@ -44,7 +35,7 @@ export const useEligibilityNavigation = () => {
 					: getEligibilityRoute(nextNodeId);
 			navigate(target);
 		}
-	}, [currentQuestionNode, currentIndexInPath, answers, navigate]);
+	}, [currentQuestionNode, answers, navigate]);
 
 	const navigateBack = useCallback(() => {
 		if (currentIndexInPath > 0) {

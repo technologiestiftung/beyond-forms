@@ -1,47 +1,33 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { useEligibilityStore } from "./useEligibilityStore";
-import { Binary, NationalityStatus } from "../schemas/eligibility.schema";
+import { Binary, HouseholdComposition } from "../schemas/eligibility.schema";
 
-describe("useEligibilityStore (Production Infrastructure)", () => {
+describe("useEligibilityStore", () => {
 	beforeEach(() => {
 		useEligibilityStore.getState().resetForm();
 		sessionStorage.clear();
 	});
 
-	it("should maintain a monotonic progress watermark on next navigation only", () => {
-		const { setAnswer, recordStepReached } = useEligibilityStore.getState();
-
-		setAnswer("nationality", NationalityStatus.GERMAN);
-		expect(useEligibilityStore.getState().maxDepthReached).toBe(0);
-
-		recordStepReached(2);
-		expect(useEligibilityStore.getState().maxDepthReached).toBe(2);
-
-		setAnswer("livesInGermany", Binary.YES);
-		expect(useEligibilityStore.getState().maxDepthReached).toBe(2);
-
-		recordStepReached(3);
-		expect(useEligibilityStore.getState().maxDepthReached).toBe(3);
-
-		setAnswer("nationality", NationalityStatus.NONE);
-		expect(useEligibilityStore.getState().maxDepthReached).toBe(1);
-	});
-
-	it("should be non-destructive (retain data on path changes)", () => {
+	it("keeps answers that fall off the path", () => {
 		const { setAnswer } = useEligibilityStore.getState();
 
-		setAnswer("nationality", NationalityStatus.GERMAN);
-		setAnswer("livesInGermany", Binary.YES);
+		setAnswer("householdComposition", HouseholdComposition.SINGLE_PARENT);
+		setAnswer("children", [{ dateOfBirth: "2018-03-01" }]);
+		setAnswer("householdComposition", HouseholdComposition.SINGLE);
 
-		expect(useEligibilityStore.getState().answers.livesInGermany).toBe(
-			Binary.YES,
-		);
+		expect(useEligibilityStore.getState().answers.children).toEqual([
+			{ dateOfBirth: "2018-03-01" },
+		]);
+	});
 
-		setAnswer("nationality", NationalityStatus.NONE);
+	it("marks the check as not eligible when living outside Germany", () => {
+		const { setAnswer } = useEligibilityStore.getState();
 
-		expect(useEligibilityStore.getState().answers.livesInGermany).toBe(
-			Binary.YES,
-		);
+		setAnswer("householdComposition", HouseholdComposition.SINGLE);
+		setAnswer("dateOfBirth", "1955-01-01");
+		setAnswer("livesInGermany", Binary.NO);
+
+		expect(useEligibilityStore.getState().isEligible).toBe(false);
 	});
 
 	it("should clear an answer and remove it from state", () => {
@@ -59,10 +45,31 @@ describe("useEligibilityStore (Production Infrastructure)", () => {
 	it("should handle validation errors", () => {
 		const { setAnswer } = useEligibilityStore.getState();
 		// @ts-expect-error - Intentionally testing runtime validation failure
-		setAnswer("nationality", "INVALID_ENUM");
+		setAnswer("householdComposition", "INVALID_ENUM");
 
 		expect(useEligibilityStore.getState().validationError).toBeDefined();
-		expect(useEligibilityStore.getState().answers.nationality).toBeUndefined();
+		expect(
+			useEligibilityStore.getState().answers.householdComposition,
+		).toBeUndefined();
+	});
+
+	it("rejects negative amounts", () => {
+		const { setAnswer } = useEligibilityStore.getState();
+
+		setAnswer("monthlyWarmRent", -1);
+
+		expect(useEligibilityStore.getState().validationError).toBeDefined();
+		expect(
+			useEligibilityStore.getState().answers.monthlyWarmRent,
+		).toBeUndefined();
+	});
+
+	it("rejects an empty children list", () => {
+		const { setAnswer } = useEligibilityStore.getState();
+
+		setAnswer("children", []);
+
+		expect(useEligibilityStore.getState().answers.children).toBeUndefined();
 	});
 
 	it("should set validationError for out-of-range date of birth", () => {

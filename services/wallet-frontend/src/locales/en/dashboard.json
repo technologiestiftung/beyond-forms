@@ -6,6 +6,7 @@
 	},
 	"sections": {
 		"applications": {
+			"ruled_out": "According to your quick check, these don't apply to you ({{count}})",
 			"basic_security": {
 				"title": "Basic Security",
 				"status": {

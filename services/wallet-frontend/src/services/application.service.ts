@@ -1,9 +1,13 @@
 import {
+	AssetsBand,
 	Binary,
-	NationalityStatus,
-	PensionStatus,
+	Citizenship,
+	HouseholdComposition,
+	WorkCapacity,
 } from "../schemas/eligibility.schema";
+import { EligibilityEngine } from "../store/EligibilityEngine";
 import type { EligibilityCheck } from "../schemas/eligibility.schema";
+import type { AbilityToWorkType } from "../schemas/profile.schema";
 import { authenticatedFetch } from "../utils/apiClient";
 import { env } from "../config/env.config";
 
@@ -12,10 +16,36 @@ export interface SyncResponse {
 	message?: string;
 }
 
+const ABILITY_TO_WORK: Record<WorkCapacity, AbilityToWorkType> = {
+	[WorkCapacity.FULL]: "Fully able",
+	[WorkCapacity.TEMPORARILY_REDUCED]: "Temporarily disabled",
+	[WorkCapacity.PERMANENTLY_REDUCED]: "Permanently disabled",
+};
+
+/** The backend fills the form's "assets over 10,000 €" field from has_assets. */
+const ASSETS_OVER_10000: Record<AssetsBand, boolean> = {
+	[AssetsBand.UNDER_5000]: false,
+	[AssetsBand.FROM_5000_TO_10000]: false,
+	[AssetsBand.FROM_10000_TO_12500]: true,
+	[AssetsBand.FROM_12500_TO_20000]: true,
+	[AssetsBand.OVER_20000]: true,
+};
+
 export const mapEligibilityToProfilePayload = (
-	answers: Partial<EligibilityCheck>,
+	allAnswers: Partial<EligibilityCheck>,
 ): Record<string, unknown> => {
+	const answers = EligibilityEngine.answersOnValidPath(allAnswers);
 	const payload: Record<string, unknown> = {};
+
+	if (answers.householdComposition) {
+		const isCouple =
+			answers.householdComposition ===
+				HouseholdComposition.COUPLE_NO_CHILDREN ||
+			answers.householdComposition ===
+				HouseholdComposition.COUPLE_WITH_CHILDREN;
+		payload.persons_in_household_count =
+			(isCouple ? 2 : 1) + (answers.children?.length ?? 0);
+	}
 
 	if (answers.dateOfBirth) {
 		payload.date_of_birth = answers.dateOfBirth;
@@ -25,33 +55,46 @@ export const mapEligibilityToProfilePayload = (
 		payload.is_resident_in_germany = answers.livesInGermany === Binary.YES;
 	}
 
-	if (answers.nationality) {
-		if (answers.nationality === NationalityStatus.GERMAN) {
-			payload.is_german_citizen = true;
-			payload.nationality = "DE";
-			payload.residence_status = "Citizen";
-		} else if (answers.nationality === NationalityStatus.EU_5_PLUS) {
-			payload.is_german_citizen = false;
-			payload.nationality = "EU";
-			payload.residence_status = "PermanentResident";
-		} else if (answers.nationality === NationalityStatus.RESIDENCE_PERMIT) {
-			payload.is_german_citizen = false;
+	if (answers.isEmployed) {
+		payload.is_currently_employed = answers.isEmployed === Binary.YES;
+	}
+
+	if (answers.citizenship === Citizenship.GERMAN) {
+		payload.is_german_citizen = true;
+		payload.nationality = "DE";
+		payload.residence_status = "Citizen";
+	}
+
+	if (answers.citizenship === Citizenship.EU) {
+		payload.is_german_citizen = false;
+		payload.nationality = "EU";
+	}
+
+	if (answers.citizenship === Citizenship.NON_EU) {
+		payload.is_german_citizen = false;
+		if (answers.hasSecureResidenceStatus === Binary.YES) {
 			payload.residence_status = "Other";
 		}
 	}
 
-	if (answers.pension) {
-		if (answers.pension === PensionStatus.OLD_AGE) {
-			payload.income_entries = [{ income_type: "Pension" }];
-		} else if (answers.pension === PensionStatus.REDUCED_EARNING_CAPACITY) {
-			payload.income_entries = [{ income_type: "Pension" }];
-			payload.ability_to_work = "Permanently disabled";
+	if (answers.workCapacity) {
+		payload.ability_to_work = ABILITY_TO_WORK[answers.workCapacity];
+		if (answers.workCapacity === WorkCapacity.PERMANENTLY_REDUCED) {
 			payload.has_permanent_reduction_in_earning_capacity = true;
 		}
 	}
 
-	if (answers.hasAssetsAboveThreshold) {
-		payload.has_assets = answers.hasAssetsAboveThreshold === Binary.YES;
+	if (answers.monthlyWarmRent !== undefined) {
+		payload.rent_total = answers.monthlyWarmRent;
+	}
+
+	if (answers.receivesBenefits) {
+		payload.receives_other_transfer_benefits =
+			answers.receivesBenefits === Binary.YES;
+	}
+
+	if (answers.assetsBand) {
+		payload.has_assets = ASSETS_OVER_10000[answers.assetsBand];
 	}
 
 	return payload;

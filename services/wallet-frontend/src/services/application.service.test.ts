@@ -4,11 +4,40 @@ import {
 	mapEligibilityToProfilePayload,
 } from "./application.service";
 import {
+	AssetsBand,
 	Binary,
-	NationalityStatus,
-	PensionStatus,
+	Citizenship,
+	HouseholdComposition,
+	WorkCapacity,
 } from "../schemas/eligibility.schema";
+import type { EligibilityCheck } from "../schemas/eligibility.schema";
 import { env } from "../config/env.config";
+
+const completed: Partial<EligibilityCheck> = {
+	householdComposition: HouseholdComposition.SINGLE,
+	dateOfBirth: "1990-05-01",
+	livesInGermany: Binary.YES,
+	isEmployed: Binary.NO,
+	workCapacity: WorkCapacity.FULL,
+	monthlyNetHouseholdIncome: 300,
+	monthlyWarmRent: 600,
+	assetsBand: AssetsBand.FROM_5000_TO_10000,
+	receivesBenefits: Binary.NO,
+	citizenship: Citizenship.EU,
+};
+
+const baseline = {
+	persons_in_household_count: 1,
+	date_of_birth: "1990-05-01",
+	is_resident_in_germany: true,
+	is_currently_employed: false,
+	is_german_citizen: false,
+	nationality: "EU",
+	ability_to_work: "Fully able",
+	rent_total: 600,
+	receives_other_transfer_benefits: false,
+	has_assets: false,
+};
 
 describe("applicationService: Guest Data Sync", () => {
 	let originalMocks: boolean;
@@ -39,90 +68,104 @@ describe("applicationService: Guest Data Sync", () => {
 	});
 
 	describe("mapEligibilityToProfilePayload", () => {
-		it("maps nationality German to correct profile flags", () => {
+		it("maps an EU citizen without guessing a residence status", () => {
+			expect(mapEligibilityToProfilePayload(completed)).toEqual(baseline);
+		});
+
+		it("maps German citizenship", () => {
 			const payload = mapEligibilityToProfilePayload({
-				nationality: NationalityStatus.GERMAN,
+				...completed,
+				citizenship: Citizenship.GERMAN,
 			});
 			expect(payload).toEqual({
+				...baseline,
 				is_german_citizen: true,
 				nationality: "DE",
 				residence_status: "Citizen",
 			});
 		});
 
-		it("maps nationality EU_5_PLUS to PermanentResident", () => {
+		it("maps a non-EU citizen with a secure residence permit", () => {
 			const payload = mapEligibilityToProfilePayload({
-				nationality: NationalityStatus.EU_5_PLUS,
+				...completed,
+				citizenship: Citizenship.NON_EU,
+				hasSecureResidenceStatus: Binary.YES,
 			});
 			expect(payload).toEqual({
-				is_german_citizen: false,
-				nationality: "EU",
-				residence_status: "PermanentResident",
-			});
-		});
-
-		it("maps nationality RESIDENCE_PERMIT to Other", () => {
-			const payload = mapEligibilityToProfilePayload({
-				nationality: NationalityStatus.RESIDENCE_PERMIT,
-			});
-			expect(payload).toEqual({
-				is_german_citizen: false,
+				...baseline,
+				nationality: undefined,
 				residence_status: "Other",
 			});
 		});
 
-		it("maps old age pension to an income entry", () => {
+		it("maps permanently reduced work capacity", () => {
 			const payload = mapEligibilityToProfilePayload({
-				pension: PensionStatus.OLD_AGE,
+				...completed,
+				workCapacity: WorkCapacity.PERMANENTLY_REDUCED,
 			});
 			expect(payload).toEqual({
-				income_entries: [{ income_type: "Pension" }],
-			});
-		});
-
-		it("maps reduced earning capacity pension to an income entry and work capability status", () => {
-			const payload = mapEligibilityToProfilePayload({
-				pension: PensionStatus.REDUCED_EARNING_CAPACITY,
-			});
-			expect(payload).toEqual({
-				income_entries: [{ income_type: "Pension" }],
+				...baseline,
 				ability_to_work: "Permanently disabled",
 				has_permanent_reduction_in_earning_capacity: true,
 			});
 		});
 
-		it("maps assets above threshold correctly", () => {
+		it("does not sync a work capacity the path skipped", () => {
 			const payload = mapEligibilityToProfilePayload({
-				hasAssetsAboveThreshold: Binary.YES,
+				...completed,
+				dateOfBirth: "1950-01-01",
+				workCapacity: WorkCapacity.PERMANENTLY_REDUCED,
 			});
-			expect(payload).toEqual({
-				has_assets: true,
+			const { ability_to_work: _skipped, ...rest } = baseline;
+			expect(payload).toEqual({ ...rest, date_of_birth: "1950-01-01" });
+		});
+
+		it("counts adults and children in the household", () => {
+			const payload = mapEligibilityToProfilePayload({
+				...completed,
+				householdComposition: HouseholdComposition.COUPLE_WITH_CHILDREN,
+				children: [
+					{ dateOfBirth: "2018-03-01" },
+					{ dateOfBirth: "2020-07-15" },
+				],
 			});
+			expect(payload.persons_in_household_count).toBe(4);
+		});
+
+		it("ignores children left over from a household without children", () => {
+			const payload = mapEligibilityToProfilePayload({
+				...completed,
+				children: [{ dateOfBirth: "2018-03-01" }],
+			});
+			expect(payload.persons_in_household_count).toBe(1);
+		});
+
+		it("maps savings bands to the 10,000 € question", () => {
+			expect(
+				mapEligibilityToProfilePayload({
+					...completed,
+					assetsBand: AssetsBand.FROM_5000_TO_10000,
+				}).has_assets,
+			).toBe(false);
+			expect(
+				mapEligibilityToProfilePayload({
+					...completed,
+					assetsBand: AssetsBand.FROM_10000_TO_12500,
+				}).has_assets,
+			).toBe(true);
 		});
 	});
 
 	describe("syncGuestData", () => {
 		it("sends mapped payload to profile endpoint", async () => {
-			const answers = {
-				dateOfBirth: "1960-01-01",
-				livesInGermany: Binary.YES,
-				nationality: NationalityStatus.GERMAN,
-			};
-
-			const result = await applicationService.syncGuestData(answers);
+			const result = await applicationService.syncGuestData(completed);
 			expect(result.success).toBe(true);
 
 			expect(fetch).toHaveBeenCalledWith(
 				`${env.VITE_API_URL}/profile`,
 				expect.objectContaining({
 					method: "POST",
-					body: JSON.stringify({
-						date_of_birth: "1960-01-01",
-						is_resident_in_germany: true,
-						is_german_citizen: true,
-						nationality: "DE",
-						residence_status: "Citizen",
-					}),
+					body: JSON.stringify(baseline),
 				}),
 			);
 		});

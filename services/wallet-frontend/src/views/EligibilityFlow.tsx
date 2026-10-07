@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import { Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-	ELIGIBILITY_TOTAL_STEPS,
-	useEligibilityStore,
-} from "../store/useEligibilityStore";
+import { useEligibilityStore } from "../store/useEligibilityStore";
+import { EligibilityEngine } from "../store/EligibilityEngine";
 import { ProgressBar } from "../components/Eligibility/ProgressBar";
 import { QuestionCard } from "../components/Eligibility/QuestionCard";
 import { DateOfBirthCard } from "../components/Eligibility/DateOfBirthCard";
+import { NumberCard } from "../components/Eligibility/NumberCard";
+import { ChildrenCard } from "../components/Eligibility/ChildrenCard";
 import { StepLayout } from "../components/Layout/StepLayout";
 import { AppRoutes, getEligibilityRoute } from "../constants/routes";
 import { useEligibilityNavigation } from "../hooks/useEligibilityNavigation";
@@ -59,6 +59,65 @@ export const EligibilityFlow: React.FC = () => {
 		return <Navigate to={getEligibilityRoute(validPath[0])} replace />;
 	}
 
+	const sharedProps = {
+		id: questionKey,
+		question: t(i18nKeys.eligibility.questionTitle(questionKey)),
+		category: t(i18nKeys.eligibility.questionCategory(questionKey)),
+		tip: t(i18nKeys.eligibility.questionTip(questionKey)),
+		onNext: navigateNext,
+	};
+	const setCurrentAnswer = (val: unknown) =>
+		handleAnswerChange(
+			questionKey,
+			val as EligibilityCheck[typeof questionKey],
+		);
+	const clearCurrentAnswer = () => clearAnswer(questionKey);
+
+	const renderQuestion = () => {
+		switch (currentQuestionNode.type) {
+			case "number":
+				return (
+					<NumberCard
+						key={currentQuestionNode.id}
+						{...sharedProps}
+						value={answers[questionKey] as number | undefined}
+						onChange={setCurrentAnswer}
+						onClear={clearCurrentAnswer}
+					/>
+				);
+			case "children":
+				return (
+					<ChildrenCard
+						key={currentQuestionNode.id}
+						{...sharedProps}
+						value={answers.children}
+						onChange={setCurrentAnswer}
+						onClear={clearCurrentAnswer}
+					/>
+				);
+			case "date":
+				return (
+					<DateOfBirthCard
+						key={currentQuestionNode.id}
+						{...sharedProps}
+						value={answers[questionKey] as string | undefined}
+						onChange={setCurrentAnswer}
+						onClear={clearCurrentAnswer}
+					/>
+				);
+			default:
+				return (
+					<QuestionCard
+						key={currentQuestionNode.id}
+						{...sharedProps}
+						options={currentQuestionNode.options ?? []}
+						value={answers[questionKey] as string | undefined}
+						onChange={setCurrentAnswer}
+					/>
+				);
+		}
+	};
+
 	return (
 		<div
 			ref={containerRef}
@@ -72,8 +131,10 @@ export const EligibilityFlow: React.FC = () => {
 				colorVariant="blue"
 			>
 				<ProgressBar
-					current={currentIndexInPath + 1}
-					total={ELIGIBILITY_TOTAL_STEPS}
+					progress={EligibilityEngine.getProgress(
+						answers,
+						currentQuestionNode.id,
+					)}
 				/>
 
 				{validationError && (
@@ -85,41 +146,7 @@ export const EligibilityFlow: React.FC = () => {
 					</div>
 				)}
 
-				{currentQuestionNode.type === "date" ? (
-					<DateOfBirthCard
-						key={currentQuestionNode.id}
-						id={questionKey}
-						question={t(i18nKeys.eligibility.questionTitle(questionKey))}
-						category={t(i18nKeys.eligibility.questionCategory(questionKey))}
-						tip={t(i18nKeys.eligibility.questionTip(questionKey))}
-						value={answers[questionKey] as string | undefined}
-						onChange={(val) =>
-							handleAnswerChange(
-								questionKey,
-								val as EligibilityCheck[typeof questionKey],
-							)
-						}
-						onClear={() => clearAnswer(questionKey)}
-						onNext={navigateNext}
-					/>
-				) : (
-					<QuestionCard
-						key={currentQuestionNode.id}
-						id={questionKey}
-						question={t(i18nKeys.eligibility.questionTitle(questionKey))}
-						category={t(i18nKeys.eligibility.questionCategory(questionKey))}
-						tip={t(i18nKeys.eligibility.questionTip(questionKey))}
-						options={currentQuestionNode.options ?? []}
-						value={answers[questionKey] as string | undefined}
-						onChange={(val) =>
-							handleAnswerChange(
-								questionKey,
-								val as EligibilityCheck[typeof questionKey],
-							)
-						}
-						onNext={navigateNext}
-					/>
-				)}
+				{renderQuestion()}
 			</StepLayout>
 		</div>
 	);
