@@ -9,52 +9,51 @@ interface CompletenessIndicatorProps {
 	level: MilestoneLevel;
 }
 
-const MILESTONE_PILLS = [
-	{
-		threshold: 1,
-		barClass: "bg-status-incomplete",
-		labelKey: "levels.pills.incomplete",
+const STATUS_BADGE = {
+	started: {
+		pillClass: "border-slate-300 bg-slate-50 text-slate-600",
+		dotClass: "bg-slate-300",
+		label: ["levels.status.started", "Gestartet"],
 	},
-	{
-		threshold: 2,
-		barClass: "bg-status-in-progress",
-		labelKey: "levels.pills.advanced",
+	missing: {
+		pillClass:
+			"border-secondary-orange-500 bg-secondary-orange-20 text-secondary-orange-800",
+		dotClass: "bg-secondary-orange-500",
+		label: ["levels.status.missing", "Fehlt noch etwas"],
 	},
-	{
-		threshold: MAX_MILESTONE_LEVEL,
-		barClass: "bg-status-done",
-		labelKey: "levels.pills.ready",
+	complete: {
+		pillClass: "border-green-600 bg-green-50 text-green-700",
+		dotClass: "bg-green-600",
+		label: ["levels.status.complete", "Komplett"],
 	},
-] as const;
+} as const;
+
+const getStatus = (level: MilestoneLevel): keyof typeof STATUS_BADGE => {
+	if (level >= MAX_MILESTONE_LEVEL) {
+		return "complete";
+	}
+	if (level >= 2) {
+		return "missing";
+	}
+	return "started";
+};
 
 export const CompletenessIndicator: React.FC<CompletenessIndicatorProps> = ({
 	level,
 }) => {
 	const { t } = useTranslation("application");
+	const { pillClass, dotClass, label } = STATUS_BADGE[getStatus(level)];
 
 	return (
-		<div className="w-full grid grid-cols-3 gap-1 xs:gap-2 text-center mt-1">
-			{MILESTONE_PILLS.map(({ threshold, barClass, labelKey }) => {
-				const isActive = level >= threshold;
-				const isCurrentLevel = level === threshold;
-
-				return (
-					<div key={threshold} className="flex flex-col gap-1 min-w-0">
-						<div
-							className={`h-1.5 rounded-full transition-all ${isActive ? barClass : "bg-slate-200"}`}
-						/>
-						<span
-							className={`text-[10px] xs:text-xs block wrap-break-word whitespace-normal transition-all ${
-								isCurrentLevel
-									? "text-brand-grey font-black scale-105"
-									: "text-brand-grey font-medium"
-							}`}
-						>
-							{t(labelKey)}
-						</span>
-					</div>
-				);
-			})}
-		</div>
+		<span
+			data-testid="completeness-indicator"
+			className={`inline-flex items-center gap-2 self-start rounded-full border px-3 py-1 text-sm font-medium whitespace-nowrap ${pillClass}`}
+		>
+			<span
+				className={`size-2 shrink-0 rounded-full ${dotClass}`}
+				aria-hidden="true"
+			/>
+			{t(...label)}
+		</span>
 	);
 };
