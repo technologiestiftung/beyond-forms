@@ -16,9 +16,9 @@
 		"questionnaire": "Assessment questionnaire"
 	},
 	"start_screen": {
-		"title": "Check Grundsicherung easily and quickly",
-		"description": "With Klaro you can check in just 5 minutes whether you can apply for Grundsicherung.",
-		"description_list": "Quick check in just 5 minutes\nSimply and clearly explained\nFree for everyone",
+		"title": "Check your entitlement to social benefits easily and quickly",
+		"description": "With Klaro you find out which social benefits could apply to you. Klaro then guides you through the application step by step.",
+		"description_list": "Initial assessment in a few minutes\nSimply and clearly explained\nFree for people in Berlin",
 		"feature_cards": {
 			"quick_check": {
 				"title": "Check quickly",
@@ -33,15 +33,10 @@
 				"description": "Data, documents and applications stay together clearly."
 			}
 		},
-		"currently_available": {
-			"label": "CURRENTLY AVAILABLE",
-			"title": "Check and prepare Grundsicherung",
-			"description": "With Klaro you can currently check whether Grundsicherung is suitable for you and prepare for the application step by step. More services will follow later."
-		},
 		"promo_card": {
-			"title": "Straight to Grundsicherung",
-			"description": "Sign in and start right away with your application for Grundsicherung. Klaro guides you step by step.",
-			"cta": "Start application now"
+			"title": "Straight to the application",
+			"description": "You already know what you need? Sign in and continue directly in your profile.",
+			"cta": "Sign in now"
 		},
 		"intro_cards": {
 			"section_title": "How Klaro works",
@@ -53,8 +48,8 @@
 				"description": "Klaro is a free service. Klaro helps you understand social support better."
 			},
 			"2": {
-				"title": "This is about social benefits",
-				"description": "Klaro currently checks the following social benefits: basic income support, basic income in old age, housing benefit and the child supplement. You can see which support could fit you."
+				"title": "You don't need to know your way around",
+				"description": "There are many social benefits. Klaro helps you find the ones that fit your situation."
 			},
 			"3": {
 				"title": "Answer a few short questions",
@@ -65,7 +60,7 @@
 				"description": "The check only takes a few minutes. You can start right away and don't need an account yet."
 			}
 		},
-		"cta": "Start quick check now"
+		"cta": "Check entitlement now"
 	},
 	"questions": {
 		"householdComposition": {

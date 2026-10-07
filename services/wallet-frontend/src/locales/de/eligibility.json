@@ -33,11 +33,6 @@
 				"description": "Daten, Dokumente und Anträge bleiben übersichtlich zusammen."
 			}
 		},
-		"currently_available": {
-			"label": "ZURZEIT VERFÜGBAR",
-			"title": "Grundsicherung prüfen und vorbereiten",
-			"description": "Mit Klaro kannst Du aktuell prüfen, ob Grundsicherung für Dich infrage kommt, und Dich Schritt-für-Schritt auf den Antrag vorbereiten. Weitere Services folgen später."
-		},
 		"promo_card": {
 			"title": "Direkt zum Antrag",
 			"description": "Du weißt schon, was Du brauchst? Melde Dich an und arbeite direkt in Deinem Profil weiter.",
