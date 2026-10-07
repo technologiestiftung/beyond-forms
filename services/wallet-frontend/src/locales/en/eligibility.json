@@ -1,6 +1,6 @@
 {
 	"progress": "Your Progress",
-	"progress_aria": "{{current}} of {{total}}",
+	"progress_aria": "{{percent}}% done",
 	"yes": "Yes",
 	"no": "No",
 	"next": "Next",
@@ -16,13 +16,13 @@
 		"questionnaire": "Assessment questionnaire"
 	},
 	"start_screen": {
-		"title": "Check Grundsicherung easily and quickly",
-		"description": "With Klaro you can check in just 5 minutes whether you can apply for Grundsicherung.",
-		"description_list": "Quick check in just 5 minutes\nSimply and clearly explained\nFree for everyone",
+		"title": "Check your entitlement to social benefits easily and quickly",
+		"description": "With Klaro you find out which social benefits could apply to you. Klaro then guides you through the application step by step.",
+		"description_list": "Initial assessment in a few minutes\nSimply and clearly explained\nFree for people in Berlin",
 		"feature_cards": {
 			"quick_check": {
 				"title": "Check quickly",
-				"description": "Answer 6 short questions."
+				"description": "Answer a few short questions."
 			},
 			"simply_guided": {
 				"title": "Simply guided",
@@ -33,15 +33,10 @@
 				"description": "Data, documents and applications stay together clearly."
 			}
 		},
-		"currently_available": {
-			"label": "CURRENTLY AVAILABLE",
-			"title": "Check and prepare Grundsicherung",
-			"description": "With Klaro you can currently check whether Grundsicherung is suitable for you and prepare for the application step by step. More services will follow later."
-		},
 		"promo_card": {
-			"title": "Straight to Grundsicherung",
-			"description": "Sign in and start right away with your application for Grundsicherung. Klaro guides you step by step.",
-			"cta": "Start application now"
+			"title": "Straight to the application",
+			"description": "You already know what you need? Sign in and continue directly in your profile.",
+			"cta": "Sign in now"
 		},
 		"intro_cards": {
 			"section_title": "How Klaro works",
@@ -53,8 +48,8 @@
 				"description": "Klaro is a free service. Klaro helps you understand social support better."
 			},
 			"2": {
-				"title": "This is about Grundsicherung",
-				"description": "Klaro first helps you with Grundsicherung. You can check whether this support might suit your situation."
+				"title": "You don't need to know your way around",
+				"description": "There are many social benefits. Klaro helps you find the ones that fit your situation."
 			},
 			"3": {
 				"title": "Answer a few short questions",
@@ -65,61 +60,114 @@
 				"description": "The check only takes a few minutes. You can start right away and don't need an account yet."
 			}
 		},
-		"cta": "Start quick check now"
+		"cta": "Check entitlement now"
 	},
 	"questions": {
-		"nationality": {
-			"category": "Nationality and Residence Status",
-			"title": "Which of the following applies to you?",
-			"tip": "This is important because different laws apply depending on your residency status. If you are new in Germany or in asylum proceedings, there is a special support system.",
+		"householdComposition": {
+			"category": "Household",
+			"title": "Who lives in your household?",
+			"tip": "How many people live together changes the calculation. Children count too.",
 			"options": {
-				"GERMAN": "I have German citizenship.",
-				"EU_5_PLUS": "I am an EU citizen and have lived in Germany for at least 5 years.",
-				"RESIDENCE_PERMIT": "I have a valid residence permit for Germany.",
-				"NONE": "None of the above."
+				"SINGLE": "I live alone.",
+				"SINGLE_PARENT": "I am a single parent.",
+				"COUPLE_NO_CHILDREN": "We are a couple, without children in the household.",
+				"COUPLE_WITH_CHILDREN": "We are a couple, with children in the household."
 			}
 		},
-		"livesInGermany": {
-			"category": "Place of Residence",
-			"title": "Do you live in Germany?",
-			"tip": "You can only receive Basic Income Support if you live in Germany permanently.",
-			"options": {
-				"YES": "Yes, I live in Germany.",
-				"NO": "No, I do not live in Germany."
-			}
+		"children": {
+			"category": "Children in the household",
+			"title": "When were your children born?",
+			"tip": "Your children's ages matter because separate amounts apply to children. Some benefits only exist for children under 18 or under 25.",
+			"child_label": "Child {{number}}",
+			"add": "Add child",
+			"remove": "Remove child {{number}}"
 		},
 		"dateOfBirth": {
-			"category": "Date of Birth",
+			"category": "Date of birth",
 			"title": "When were you born?",
-			"tip": "Basic Income Support may be an option for you if you:\n• have reached the standard retirement age or\n• are at least 18 years old and permanently fully unable to work."
+			"tip": "Your age helps decide which benefits may apply to you. Different rules apply once you reach the standard retirement age."
 		},
-		"pension": {
-			"category": "Pension Status",
-			"title": "Do you receive a pension?",
-			"tip": "From the standard retirement age, Basic Income Support in old age may be an option for you. When you reach this age limit depends on your year of birth.",
+		"livesInGermany": {
+			"category": "Residence",
+			"title": "Do you live in Germany?",
+			"tip": "The benefits Klaro checks are only available if you live in Germany permanently.",
 			"options": {
-				"OLD_AGE": "I receive an old-age pension.",
-				"REDUCED_EARNING_CAPACITY": "I receive a pension because I am no longer able to work full-time (Reduced Earning Capacity).",
-				"NONE": "I do not receive a pension."
+				"YES": "Yes",
+				"NO": "No"
 			}
 		},
-		"income": {
-			"category": "Income Assessment",
-			"title": "Which of the following applies to you?",
-			"tip": "Sometimes money is enough for food, but not for the rent. Then you might get housing benefit.",
+		"isEmployed": {
+			"category": "Work",
+			"title": "Are you currently working?",
+			"tip": "If you live with a partner, their work counts too.",
 			"options": {
-				"NOT_SUFFICIENT": "My current income is not sufficient to cover my needs.",
-				"SOON_INSUFFICIENT": "I am concerned that my income may soon be insufficient.",
-				"SUFFICIENT": "My income is sufficient. I can afford my expenses."
+				"YES": "Yes, I work.",
+				"NO": "No, not at the moment."
 			}
 		},
-		"hasAssetsAboveThreshold": {
-			"category": "Assets check",
-			"title": "Approximately how much do you have in assets?",
-			"tip": "Don't worry, many people receive help despite savings. The limit in the first year is €10,000 for one person. This includes cash, valuable items, or your car, for example.",
+		"monthlyGrossIncome": {
+			"category": "Work",
+			"title": "What is the monthly gross income?",
+			"tip": "Gross means the amount before taxes and contributions. You can find it on your payslip. If you live with a partner, add both together."
+		},
+		"workCapacity": {
+			"category": "Ability to work",
+			"title": "Can you work at least three hours a day?",
+			"tip": "Three hours is a limit set by law. It decides which office is responsible for you. We also ask if you work: some people work in a sheltered workshop, for example, and still count as having reduced earning capacity.",
 			"options": {
-				"YES": "Yes, I have more than €10,000 in assets.",
-				"NO": "No, I have less than €10,000 in assets."
+				"FULL": "Yes, at least three hours a day.",
+				"TEMPORARILY_REDUCED": "Not at the moment, but maybe again later.",
+				"PERMANENTLY_REDUCED": "No, permanently not."
+			}
+		},
+		"monthlyNetHouseholdIncome": {
+			"category": "Income",
+			"title": "How much money does your household have per month in total?",
+			"tip": "Add up everything that comes in each month: wages after deductions, pension, child benefit, maintenance, other benefits. An approximate amount is enough."
+		},
+		"monthlyWarmRent": {
+			"category": "Housing",
+			"title": "How much is your monthly rent including utilities?",
+			"tip": "This means rent plus service charges plus heating costs. The amount is in your tenancy agreement or on your bank statement."
+		},
+		"assetsBand": {
+			"category": "Savings",
+			"title": "How much money have you saved?",
+			"tip": "This means everything you have put aside: account, savings book, cash, securities. You may keep part of it — how much depends on your age. A rough estimate is enough.",
+			"options": {
+				"UNDER_5000": "Less than 5,000 euros.",
+				"FROM_5000_TO_10000": "Between 5,000 and 10,000 euros.",
+				"FROM_10000_TO_12500": "Between 10,000 and 12,500 euros.",
+				"FROM_12500_TO_20000": "Between 12,500 and 20,000 euros.",
+				"OVER_20000": "More than 20,000 euros."
+			}
+		},
+		"receivesBenefits": {
+			"category": "Current benefits",
+			"title": "Do you already receive a social benefit?",
+			"tip": "For example basic income support, basic income in old age or subsistence assistance. Some benefits cannot be received at the same time.",
+			"options": {
+				"YES": "Yes",
+				"NO": "No"
+			}
+		},
+		"citizenship": {
+			"category": "Citizenship",
+			"title": "What is your citizenship?",
+			"tip": "Different laws apply depending on citizenship and residence status.",
+			"options": {
+				"GERMAN": "German.",
+				"EU": "From another EU country.",
+				"NON_EU": "From a country outside the EU."
+			}
+		},
+		"hasSecureResidenceStatus": {
+			"category": "Residence status",
+			"title": "Do you have a secure residence permit?",
+			"tip": "Secure means, for example: settlement permit, permanent residence permit or recognition as a refugee. If you are still in the asylum procedure, there is a separate system — Klaro will point this out at the end.",
+			"options": {
+				"YES": "Yes",
+				"NO": "No, or I am not sure."
 			}
 		}
 	},
@@ -127,20 +175,45 @@
 		"reason_label": "What this means for you",
 		"heading": "Your result",
 		"eligible": {
-			"title": "You could be entitled to basic income support.",
-			"description": "This is an initial assessment. Klaro helps you fill out your application step-by-step. It is easy, digital, and free.",
-			"cta": "Fill out application now"
+			"title": "Your initial assessment",
+			"cta": "Create account and fill in application"
 		},
 		"not_eligible": {
-			"title": "Basic Income Support is not a good fit at the moment...",
-			"description": "You can still create an account and save your answers securely. So you can use Klaro later when your situation changes or you need support with further steps. Later we will offer more applications!",
+			"title": "You are not entitled to these benefits.",
+			"description": "The benefits Klaro checks are only available if you live in Germany permanently.",
 			"cta": "Create account"
 		},
-		"sozialamt": {
-			"title": "Please contact your local Social Services Office",
-			"description": "Based on your answers, none of the qualifying residence statuses apply. Please contact your local Social Services Office (Sozialamt) for guidance on which support may be available to you.",
-			"cta": "Find your Social Services Office"
+		"benefits": {
+			"GRUNDSICHERUNGSGELD": "Basic income support (Grundsicherungsgeld)",
+			"GRUNDSICHERUNG_ALTER": "Basic income in old age and for reduced earning capacity",
+			"WOHNGELD": "Housing benefit (Wohngeld)",
+			"KINDERZUSCHLAG": "Child supplement (Kinderzuschlag)"
 		},
+		"status": {
+			"LIKELY": "You are probably entitled",
+			"POSSIBLE": "You could be entitled – have it checked",
+			"NO": "Does not apply to you"
+		},
+		"reasons": {
+			"income_covers_needs": "Your income covers your needs including rent.",
+			"assets_too_high": "Your savings are above the amount you may keep.",
+			"assets_near_limit": "Your savings are around the amount you may keep.",
+			"income_below_needs": "Your income does not cover your needs including rent.",
+			"retirement_age_reached": "You have reached the standard retirement age.",
+			"permanently_unable_to_work": "You can permanently work less than three hours a day.",
+			"temporarily_unable_to_work": "Whether you need to be able to work for this depends on how long you cannot work.",
+			"not_retired_nor_unable_to_work": "You have not reached the standard retirement age and are able to work.",
+			"income_too_low_for_wohngeld": "Your income is too low for housing benefit. Another benefit fits better.",
+			"high_rent_share": "Your rent is high compared to your income.",
+			"low_rent_share": "Your rent is not high compared to your income.",
+			"no_children": "No children under 25 live in your household.",
+			"gross_below_minimum": "Your gross income is below the minimum income for the child supplement.",
+			"gross_above_minimum": "Your gross income reaches the minimum income for the child supplement.",
+			"already_receives_benefits": "You already receive a social benefit. Some benefits cannot be received at the same time.",
+			"residence_status_unclear": "Whether you are entitled depends on your residence status."
+		},
+		"residence_hint": "If you are in the asylum procedure or have a toleration permit (Duldung), you receive benefits under the Asylum Seekers' Benefits Act. Contact the State Office for Refugee Affairs or the social welfare office.",
+		"disclaimer": "This is a non-binding, automatic initial assessment and not legal advice. The responsible office decides whether you are entitled.",
 		"start_over": "Start over"
 	}
 }

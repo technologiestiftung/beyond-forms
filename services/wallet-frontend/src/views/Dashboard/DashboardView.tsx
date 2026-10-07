@@ -12,6 +12,15 @@ import { PrimaryButton } from "../../components/ui/PrimaryButton";
 import { ApplicationCard } from "./ApplicationCard";
 import { SimpleApplicationCard } from "./SimpleApplicationCard";
 import { GreetingHeader } from "../../components/Layout/GreetingHeader";
+import { useEligibilityStore } from "../../store/useEligibilityStore";
+import { EligibilityEngine } from "../../store/EligibilityEngine";
+import {
+	Benefit,
+	BenefitStatus,
+	assessBenefits,
+} from "../../store/benefitRules";
+import { ResultProfile } from "../../schemas/eligibility.schema";
+import type { EligibilityCheck } from "../../schemas/eligibility.schema";
 
 function applicationCardStatusForMilestone(
 	milestoneLevel?: number,
@@ -24,6 +33,27 @@ function applicationCardStatusForMilestone(
 	}
 	return "in_progress";
 }
+
+/** Benefits the eligibility check ruled out, empty when the check was not completed in this session. */
+function ruledOutBenefits(answers: Partial<EligibilityCheck>): Set<Benefit> {
+	const profile = EligibilityEngine.getOutcomeProfile(
+		EligibilityEngine.getValidPath(answers),
+	);
+	if (profile === ResultProfile.NOT_ELIGIBLE) {
+		return new Set(Object.values(Benefit));
+	}
+	if (profile === ResultProfile.ELIGIBLE) {
+		return new Set(
+			assessBenefits(EligibilityEngine.answersOnValidPath(answers))
+				.filter((a) => a.status === BenefitStatus.NO)
+				.map((a) => a.benefit),
+		);
+	}
+	return new Set();
+}
+
+const CARD_GRID_CLASS =
+	"flex flex-col gap-6 w-full min-w-0 lg:grid lg:grid-cols-[repeat(auto-fit,minmax(288px,1fr))] lg:gap-5";
 
 export const DashboardView: React.FC = () => {
 	const { t } = useTranslation("dashboard");
@@ -47,6 +77,7 @@ export const DashboardView: React.FC = () => {
 	});
 
 	const setMilestoneLevel = useProfileStore((s) => s.setMilestoneLevel);
+	const eligibilityAnswers = useEligibilityStore((s) => s.answers);
 
 	const milestoneLevel =
 		rawMilestoneLevel === 0 && (hasCompletedOnboarding || !!profileData)
@@ -91,6 +122,88 @@ export const DashboardView: React.FC = () => {
 		? t("onboarding.checklist.greeting_named", { name: trimmedFirstName })
 		: t("onboarding.checklist.greeting_anonymous");
 
+	const ruledOut = ruledOutBenefits(eligibilityAnswers);
+	const cards: { benefit?: Benefit; card: React.ReactNode }[] = [
+		{
+			benefit: Benefit.GRUNDSICHERUNG_ALTER,
+			card: (
+				<ApplicationCard
+					key="antrag_grundsicherung_im_alter"
+					status={appCardStatus}
+					level={milestoneLevel}
+					formType="antrag_grundsicherung_im_alter"
+				/>
+			),
+		},
+		{
+			card: (
+				<SimpleApplicationCard
+					key="antrag_bewohnerparkausweis"
+					title={t(
+						"sections.applications.parking_permit.title",
+						"Bewohnerparkausweis",
+					)}
+					description={t(
+						"sections.applications.parking_permit.description",
+						"Beantrage Deinen Bewohnerparkausweis direkt mit Deinen hinterlegten Angaben.",
+					)}
+					formType="antrag_bewohnerparkausweis"
+				/>
+			),
+		},
+		{
+			benefit: Benefit.WOHNGELD,
+			card: (
+				<SimpleApplicationCard
+					key="antrag_wohngeld"
+					title={t("sections.applications.housing_allowance.title", "Wohngeld")}
+					description={t(
+						"sections.applications.housing_allowance.description",
+						"Beantrage Wohngeld für Deine Miete direkt mit Deinen hinterlegten Angaben.",
+					)}
+					formType="antrag_wohngeld"
+				/>
+			),
+		},
+		{
+			benefit: Benefit.GRUNDSICHERUNGSGELD,
+			card: (
+				<SimpleApplicationCard
+					key="antrag_grundsicherungsgeld"
+					title={t(
+						"sections.applications.basic_income.title",
+						"Grundsicherungsgeld",
+					)}
+					description={t(
+						"sections.applications.basic_income.description",
+						"Beantrage Grundsicherungsgeld direkt mit Deinen hinterlegten Angaben.",
+					)}
+					formType="antrag_grundsicherungsgeld"
+				/>
+			),
+		},
+		{
+			benefit: Benefit.KINDERZUSCHLAG,
+			card: (
+				<SimpleApplicationCard
+					key="antrag_kinderzuschlag"
+					title={t(
+						"sections.applications.child_allowance.title",
+						"Kinderzuschlag",
+					)}
+					description={t(
+						"sections.applications.child_allowance.description",
+						"Beantrage Kinderzuschlag direkt mit Deinen hinterlegten Angaben.",
+					)}
+					formType="antrag_kinderzuschlag"
+				/>
+			),
+		},
+	];
+	const isRuledOut = (benefit?: Benefit) => !!benefit && ruledOut.has(benefit);
+	const visibleCards = cards.filter(({ benefit }) => !isRuledOut(benefit));
+	const hiddenCards = cards.filter(({ benefit }) => isRuledOut(benefit));
+
 	return (
 		<PageContainer
 			bgColor="brand-bg"
@@ -106,61 +219,22 @@ export const DashboardView: React.FC = () => {
 					subtitle={t("onboarding.checklist.intro")}
 				/>
 
-				<div className="flex flex-col gap-6 w-full min-w-0 lg:grid lg:grid-cols-[repeat(auto-fit,minmax(288px,1fr))] lg:gap-5">
-					<ApplicationCard
-						status={appCardStatus}
-						level={milestoneLevel}
-						formType="antrag_grundsicherung_im_alter"
-					/>
-
-					<SimpleApplicationCard
-						title={t(
-							"sections.applications.parking_permit.title",
-							"Bewohnerparkausweis",
-						)}
-						description={t(
-							"sections.applications.parking_permit.description",
-							"Beantrage Deinen Bewohnerparkausweis direkt mit Deinen hinterlegten Angaben.",
-						)}
-						formType="antrag_bewohnerparkausweis"
-					/>
-
-					<SimpleApplicationCard
-						title={t(
-							"sections.applications.housing_allowance.title",
-							"Wohngeld",
-						)}
-						description={t(
-							"sections.applications.housing_allowance.description",
-							"Beantrage Wohngeld für Deine Miete direkt mit Deinen hinterlegten Angaben.",
-						)}
-						formType="antrag_wohngeld"
-					/>
-
-					<SimpleApplicationCard
-						title={t(
-							"sections.applications.basic_income.title",
-							"Grundsicherungsgeld",
-						)}
-						description={t(
-							"sections.applications.basic_income.description",
-							"Beantrage Grundsicherungsgeld direkt mit Deinen hinterlegten Angaben.",
-						)}
-						formType="antrag_grundsicherungsgeld"
-					/>
-
-					<SimpleApplicationCard
-						title={t(
-							"sections.applications.child_allowance.title",
-							"Kinderzuschlag",
-						)}
-						description={t(
-							"sections.applications.child_allowance.description",
-							"Beantrage Kinderzuschlag direkt mit Deinen hinterlegten Angaben.",
-						)}
-						formType="antrag_kinderzuschlag"
-					/>
+				<div className={CARD_GRID_CLASS}>
+					{visibleCards.map(({ card }) => card)}
 				</div>
+
+				{hiddenCards.length > 0 && (
+					<details className="w-full" data-testid="ruled-out-applications">
+						<summary className="cursor-pointer text-body-lg text-brand-black underline mb-4">
+							{t("sections.applications.ruled_out", {
+								count: hiddenCards.length,
+							})}
+						</summary>
+						<div className={CARD_GRID_CLASS}>
+							{hiddenCards.map(({ card }) => card)}
+						</div>
+					</details>
+				)}
 
 				{/*
 				Commented out for now as we don't want to use tutorials yet

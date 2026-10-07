@@ -27,7 +27,7 @@ export const EligibilityStart: React.FC = () => {
 	}, [isAuthenticated, navigate, resetEligibility]);
 
 	const handleGoToCheck = () => {
-		navigate(getEligibilityRoute("nationality"));
+		navigate(getEligibilityRoute("household"));
 	};
 
 	const handleGoToLogin = () => {
@@ -54,13 +54,11 @@ export const EligibilityStart: React.FC = () => {
 					<p className="text-brand-black text-body-lg leading-relaxed w-full mb-4">
 						{t(i18nKeys.start.desc)}
 					</p>
-					<ul className="text-brand-black text-body-lg leading-relaxed w-full mb-4 lg:mb-8 ml-2">
+					<ul className="text-brand-black text-body-lg leading-relaxed w-full mb-4 lg:mb-8 pl-7 list-disc list-outside">
 						{t(i18nKeys.start.descList)
 							.split("\n")
 							.map((item: string) => (
-								<li key={item} className="list-disc list-inside">
-									{item}
-								</li>
+								<li key={item}>{item}</li>
 							))}
 					</ul>
 					<PrimaryButton

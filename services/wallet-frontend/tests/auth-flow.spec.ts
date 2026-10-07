@@ -6,6 +6,7 @@ import {
 	openManualPhoneForm,
 } from "./helpers/auth";
 import { gotoWithRetry } from "./helpers/navigation";
+import { completePensionerCheck } from "./helpers/eligibility";
 
 test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 	test.beforeEach(async ({ page, context }) => {
@@ -28,25 +29,7 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 
 	test("Happy Path: New User Registration with Data Sync", async ({ page }) => {
 		await gotoWithRetry(page, "/");
-		await page.getByTestId("start-button").click();
-
-		await page.getByTestId("option-german").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-yes").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("dob-date-input").fill("1955-01-01");
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-old_age").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-not_sufficient").click();
-		await page.getByTestId("next-button").click();
-
-		await page.getByTestId("option-no").click();
-		await page.getByTestId("next-button").click();
+		await completePensionerCheck(page);
 
 		await page.getByTestId("outcome-cta").click();
 		await expect(page).toHaveURL(/\/auth\?origin=eligibility/);
@@ -162,15 +145,11 @@ test.describe("Authentication Flow - Security & Data Persistence Audit", () => {
 	test("Language Switching: Verify multilingual support", async ({ page }) => {
 		await gotoWithRetry(page, "/auth");
 		// The persona picker is the first screen of the auth view.
-		await expect(
-			page.getByText(/Mit Telefonnummer anmelden/i),
-		).toBeVisible();
+		await expect(page.getByText(/Mit Telefonnummer anmelden/i)).toBeVisible();
 
 		await page.getByTestId("language-switcher").click();
 		await page.getByText("EN", { exact: true }).click();
-		await expect(
-			page.getByText(/Log in with a phone number/i),
-		).toBeVisible();
+		await expect(page.getByText(/Log in with a phone number/i)).toBeVisible();
 	});
 
 	test("Accessibility: Auth Flow Deep Audit", async ({ page }) => {

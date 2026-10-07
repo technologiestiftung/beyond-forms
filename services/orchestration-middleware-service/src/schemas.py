@@ -235,6 +235,8 @@ class UserProfileValidationSchema(BaseModel):
 
     # Financial and Asset fields
     monthly_income: Optional[decimal.Decimal] = Field(None, ge=0)
+    is_currently_employed: Optional[bool] = None
+    has_received_previous_benefits: Optional[bool] = None
     has_assets: Optional[bool] = None
     assets_description: Optional[str] = Field(None, max_length=1000)
     associated_persons: Optional[list[AssociatedPersonSchema]] = None
