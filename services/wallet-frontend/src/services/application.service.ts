@@ -1,9 +1,10 @@
 import {
 	Binary,
-	NationalityStatus,
-	PensionStatus,
+	Citizenship,
+	WorkCapacity,
 } from "../schemas/eligibility.schema";
 import type { EligibilityCheck } from "../schemas/eligibility.schema";
+import type { AbilityToWorkType } from "../schemas/profile.schema";
 import { authenticatedFetch } from "../utils/apiClient";
 import { env } from "../config/env.config";
 
@@ -11,6 +12,12 @@ export interface SyncResponse {
 	success: boolean;
 	message?: string;
 }
+
+const ABILITY_TO_WORK: Record<WorkCapacity, AbilityToWorkType> = {
+	[WorkCapacity.FULL]: "Fully able",
+	[WorkCapacity.TEMPORARILY_REDUCED]: "Temporarily disabled",
+	[WorkCapacity.PERMANENTLY_REDUCED]: "Permanently disabled",
+};
 
 export const mapEligibilityToProfilePayload = (
 	answers: Partial<EligibilityCheck>,
@@ -25,33 +32,18 @@ export const mapEligibilityToProfilePayload = (
 		payload.is_resident_in_germany = answers.livesInGermany === Binary.YES;
 	}
 
-	if (answers.nationality) {
-		if (answers.nationality === NationalityStatus.GERMAN) {
-			payload.is_german_citizen = true;
-			payload.nationality = "DE";
-			payload.residence_status = "Citizen";
-		} else if (answers.nationality === NationalityStatus.EU_5_PLUS) {
-			payload.is_german_citizen = false;
-			payload.nationality = "EU";
-			payload.residence_status = "PermanentResident";
-		} else if (answers.nationality === NationalityStatus.RESIDENCE_PERMIT) {
-			payload.is_german_citizen = false;
+	if (answers.citizenship === Citizenship.NON_EU) {
+		payload.is_german_citizen = false;
+		if (answers.hasSecureResidenceStatus === Binary.YES) {
 			payload.residence_status = "Other";
 		}
 	}
 
-	if (answers.pension) {
-		if (answers.pension === PensionStatus.OLD_AGE) {
-			payload.income_entries = [{ income_type: "Pension" }];
-		} else if (answers.pension === PensionStatus.REDUCED_EARNING_CAPACITY) {
-			payload.income_entries = [{ income_type: "Pension" }];
-			payload.ability_to_work = "Permanently disabled";
+	if (answers.workCapacity) {
+		payload.ability_to_work = ABILITY_TO_WORK[answers.workCapacity];
+		if (answers.workCapacity === WorkCapacity.PERMANENTLY_REDUCED) {
 			payload.has_permanent_reduction_in_earning_capacity = true;
 		}
-	}
-
-	if (answers.hasAssetsAboveThreshold) {
-		payload.has_assets = answers.hasAssetsAboveThreshold === Binary.YES;
 	}
 
 	return payload;

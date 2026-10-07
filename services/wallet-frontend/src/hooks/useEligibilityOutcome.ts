@@ -6,7 +6,6 @@ import { ResultProfile } from "../schemas/eligibility.schema";
 const PROFILE_TRANSLATION_KEYS: Record<ResultProfile, string> = {
 	[ResultProfile.ELIGIBLE]: "eligible",
 	[ResultProfile.NOT_ELIGIBLE]: "not_eligible",
-	[ResultProfile.SOZIALAMT]: "sozialamt",
 };
 
 export function useEligibilityOutcome() {

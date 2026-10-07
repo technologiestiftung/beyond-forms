@@ -6,6 +6,7 @@
 	},
 	"sections": {
 		"applications": {
+			"ruled_out": "Laut Deinem Schnelltest trifft das nicht auf Dich zu ({{count}})",
 			"basic_security": {
 				"title": "Grundsicherung",
 				"status": {
