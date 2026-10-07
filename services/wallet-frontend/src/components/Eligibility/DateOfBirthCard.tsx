@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { QuestionLayout } from "./QuestionLayout";
+import { questionTipId } from "./questionTipId";
 
 interface DateOfBirthCardProps {
 	id: string;
@@ -25,7 +26,7 @@ export const DateOfBirthCard: React.FC<DateOfBirthCardProps> = ({
 	const labelRef = useRef<HTMLLabelElement>(null);
 	const [draft, setDraft] = useState(value ?? "");
 	const [prevValue, setPrevValue] = useState(value);
-	const tipId = `${id}-tip`;
+	const tipId = questionTipId(id);
 
 	if (value !== prevValue) {
 		setPrevValue(value);
@@ -57,9 +58,9 @@ export const DateOfBirthCard: React.FC<DateOfBirthCardProps> = ({
 
 	return (
 		<QuestionLayout
+			id={id}
 			category={category}
 			tip={tip}
-			tipId={tipId}
 			canSubmit={!!value}
 			onSubmit={onNext}
 		>

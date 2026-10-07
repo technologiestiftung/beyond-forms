@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { QuestionLayout } from "./QuestionLayout";
+import { questionTipId } from "./questionTipId";
 
 interface QuestionCardProps {
 	id: string;
@@ -25,7 +26,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const legendRef = useRef<HTMLLegendElement>(null);
-	const tipId = `${id}-tip`;
+	const tipId = questionTipId(id);
 	const legendId = `${id}-legend`;
 
 	useEffect(() => {
@@ -44,9 +45,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
 	return (
 		<QuestionLayout
+			id={id}
 			category={category}
 			tip={tip}
-			tipId={tipId}
 			canSubmit={value !== undefined}
 			onSubmit={onNext}
 		>
@@ -72,7 +73,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 							key={option}
 							htmlFor={inputId}
 							data-testid={`option-${option.toLowerCase()}`}
-							className="group flex gap-2 items-start justify-start w-full min-h-11 text-left cursor-pointer rounded-lg transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary-blue-500 lg:gap-4 lg:items-center lg:min-h-14 lg:rounded-2xl lg:border-2 lg:border-brand-border lg:bg-white lg:px-5 lg:py-2.5 lg:hover:border-primary-blue-300 lg:hover:bg-brand-bg lg:has-checked:border-primary-blue-500 lg:has-checked:bg-primary-blue-50"
+							className="group flex gap-2 items-start justify-start w-full min-h-11 text-left cursor-pointer rounded-lg transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary-blue-500 lg:gap-4 lg:items-center lg:min-h-12 lg:rounded-2xl lg:border-2 lg:border-brand-border lg:bg-white lg:px-5 lg:py-2.5 lg:hover:border-primary-blue-300 lg:hover:bg-brand-bg lg:has-checked:border-primary-blue-500 lg:has-checked:bg-primary-blue-50"
 						>
 							<input
 								type="radio"

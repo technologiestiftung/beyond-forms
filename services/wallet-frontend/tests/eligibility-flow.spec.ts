@@ -7,6 +7,8 @@ import {
 	answerDate,
 	answerNumber,
 	completePensionerCheck,
+	fillNumber,
+	submitAnswer,
 } from "./helpers/eligibility";
 
 test.describe("Eligibility Navigator - Principal Journey Audit", () => {
@@ -200,7 +202,7 @@ test.describe("Eligibility Navigator - Desktop layout", () => {
 		{ width: 1280, height: 720 },
 		{ width: 1920, height: 1080 },
 	]) {
-		test(`questions and result fit without scrolling at ${viewport.width}px`, async ({
+		test(`questions fit without scrolling and result has no horizontal overflow at ${viewport.width}px`, async ({
 			page,
 		}) => {
 			await page.setViewportSize(viewport);
@@ -212,28 +214,31 @@ test.describe("Eligibility Navigator - Desktop layout", () => {
 			await page.reload();
 			await page.getByTestId("start-button").click();
 
-			const answers = [
-				"option-eu_5_plus",
-				"option-yes",
-				null,
-				"option-reduced_earning_capacity",
-				"option-soon_insufficient",
-				"option-no",
+			const steps: Array<(page: Page) => Promise<unknown>> = [
+				(p) => p.getByTestId("option-single_parent").click(),
+				(p) => p.getByTestId("child-date-input-0").fill("2018-03-01"),
+				(p) => p.getByTestId("dob-date-input").fill("1990-05-01"),
+				(p) => p.getByTestId("option-yes").click(),
+				(p) => p.getByTestId("option-yes").click(),
+				(p) => fillNumber(p, 2500),
+				(p) => p.getByTestId("option-full").click(),
+				(p) => fillNumber(p, 2000),
+				(p) => fillNumber(p, 900),
+				(p) => p.getByTestId("option-under_5000").click(),
+				(p) => p.getByTestId("option-no").click(),
+				(p) => p.getByTestId("option-non_eu").click(),
+				(p) => p.getByTestId("option-no").click(),
 			];
 
-			for (const answer of answers) {
+			for (const answer of steps) {
 				await expect(page.getByTestId("question-card")).toBeVisible();
 				await expectFitsViewport(page);
-				if (answer) {
-					await page.getByTestId(answer).click();
-				} else {
-					await page.getByTestId("dob-date-input").fill("1955-01-01");
-				}
-				await page.getByTestId("next-button").click();
+				await answer(page);
+				await submitAnswer(page);
 			}
 
 			await expect(page).toHaveURL(/\/eligibility-check\/result/);
-			await expect(page.getByTestId("outcome-card")).toBeVisible();
+			await expect(page.getByTestId("benefit-kinderzuschlag")).toBeVisible();
 			const overflowX = await page.evaluate(() => {
 				const main =
 					document.getElementById("main-content") ?? document.documentElement;
@@ -262,7 +267,7 @@ test.describe("Eligibility Navigator - Desktop layout", () => {
 		});
 		await page.reload();
 		await page.getByTestId("start-button").click();
-		await page.getByTestId("option-german").click();
+		await page.getByTestId("option-single").click();
 
 		await page.getByTestId("back-button").focus();
 		await page.keyboard.press("Tab");
@@ -271,14 +276,14 @@ test.describe("Eligibility Navigator - Desktop layout", () => {
 		).toBeFocused();
 		await page.keyboard.press("Tab");
 		await expect(
-			page.getByTestId("option-german").locator("input"),
+			page.getByTestId("option-single").locator("input"),
 		).toBeFocused();
 		await page.keyboard.press("Tab");
 		await expect(page.getByTestId("next-button")).toBeFocused();
 
 		await page.getByTestId("next-button").click();
-		await expect(page).toHaveURL(/\/eligibility-check\/germany/);
+		await expect(page).toHaveURL(/\/eligibility-check\/birthdate/);
 		await page.getByTestId("back-button").click();
-		await expect(page).toHaveURL(/\/eligibility-check\/nationality/);
+		await expect(page).toHaveURL(/\/eligibility-check\/household/);
 	});
 });
