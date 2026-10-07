@@ -9,12 +9,10 @@ import { PrimaryButton } from "../ui/PrimaryButton";
 const profileFromEligibilityPath = `${AppRoutes.Profile}?${URL_PARAMS.ORIGIN}=${URL_PARAMS.ORIGIN_ELIGIBILITY}`;
 
 const getExternalLink = (key: string): string | null => {
-	switch (key) {
-		case "sozialamt":
-			return EXTERNAL_LINKS.SOZIALAMT;
-		default:
-			return null;
+	if (key === "sozialamt") {
+		return EXTERNAL_LINKS.SOZIALAMT;
 	}
+	return null;
 };
 
 export interface Outcome {
