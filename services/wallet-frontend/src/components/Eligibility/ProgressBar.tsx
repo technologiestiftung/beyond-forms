@@ -1,32 +1,24 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { i18nKeys } from "../../i18n/i18nKeys";
-import { useEligibilityStore } from "../../store/useEligibilityStore";
 import { ProgressBar as SharedProgressBar } from "../ui/ProgressBar";
 
 interface ProgressBarProps {
-	current: number;
-	total: number;
+	progress: number;
 }
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({ current, total }) => {
+export const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
 	const { t } = useTranslation();
-	const maxDepthReached = useEligibilityStore((state) => state.maxDepthReached);
-	const visualDepth = Math.max(current, maxDepthReached);
-	const progressText = t(i18nKeys.eligibility.progressAria, {
-		current,
-		total,
-	});
+	const percent = Math.round(progress * 100);
 
 	return (
-		<div className="w-full mb-6 font-sans flex flex-col gap-3">
+		<div className="w-full mb-6 font-sans">
 			<SharedProgressBar
-				current={visualDepth}
-				total={total}
+				current={percent}
+				total={100}
 				colorVariant="blue"
-				ariaLabel={progressText}
+				ariaLabel={t(i18nKeys.eligibility.progressAria, { percent })}
 			/>
-			<p className="text-base text-brand-grey">{progressText}</p>
 		</div>
 	);
 };
