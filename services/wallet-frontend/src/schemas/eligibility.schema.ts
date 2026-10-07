@@ -71,7 +71,7 @@ export const CitizenshipSchema = z.enum([
 export const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 /** Today as YYYY-MM-DD in local time, matching what a date input shows. */
-export function todayIsoDate(): string {
+export function localDateToday(): string {
 	const today = new Date();
 	const year = today.getFullYear();
 	const month = String(today.getMonth() + 1).padStart(2, "0");
@@ -96,7 +96,7 @@ const BirthDateSchema = z
 		"Date must be on or after 1 January 1900",
 	)
 	.refine(
-		(val) => val <= todayIsoDate(),
+		(val) => val <= localDateToday(),
 		"Date of birth cannot be in the future",
 	);
 
