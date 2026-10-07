@@ -111,7 +111,7 @@ export const IntroCarousel: React.FC = () => {
 		>
 			<h2
 				id="intro-carousel-heading"
-				className="text-brand-black text-h1 lg:text-[32px] lg:leading-10 font-bold leading-tight w-full mb-6 lg:mb-8"
+				className="text-brand-black text-h1 lg:text-[2rem] lg:leading-10 font-bold leading-tight w-full mb-6 lg:mb-8"
 			>
 				{sectionTitle}
 			</h2>

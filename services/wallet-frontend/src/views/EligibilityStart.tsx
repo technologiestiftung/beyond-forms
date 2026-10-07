@@ -35,10 +35,7 @@ export const EligibilityStart: React.FC = () => {
 	};
 
 	return (
-		<StepLayout
-			topBarClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4"
-			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
-		>
+		<StepLayout width="wide">
 			{/* Hero Section */}
 			<div className="w-full flex flex-col items-center lg:flex-row lg:items-center lg:gap-6 mb-8 lg:mb-10 font-sans">
 				<div className="bg-white rounded-full size-20 shrink-0 shadow-md border border-brand-border/10 flex items-center justify-center mb-6 lg:mb-0">
@@ -47,7 +44,7 @@ export const EligibilityStart: React.FC = () => {
 					</div>
 				</div>
 
-				<h1 className="text-brand-black text-h1 lg:text-[40px] lg:leading-12 font-bold leading-tight w-full lg:max-w-[820px]">
+				<h1 className="text-brand-black text-h1 lg:text-[2.5rem] lg:leading-12 font-bold leading-tight w-full lg:max-w-[820px]">
 					{t(i18nKeys.start.title)}
 				</h1>
 			</div>

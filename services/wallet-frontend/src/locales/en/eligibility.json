@@ -172,6 +172,8 @@
 		}
 	},
 	"outcome": {
+		"reason_label": "What this means for you",
+		"heading": "Your result",
 		"eligible": {
 			"title": "Your initial assessment",
 			"cta": "Create account and fill in application"

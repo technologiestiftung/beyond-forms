@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { i18nKeys } from "../../i18n/i18nKeys";
-import { PrimaryButton } from "../ui/PrimaryButton";
-import { Info } from "lucide-react";
+import { QuestionLayout } from "./QuestionLayout";
+import { questionTipId } from "./questionTipId";
 
 interface QuestionCardProps {
 	id: string;
@@ -27,7 +26,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const legendRef = useRef<HTMLLegendElement>(null);
-	const tipId = `${id}-tip`;
+	const tipId = questionTipId(id);
 	const legendId = `${id}-legend`;
 
 	useEffect(() => {
@@ -44,103 +43,62 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 		return t(option.toLowerCase());
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (value !== undefined) {
-			onNext();
-		}
-	};
-
 	return (
-		<form
-			onSubmit={handleSubmit}
-			data-testid="question-card"
-			className="w-full font-sans flex flex-col justify-between flex-grow min-h-[360px]"
+		<QuestionLayout
+			id={id}
+			category={category}
+			tip={tip}
+			canSubmit={value !== undefined}
+			onSubmit={onNext}
 		>
-			<div className="flex flex-col gap-6 w-full mb-8">
-				<div className="flex flex-col gap-3">
-					<p className="text-body text-brand-grey">
-						{t(i18nKeys.eligibility.title)}
-					</p>
-					<h1 className="text-xl font-bold text-brand-black leading-snug">
-						{category}
-					</h1>
-				</div>
-
-				{tip && (
-					<div
-						id={tipId}
-						className="bg-brand-bg border border-brand-border/40 rounded-xl p-4 flex flex-row gap-2 items-start"
-					>
-						<Info
-							className="size-5 text-brand-grey shrink-0 mt-0.5"
-							aria-hidden="true"
-						/>
-						<p className="text-base text-brand-grey leading-snug whitespace-pre-line">
-							{tip}
-						</p>
-					</div>
-				)}
-
-				<fieldset
-					className="w-full border-none p-0 m-0 flex flex-col gap-4"
-					aria-describedby={tip ? tipId : undefined}
+			<fieldset
+				className="w-full border-none p-0 m-0 flex flex-col gap-4 lg:gap-3"
+				aria-describedby={tip ? tipId : undefined}
+			>
+				<legend
+					ref={legendRef}
+					id={legendId}
+					tabIndex={-1}
+					className="font-bold text-brand-black leading-snug focus:outline-none mb-6 lg:mb-4 lg:text-h2"
 				>
-					<legend
-						ref={legendRef}
-						id={legendId}
-						tabIndex={-1}
-						className="font-bold text-brand-black leading-snug focus:outline-none mb-6"
-					>
-						{question}
-					</legend>
+					{question}
+				</legend>
 
-					{options.map((option) => {
-						const inputId = `${id}-${option}`;
-						const isChecked = value === option;
+				{options.map((option) => {
+					const inputId = `${id}-${option}`;
+					const isChecked = value === option;
 
-						return (
-							<label
-								key={option}
-								htmlFor={inputId}
-								data-testid={`option-${option.toLowerCase()}`}
-								className="flex gap-2 items-start justify-start w-full min-h-11 text-left cursor-pointer rounded-lg has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary-blue-500"
+					return (
+						<label
+							key={option}
+							htmlFor={inputId}
+							data-testid={`option-${option.toLowerCase()}`}
+							className="group flex gap-2 items-start justify-start w-full min-h-11 text-left cursor-pointer rounded-lg transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary-blue-500 lg:gap-4 lg:items-center lg:min-h-12 lg:rounded-2xl lg:border-2 lg:border-brand-border lg:bg-white lg:px-5 lg:py-2.5 lg:hover:border-primary-blue-300 lg:hover:bg-brand-bg lg:has-checked:border-primary-blue-500 lg:has-checked:bg-primary-blue-50"
+						>
+							<input
+								type="radio"
+								id={inputId}
+								name={id}
+								value={option}
+								checked={isChecked}
+								onChange={() => onChange(option)}
+								className="sr-only"
+							/>
+							<span
+								className={`size-6 shrink-0 rounded-full border-2 flex items-center justify-center transition-colors group-hover:border-primary-blue-300 lg:bg-white ${isChecked ? "border-primary-blue-500" : "border-brand-border"}`}
+								aria-hidden="true"
 							>
-								<input
-									type="radio"
-									id={inputId}
-									name={id}
-									value={option}
-									checked={isChecked}
-									onChange={() => onChange(option)}
-									className="sr-only"
-								/>
-								<span
-									className="size-6 shrink-0 rounded-full border-2 border-brand-border flex items-center justify-center"
-									aria-hidden="true"
-								>
-									{isChecked && (
-										<span className="size-3 rounded-full bg-primary-blue-500" />
-									)}
-								</span>
-								<span className="text-body-lg text-brand-grey leading-snug">
-									{getLabel(option)}
-								</span>
-							</label>
-						);
-					})}
-				</fieldset>
-			</div>
-
-			<div className="w-full">
-				<PrimaryButton
-					type="submit"
-					disabled={value === undefined}
-					data-testid="next-button"
-				>
-					{t(i18nKeys.common.next)}
-				</PrimaryButton>
-			</div>
-		</form>
+								{isChecked && (
+									<span className="size-3 rounded-full bg-primary-blue-500" />
+								)}
+							</span>
+							<span className="text-body-lg text-brand-grey leading-snug group-hover:text-brand-black lg:text-brand-black lg:group-has-checked:font-medium">
+								{getLabel(option)}
+							</span>
+						</label>
+					);
+				})}
+			</fieldset>
+		</QuestionLayout>
 	);
 };

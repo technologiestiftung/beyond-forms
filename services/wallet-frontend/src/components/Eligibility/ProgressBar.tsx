@@ -12,7 +12,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
 	const percent = Math.round(progress * 100);
 
 	return (
-		<div className="w-full mb-6 font-sans">
+		<div className="w-full mb-6 font-sans lg:px-13">
 			<SharedProgressBar
 				current={percent}
 				total={100}

@@ -47,16 +47,16 @@
 	--color-status-done: var(--color-primary-blue-500);
 
 	/* Typography Scales */
-	--text-h1: 28px;
-	--text-h1--line-height: 38px;
-	--text-h2: 24px;
-	--text-h2--line-height: 32px;
-	--text-body-lg: 18px;
-	--text-body-lg--line-height: 28px;
-	--text-body: 14px;
-	--text-body--line-height: 21px;
-	--text-otp: 24px;
-	--text-otp--line-height: 32px;
+	--text-h1: 1.75rem;
+	--text-h1--line-height: 2.375rem;
+	--text-h2: 1.5rem;
+	--text-h2--line-height: 2rem;
+	--text-body-lg: 1.125rem;
+	--text-body-lg--line-height: 1.75rem;
+	--text-body: 0.875rem;
+	--text-body--line-height: 1.3125rem;
+	--text-otp: 1.5rem;
+	--text-otp--line-height: 2rem;
 
 	/* Z-Index Scale */
 	--z-nav: 90;

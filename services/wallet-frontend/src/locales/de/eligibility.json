@@ -172,6 +172,8 @@
 		}
 	},
 	"outcome": {
+		"reason_label": "Was das für Dich bedeutet",
+		"heading": "Dein Ergebnis",
 		"eligible": {
 			"title": "Deine Ersteinschätzung",
 			"cta": "Konto erstellen und Antrag ausfüllen"

@@ -1,7 +1,7 @@
 import { expect, type Page } from "@playwright/test";
 
 /** Waits for the next question to replace the current one, so the next fill hits the new input. */
-async function submitAnswer(page: Page) {
+export async function submitAnswer(page: Page) {
 	const current = page.url();
 	await page.getByTestId("next-button").click();
 	await page.waitForURL((url) => url.toString() !== current);
@@ -12,11 +12,15 @@ export async function answerChoice(page: Page, option: string) {
 	await submitAnswer(page);
 }
 
-export async function answerNumber(page: Page, amount: number) {
+export async function fillNumber(page: Page, amount: number) {
 	const input = page.getByTestId("number-input");
 	// Consecutive number questions share the test id; the empty one is the freshly rendered card.
 	await expect(input).toHaveValue("");
 	await input.fill(String(amount));
+}
+
+export async function answerNumber(page: Page, amount: number) {
+	await fillNumber(page, amount);
 	await submitAnswer(page);
 }
 

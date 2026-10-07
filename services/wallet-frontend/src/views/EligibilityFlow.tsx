@@ -129,6 +129,7 @@ export const EligibilityFlow: React.FC = () => {
 				backAriaLabel={t(i18nKeys.common.back)}
 				backTestId="back-button"
 				colorVariant="blue"
+				width="wide"
 			>
 				<ProgressBar
 					progress={EligibilityEngine.getProgress(
