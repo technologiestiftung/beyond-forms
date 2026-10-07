@@ -27,11 +27,15 @@ const completed: Partial<EligibilityCheck> = {
 };
 
 const baseline = {
+	persons_in_household_count: 1,
 	date_of_birth: "1990-05-01",
 	is_resident_in_germany: true,
+	is_currently_employed: false,
 	is_german_citizen: false,
 	nationality: "EU",
 	ability_to_work: "Fully able",
+	rent_total: 600,
+	receives_other_transfer_benefits: false,
 	has_assets: false,
 };
 
@@ -112,13 +116,28 @@ describe("applicationService: Guest Data Sync", () => {
 				dateOfBirth: "1950-01-01",
 				workCapacity: WorkCapacity.PERMANENTLY_REDUCED,
 			});
-			expect(payload).toEqual({
-				date_of_birth: "1950-01-01",
-				is_resident_in_germany: true,
-				has_assets: false,
-				is_german_citizen: false,
-				nationality: "EU",
+			const { ability_to_work: _skipped, ...rest } = baseline;
+			expect(payload).toEqual({ ...rest, date_of_birth: "1950-01-01" });
+		});
+
+		it("counts adults and children in the household", () => {
+			const payload = mapEligibilityToProfilePayload({
+				...completed,
+				householdComposition: HouseholdComposition.COUPLE_WITH_CHILDREN,
+				children: [
+					{ dateOfBirth: "2018-03-01" },
+					{ dateOfBirth: "2020-07-15" },
+				],
 			});
+			expect(payload.persons_in_household_count).toBe(4);
+		});
+
+		it("ignores children left over from a household without children", () => {
+			const payload = mapEligibilityToProfilePayload({
+				...completed,
+				children: [{ dateOfBirth: "2018-03-01" }],
+			});
+			expect(payload.persons_in_household_count).toBe(1);
 		});
 
 		it("maps savings bands to the 10,000 € question", () => {

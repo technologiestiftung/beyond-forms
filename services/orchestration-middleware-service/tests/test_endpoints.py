@@ -177,6 +177,11 @@ def test_update_profile_echecker_sync_fields_success(mock_post, mock_db):
         "is_resident_in_germany": True,
         "has_permanent_reduction_in_earning_capacity": True,
         "ability_to_work": "Permanently disabled",
+        "persons_in_household_count": 3,
+        "is_currently_employed": True,
+        "rent_total": 850,
+        "receives_other_transfer_benefits": False,
+        "has_received_previous_benefits": True,
     }
     response = client.post("/profile", json=payload)
 
@@ -186,6 +191,11 @@ def test_update_profile_echecker_sync_fields_success(mock_post, mock_db):
     assert mock_user.is_resident_in_germany is True
     assert mock_user.has_permanent_reduction_in_earning_capacity is True
     assert mock_user.ability_to_work == "Permanently disabled"
+    assert mock_user.persons_in_household_count == 3
+    assert mock_user.is_currently_employed is True
+    assert mock_user.rent_total == 850
+    assert mock_user.receives_other_transfer_benefits is False
+    assert mock_user.has_received_previous_benefits is True
     mock_db.commit.assert_called_once()
 
 

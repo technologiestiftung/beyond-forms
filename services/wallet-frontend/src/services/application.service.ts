@@ -2,6 +2,7 @@ import {
 	AssetsBand,
 	Binary,
 	Citizenship,
+	HouseholdComposition,
 	WorkCapacity,
 } from "../schemas/eligibility.schema";
 import { EligibilityEngine } from "../store/EligibilityEngine";
@@ -36,12 +37,26 @@ export const mapEligibilityToProfilePayload = (
 	const answers = EligibilityEngine.answersOnValidPath(allAnswers);
 	const payload: Record<string, unknown> = {};
 
+	if (answers.householdComposition) {
+		const isCouple =
+			answers.householdComposition ===
+				HouseholdComposition.COUPLE_NO_CHILDREN ||
+			answers.householdComposition ===
+				HouseholdComposition.COUPLE_WITH_CHILDREN;
+		payload.persons_in_household_count =
+			(isCouple ? 2 : 1) + (answers.children?.length ?? 0);
+	}
+
 	if (answers.dateOfBirth) {
 		payload.date_of_birth = answers.dateOfBirth;
 	}
 
 	if (answers.livesInGermany) {
 		payload.is_resident_in_germany = answers.livesInGermany === Binary.YES;
+	}
+
+	if (answers.isEmployed) {
+		payload.is_currently_employed = answers.isEmployed === Binary.YES;
 	}
 
 	if (answers.citizenship === Citizenship.GERMAN) {
@@ -67,6 +82,15 @@ export const mapEligibilityToProfilePayload = (
 		if (answers.workCapacity === WorkCapacity.PERMANENTLY_REDUCED) {
 			payload.has_permanent_reduction_in_earning_capacity = true;
 		}
+	}
+
+	if (answers.monthlyWarmRent !== undefined) {
+		payload.rent_total = answers.monthlyWarmRent;
+	}
+
+	if (answers.receivesBenefits) {
+		payload.receives_other_transfer_benefits =
+			answers.receivesBenefits === Binary.YES;
 	}
 
 	if (answers.assetsBand) {
