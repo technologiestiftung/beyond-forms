@@ -16,9 +16,9 @@
 		"questionnaire": "Fragebogen zur Prüfung"
 	},
 	"start_screen": {
-		"title": "Schnell und einfach Deinen Anspruch auf Grundsicherung prüfen",
-		"description": "Mit Klaro findest Du in nur 5 Minuten heraus, ob Du Grundsicherung beantragen kannst.",
-		"description_list": "Schnelltest in nur 5 Minuten\nEinfach und verständlich erklärt\nKostenlos für alle",
+		"title": "Schnell und einfach Deinen Anspruch auf Sozialleistungen prüfen",
+		"description": "Mit Klaro findest Du heraus, welche Sozialleistungen für Dich infrage kommen. Danach begleitet Dich Klaro Schritt für Schritt durch den Antrag.",
+		"description_list": "Erste Einschätzung in wenigen Minuten\nEinfach und verständlich erklärt\nKostenlos für Berliner Bürger:innen",
 		"feature_cards": {
 			"quick_check": {
 				"title": "Schnell prüfen",
@@ -39,9 +39,9 @@
 			"description": "Mit Klaro kannst Du aktuell prüfen, ob Grundsicherung für Dich infrage kommt, und Dich Schritt-für-Schritt auf den Antrag vorbereiten. Weitere Services folgen später."
 		},
 		"promo_card": {
-			"title": "Direkt zur Grundsicherung",
-			"description": "Melde Dich an und starte direkt mit Deinem Antrag zur Grundsicherung. Klaro begleitet Dich Schritt für Schritt.",
-			"cta": "Jetzt Antrag starten"
+			"title": "Direkt zum Antrag",
+			"description": "Du weißt schon, was Du brauchst? Melde Dich an und arbeite direkt in Deinem Profil weiter.",
+			"cta": "Jetzt anmelden"
 		},
 		"intro_cards": {
 			"section_title": "So funktioniert Klaro",
@@ -50,22 +50,22 @@
 			"tap_advance": "Tippen, um die nächste Karte anzuzeigen",
 			"1": {
 				"title": "Willkommen bei Klaro",
-				"description": "Klaro ist ein kostenloses Angebot. Klaro hilft Dir dabei, soziale Unterstützung besser zu verstehen."
+				"description": "Klaro ist ein kostenloses Angebot. Klaro hilft dir dabei, soziale Unterstützung besser zu verstehen."
 			},
 			"2": {
-				"title": "Hier geht es um Grundsicherung",
-				"description": "Klaro hilft Dir zuerst beim Thema Grundsicherung. Du kannst prüfen, ob diese Unterstützung für Dich passen könnte."
+				"title": "Du musst Dich nicht auskennen",
+				"description": "Es gibt viele Sozialleistungen. Klaro hilft Dir, die zu finden, die zu Deiner Situation passen."
 			},
 			"3": {
 				"title": "Beantworte ein paar kurze Fragen",
-				"description": "Mit einigen Fragen prüft Klaro Deine Situation. So bekommst Du eine erste Orientierung."
+				"description": "Mit einigen Fragen prüft Klaro deine Situation. So bekommstdu eine erste Orientierung."
 			},
 			"4": {
 				"title": "Starte jetzt die Prüfung",
 				"description": "Die Prüfung dauert nur wenige Minuten. Du kannst direkt starten und brauchst noch kein Konto."
 			}
 		},
-		"cta": "Jetzt Schnelltest starten"
+		"cta": "Jetzt Anspruch prüfen"
 	},
 	"questions": {
 		"nationality": {
