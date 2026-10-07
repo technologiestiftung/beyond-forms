@@ -165,7 +165,7 @@ export class MockProfileService implements IProfileService {
 		if (section === "documents") {
 			updatedProfile = {
 				...currentProfile,
-				documents: payloadData as unknown as Profile["documents"],
+				documents: data as unknown as Profile["documents"],
 			};
 		} else {
 			updatedProfile = {

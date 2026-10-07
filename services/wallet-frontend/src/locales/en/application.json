@@ -4,6 +4,11 @@
 			"incomplete": "Incomplete",
 			"advanced": "Advanced",
 			"ready": "Ready"
+		},
+		"status": {
+			"started": "Started",
+			"missing": "Something missing",
+			"complete": "Complete"
 		}
 	},
 	"overview": {
