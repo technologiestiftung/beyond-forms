@@ -23,12 +23,14 @@ const completed: Partial<EligibilityCheck> = {
 	monthlyWarmRent: 600,
 	assetsBand: AssetsBand.FROM_5000_TO_10000,
 	receivesBenefits: Binary.NO,
-	citizenship: Citizenship.DE_EU,
+	citizenship: Citizenship.EU,
 };
 
 const baseline = {
 	date_of_birth: "1990-05-01",
 	is_resident_in_germany: true,
+	is_german_citizen: false,
+	nationality: "EU",
 	ability_to_work: "Fully able",
 	has_assets: false,
 };
@@ -62,8 +64,21 @@ describe("applicationService: Guest Data Sync", () => {
 	});
 
 	describe("mapEligibilityToProfilePayload", () => {
-		it("does not guess German citizenship from DE/EU", () => {
+		it("maps an EU citizen without guessing a residence status", () => {
 			expect(mapEligibilityToProfilePayload(completed)).toEqual(baseline);
+		});
+
+		it("maps German citizenship", () => {
+			const payload = mapEligibilityToProfilePayload({
+				...completed,
+				citizenship: Citizenship.GERMAN,
+			});
+			expect(payload).toEqual({
+				...baseline,
+				is_german_citizen: true,
+				nationality: "DE",
+				residence_status: "Citizen",
+			});
 		});
 
 		it("maps a non-EU citizen with a secure residence permit", () => {
@@ -74,7 +89,7 @@ describe("applicationService: Guest Data Sync", () => {
 			});
 			expect(payload).toEqual({
 				...baseline,
-				is_german_citizen: false,
+				nationality: undefined,
 				residence_status: "Other",
 			});
 		});
@@ -101,6 +116,8 @@ describe("applicationService: Guest Data Sync", () => {
 				date_of_birth: "1950-01-01",
 				is_resident_in_germany: true,
 				has_assets: false,
+				is_german_citizen: false,
+				nationality: "EU",
 			});
 		});
 

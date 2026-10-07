@@ -59,14 +59,16 @@ export const AssetsBandSchema = z.enum([
 ]);
 
 export const Citizenship = {
-	DE_EU: "DE_EU",
+	GERMAN: "GERMAN",
+	EU: "EU",
 	NON_EU: "NON_EU",
 } as const;
 
 export type Citizenship = (typeof Citizenship)[keyof typeof Citizenship];
 
 export const CitizenshipSchema = z.enum([
-	Citizenship.DE_EU,
+	Citizenship.GERMAN,
+	Citizenship.EU,
 	Citizenship.NON_EU,
 ]);
 
@@ -127,7 +129,9 @@ export const EligibilityCheckSchema = z.object({
 	monthlyWarmRent: EuroAmountSchema.describe("Monthly warm rent"),
 	assetsBand: AssetsBandSchema.describe("Savings"),
 	receivesBenefits: BinarySchema.describe("Already receiving a benefit?"),
-	citizenship: CitizenshipSchema.describe("German or EU citizenship?"),
+	citizenship: CitizenshipSchema.describe(
+		"German, other EU or non-EU citizenship",
+	),
 	hasSecureResidenceStatus: BinarySchema.describe("Secure residence permit?"),
 });
 

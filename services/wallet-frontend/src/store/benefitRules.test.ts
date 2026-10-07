@@ -29,7 +29,7 @@ const base: Partial<EligibilityCheck> = {
 	monthlyWarmRent: 600,
 	assetsBand: AssetsBand.UNDER_5000,
 	receivesBenefits: Binary.NO,
-	citizenship: Citizenship.DE_EU,
+	citizenship: Citizenship.GERMAN,
 };
 
 const pensioner: Partial<EligibilityCheck> = {

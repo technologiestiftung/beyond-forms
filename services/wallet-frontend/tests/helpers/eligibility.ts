@@ -39,6 +39,6 @@ export async function completePensionerCheck(
 	await answerNumber(page, 600);
 	await answerChoice(page, "under_5000");
 	await answerChoice(page, "no");
-	await answerChoice(page, "de_eu");
+	await answerChoice(page, "german");
 	await expect(page).toHaveURL(/\/eligibility-check\/result/);
 }

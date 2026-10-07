@@ -158,11 +158,12 @@
 		},
 		"citizenship": {
 			"category": "Staatsangehörigkeit",
-			"title": "Hast Du die deutsche Staatsangehörigkeit oder die eines EU-Landes?",
+			"title": "Welche Staatsangehörigkeit hast Du?",
 			"tip": "Je nach Staatsangehörigkeit und Aufenthaltsstatus gelten unterschiedliche Gesetze.",
 			"options": {
-				"DE_EU": "Ja, deutsch oder aus einem EU-Land.",
-				"NON_EU": "Nein, aus einem anderen Land."
+				"GERMAN": "Deutsch.",
+				"EU": "Aus einem anderen EU-Land.",
+				"NON_EU": "Aus einem Land außerhalb der EU."
 			}
 		},
 		"hasSecureResidenceStatus": {

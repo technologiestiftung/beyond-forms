@@ -158,11 +158,12 @@
 		},
 		"citizenship": {
 			"category": "Citizenship",
-			"title": "Do you have German citizenship or that of an EU country?",
+			"title": "What is your citizenship?",
 			"tip": "Different laws apply depending on citizenship and residence status.",
 			"options": {
-				"DE_EU": "Yes, German or from an EU country.",
-				"NON_EU": "No, from another country."
+				"GERMAN": "German.",
+				"EU": "From another EU country.",
+				"NON_EU": "From a country outside the EU."
 			}
 		},
 		"hasSecureResidenceStatus": {

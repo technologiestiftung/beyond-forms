@@ -140,9 +140,9 @@ const GRAPH: Record<NodeId, FlowNode> = {
 		id: "citizenship",
 		type: "multi-choice",
 		key: "citizenship",
-		options: [Citizenship.DE_EU, Citizenship.NON_EU],
+		options: [Citizenship.GERMAN, Citizenship.EU, Citizenship.NON_EU],
 		next: (a) =>
-			a.citizenship === Citizenship.DE_EU
+			a.citizenship === Citizenship.GERMAN || a.citizenship === Citizenship.EU
 				? "result_eligible"
 				: "residence-status",
 	},

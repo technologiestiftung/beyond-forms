@@ -44,6 +44,17 @@ export const mapEligibilityToProfilePayload = (
 		payload.is_resident_in_germany = answers.livesInGermany === Binary.YES;
 	}
 
+	if (answers.citizenship === Citizenship.GERMAN) {
+		payload.is_german_citizen = true;
+		payload.nationality = "DE";
+		payload.residence_status = "Citizen";
+	}
+
+	if (answers.citizenship === Citizenship.EU) {
+		payload.is_german_citizen = false;
+		payload.nationality = "EU";
+	}
+
 	if (answers.citizenship === Citizenship.NON_EU) {
 		payload.is_german_citizen = false;
 		if (answers.hasSecureResidenceStatus === Binary.YES) {
