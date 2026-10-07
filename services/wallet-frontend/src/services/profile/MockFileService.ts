@@ -18,7 +18,7 @@ export class MockFileService {
 
 		if (stored) {
 			const profile = JSON.parse(stored);
-			return Array.isArray(profile.documents) ? profile.documents : [];
+			return profile.documents || [];
 		}
 		return [];
 	}
