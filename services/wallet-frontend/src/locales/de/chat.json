@@ -22,5 +22,37 @@
 		"quick_action1": "Kann ich Grundsicherung bekommen?",
 		"quick_action2": "Welche Unterlagen brauche ich?",
 		"quick_action3": "Wie stelle ich einen Antrag?"
+	},
+	"guided": {
+		"consent": {
+			"title": "Lass uns prüfen, welche Unterstützung zu Dir passt",
+			"goal_label": "Ziel",
+			"goal": "Eine erste Einschätzung, welche Leistungen für Dich infrage kommen.",
+			"scope_label": "Umfang",
+			"scope": "Etwa 10 kurze Fragen, ungefähr 3 Minuten. Du kannst zwischendurch jederzeit frei schreiben.",
+			"privacy_label": "Deine Daten",
+			"privacy": "Deine Antworten auf den Karten bleiben auf Deinem Gerät.",
+			"start": "Los geht's",
+			"later": "Später"
+		},
+		"why": "Warum wir fragen",
+		"unsure": "Weiß ich nicht genau",
+		"unsure_message": "Das weiß ich nicht genau.",
+		"next": "Weiter",
+		"provisional": "vorläufig",
+		"noted": "Notiert (vorläufig) – {{label}}: {{value}}",
+		"confirm": {
+			"title": "Stimmt das so?",
+			"description": "Diese Angaben habe ich aus unserem Gespräch übernommen. Bitte prüfe sie kurz.",
+			"ok": "Stimmt so",
+			"change": "Lieber einzeln beantworten"
+		},
+		"result": {
+			"details": "Ausführliches Ergebnis ansehen"
+		},
+		"children": {
+			"label": "Kind {{index}}",
+			"add": "Weiteres Kind hinzufügen"
+		}
 	}
 }
