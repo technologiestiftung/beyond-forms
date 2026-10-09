@@ -134,6 +134,7 @@ const OpenQuestion: React.FC<{
 				</p>
 			</div>
 			{renderInput()}
+			<OwnAnswerInput onSubmit={(text) => void sendMessage(text)} />
 			<ChipButton
 				className="w-fit"
 				onClick={() => void sendMessage(tChat("guided.unsure_message"))}
@@ -141,6 +142,38 @@ const OpenQuestion: React.FC<{
 				{tChat("guided.unsure")}
 			</ChipButton>
 		</ChatCard>
+	);
+};
+
+/** Free text goes to the assistant, which may record it as a provisional answer. */
+const OwnAnswerInput: React.FC<{ onSubmit: (text: string) => void }> = ({
+	onSubmit,
+}) => {
+	const { t } = useTranslation("chat");
+	const [draft, setDraft] = useState("");
+
+	return (
+		<form
+			className="flex items-center gap-2"
+			onSubmit={(e) => {
+				e.preventDefault();
+				if (draft.trim()) {
+					onSubmit(draft);
+				}
+			}}
+		>
+			<input
+				type="text"
+				autoComplete="off"
+				placeholder={t("guided.own_answer")}
+				aria-label={t("guided.own_answer")}
+				data-testid="guided-own-answer"
+				value={draft}
+				onChange={(e) => setDraft(e.target.value)}
+				className={inputClassName}
+			/>
+			<SendButton disabled={!draft.trim()} />
+		</form>
 	);
 };
 

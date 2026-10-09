@@ -39,6 +39,7 @@
 		"unsure": "Weiß ich nicht genau",
 		"unsure_message": "Das weiß ich nicht genau.",
 		"send": "Antwort senden",
+		"own_answer": "Eigene Angabe",
 		"provisional": "vorläufig",
 		"noted": "Notiert (vorläufig) – {{label}}: {{value}}",
 		"confirm": {

@@ -39,6 +39,7 @@
 		"unsure": "I'm not sure",
 		"unsure_message": "I'm not sure about that.",
 		"send": "Send answer",
+		"own_answer": "Your own answer",
 		"provisional": "provisional",
 		"noted": "Noted (provisional) – {{label}}: {{value}}",
 		"confirm": {
