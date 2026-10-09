@@ -18,9 +18,42 @@
 	},
 	"welcome": {
 		"heading": "Hello, I'm Klaro",
-		"description": "I can help with questions about basic security benefits, applications, documents, and next steps.",
-		"quick_action1": "Can I receive basic security benefits?",
+		"description": "I can help with questions about social benefits, applications, documents, and next steps.",
+		"quick_action1": "What support can I get?",
 		"quick_action2": "What documents do I need?",
 		"quick_action3": "How do I submit an application?"
+	},
+	"guided": {
+		"consent": {
+			"title": "Let's find out which support fits you",
+			"goal_label": "Goal",
+			"goal": "A first assessment of which benefits may apply to you.",
+			"scope_label": "Scope",
+			"scope": "About 10 short questions, roughly 3 minutes. You can write freely at any point.",
+			"privacy_label": "Your data",
+			"privacy": "Your answers on the cards stay on your device.",
+			"start": "Let's start",
+			"later": "Later"
+		},
+		"why": "Why we ask",
+		"unsure": "I'm not sure",
+		"unsure_message": "I'm not sure about that.",
+		"send": "Send answer",
+		"own_answer": "Your own answer",
+		"provisional": "provisional",
+		"noted": "Noted (provisional) – {{label}}: {{value}}",
+		"confirm": {
+			"title": "Is this correct?",
+			"description": "I took these details from our conversation. Please check them briefly.",
+			"ok": "That's correct",
+			"change": "Answer one by one instead"
+		},
+		"result": {
+			"details": "See the detailed result"
+		},
+		"children": {
+			"label": "Child",
+			"add": "Add another child"
+		}
 	}
 }
