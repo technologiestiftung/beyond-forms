@@ -18,8 +18,8 @@
 	},
 	"welcome": {
 		"heading": "Hallo, ich bin Klaro",
-		"description": "Ich helfe Dir bei Fragen zu Grundsicherung, Anträgen, Dokumenten und den nächsten Schritten.",
-		"quick_action1": "Kann ich Grundsicherung bekommen?",
+		"description": "Ich helfe Dir bei Fragen zu Sozialleistungen, Anträgen, Dokumenten und den nächsten Schritten.",
+		"quick_action1": "Welche Unterstützung kann ich bekommen?",
 		"quick_action2": "Welche Unterlagen brauche ich?",
 		"quick_action3": "Wie stelle ich einen Antrag?"
 	},

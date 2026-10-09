@@ -7,7 +7,8 @@ const MOCK_REPLIES = [
 	"Ich bin eine Demo-Antwort. Sobald das Backend verbunden ist, ersetzt diese Nachricht die echte KI-Antwort.",
 ];
 
-const ELIGIBILITY_INTENT = /anspruch|bekommen|leistung|entitled|eligib/i;
+const ELIGIBILITY_INTENT =
+	/anspruch|bekommen|leistung|unterstützung|entitled|eligib|support/i;
 
 /**
  * Local mock: returns a canned assistant reply as a single synchronous response.
