@@ -134,7 +134,9 @@ const OpenQuestion: React.FC<{
 				</p>
 			</div>
 			{renderInput()}
-			<OwnAnswerInput onSubmit={(text) => void sendMessage(text)} />
+			{hasOwnInputField(node) || (
+				<OwnAnswerInput onSubmit={(text) => void sendMessage(text)} />
+			)}
 			<ChipButton
 				className="w-fit"
 				onClick={() => void sendMessage(tChat("guided.unsure_message"))}
@@ -144,6 +146,10 @@ const OpenQuestion: React.FC<{
 		</ChatCard>
 	);
 };
+
+/** Number, date and children questions already take free input; only choice questions need an own-answer field. */
+const hasOwnInputField = (node: FlowNode) =>
+	node.type === "number" || node.type === "date" || node.type === "children";
 
 /** Free text goes to the assistant, which may record it as a provisional answer. */
 const OwnAnswerInput: React.FC<{ onSubmit: (text: string) => void }> = ({
