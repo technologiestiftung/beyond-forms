@@ -1,8 +1,10 @@
+import json
 from typing import Any
 
 from pydantic import BaseModel
 
 from src.a2ui import consent_surface
+from src.generated_views import build_view, catalog_prompt
 
 ELIGIBILITY_FIELDS: dict[str, str] = {
     "householdComposition": "SINGLE, SINGLE_PARENT, COUPLE_NO_CHILDREN or COUPLE_WITH_CHILDREN",
@@ -50,10 +52,40 @@ def record_eligibility_answer(locale: str, field: str, value: str) -> UiToolResu
     )
 
 
+def show_view(locale: str, components_json: str) -> UiToolResult:
+    view = build_view(components_json)
+    if view.errors:
+        return UiToolResult(
+            result={
+                "error": "view rejected",
+                "errors": view.errors,
+                "instruction": "Fix these problems and call show_view again.",
+            }
+        )
+    return UiToolResult(
+        a2ui_messages=view.a2ui_messages,
+        result={
+            "status": "view shown",
+            "instruction": "The user sees the view below your message. Add at most one short sentence, do not repeat its content.",
+        },
+    )
+
+
 UI_TOOL_HANDLERS = {
     "start_eligibility_check": start_eligibility_check,
     "record_eligibility_answer": record_eligibility_answer,
+    "show_view": show_view,
 }
+
+SHOW_VIEW_EXAMPLE = json.dumps(
+    [
+        {"id": "root", "component": "Card", "child": "content"},
+        {"id": "content", "component": "Column", "children": ["title", "list"]},
+        {"id": "title", "component": "Text", "variant": "title", "text": "Unterlagen für Wohngeld"},
+        {"id": "list", "component": "Checklist", "items": [{"label": "Mietvertrag", "hint": "mit aktueller Miethöhe"}]},
+    ],
+    ensure_ascii=False,
+)
 
 UI_TOOLS = [
     {
@@ -82,6 +114,28 @@ UI_TOOLS = [
                     },
                 },
                 "required": ["field", "value"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "show_view",
+            "description": "Shows the user a card you compose yourself, for content that reads better as structure than as text: \
+            a checklist of documents, a comparison table, steps, or follow-up questions as buttons. \
+            Never use it for the eligibility check questions, the app asks those itself. \
+            Write the user-facing texts in the user's language and in plain words.\n"
+            'The view is a flat list of components; containers refer to their children by id and one component has the id "root". \
+            Only these components and props exist:\n' + catalog_prompt() + "\nExample: " + SHOW_VIEW_EXAMPLE,
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "components_json": {
+                        "type": "string",
+                        "description": "The components as a JSON array, like the example.",
+                    },
+                },
+                "required": ["components_json"],
             },
         },
     },

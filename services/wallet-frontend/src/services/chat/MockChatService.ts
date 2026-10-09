@@ -11,6 +11,69 @@ const MOCK_REPLIES = [
 const ELIGIBILITY_INTENT =
 	/anspruch|bekommen|leistung|unterstützung|entitled|eligib|support/i;
 
+const DOCUMENTS_INTENT = /unterlagen|dokumente|documents/i;
+
+/** A view as the model might compose it with the backend's `show_view` tool. */
+const documentsView = (): A2uiMessage[] =>
+	newSurface("generated-view", [
+		{ id: "root", component: "Card", child: "content" },
+		{
+			id: "content",
+			component: "Column",
+			children: ["title", "intro", "list", "compare", "next"],
+		},
+		{
+			id: "title",
+			component: "Text",
+			variant: "title",
+			text: "Diese Unterlagen brauchst Du meistens",
+		},
+		{
+			id: "intro",
+			component: "Text",
+			variant: "muted",
+			text: "Hake ab, was Du schon hast. Die genaue Liste hängt von der Leistung ab.",
+		},
+		{
+			id: "list",
+			component: "Checklist",
+			items: [
+				{ label: "Personalausweis oder Pass" },
+				{ label: "Mietvertrag", hint: "mit aktueller Miethöhe" },
+				{ label: "Kontoauszüge", hint: "der letzten drei Monate" },
+				{
+					label: "Nachweise über Einkommen",
+					hint: "z. B. Lohnabrechnung, Rentenbescheid",
+				},
+			],
+		},
+		{
+			id: "compare",
+			component: "Table",
+			columns: ["Unterlage", "Wohngeld", "Grundsicherungsgeld"],
+			rows: [
+				["Mietvertrag", "ja", "ja"],
+				["Kontoauszüge", "manchmal", "ja"],
+				["Nachweis über Vermögen", "nein", "ja"],
+			],
+		},
+		{ id: "next", component: "Row", children: ["ask-office", "ask-upload"] },
+		{
+			id: "ask-office",
+			component: "Chip",
+			label: "Wo gebe ich das ab?",
+			action: event("send_text", { text: "Wo gebe ich die Unterlagen ab?" }),
+		},
+		{
+			id: "ask-upload",
+			component: "Chip",
+			label: "Kann ich das hochladen?",
+			action: event("send_text", {
+				text: "Kann ich die Unterlagen hochladen?",
+			}),
+		},
+	]);
+
 /** The consent card as the backend's `start_eligibility_check` tool sends it. */
 const consentSurface = (): A2uiMessage[] => {
 	const t = (key: string) => i18n.t(`guided.consent.${key}`, { ns: "chat" });
@@ -80,6 +143,13 @@ export class MockChatService implements IChatService {
 		if (guidedCheck?.currentField && amount) {
 			onEligibilityAnswer?.({ field: guidedCheck.currentField, value: amount });
 			onResponse("Danke, das habe ich mir vorläufig notiert.");
+			onDone();
+			return;
+		}
+
+		if (DOCUMENTS_INTENT.test(content)) {
+			onResponse("Hier eine Übersicht, die Du abhaken kannst.");
+			documentsView().forEach((message) => onA2ui?.(message));
 			onDone();
 			return;
 		}
