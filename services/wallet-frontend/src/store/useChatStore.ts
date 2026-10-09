@@ -4,18 +4,30 @@ import { createZustandStorage } from "../utils/storage";
 import { chatService } from "../services/chat";
 import { useAuthStore } from "./useAuthStore";
 import { queryClient } from "../config/queryClient";
+import { ChatUiComponent, type ChatUi } from "../schemas/chat.schema";
+import { useGuidedCheckStore } from "./useGuidedCheckStore";
+import {
+	chatUiFromServer,
+	currentGuidedField,
+	nextGuidedStep,
+} from "./guidedCheck";
 
-export type ChatMessage = {
-	id: string;
-	role: "user" | "assistant";
-	content: string;
-};
+export type ChatMessage =
+	| {
+			id: string;
+			role: "user" | "assistant";
+			content: string;
+	  }
+	| ({ id: string; role: "ui" } & ChatUi);
 
 interface ChatState {
 	messages: ChatMessage[];
 	isLoading: boolean;
 	error: string | null;
 	sendMessage: (text: string) => Promise<void>;
+	appendUi: (ui: ChatUi) => void;
+	markUiAnswered: (id: string) => void;
+	showNextGuidedStep: () => void;
 	newChat: () => Promise<void>;
 	clearError: () => void;
 	reset: () => void;
@@ -52,6 +64,15 @@ export const useChatStore = create<ChatState>()(
 				try {
 					await chatService.sendMessage({
 						content: trimmed,
+						guidedCheck: useGuidedCheckStore.getState().isActive
+							? { currentField: currentGuidedField() }
+							: undefined,
+						onUi: (event) => {
+							const ui = chatUiFromServer(event);
+							if (ui) {
+								get().appendUi(ui);
+							}
+						},
 						onResponse: (response) => {
 							set((s) => ({
 								messages: s.messages.map((m) =>
@@ -69,6 +90,9 @@ export const useChatStore = create<ChatState>()(
 										m.content.length > 0,
 								),
 							}));
+							if (useGuidedCheckStore.getState().isActive) {
+								get().showNextGuidedStep();
+							}
 							void queryClient.invalidateQueries({ queryKey: ["profile"] });
 						},
 						onError: (message) => {
@@ -88,10 +112,36 @@ export const useChatStore = create<ChatState>()(
 				}
 			},
 
+			appendUi: (ui) =>
+				set((s) => ({
+					messages: [
+						...s.messages,
+						{ id: crypto.randomUUID(), role: "ui" as const, ...ui },
+					],
+				})),
+
+			markUiAnswered: (id) =>
+				set((s) => ({
+					messages: s.messages.map((m) =>
+						m.id === id && m.role === "ui"
+							? { ...m, props: { ...m.props, answered: true } }
+							: m,
+					),
+				})),
+
+			showNextGuidedStep: () => {
+				const step = nextGuidedStep();
+				if (step.component === ChatUiComponent.ELIGIBILITY_RESULT) {
+					useGuidedCheckStore.getState().finish();
+				}
+				get().appendUi(step);
+			},
+
 			clearError: () => set({ error: null }),
 
 			newChat: async () => {
 				set({ messages: [], isLoading: true, error: null });
+				useGuidedCheckStore.getState().reset();
 				try {
 					await chatService.newChat();
 					set({ isLoading: false, error: null });
