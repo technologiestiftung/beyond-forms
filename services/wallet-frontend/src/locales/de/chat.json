@@ -38,7 +38,7 @@
 		"why": "Warum wir fragen",
 		"unsure": "Weiß ich nicht genau",
 		"unsure_message": "Das weiß ich nicht genau.",
-		"next": "Weiter",
+		"send": "Antwort senden",
 		"provisional": "vorläufig",
 		"noted": "Notiert (vorläufig) – {{label}}: {{value}}",
 		"confirm": {

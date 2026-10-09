@@ -15,6 +15,7 @@ import {
 	EligibilityCheckSchema,
 	type EligibilityCheck,
 } from "../../../schemas/eligibility.schema";
+import * as Icons from "../../ui/Icons";
 import { ChatCard, ChipButton } from "./ChatCard";
 import { useAnswerLabel } from "./useAnswerLabel";
 
@@ -167,17 +168,18 @@ const ChoiceInput: React.FC<{
 	);
 };
 
-const NextButton: React.FC<{ disabled: boolean }> = ({ disabled }) => {
+const SendButton: React.FC<{ disabled: boolean }> = ({ disabled }) => {
 	const { t } = useTranslation("chat");
 	return (
-		<ChipButton
+		<button
 			type="submit"
-			variant="solid"
 			disabled={disabled}
-			className="w-fit"
+			aria-label={t("guided.send")}
+			data-testid="guided-send"
+			className="size-11 shrink-0 flex items-center justify-center rounded-full bg-primary-blue-500 text-white transition-colors cursor-pointer hover:bg-primary-blue-500/90 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-blue-500"
 		>
-			{t("guided.next")}
-		</ChipButton>
+			<Icons.SendIcon className="size-5" />
+		</button>
 	);
 };
 
@@ -193,7 +195,7 @@ const NumberInput: React.FC<{ field: Field; onSubmit: SubmitAnswer }> = ({
 
 	return (
 		<form
-			className="flex flex-col gap-3"
+			className="flex items-center gap-2"
 			onSubmit={(e) => {
 				e.preventDefault();
 				if (parsed.success) {
@@ -201,7 +203,7 @@ const NumberInput: React.FC<{ field: Field; onSubmit: SubmitAnswer }> = ({
 				}
 			}}
 		>
-			<div className="relative max-w-60">
+			<div className="relative w-full max-w-60">
 				<input
 					type="text"
 					inputMode="numeric"
@@ -219,7 +221,7 @@ const NumberInput: React.FC<{ field: Field; onSubmit: SubmitAnswer }> = ({
 					€
 				</span>
 			</div>
-			<NextButton disabled={!parsed.success} />
+			<SendButton disabled={!parsed.success} />
 		</form>
 	);
 };
@@ -234,7 +236,7 @@ const DateInput: React.FC<{ field: Field; onSubmit: SubmitAnswer }> = ({
 
 	return (
 		<form
-			className="flex flex-col gap-3"
+			className="flex items-center gap-2"
 			onSubmit={(e) => {
 				e.preventDefault();
 				if (parsed.success) {
@@ -249,7 +251,7 @@ const DateInput: React.FC<{ field: Field; onSubmit: SubmitAnswer }> = ({
 				onChange={(e) => setDraft(e.target.value)}
 				className={`${inputClassName} max-w-60`}
 			/>
-			<NextButton disabled={!parsed.success} />
+			<SendButton disabled={!parsed.success} />
 		</form>
 	);
 };
@@ -289,14 +291,16 @@ const ChildrenInput: React.FC<{ onSubmit: SubmitAnswer }> = ({ onSubmit }) => {
 					/>
 				</label>
 			))}
-			<button
-				type="button"
-				onClick={() => setDates((current) => [...current, ""])}
-				className="w-fit text-[14px] text-primary-blue-400 underline cursor-pointer"
-			>
-				{t("guided.children.add")}
-			</button>
-			<NextButton disabled={!parsed.success} />
+			<div className="flex items-center justify-between gap-2 max-w-73">
+				<button
+					type="button"
+					onClick={() => setDates((current) => [...current, ""])}
+					className="w-fit text-[14px] text-primary-blue-400 underline cursor-pointer"
+				>
+					{t("guided.children.add")}
+				</button>
+				<SendButton disabled={!parsed.success} />
+			</div>
 		</form>
 	);
 };
