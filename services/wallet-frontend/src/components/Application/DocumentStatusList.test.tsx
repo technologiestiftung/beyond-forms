@@ -75,33 +75,15 @@ describe("DocumentStatusList", () => {
 		expect(row).not.toHaveTextContent("Hinzufügen");
 	});
 
-	it("displays required checklist slots for application wizard (WIZARD origin)", () => {
+	it("displays no required checklist slots for application wizard (WIZARD origin)", () => {
 		render(
 			<MemoryRouter>
 				<DocumentStatusList documents={mockDocs} origin={Origins.WIZARD} />
 			</MemoryRouter>,
 		);
 
-		// Helmut Klar (MVP) application expected document slots
-		expect(screen.getByTestId("slot-title-id_card")).toBeInTheDocument();
-		expect(
-			screen.getByTestId("slot-title-health_insurance"),
-		).toBeInTheDocument();
-		expect(screen.getByTestId("slot-title-pension_notice")).toBeInTheDocument();
-		expect(screen.getByTestId("slot-title-stmt3")).toBeInTheDocument();
-		expect(screen.getByTestId("slot-title-rent")).toBeInTheDocument();
-		expect(screen.getByTestId("slot-title-heating")).toBeInTheDocument();
-
-		// Non-targeted slots must NOT be displayed in the wizard
-		expect(
-			screen.queryByTestId("slot-title-registration"),
-		).not.toBeInTheDocument();
-		expect(
-			screen.queryByTestId("slot-title-utility_bill"),
-		).not.toBeInTheDocument();
-		expect(
-			screen.queryByTestId("slot-title-cooperation_agreement"),
-		).not.toBeInTheDocument();
+		expect(screen.queryByTestId("slot-title-id_card")).not.toBeInTheDocument();
+		expect(screen.queryByTestId("slot-title-rent")).not.toBeInTheDocument();
 	});
 
 	it("correctly identifies and matches uploaded documents by type to avoid unsorted category", () => {
@@ -150,14 +132,22 @@ describe("DocumentStatusList", () => {
 		};
 		const { rerender } = render(
 			<MemoryRouter>
-				<DocumentStatusList documents={[sampleDoc]} showDelete={false} />
+				<DocumentStatusList
+					documents={[sampleDoc]}
+					origin={Origins.HUB}
+					showDelete={false}
+				/>
 			</MemoryRouter>,
 		);
 		expect(screen.queryByTestId("delete-btn-doc-123")).not.toBeInTheDocument();
 
 		rerender(
 			<MemoryRouter>
-				<DocumentStatusList documents={[sampleDoc]} showDelete={true} />
+				<DocumentStatusList
+					documents={[sampleDoc]}
+					origin={Origins.HUB}
+					showDelete={true}
+				/>
 			</MemoryRouter>,
 		);
 		expect(screen.getByTestId("delete-btn-doc-123")).toBeInTheDocument();
@@ -176,6 +166,7 @@ describe("DocumentStatusList", () => {
 			<MemoryRouter>
 				<DocumentStatusList
 					documents={[processingDoc]}
+					origin={Origins.HUB}
 					showUnassigned={true}
 					slotIds={[]}
 				/>
@@ -225,6 +216,7 @@ describe("DocumentStatusList", () => {
 			<MemoryRouter>
 				<DocumentStatusList
 					documents={mockFileList}
+					origin={Origins.HUB}
 					showUnassigned={true}
 					slotIds={[]}
 				/>
@@ -252,7 +244,10 @@ describe("DocumentStatusList", () => {
 
 		render(
 			<MemoryRouter>
-				<DocumentStatusList documents={[processingSlotDoc]} />
+				<DocumentStatusList
+					documents={[processingSlotDoc]}
+					origin={Origins.HUB}
+				/>
 			</MemoryRouter>,
 		);
 

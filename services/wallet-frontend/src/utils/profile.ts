@@ -3,7 +3,6 @@ import type { TFunction } from "i18next";
 import type { Profile, WalletDocument } from "../schemas/profile.schema";
 import {
 	MVP_SKIPPED_CATEGORIES,
-	REQUIRED_DOCUMENT_SLOTS,
 	type RequiredDocumentSlot,
 } from "../config/applicationConfig";
 import { AppRoutes } from "../constants/routes";
@@ -115,10 +114,7 @@ const getHouseholdStats = (
 	) {
 		answered++;
 	}
-	if (
-		profile.personalData?.displacedStatus !== undefined &&
-		profile.personalData?.displacedStatus !== null
-	) {
+	if (profile.personalData?.displacedStatus !== undefined) {
 		answered++;
 	}
 	if (
@@ -631,34 +627,10 @@ export const getMappedInformationSections = (
 	];
 };
 
+// Required documents are switched off for now; progress counts questionnaire sections only.
 export const getActiveDocumentSlots = (
-	profile: Partial<Profile>,
-): RequiredDocumentSlot[] => {
-	const baseIds = ["id_card", "health_insurance", "pension_notice", "stmt3"];
-
-	if (profile.health?.hasInpatientFacilityAccommodation !== true) {
-		baseIds.push("rent", "heating");
-	}
-
-	if (profile.health?.isCareDependent === true) {
-		baseIds.push("care_level_notice");
-	}
-
-	if (profile.health?.hasInpatientFacilityAccommodation === true) {
-		baseIds.push("care_home_contract", "care_facility_costs");
-	} else if (profile.health?.isCareDependent === true) {
-		baseIds.push("care_service_invoice");
-	}
-
-	if (
-		profile.health?.abilityToWork === "Permanently disabled" ||
-		profile.health?.abilityToWork === "Temporarily disabled"
-	) {
-		baseIds.push("disability_id");
-	}
-
-	return REQUIRED_DOCUMENT_SLOTS.filter((slot) => baseIds.includes(slot.id));
-};
+	_profile: Partial<Profile>,
+): RequiredDocumentSlot[] => [];
 
 /**
  * Computes the 3-tier progress signal (Level 0 to Level 3) based on exact mathematical ratios

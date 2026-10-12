@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { UserPlus } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useEligibilityStore } from "../../store/useEligibilityStore";
 import type { OTP, PhoneNumber } from "../../schemas/auth.schema";
-import { DEMO_PERSONAS, generateOwnDramaNumber } from "../../config/demoPersonas";
+import {
+	DEMO_PERSONAS,
+	generateOwnDramaNumber,
+} from "../../config/demoPersonas";
 import { env } from "../../config/env.config";
 import { getMockProfileStorageKey } from "../../utils/profile";
 
@@ -41,7 +45,10 @@ export const PersonaPicker: React.FC<PersonaPickerProps> = ({
 		}
 	};
 
-	const handlePersonaClick = async (persona: (typeof DEMO_PERSONAS)[number]) => {
+	const handlePersonaClick = async (
+		persona: (typeof DEMO_PERSONAS)[number],
+	) => {
+		useEligibilityStore.getState().setAnswers(persona.eligibilityAnswers);
 		if (env.VITE_USE_MOCK_AUTH) {
 			localStorage.setItem(
 				getMockProfileStorageKey(persona.phoneNumber),

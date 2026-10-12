@@ -15,6 +15,7 @@ interface EligibilityState {
 		key: K,
 		value: EligibilityCheck[K],
 	) => void;
+	setAnswers: (answers: Partial<EligibilityCheck>) => void;
 	clearAnswer: <K extends keyof EligibilityCheck>(key: K) => void;
 	resetForm: () => void;
 	clearError: () => void;
@@ -54,6 +55,8 @@ export const useEligibilityStore = create<EligibilityState>()(
 					const nextAnswers = { ...get().answers, [key]: value };
 					applyAnswers(nextAnswers);
 				},
+
+				setAnswers: (answers) => applyAnswers(answers),
 
 				clearAnswer: (key) => {
 					const { [key]: _removed, ...rest } = get().answers;
