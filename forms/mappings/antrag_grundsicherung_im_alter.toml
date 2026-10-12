@@ -734,6 +734,7 @@ description = "Personenziffer 2 Kunden-Nr. der Agentur für Arbeit (falls vorhan
 value = "{{ partner && partner.employment_office_customer_number ? partner.employment_office_customer_number : '' }}"
 
 ["p3_personenziffer_1_mögliche_ausschlussgründe_für_die_grundsicherung"]
+optional = true
 type = "radio"
 description = "Personenziffer 1 Mögliche Ausschlussgründe für die Grundsicherung"
 options = [
@@ -745,6 +746,7 @@ option_labels = { "Nein" = "Nein Nein", "Ja" = "Ja Ja" }
 value = ""
 
 ["p3_personenziffer_2_mögliche_ausschlussgründe_für_die_grundsicherung"]
+optional = true
 type = "radio"
 description = "Personenziffer 2 Mögliche Ausschlussgründe für die Grundsicherung"
 options = [
@@ -2204,6 +2206,7 @@ description = "Personenziffer 2, Sonstiges Vermögen "
 value = "{{ partner && partner.assets['Other Assets'] ? partner.assets['Other Assets'] : '' }}"
 
 ["p8_sonstige_angaben"]
+optional = true
 type = "string"
 description = "Sonstige Angaben"
 value = ""
@@ -2294,16 +2297,19 @@ description = "6 - Mietschulden"
 value = "{{ rent_arrears_amount ? true : false }}"
 
 ["p9_weitere_anlage"]
+optional = true
 type = "checkbox"
 description = "weitere Anlage"
 value = ""
 
 ["p9_name_der_weiteren_anlage"]
+optional = true
 type = "string"
 description = "Name der weiteren Anlage"
 value = ""
 
 ["p9_beigefügte_unterlagen"]
+optional = true
 type = "string"
 description = "Beigefügte Unterlagen"
 value = ""

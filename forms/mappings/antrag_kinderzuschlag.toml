@@ -32,6 +32,7 @@ description = "Gegebenenfalls abweichender Geburtsname der antragstellenden Pers
 value = "{{ birth_name ? birth_name : '' }}"
 
 ["p2_formular1[0].seite-1[0].frage-1[0].titel-kgb[0]"]
+optional = true
 type = "string"
 description = "Titel der antragstellenden Person."
 value = ""
@@ -177,176 +178,211 @@ description = "Geburtsdatum des Kinder, für das Kinderzuschlag beantragt wird."
 value = "{{ household_children[5] && household_children[5].date_of_birth ? household_children[5].date_of_birth : '' }}"
 
 ["p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile1[0].zelle1[0]"]
+optional = true
 type = "string"
 description = "Vorname des Kindes, das sich nicht ständig in meinem Haushalt aufhält."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile1[0].zelle3[0]"]
+optional = true
 type = "string"
 description = "Grund und Dauer der Abwesenheit des Kindes."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile2[0].zelle1[0]"]
+optional = true
 type = "string"
 description = "Vorname des Kindes, das sich nicht ständig in meinem Haushalt aufhält."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile2[0].zelle1[1]"]
+optional = true
 type = "string"
 description = "Name und Vorname des Kinder, für das Kinderzuschlag beantragt wird."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile3[0].zelle1[0]"]
+optional = true
 type = "string"
 description = "Vorname des Kindes, das sich nicht ständig in meinem Haushalt aufhält."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile3[0].zelle3[0]"]
+optional = true
 type = "string"
 description = "Grund und Dauer der Abwesenheit des Kindes."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile1[0].zelle1[0]"]
+optional = true
 type = "string"
 description = "Name und Vorname des Kindes, das sich zeitweise in meinem Haushalt aufhält für das kein Kindergeld bezogen wird."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile1[0].zelle2[0]"]
+optional = true
 type = "string"
 description = "Geburtsdatum des Kindes, das sich zeitweise in meinem Haushalt aufhält, für das kein Kindergeld bezogen wird."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile1[0].zelle3[0]"]
+optional = true
 type = "string"
 description = "Grund und Dauer der Abwesenheit des Kindes, das sich zeitweise in meinem Haushalt aufhält, für das kein Kindergeld bezogen wird."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile2[0].zelle1[0]"]
+optional = true
 type = "string"
 description = "Name und Vorname des Kindes, das sich zeitweise in meinem Haushalt aufhält für das kein Kindergeld bezogen wird."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile2[0].zelle2[0]"]
+optional = true
 type = "string"
 description = "Geburtsdatum des Kindes, das sich zeitweise in meinem Haushalt aufhält, für das kein Kindergeld bezogen wird."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile2[0].zelle3[0]"]
+optional = true
 type = "string"
 description = "Grund und Dauer der Abwesenheit des Kindes, das sich zeitweise in meinem Haushalt aufhält, für das kein Kindergeld bezogen wird."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile3[0].zelle1[0]"]
+optional = true
 type = "string"
 description = "Name und Vorname des Kindes, das sich zeitweise in meinem Haushalt aufhält für das kein Kindergeld bezogen wird."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile3[0].zelle2[0]"]
+optional = true
 type = "string"
 description = "Geburtsdatum des Kindes, das sich zeitweise in meinem Haushalt aufhält, für das kein Kindergeld bezogen wird."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile3[0].zelle3[0]"]
+optional = true
 type = "string"
 description = "Grund und Dauer der Abwesenheit des Kindes, das sich zeitweise in meinem Haushalt aufhält, für das kein Kindergeld bezogen wird."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile1[0].zelle1[0]"]
+optional = true
 type = "string"
 description = "Name und Vorname der Person, die neben mir, meinem Partner und den Kindern noch im Haushalt wohnt."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile1[0].zelle2[0]"]
+optional = true
 type = "string"
 description = "Geburtsdatum der Person, die noch im Haushalt wohnt."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile1[0].zelle3[0]"]
+optional = true
 type = "string"
 description = "Verwandtschaftsverhältnis zu mir."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile1[0].zelle4[0]"]
+optional = true
 type = "string"
 description = "Verwandtschaftsverhältnis zum Partner, zur Partnerin."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile2[0].zelle1[0]"]
+optional = true
 type = "string"
 description = "Name und Vorname der Person, die neben mir, meinem Partner und den Kindern noch im Haushalt wohnt."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile2[0].zelle2[0]"]
+optional = true
 type = "string"
 description = "Geburtsdatum der Person, die noch im Haushalt wohnt."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile2[0].zelle3[0]"]
+optional = true
 type = "string"
 description = "Verwandtschaftsverhältnis zu mir."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile2[0].zelle4[0]"]
+optional = true
 type = "string"
 description = "Verwandtschaftsverhältnis zum Partner, zur Partnerin."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile3[0].zelle1[0]"]
+optional = true
 type = "string"
 description = "Name und Vorname der Person, die neben mir, meinem Partner und den Kindern noch im Haushalt wohnt."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile3[0].zelle2[0]"]
+optional = true
 type = "string"
 description = "Geburtsdatum der Person, die noch im Haushalt wohnt."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile3[0].#field[2]"]
+optional = true
 type = "string"
 description = "Verwandtschaftsverhältnis zu mir."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile3[0].zelle4[0]"]
+optional = true
 type = "string"
 description = "Verwandtschaftsverhältnis zum Partner, zur Partnerin."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile4[0].zelle1[0]"]
+optional = true
 type = "string"
 description = "Name und Vorname der Person, die neben mir, meinem Partner und den Kindern noch im Haushalt wohnt."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile4[0].zelle2[0]"]
+optional = true
 type = "string"
 description = "Geburtsdatum der Person, die noch im Haushalt wohnt."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile4[0].zelle3[0]"]
+optional = true
 type = "string"
 description = "Verwandtschaftsverhältnis zu mir."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile4[0].zelle4[0]"]
+optional = true
 type = "string"
 description = "Verwandtschaftsverhältnis zum Partner, zur Partnerin."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile5[0].zelle1[0]"]
+optional = true
 type = "string"
 description = "Name und Vorname der Person, die neben mir, meinem Partner und den Kindern noch im Haushalt wohnt."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile5[0].zelle2[0]"]
+optional = true
 type = "string"
 description = "Geburtsdatum der Person, die noch im Haushalt wohnt."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile5[0].zelle3[0]"]
+optional = true
 type = "string"
 description = "Verwandtschaftsverhältnis zu mir."
 value = ""
 
 ["p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile5[0].zelle4[0]"]
+optional = true
 type = "string"
 description = "Verwandtschaftsverhältnis zum Partner, zur Partnerin."
 value = ""
@@ -357,6 +393,7 @@ description = "Datum der Antragstellung."
 value = "{{ today }}"
 
 ["p3_formular1[0].seite-2[0].#area[3].kg-nr-zweiter-antragsteller[0]"]
+optional = true
 type = "string"
 description = "Kindergeldnummer der zweiten antragstellenden Person."
 value = ""

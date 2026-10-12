@@ -110,6 +110,11 @@
 		"logout": "Logout from Klaro",
 		"delete_account": "Delete my Klaro Account"
 	},
+	"demo_reseed": {
+		"button": "Reset demo profile",
+		"pending": "Resetting…",
+		"error": "Could not reset the demo profile."
+	},
 	"sections": {
 		"personal": {
 			"title": "Personal Data",

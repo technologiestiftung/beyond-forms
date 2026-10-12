@@ -163,6 +163,12 @@ class DemoSeedService:
             personas.append(persona)
         return personas
 
+    def slug_for_phone(self, phone_number: str) -> Optional[str]:
+        for persona in self.list_personas():
+            if persona["phone_number"] == phone_number:
+                return persona["slug"]
+        return None
+
     def _fixture_hash(self, slug: str) -> str:
         """
         Content hash of a persona's fixture file, so a change to `demo/personas/<slug>.json`
@@ -285,7 +291,8 @@ class DemoSeedService:
                 setattr(db_user, column.name, None)
         db_user.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
-        self.db.commit()
+        # No commit here: `seed` commits once the persona is applied, so a failure part-way
+        # rolls the reset back instead of leaving the account wiped.
         return {
             "documents_deleted": len(rows),
             "blobs_deleted": deleted_blobs,

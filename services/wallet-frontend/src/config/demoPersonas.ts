@@ -1,6 +1,7 @@
 import helmutPersona from "../../../../demo/personas/helmut.json";
 import sabinePersona from "../../../../demo/personas/sabine.json";
 import sandorPersona from "../../../../demo/personas/sandor.json";
+import type { EligibilityCheck } from "../schemas/eligibility.schema";
 import { buildDemoProfileFromPersona } from "../services/profile/demoPersonaAdapter";
 
 export interface DemoPersona {
@@ -9,13 +10,15 @@ export interface DemoPersona {
 	phoneNumber: string;
 	statusKey: string;
 	fallbackStatus: string;
+	/** What the eligibility check ("bouncer") would have recorded, so the dashboard sorts out non-applicable services. */
+	eligibilityAnswers: Partial<EligibilityCheck>;
 	getProfile: () => ReturnType<typeof buildDemoProfileFromPersona>;
 }
 
 /**
  * Always-visible login personas, each tied to a fixed Bundesnetzagentur
  * "drama number" that skips SMS verification (any 6-digit code works) on
- * both the mock provider and the real staging auth-proxy. Add more personas 
+ * both the mock provider and the real staging auth-proxy. Add more personas
  * here as they're built.
  *
  * Profile data is sourced from demo/personas/*.json (single source of truth),
@@ -29,6 +32,17 @@ export const DEMO_PERSONAS: DemoPersona[] = [
 		phoneNumber: "+493023125102",
 		statusKey: "persona_picker.personas.helmut.status",
 		fallbackStatus: "Alle Dokumente vollständig und verifiziert",
+		eligibilityAnswers: {
+			householdComposition: "COUPLE_NO_CHILDREN",
+			dateOfBirth: "1947-02-14",
+			livesInGermany: "YES",
+			isEmployed: "NO",
+			monthlyNetHouseholdIncome: 1170,
+			monthlyWarmRent: 456,
+			assetsBand: "FROM_5000_TO_10000",
+			receivesBenefits: "NO",
+			citizenship: "GERMAN",
+		},
 		getProfile: () =>
 			buildDemoProfileFromPersona(helmutPersona as never, {
 				displayName: "Helmut",
@@ -41,6 +55,18 @@ export const DEMO_PERSONAS: DemoPersona[] = [
 		phoneNumber: "+493023125101",
 		statusKey: "persona_picker.personas.sabine.status",
 		fallbackStatus: "Ein Dokument fehlt noch",
+		eligibilityAnswers: {
+			householdComposition: "SINGLE",
+			dateOfBirth: "1968-04-22",
+			livesInGermany: "YES",
+			isEmployed: "NO",
+			workCapacity: "PERMANENTLY_REDUCED",
+			monthlyNetHouseholdIncome: 245,
+			monthlyWarmRent: 885,
+			assetsBand: "UNDER_5000",
+			receivesBenefits: "NO",
+			citizenship: "GERMAN",
+		},
 		getProfile: () =>
 			buildDemoProfileFromPersona(sabinePersona as never, {
 				displayName: "Sabine",
@@ -53,6 +79,19 @@ export const DEMO_PERSONAS: DemoPersona[] = [
 		phoneNumber: "+493023125103",
 		statusKey: "persona_picker.personas.sandor.status",
 		fallbackStatus: "Ein Dokument ist unleserlich",
+		eligibilityAnswers: {
+			householdComposition: "SINGLE",
+			dateOfBirth: "1965-09-30",
+			livesInGermany: "YES",
+			isEmployed: "NO",
+			workCapacity: "FULL",
+			monthlyNetHouseholdIncome: 290,
+			monthlyWarmRent: 715,
+			assetsBand: "UNDER_5000",
+			receivesBenefits: "YES",
+			citizenship: "NON_EU",
+			hasSecureResidenceStatus: "YES",
+		},
 		getProfile: () =>
 			buildDemoProfileFromPersona(sandorPersona as never, {
 				displayName: "Sandor",

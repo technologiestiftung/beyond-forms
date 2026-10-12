@@ -153,10 +153,18 @@ export const AuthView: React.FC = () => {
 				return manualFlow ? (
 					<PhoneNumberForm />
 				) : (
-					<PersonaPicker onUsePhoneNumber={() => setManualFlow(true)} />
+					<PersonaPicker
+						onUsePhoneNumber={() => setManualFlow(true)}
+						origin={origin}
+					/>
 				);
 			default:
-				return <PersonaPicker onUsePhoneNumber={() => setManualFlow(true)} />;
+				return (
+					<PersonaPicker
+						onUsePhoneNumber={() => setManualFlow(true)}
+						origin={origin}
+					/>
+				);
 		}
 	};
 

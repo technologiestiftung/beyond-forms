@@ -742,6 +742,28 @@ async def test_get_completeness_ignores_documents_namespace(form_service, mock_u
     assert (filled, total) == (0, 0)
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "context, expected",
+    [
+        ({"first_name": "Max", "is_care_dependent": False}, (1, 1)),
+        ({"first_name": "Max", "is_care_dependent": True}, (1, 2)),
+        ({"first_name": "Max", "is_care_dependent": True, "care_level": "Level 2"}, (2, 2)),
+    ],
+)
+async def test_get_completeness_counts_follow_up_fields_only_when_gate_is_yes(form_service, mock_user, context, expected):
+    mock_mapping = {
+        "p1_check": "{{ first_name != null ? first_name : '' }}",
+        "p1_care": "{{ care_level ? care_level : '' }}",
+    }
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch.object(form_service, "_build_base_context", return_value=(context, None)),
+    ):
+        assert await form_service.get_completeness("test_form", mock_user) == expected
+
+
 def test_person_context_splits_household_from_partner():
     """A partner living elsewhere belongs under `partner` but not `household_members`,
     and the German label fields come along so form slots need no translation chain."""
@@ -975,3 +997,52 @@ def test_expense_total_is_reachable_per_person():
         == ""
     )
 
+
+def test_count_unmapped_required_fields_skips_optional_filled_and_container_entries(tmp_path):
+    from src.services.form_service import _count_unmapped_required_fields
+
+    mapping_file = tmp_path / "form.toml"
+    mapping_file.write_text(
+        '["p1_mapped"]\ntype = "string"\nvalue = "{{ first_name }}"\n\n'
+        '["p1_unmapped"]\ntype = "radio"\nvalue = ""\n\n'
+        '["p1_optional"]\ntype = "string"\nvalue = ""\noptional = true\n\n'
+        '["p1_container"]\ntype = "unknown"\nvalue = ""\n\n'
+        '["p1_static"]\ntype = "choice"\nvalue = "Soziales"\n',
+        encoding="utf-8",
+    )
+
+    assert _count_unmapped_required_fields(str(mapping_file)) == 1
+    assert _count_unmapped_required_fields(str(tmp_path / "missing.toml")) == 0
+
+
+@pytest.mark.asyncio
+async def test_get_completeness_counts_unmapped_required_fields_as_unfilled(form_service, mock_user, tmp_path):
+    form_service.mapping_path = str(tmp_path)
+    (tmp_path / "test_form.toml").write_text(
+        '["p1_mapped"]\ntype = "string"\nvalue = "{{ first_name }}"\n\n'
+        '["p1_unmapped"]\ntype = "radio"\nvalue = ""\n',
+        encoding="utf-8",
+    )
+    mock_mapping = {"p1_mapped": "{{ first_name }}", "p1_unmapped": ""}
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch.object(form_service, "_build_base_context", return_value=({"first_name": "Max"}, None)),
+    ):
+        assert await form_service.get_completeness("test_form", mock_user) == (1, 2)
+
+
+def test_count_unmapped_required_fields_rereads_an_edited_mapping(tmp_path):
+    import os
+
+    from src.services.form_service import _count_unmapped_required_fields
+
+    mapping_file = tmp_path / "form.toml"
+    mapping_file.write_text('["p1_unmapped"]\ntype = "radio"\nvalue = ""\n', encoding="utf-8")
+    assert _count_unmapped_required_fields(str(mapping_file)) == 1
+
+    mapping_file.write_text('["p1_unmapped"]\ntype = "radio"\nvalue = ""\noptional = true\n', encoding="utf-8")
+    stat = mapping_file.stat()
+    os.utime(mapping_file, ns=(stat.st_atime_ns, stat.st_mtime_ns + 1_000_000))
+
+    assert _count_unmapped_required_fields(str(mapping_file)) == 0

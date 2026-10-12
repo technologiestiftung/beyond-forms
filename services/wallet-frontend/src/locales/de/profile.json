@@ -110,6 +110,11 @@
 		"logout": "Bei Klaro ausloggen",
 		"delete_account": "Mein Klaro Konto löschen"
 	},
+	"demo_reseed": {
+		"button": "Demo-Profil zurücksetzen",
+		"pending": "Wird zurückgesetzt…",
+		"error": "Das Demo-Profil konnte nicht zurückgesetzt werden."
+	},
 	"sections": {
 		"personal": {
 			"title": "Persönliche Daten",
