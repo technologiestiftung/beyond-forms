@@ -57,6 +57,7 @@ description = "8 - Option 3 von 4 - Geschlecht der antragstellenden Person - div
 value = "{{ legal_gender == 'Diverse' }}"
 
 ["p1_chbxkeineangabe"]
+optional = true
 type = "checkbox"
 description = "8 - Option 4 von 4 - Geschlecht der antragstellenden Person - keine Angabe"
 value = ""
@@ -82,6 +83,7 @@ description = "12 - Wohnort der antragstellenden Person"
 value = "{{ city ? city : '' }}"
 
 ["p1_txtfpersonpostfach"]
+optional = true
 type = "string"
 description = "13 - Postfachanschrift der antragstellenden Person"
 value = ""
@@ -102,6 +104,7 @@ option_labels = { "0" = "Ja", "1" = "Nein" }
 value = ""
 
 ["p1_txtareawohnhaft"]
+optional = true
 type = "string"
 description = "16 - Gegebenenfalls wohnhaft bei (Name und Anschrift Person/Einrichtung)"
 value = ""
@@ -117,6 +120,7 @@ description = "18 - IBAN (22-stellig)"
 value = "{{ documents.bank_details ? documents.bank_details.iban : documents.bank_statements ? documents.bank_statements.iban : (iban ? iban : '') }}"
 
 ["p2_txtareakontogrund"]
+optional = true
 type = "string"
 description = "19 - Wenn Sie keine Bankverbindung angeben können, teilen Sie dem Jobcenter mit, weshalb Sie kein Basiskonto eröffnen können."
 value = ""
@@ -132,11 +136,13 @@ description = "20 - Meine Rentenversicherungsnummer/Sozialversicherungsnummer la
 value = "{{ documents.health_insurance_proof && documents.health_insurance_proof.pension_insurance_number ? documents.health_insurance_proof.pension_insurance_number : documents.pension_notice && documents.pension_notice.pension_insurance_number ? documents.pension_notice.pension_insurance_number : (pension_insurance_no ? pension_insurance_no : '') }}"
 
 ["p2_chbxrvnrkeine"]
+optional = true
 type = "checkbox"
 description = "20 - Option 2 von 3 - Machen Sie Angaben zu Ihrer Rentenversicherungsnummer/Sozialversicherungsnummer. - Diese ist nicht vorhanden."
 value = ""
 
 ["p2_chbxrvnrbeantragt"]
+optional = true
 type = "checkbox"
 description = "20 - Option 3 von 3 - Machen Sie Angaben zu Ihrer Rentenversicherungsnummer/Sozialversicherungsnummer. - Diese wurde beantragt."
 value = ""
@@ -177,11 +183,13 @@ option_labels = { "0" = "Ja (bitte fügen Sie einen Nachweis über den aufenthal
 value = "{{ has_applied_for_asylum_benefits == true ? '0' : (has_applied_for_asylum_benefits == false ? '1' : '') }}"
 
 ["p2_dateasylblg"]
+optional = true
 type = "string"
 description = "25 - Bis wann erhalten Sie Asylbewerberleistungen? - Datum bis (TT.MM.JJJJ)"
 value = ""
 
 ["p2_txtfazrnr"]
+optional = true
 type = "string"
 description = "26 - Geben Sie Ihre Ausländerzentralregistriernummer an, falls vorhanden."
 value = ""
@@ -212,11 +220,13 @@ description = "29 - Option 2 von 2 - Ab welchem Zeitpunkt möchten Sie Bürgerge
 value = ""
 
 ["p3_datebuegspaeter"]
+optional = true
 type = "string"
 description = "30 - Bitte geben Sie den späteren Zeitpunkt der Beantragung von Bürgergeld an. - Datum ab (TT.MM.JJJJ)"
 value = ""
 
 ["p3_dateeinreise"]
+optional = true
 type = "string"
 description = "31 - Wenn Sie zuvor im Ausland gelebt haben, geben Sie bitte das Datum Ihrer Einreise nach Deutschland an (TT.MM.JJJJ)."
 value = ""
@@ -252,11 +262,13 @@ description = "32 - Option 6 von 7 - Geben Sie Ihren aktuellen Familienstand an.
 value = "{{ marital_status == 'Divorced' }}"
 
 ["p3_chbxfamstandaufgehoben"]
+optional = true
 type = "checkbox"
 description = "32 - Option 7 von 7 - Geben Sie Ihren aktuellen Familienstand an. - aufgehobene Lebenspartnerschaft (füllen Sie auch die Anlage UH1 aus)"
 value = ""
 
 ["p3_dategetrennt"]
+optional = true
 type = "string"
 description = "33 - Seit wann sind Sie dauernd getrennt lebend, geschieden oder wann wurde Ihre Lebenspartnerschaft aufgehoben? - Datum am/seit (TT.MM.JJJJ)"
 value = ""
@@ -387,6 +399,7 @@ description = "43 - Option 8 von 9 - Geben Sie an, welche Leistungen, Sie beantr
 value = "{{ benefits_awaiting_decision_type == 'Kinderzuschlag' }}"
 
 ["p4_chbxleistungsonstiges"]
+optional = true
 type = "checkbox"
 description = "43 - Option 9 von 9 - Geben Sie an, welche Leistungen, Sie beantragt haben oder beantragen möchten. - Sonstiges"
 value = ""
@@ -447,6 +460,7 @@ option_labels = { "0" = "Ja", "1" = "Nein" }
 value = "{{ has_inpatient_facility_accommodation == true ? '0' : (has_inpatient_facility_accommodation == false ? '1' : '') }}"
 
 ["p4_txtfstationaerart"]
+optional = true
 type = "string"
 description = "49 - Geben Sie die Art der stationären Einrichtung an."
 value = ""
@@ -472,16 +486,19 @@ option_labels = { "0" = "Ja", "1" = "Nein" }
 value = "{{ has_received_previous_benefits == true ? '0' : (has_received_previous_benefits == false ? '1' : '') }}"
 
 ["p5_txtfleistungart"]
+optional = true
 type = "string"
 description = "52 - Bitte geben Sie die Art der Leistung an."
 value = ""
 
 ["p5_dateleistungvon"]
+optional = true
 type = "string"
 description = "53 - Bitte geben Sie den Zeitraum an, in dem Sie Leistungen erhalten haben - Datum von (TT.MM.JJJJ)"
 value = ""
 
 ["p5_dateleistungbis"]
+optional = true
 type = "string"
 description = "53 - Bitte geben Sie den Zeitraum an, in dem Sie Leistungen erhalten haben - Datum bis (TT.MM.JJJJ)"
 value = ""
@@ -492,21 +509,25 @@ description = "54 - Name des Leistungsträgers"
 value = "{{ previous_benefits_authority ? previous_benefits_authority : '' }}"
 
 ["p5_txtftraegerstr"]
+optional = true
 type = "string"
 description = "55 - Straße des Leistungsträgers"
 value = ""
 
 ["p5_txtftraegerhausnr"]
+optional = true
 type = "string"
 description = "56 - Hausnummer des Leistungsträgers"
 value = ""
 
 ["p5_txtftraegerplz"]
+optional = true
 type = "string"
 description = "57 - Postleitzahl des Leistungsträgers"
 value = ""
 
 ["p5_txtftraegerort"]
+optional = true
 type = "string"
 description = "58 - Ort des Leistungsträgers"
 value = ""
@@ -522,21 +543,25 @@ option_labels = { "0" = "Ja", "1" = "Nein (weiter mit 67)" }
 value = "{{ is_currently_employed == true ? '0' : (is_currently_employed == false ? '1' : '') }}"
 
 ["p5_datebeschaeftigtvon"]
+optional = true
 type = "string"
 description = "60 - Bitte geben Sie den ersten Zeitraum der Beschäftigungen an. - Datum von (TT.MM.JJJJ)"
 value = ""
 
 ["p5_datebeschaeftigtbis"]
+optional = true
 type = "string"
 description = "60 - Bitte geben Sie den ersten Zeitraum der Beschäftigungen an. - Datum bis (TT.MM.JJJJ)"
 value = ""
 
 ["p5_datebeschaeftigt2von"]
+optional = true
 type = "string"
 description = "60 - Bitte geben Sie den zweiten Zeitraum der Beschäftigungen an. - Datum von (TT.MM.JJJJ)"
 value = ""
 
 ["p5_datebeschaeftigt2bis"]
+optional = true
 type = "string"
 description = "60 - Bitte geben Sie den zweiten Zeitraum der Beschäftigungen an. - Datum bis (TT.MM.JJJJ)"
 value = ""
@@ -557,21 +582,25 @@ description = "62 - Name (ehemalige) Arbeitgeberin/(ehemaliger) Arbeitgeber"
 value = "{{ employer_name ? employer_name : (documents.wage_slips && documents.wage_slips.employer_name ? documents.wage_slips.employer_name : '') }}"
 
 ["p5_txtfagstr"]
+optional = true
 type = "string"
 description = "63 - Straße (ehemalige) Arbeitgeberin/(ehemaliger) Arbeitgeber"
 value = ""
 
 ["p5_txtfaghausnr"]
+optional = true
 type = "string"
 description = "64 - Hausnummer (ehemalige) Arbeitgeberin/(ehemaliger) Arbeitgeber"
 value = ""
 
 ["p5_txtfagplz"]
+optional = true
 type = "string"
 description = "65 - Postleitzahl (ehemalige) Arbeitgeberin/(ehemaliger) Arbeitgeber"
 value = ""
 
 ["p5_txtfagort"]
+optional = true
 type = "string"
 description = "66 - Ort (ehemalige) Arbeitgeberin/(ehemaliger) Arbeitgeber"
 value = ""
@@ -597,16 +626,19 @@ option_labels = { "0" = "Ja", "1" = "Nein (weiter mit 71)" }
 value = ""
 
 ["p5_txtfentgeltersatz"]
+optional = true
 type = "string"
 description = "69 - Bitte geben Sie die Entgeltersatzleistung an."
 value = ""
 
 ["p5_dateentgeltersatzvon"]
+optional = true
 type = "string"
 description = "70 - Bitte geben Sie den Zeitraum an, in dem Sie die Entgeltersatzleistung erhalten haben - Datum von (TT.MM.JJJJ)"
 value = ""
 
 ["p5_dateentgeltersatzbis"]
+optional = true
 type = "string"
 description = "70 - Bitte geben Sie den Zeitraum an, in dem Sie die Entgeltersatzleistung erhalten haben - Datum bis (TT.MM.JJJJ)"
 value = ""
@@ -632,6 +664,7 @@ option_labels = { "0" = "Ja", "1" = "Nein" }
 value = ""
 
 ["p6_txtarealebensunterhalt"]
+optional = true
 type = "string"
 description = "73 - Wenn keine der obigen Aussagen innerhalb der letzten 5 Jahre auf Sie zutrifft, geben Sie an, wie Sie Ihren Lebensunterhalt bestritten haben, zum Beispiel finanzielle Unterstützung durch Verwandte/Bekannte, Ersparnisse, Erbschaft."
 value = ""

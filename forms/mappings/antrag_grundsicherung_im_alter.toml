@@ -2204,6 +2204,7 @@ description = "Personenziffer 2, Sonstiges Vermögen "
 value = "{{ partner && partner.assets['Other Assets'] ? partner.assets['Other Assets'] : '' }}"
 
 ["p8_sonstige_angaben"]
+optional = true
 type = "string"
 description = "Sonstige Angaben"
 value = ""
@@ -2294,16 +2295,19 @@ description = "6 - Mietschulden"
 value = "{{ rent_arrears_amount ? true : false }}"
 
 ["p9_weitere_anlage"]
+optional = true
 type = "checkbox"
 description = "weitere Anlage"
 value = ""
 
 ["p9_name_der_weiteren_anlage"]
+optional = true
 type = "string"
 description = "Name der weiteren Anlage"
 value = ""
 
 ["p9_beigefügte_unterlagen"]
+optional = true
 type = "string"
 description = "Beigefügte Unterlagen"
 value = ""

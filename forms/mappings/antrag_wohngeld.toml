@@ -9,6 +9,7 @@ description = "Erstantrag/Weiterleistungsantrag ab"
 value = "{{ is_wohngeld_first_application == true ? true : '' }}"
 
 ["p1_monat/jahr_af_date"]
+optional = true
 type = "string"
 description = "ab Monat/Jahr"
 value = ""
@@ -144,6 +145,7 @@ description = "Rentner/in oder Pensionär/in"
 value = "{{ pension_insurance_provider ? 'true' : '' }}"
 
 ["p1_mz1.3-cb_persangerwerbnichterwerbsperson"]
+optional = true
 type = "checkbox"
 description = "sonstige Nichterwerbsperson"
 value = ""
@@ -169,6 +171,7 @@ description = "Ort"
 value = "{{ city ? city : '' }}"
 
 ["p1_mz1.3-et_wohnungzkanschriftstraße"]
+optional = true
 type = "string"
 description = "Straße "
 # This "zk" block is the planned/future address for someone not yet living at the
@@ -176,21 +179,25 @@ description = "Straße "
 value = ""
 
 ["p1_mz1.3-et_wohnungzkanschrifthausnummer"]
+optional = true
 type = "string"
 description = "Hausnummer (ggf. weitere Zusätze)"
 value = ""
 
 ["p1_mz1.3-et_wohnungzkanschriftpostleitzahl"]
+optional = true
 type = "string"
 description = "Postleitzahl"
 value = ""
 
 ["p1_mz1.3-et_wohnungzkanschriftwohnort"]
+optional = true
 type = "string"
 description = "Ort "
 value = ""
 
 ["p1_mz1.3-da_wohnungzkanschrifteinzugsdatum"]
+optional = true
 type = "string"
 description = "geplantes Einzugsdatum"
 value = ""
@@ -206,6 +213,7 @@ description = "Ja"
 value = "{{ is_subsidized_housing == true ? true : '' }}"
 
 ["p1_mz1.3-cb_persangerwerbarbeitslos"]
+optional = true
 type = "checkbox"
 description = "zurzeit arbeitslos"
 value = ""
@@ -499,31 +507,37 @@ description = "Ja "
 value = "{{ rent_paid_partly_by_third_party == true }}"
 
 ["p3_mz1.3-et_drittstaatkostentragenwerfamilienname"]
+optional = true
 type = "string"
 description = "Familienname"
 value = ""
 
 ["p3_mz1.3-et_drittstaatkostentragenwervorname"]
+optional = true
 type = "string"
 description = "Vorname(n)"
 value = ""
 
 ["p3_mz1.3-et_drittstaatkostentragenweranschrift"]
+optional = true
 type = "string"
 description = "Anschrift (Straße, Hausnummer, ggf. weitere Zusätze, Postleitzahl, Ort)"
 value = ""
 
 ["p3_mz1.3-et_drittstaatkostentragenfürwenfamilienname"]
+optional = true
 type = "string"
 description = "Familienname"
 value = ""
 
 ["p3_mz1.3-et_drittstaatkostentragenfürwenvornamen"]
+optional = true
 type = "string"
 description = "Vorname(n)"
 value = ""
 
 ["p3_mz1.3-et_drittstaatüberkosten"]
+optional = true
 type = "string"
 description = "Betrag in EUR/Monat"
 value = ""
@@ -543,21 +557,25 @@ description = "Ja "
 value = "{{ persons_in_household_count && household_members_count > 4 ? true : '' }}"
 
 ["p3_mz1.3-et_weiterepersonfamilienname1"]
+optional = true
 type = "string"
 description = "Familienname (1. Mitbewohner/Mitbewohnerin)"
 value = ""
 
 ["p3_mz1.3-et_weiterepersonvornamename1"]
+optional = true
 type = "string"
 description = "Vorname(n)"
 value = ""
 
 ["p3_mz1.3-et_weiterepersonfamilienname2"]
+optional = true
 type = "string"
 description = "Familienname (2. Mitbewohner/Mitbewohnerin)"
 value = ""
 
 ["p3_mz1.3-et_weiterepersonvornamename2"]
+optional = true
 type = "string"
 description = "Vorname(n)"
 value = ""
@@ -573,16 +591,19 @@ description = "Ja "
 value = "false"
 
 ["p3_mz1.3-et_verändhhmwerfamilienname"]
+optional = true
 type = "string"
 description = "Familienname"
 value = ""
 
 ["p3_mz1.3-et_verändhhmwervorname"]
+optional = true
 type = "string"
 description = "Vorname(n)"
 value = ""
 
 ["p3_mz1.3-da_verändhhmwann"]
+optional = true
 type = "string"
 description = "Datum"
 value = ""
@@ -618,16 +639,19 @@ description = "Ja "
 value = "false"
 
 ["p4_mz1.3-et_verändhhmtodfamilienname"]
+optional = true
 type = "string"
 description = "Familienname"
 value = ""
 
 ["p4_mz1.3-et_verändhhmtodvorname"]
+optional = true
 type = "string"
 description = "Vorname(n)"
 value = ""
 
 ["p4_mz1.3-da_verändhhmtodwann"]
+optional = true
 type = "string"
 description = "Datum"
 value = ""
@@ -643,16 +667,19 @@ description = "Ja "
 value = "false"
 
 ["p4_mz1.3-da_verändhhmanzahlwann"]
+optional = true
 type = "string"
 description = "Datum"
 value = ""
 
 ["p4_mz1.3-et_verändhhmanzahlgrund"]
+optional = true
 type = "string"
 description = "Grund der Änderung (zum Beispiel Einzug, Umzug, Geburt)"
 value = ""
 
 ["p4_mz1.3-da_verändhhmanzahldatum"]
+optional = true
 type = "string"
 description = "Datum"
 value = ""
@@ -693,81 +720,97 @@ description = "Datum der Bewilligung"
 value = "{{ documents.social_benefits_proof && documents.social_benefits_proof.date_of_issue ? documents.social_benefits_proof.date_of_issue : '' }}"
 
 ["p4_mz1.3-da_transfhhm1jawegfall"]
+optional = true
 type = "string"
 description = "Datum des Wegfalls"
 value = ""
 
 ["p4_mz1.3-da_transfhhm1jaablehnung"]
+optional = true
 type = "string"
 description = "Datum der Ablehnung"
 value = ""
 
 ["p4_mz1.3-et_transfhhm2familienname"]
+optional = true
 type = "string"
 description = "Familienname"
 value = ""
 
 ["p4_mz1.3-et_transfhhm2vorname"]
+optional = true
 type = "string"
 description = "Vorname(n)"
 value = ""
 
 ["p4_mz1.3-et_transfhhm2leistung"]
+optional = true
 type = "string"
 description = "Welche Leistung? (siehe oben)"
 value = ""
 
 ["p4_mz1.3-da_transfhhm2jabeantragung"]
+optional = true
 type = "string"
 description = "Datum der Beantragung"
 value = ""
 
 ["p4_mz1.3-da_transfhhm2jabewilligung"]
+optional = true
 type = "string"
 description = "Datum der Bewilligung"
 value = ""
 
 ["p4_mz1.3-da_transfhhm2jawegfall"]
+optional = true
 type = "string"
 description = "Datum des Wegfalls"
 value = ""
 
 ["p4_mz1.3-da_transfhhm2jaablehnung"]
+optional = true
 type = "string"
 description = "Datum der Ablehnung"
 value = ""
 
 ["p5_mz1.3-et_transfhhm3familienname"]
+optional = true
 type = "string"
 description = "Familienname"
 value = ""
 
 ["p5_mz1.3-et_transfhhm3vorname"]
+optional = true
 type = "string"
 description = "Vorname(n)"
 value = ""
 
 ["p5_mz1.3-et_transfhhm3leistung"]
+optional = true
 type = "string"
 description = "Welche Leistung? (siehe oben)"
 value = ""
 
 ["p5_mz1.3-da_transfhhm3jabeantragung"]
+optional = true
 type = "string"
 description = "Datum der Beantragung"
 value = ""
 
 ["p5_mz1.3-da_transfhhm3jabewilligung"]
+optional = true
 type = "string"
 description = "Datum der Bewilligung"
 value = ""
 
 ["p5_mz1.3-da_transfhhm3jawegfall"]
+optional = true
 type = "string"
 description = "Datum des Wegfalls"
 value = ""
 
 ["p5_mz1.3-da_transfhhm3jaablehnung"]
+optional = true
 type = "string"
 description = "Datum der Ablehnung"
 value = ""
@@ -803,6 +846,7 @@ description = "Brutto in EUR"
 value = "{{ income_list[0] ? income_list[0].monthly_amount : '' }}"
 
 ["p5_mz1.3-et_einnahmehhm1art1turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -818,6 +862,7 @@ description = "Brutto in EUR"
 value = "{{ income_list[1] ? income_list[1].monthly_amount : '' }}"
 
 ["p5_mz1.3-et_einnahmehhm1art2turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -833,6 +878,7 @@ description = "Brutto in EUR"
 value = "{{ income_list[2] ? income_list[2].monthly_amount : '' }}"
 
 ["p5_mz1.3-et_einnahmehhm1art3turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -848,6 +894,7 @@ description = "Brutto in EUR"
 value = "{{ income_list[3] ? income_list[3].monthly_amount : '' }}"
 
 ["p5_mz1.3-et_einnahmehhm1art4turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -888,6 +935,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[0] ? household_members[0].monthly_pension_income : '' }}"
 
 ["p5_mz1.3-et_einnahmehhm2art1turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -903,6 +951,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[0] && household_members[0].income_list[1] ? household_members[0].income_list[1].monthly_amount : '' }}"
 
 ["p5_mz1.3-et_einnahmehhm2art2turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -918,6 +967,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[0] && household_members[0].income_list[2] ? household_members[0].income_list[2].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm2art3turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -933,6 +983,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[0] && household_members[0].income_list[3] ? household_members[0].income_list[3].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm2art4turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -973,6 +1024,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[1] && household_members[1].income_list[0] ? household_members[1].income_list[0].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm3art1turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -988,6 +1040,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[1] && household_members[1].income_list[1] ? household_members[1].income_list[1].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm3art2turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -1003,6 +1056,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[1] && household_members[1].income_list[2] ? household_members[1].income_list[2].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm3art3turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -1018,6 +1072,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[1] && household_members[1].income_list[3] ? household_members[1].income_list[3].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm3art4turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -1058,6 +1113,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[2] && household_members[2].income_list[0] ? household_members[2].income_list[0].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm4art1turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -1073,6 +1129,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[2] && household_members[2].income_list[1] ? household_members[2].income_list[1].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm4art2turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -1088,6 +1145,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[2] && household_members[2].income_list[2] ? household_members[2].income_list[2].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm4art3turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -1103,6 +1161,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[2] && household_members[2].income_list[3] ? household_members[2].income_list[3].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm4art4turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -1143,6 +1202,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[3] && household_members[3].income_list[0] ? household_members[3].income_list[0].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm5art1turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -1158,6 +1218,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[3] && household_members[3].income_list[1] ? household_members[3].income_list[1].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm5art2turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -1173,6 +1234,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[3] && household_members[3].income_list[2] ? household_members[3].income_list[2].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm5art3turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -1188,6 +1250,7 @@ description = "Brutto in EUR"
 value = "{{ household_members[3] && household_members[3].income_list[3] ? household_members[3].income_list[3].monthly_amount : '' }}"
 
 ["p6_mz1.3-et_einnahmehhm5art4turnus"]
+optional = true
 type = "string"
 description = "Turnus"
 value = ""
@@ -1243,6 +1306,7 @@ description = "Vorname(n)"
 value = "{{ household_members[1] && household_members[1].first_name ? household_members[1].first_name : '' }}"
 
 ["p7_mz1.3-et_freibwerbhhm2ausgaben"]
+optional = true
 type = "string"
 description = "Ausgaben in EUR/Monat"
 value = ""
@@ -1268,6 +1332,7 @@ description = "Vorname(n)"
 value = "{{ household_members[0] && household_members[0].first_name ? household_members[0].first_name : '' }}"
 
 ["p7_mz1.3-et_freikinderbetreuhhm1ausgaben"]
+optional = true
 type = "string"
 description = "Ausgaben in EUR/Monat"
 value = ""
@@ -1283,6 +1348,7 @@ description = "Vorname(n)"
 value = "{{ household_members[1] && household_members[1].first_name ? household_members[1].first_name : '' }}"
 
 ["p7_mz1.3-et_freikinderbetreuhhm2ausgaben"]
+optional = true
 type = "string"
 description = "Ausgaben in EUR/Monat"
 value = ""
@@ -1338,6 +1404,7 @@ description = "Vorname(n)"
 value = "{{ household_members[0] && (household_members[0].has_disability_id || household_members[0].is_care_dependent || household_members[0].care_level != null) ? household_members[0].first_name : '' }}"
 
 ["p7_mz1.3-et_freibschwerbehhm2behinderungsgrad"]
+optional = true
 type = "string"
 description = "Schwerbehinderung (Grad der Behinderung)"
 value = ""
@@ -1353,6 +1420,7 @@ description = "häuslich pflegebedürftig, in teilstationärer Pflege oder in Ku
 value = "{{ household_members[0] ? household_members[0].is_care_dependent : false }}"
 
 ["p7_mz1.3-cb_freibschwerbehhm2beg"]
+optional = true
 type = "checkbox"
 description = "Opfer nationalsozialistischer Verfolgung oder ihnen Gleichgestellte im Sinne des BEG"
 value = ""
@@ -1383,21 +1451,25 @@ description = "Familienname"
 value = "{{ documents.alimony_proof ? documents.alimony_proof.recipient_name : '' }}"
 
 ["p7_mz1.3-et__freibunterhhhm1fürvorname"]
+optional = true
 type = "string"
 description = "Vorname(n)"
 value = ""
 
 ["p8_mz1.3-da_unterhhhm1fürgeburtsdatum"]
+optional = true
 type = "string"
 description = "Geburtsdatum"
 value = ""
 
 ["p8_mz1.3-et__freibunterhhhm1füranschrift"]
+optional = true
 type = "string"
 description = "Anschrift (Straße, Hausnummer, ggf. weitere Zusätze, Postleitzahl, Ort)"
 value = ""
 
 ["p8_mz1.3-et__freibunterhhhm1verwandt"]
+optional = true
 type = "string"
 description = "Wie ist diese Person mit der Person, die Unterhalt zahlt, verwandt?"
 value = ""
@@ -1413,6 +1485,7 @@ description = "Familienname"
 value = "{{ household_members[1] && household_members[1].last_name ? household_members[1].last_name : '' }}"
 
 ["p8_mz1.3-et__freibunterh_hhm2vorname"]
+optional = true
 type = "string"
 description = "Vorname(n)"
 value = ""
@@ -1423,26 +1496,31 @@ description = "Familienname"
 value = "{{ documents.alimony_proof ? documents.alimony_proof.recipient_name : '' }}"
 
 ["p8_mz1.3-et__freibunterhfürhhm2fürvorname"]
+optional = true
 type = "string"
 description = "Vorname(n)"
 value = ""
 
 ["p8_mz1.3-da_unterhfürhhm2geburtsdatum"]
+optional = true
 type = "string"
 description = "Geburtsdatum"
 value = ""
 
 ["p8_mz1.3-et__freibunterhfürhhm2füranschrift"]
+optional = true
 type = "string"
 description = "Anschrift (Straße, Hausnummer, ggf. weitere Zusätze, Postleitzahl, Ort)"
 value = ""
 
 ["p8_mz1.3-et__freibunterhfürhhm2verwandt"]
+optional = true
 type = "string"
 description = "Wie ist diese Person mit der Person, die Unterhalt zahlt, verwandt?"
 value = ""
 
 ["p8_mz1.3-et__freibunterh_hhm2betrag"]
+optional = true
 type = "string"
 description = "Höhe des Unterhalts in EUR/Monat"
 value = ""
@@ -1473,6 +1551,7 @@ description = "Anspruch in EUR/Monat"
 value = "{{ receives_support_from_others && documents.alimony_proof ? documents.alimony_proof.monthly_payment : (income && income.Alimony ? income.Alimony : '') }}"
 
 ["p8_mz1.3-cb_sonsteinunterhhhm1anspruchnichtbekannt"]
+optional = true
 type = "checkbox"
 description = "Höhe des Anspruchs nicht bekannt"
 value = ""
@@ -1488,11 +1567,13 @@ description = "Vorname(n)"
 value = "{{ household_members[1] && household_members[1].first_name ? household_members[1].first_name : '' }}"
 
 ["p8_mz1.3-et_sonsteinunterhhhm2anspruch"]
+optional = true
 type = "string"
 description = "Anspruch in EUR/Monat"
 value = ""
 
 ["p8_mz1.3-cb_sonsteinunterhhhm2anspruchnichtbekannt"]
+optional = true
 type = "checkbox"
 description = "Höhe des Anspruchs nicht bekannt"
 value = ""
@@ -1563,11 +1644,13 @@ description = "Nein"
 value = "{{ expects_future_income_change == false ? true : '' }}"
 
 ["p9_mz1.3-cb_sonsteinerhjaver"]
+optional = true
 type = "checkbox"
 description = "Ja, verringern"
 value = ""
 
 ["p9_mz1.3-cb_sonsteinerhjaerh"]
+optional = true
 type = "checkbox"
 description = "Ja, erhöhen"
 value = ""
@@ -1583,21 +1666,25 @@ description = "Vorname(n)"
 value = "{{ expects_future_income_change ? first_name : '' }}"
 
 ["p9_mz1.3-et_sonsteinerhhhm1zeitpunktveränderung"]
+optional = true
 type = "string"
 description = "Einnahmeart"
 value = ""
 
 ["p9_mz1.3-et_sonsteinerhhhm1einnahmeart"]
+optional = true
 type = "string"
 description = "Zeitpunkt der Veränderung"
 value = ""
 
 ["p9_mz1.3-et_sonsteinerhhhm1butto"]
+optional = true
 type = "string"
 description = "Grund der Veränderung"
 value = ""
 
 ["p9_mz1.3-et_sonsteinerhhhm1grund"]
+optional = true
 type = "string"
 description = "zukünftige Brutto-Einnahmen in EUR/Monat"
 value = ""
@@ -1613,21 +1700,25 @@ description = "Vorname(n)"
 value = "{{ household_members[1] ? household_members[1].first_name : '' }}"
 
 ["p9_mz1.3-et_sonsteinerhhhm2zeitpunktveränderung"]
+optional = true
 type = "string"
 description = "Einnahmeart"
 value = ""
 
 ["p9_mz1.3-et_sonsteinerhhhm2einnahmeart"]
+optional = true
 type = "string"
 description = "Zeitpunkt der Veränderung"
 value = ""
 
 ["p9_mz1.3-et_sonsteinerhhhm2butto"]
+optional = true
 type = "string"
 description = "Grund der Veränderung"
 value = ""
 
 ["p9_mz1.3-et_sonsteinerhhhm2grund"]
+optional = true
 type = "string"
 description = "zukünftige Brutto-Einnahmen in EUR/Monat"
 value = ""
@@ -1708,11 +1799,13 @@ description = "Bewohner/Bewohnerin von Wohnraum im eigenen Mehrfamilinehaus (Hau
 value = "{{ accomodation_type == 'Own Home' ? 'Bewohner/Bewohnerin von Wohnraum im eigenen Mehrfamilinehaus' : '' }}"
 
 ["p10_mz1.3-cb_ichbinsonstiges"]
+optional = true
 type = "checkbox"
 description = "Sonstiges (zum Beispiel Inhaber/Inhaberin einer Genossenschaftswohnung oder eines mietähnlichen Dauerwohnrechts)"
 value = ""
 
 ["p10_mz1.3-et_ichbinsonstiges"]
+optional = true
 type = "string"
 description = "Sonstiges"
 value = ""
@@ -1738,6 +1831,7 @@ description = "Betrag in EUR/Monat"
 value = "{{ documents.rental_contract && documents.rental_contract.monthly_total_rent ? documents.rental_contract.monthly_total_rent : (rent_total ? rent_total : '') }}"
 
 ["p10_mz1.3-cb_monatmieteheizkostemnein"]
+optional = true
 type = "checkbox"
 description = "Nein"
 value = ""
@@ -1753,6 +1847,7 @@ description = "Betrag im EUR/Monat"
 value = "{{ heating_costs ? heating_costs : '' }}"
 
 ["p10_mz1.3-cb_monatmieteheizkostemjagesond"]
+optional = true
 type = "checkbox"
 description = "Höhe nicht gesondert vereinbart"
 value = ""
@@ -1773,6 +1868,7 @@ description = "Betrag im EUR/Monat"
 value = "{{ hot_water_costs ? hot_water_costs : '' }}"
 
 ["p10_mz1.3-cb_monatmietewarmwasserjagesond"]
+optional = true
 type = "checkbox"
 description = "Höhe nicht gesondert vereinbart"
 value = ""
@@ -1793,6 +1889,7 @@ description = "Betrag im EUR/Monat"
 value = "{{ garage_costs ? garage_costs : '' }}"
 
 ["p10_mz1.3-cb_monatmietegaragejagesond"]
+optional = true
 type = "checkbox"
 description = "Höhe nicht gesondert vereinbart"
 value = ""
@@ -1808,11 +1905,13 @@ description = "Ja"
 value = "{{ service_costs_included_in_rent == true }}"
 
 ["p10_mz1.3-et_monatmieteservicebetrag"]
+optional = true
 type = "string"
 description = "Betrag im EUR/Monat"
 value = ""
 
 ["p10_mz1.3-cb_monatmieteservicejagesond"]
+optional = true
 type = "checkbox"
 description = "Höhe nicht gesondert vereinbart"
 value = ""
@@ -1833,6 +1932,7 @@ description = "Betrag im EUR/Monat"
 value = "{{ household_energy_costs ? household_energy_costs : '' }}"
 
 ["p10_mz1.3-cb_monatmietehaushaltsenergiejagesond"]
+optional = true
 type = "checkbox"
 description = "Höhe nicht gesondert vereinbart"
 value = ""
@@ -1848,6 +1948,7 @@ description = "Ja"
 value = "{{ rent_paid_partly_by_third_party == true }}"
 
 ["p10_mz1.3-et_mietedrittebetrag"]
+optional = true
 type = "string"
 description = "Betrag im EUR/Monat"
 value = ""
@@ -1863,21 +1964,25 @@ description = "Ja"
 value = "{{ receives_rent_contribution_from_others == true }}"
 
 ["p10_mz1.3-et_mietedrittevonfamilienname"]
+optional = true
 type = "string"
 description = "Name/Familienname"
 value = ""
 
 ["p10_mz1.3-et_mietedrittevonvornamename"]
+optional = true
 type = "string"
 description = "Vorname(n)"
 value = ""
 
 ["p10_mz1.3-et_mietedrittevonbetrag"]
+optional = true
 type = "string"
 description = "Betrag in EUR/Monat"
 value = ""
 
 ["p10_mz1.3-et_mietedrittevonzeitraum"]
+optional = true
 type = "string"
 description = "Für welchen Zeitraum?"
 value = ""
@@ -1888,6 +1993,7 @@ description = "Nein"
 value = "{{ expects_rent_change == false ? true : '' }}"
 
 ["p10_mz1.3-cb_mieteverändjaverringern"]
+optional = true
 type = "checkbox"
 description = "Ja, verringern"
 value = ""
@@ -1898,16 +2004,19 @@ description = "Ja, erhöhen"
 value = "{{ expects_rent_change == true }}"
 
 ["p10_mz1.3-et_mieteverändwann"]
+optional = true
 type = "string"
 description = "Zeitpunkt der Änderung"
 value = ""
 
 ["p10_mz1.3-et_mieteverändgrund"]
+optional = true
 type = "string"
 description = "Grund der Änderung"
 value = ""
 
 ["p10_mz1.3-et_mieteverändzukünftigemiete"]
+optional = true
 type = "string"
 description = "Zukünftige Gesamtmiete in EUR/Monat"
 value = ""
@@ -1928,16 +2037,19 @@ description = "anderen Personen entgeltlich oder unentgeltlich überlassen"
 value = false
 
 ["p11_mz1.3-et_nutzwohnraumandpersüberlassenfläche"]
+optional = true
 type = "string"
 description = "Fläche (in Quadratmeter)"
 value = ""
 
 ["p11_mz1.3-cb_nutzwohnraumandpersentgeltlich"]
+optional = true
 type = "checkbox"
 description = "von anderen Personen entgeltlich oder unentgeltlich mitbewohnt"
 value = ""
 
 ["p11_mz1.3-et_nutzwohnraumandpersentgeltlichfläche"]
+optional = true
 type = "string"
 description = "Fläche (in Quadratmeter)"
 value = ""
@@ -1948,31 +2060,37 @@ description = "Betrag in EUR/Monat"
 value = "{{ sublet_rent_income ? sublet_rent_income : '' }}"
 
 ["p11_mz1.3-cb_nutzunterheizung"]
+optional = true
 type = "checkbox"
 description = "Kosten für Heizung und Warmwasser"
 value = ""
 
 ["p11_mz1.3-et_nutzunterheizungbetrag"]
+optional = true
 type = "string"
 description = "Beitrag in EUR/Monat"
 value = ""
 
 ["p11_mz1.3-cb_nutzunterhausenergie"]
+optional = true
 type = "checkbox"
 description = "Kosten der Haushaltsenergie (Strom-/Gasverbrauch für Haushaltsgeräte/Beleuchtung)"
 value = ""
 
 ["p11_mz1.3-et_nutzunterhausenergiebetrag"]
+optional = true
 type = "string"
 description = "Beitrag in EUR/Monat"
 value = ""
 
 ["p11_mz1.3-cb_nutzuntergarage"]
+optional = true
 type = "checkbox"
 description = "(Tief-)Garage/Stellplatz/Carport"
 value = ""
 
 ["p11_mz1.3-et_nutzuntergaragebetrag"]
+optional = true
 type = "string"
 description = "Beitrag in EUR/Monat"
 value = ""

@@ -996,3 +996,37 @@ def test_expense_total_is_reachable_per_person():
         jexl.evaluate("partner && partner.monthly_expenses_total ? partner.monthly_expenses_total : ''", empty_ctx)
         == ""
     )
+
+
+def test_count_unmapped_required_fields_skips_optional_filled_and_container_entries(tmp_path):
+    from src.services.form_service import _count_unmapped_required_fields
+
+    mapping_file = tmp_path / "form.toml"
+    mapping_file.write_text(
+        '["p1_mapped"]\ntype = "string"\nvalue = "{{ first_name }}"\n\n'
+        '["p1_unmapped"]\ntype = "radio"\nvalue = ""\n\n'
+        '["p1_optional"]\ntype = "string"\nvalue = ""\noptional = true\n\n'
+        '["p1_container"]\ntype = "unknown"\nvalue = ""\n\n'
+        '["p1_static"]\ntype = "choice"\nvalue = "Soziales"\n',
+        encoding="utf-8",
+    )
+
+    assert _count_unmapped_required_fields(str(mapping_file)) == 1
+    assert _count_unmapped_required_fields(str(tmp_path / "missing.toml")) == 0
+
+
+@pytest.mark.asyncio
+async def test_get_completeness_counts_unmapped_required_fields_as_unfilled(form_service, mock_user, tmp_path):
+    form_service.mapping_path = str(tmp_path)
+    (tmp_path / "test_form.toml").write_text(
+        '["p1_mapped"]\ntype = "string"\nvalue = "{{ first_name }}"\n\n'
+        '["p1_unmapped"]\ntype = "radio"\nvalue = ""\n',
+        encoding="utf-8",
+    )
+    mock_mapping = {"p1_mapped": "{{ first_name }}", "p1_unmapped": ""}
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch.object(form_service, "_build_base_context", return_value=({"first_name": "Max"}, None)),
+    ):
+        assert await form_service.get_completeness("test_form", mock_user) == (1, 2)

@@ -1,6 +1,7 @@
 import asyncio
 import base64
 import copy
+import functools
 import datetime
 import decimal
 import logging
@@ -103,6 +104,28 @@ _CONDITIONAL_CONTEXT_FIELDS = {
     "inpatient_facility_assigned_until": "has_inpatient_facility_accommodation",
     "inpatient_facility_move_in_date": "has_inpatient_facility_accommodation",
 }
+
+
+@functools.lru_cache(maxsize=None)
+def _count_unmapped_required_fields(mapping_file: str) -> int:
+    """
+    Counts form fields that no profile data can fill: an empty `value` on a field widget,
+    not marked `optional = true` in the mapping. They stay unfilled for every profile, so
+    a form with any of them is never complete.
+    """
+    try:
+        with open(mapping_file, "rb") as f:
+            raw_mapping = tomllib.load(f)
+    except FileNotFoundError:
+        return 0
+    return sum(
+        1
+        for field_info in raw_mapping.values()
+        if isinstance(field_info, dict)
+        and field_info.get("value") in ("", None)
+        and field_info.get("type") not in (None, "unknown")
+        and not field_info.get("optional", False)
+    )
 
 
 def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set[str]:
@@ -370,13 +393,15 @@ class FormService:
         """
         Reports how many of the profile fields a form's mapping reads from are
         filled in, so the frontend can show a per-form readiness indicator without
-        needing to know each form's specific field list. Deliberately ignores the
+        needing to know each form's specific field list. Fields the mapping leaves
+        empty and does not mark optional count as unfilled. Deliberately ignores the
         `documents` namespace: document verification isn't required to generate
         these simpler (non-Grundsicherung) forms today.
         """
         mapping, _field_types, _pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
         required_fields = _extract_required_context_fields(mapping, self.jexl)
-        if not required_fields:
+        unmapped_required = _count_unmapped_required_fields(os.path.join(self.mapping_path, f"{form_type}.toml"))
+        if not required_fields and not unmapped_required:
             return 0, 0
 
         context, _application = self._build_base_context(form_type, user)
@@ -386,7 +411,7 @@ class FormService:
             if field not in _CONDITIONAL_CONTEXT_FIELDS or context.get(_CONDITIONAL_CONTEXT_FIELDS[field]) is True
         }
         filled = sum(1 for field in required_fields if _is_context_value_filled(context.get(field)))
-        return filled, len(required_fields)
+        return filled, len(required_fields) + unmapped_required
 
     async def fill_form(self, form_type: str, user: Users) -> bytes:
         """

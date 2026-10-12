@@ -37,6 +37,7 @@ default_value = ""
 value = "{{ district == 'Tempelhof-Schöneberg' ? 'Tempelhof-Schöneberg von Berlin' : '' }}"
 
 ["p1_fax"]
+optional = true
 type = "string"
 read_only = true
 default_value = ""
@@ -67,6 +68,7 @@ default_value = ""
 value = "{{ district == 'Tempelhof-Schöneberg' ? 'post-buergeramt@ba-ts.berlin.de' : '' }}"
 
 ["p1_anschrift_bezirk_zeile_5"]
+optional = true
 type = "string"
 read_only = true
 default_value = ""
@@ -121,24 +123,28 @@ default_value = ""
 value = "{{ phone_number ? '' : '' }}"
 
 ["p1_kennzeichen_alt"]
+optional = true
 type = "string"
 description = "Bitte geben Sie das alte Kennzeichen an."
 default_value = ""
 value = ""
 
 ["p1_straße_hausnr_bisherige_anschrift"]
+optional = true
 type = "string"
 description = "Bitte geben Sie die Straße und Hausnummer Ihrer bisherigen Anschrift an."
 default_value = ""
 value = ""
 
 ["p1_plz_wohnort_bisherige_anschrift"]
+optional = true
 type = "string"
 description = "Bitte geben Sie die PLZ und den Wohnort Ihrer bisherigen Anschrift an."
 default_value = ""
 value = ""
 
 ["p1_parkzone_neu__alt"]
+optional = true
 type = "string"
 description = "Bitte geben Sie die alte und die neue Parkzone an."
 default_value = ""
@@ -184,6 +190,7 @@ nearby_label = "Einverständnis Melderegister:"
 value = "{{ consents_to_registry_verification == true ? true : '' }}"
 
 ["p2_freitext"]
+optional = true
 type = "string"
 description = "Für weitere Anmerkungen stehen Ihnen 560 Zeichen zur Verfügung."
 default_value = ""
