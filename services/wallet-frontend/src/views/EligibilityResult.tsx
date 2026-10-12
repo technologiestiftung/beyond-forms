@@ -58,14 +58,12 @@ const ITEM_STYLES = {
 	card: {
 		item: "lg:gap-3 lg:rounded-2xl lg:border-brand-border-subtle lg:p-8 lg:shadow-cards",
 		title: "lg:text-2xl lg:leading-snug",
-		badge: "lg:order-first",
 		reason: "lg:text-body-lg",
 	},
 	row: {
 		item: "lg:flex-row lg:items-baseline lg:gap-4 lg:rounded-none lg:border-x-0 lg:border-t-0 lg:border-brand-border-subtle lg:last:border-b-0 lg:bg-transparent lg:px-6 lg:py-4",
 		title:
 			"lg:w-1/3 lg:shrink-0 lg:text-base lg:font-semibold lg:text-brand-grey",
-		badge: "lg:hidden",
 		reason: "lg:text-brand-grey",
 	},
 };
@@ -85,11 +83,13 @@ const BenefitItem: React.FC<
 			<h3 className={`text-lg font-bold text-brand-black ${styles.title}`}>
 				{t(`outcome.benefits.${benefit}`)}
 			</h3>
-			<span
-				className={`self-start rounded-full px-3 py-1 text-sm font-medium ${STATUS_STYLES[status]} ${styles.badge}`}
-			>
-				{t(`outcome.status.${status}`)}
-			</span>
+			{variant === "row" && (
+				<span
+					className={`self-start rounded-full px-3 py-1 text-sm font-medium lg:hidden ${STATUS_STYLES[status]}`}
+				>
+					{t(`outcome.status.${status}`)}
+				</span>
+			)}
 			<p className={`text-base text-brand-black ${styles.reason}`}>
 				{t(`outcome.reasons.${reason}`)}
 			</p>
