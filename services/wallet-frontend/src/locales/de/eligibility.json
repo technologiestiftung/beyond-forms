@@ -176,7 +176,7 @@
 		"heading": "Dein Ergebnis",
 		"eligible": {
 			"title": "Das könnte Dir zustehen",
-			"cta": "Konto erstellen und Antrag ausfüllen"
+			"cta": "Antrag starten und Konto erstellen"
 		},
 		"not_eligible": {
 			"title": "Du hast keinen Anspruch auf diese Leistungen.",
@@ -213,7 +213,7 @@
 			"residence_status_unclear": "Ob Du Anspruch hast, hängt von Deinem Aufenthaltsstatus ab."
 		},
 		"residence_hint": "Bist Du im Asylverfahren oder hast Du eine Duldung, bekommst Du Leistungen nach dem Asylbewerberleistungsgesetz. Wende Dich dafür an das Landesamt für Flüchtlingsangelegenheiten oder das Sozialamt.",
-		"disclaimer": "Das ist eine unverbindliche, automatische Ersteinschätzung und keine Rechtsberatung. Ob Du Anspruch hast, entscheidet die zuständige Stelle.",
-		"start_over": "Von vorne anfangen"
+		"disclaimer": "Das Ergebnis ist eine erste Orientierung und keine Rechtsberatung. Ob Du eine Leistung bekommst, entscheidet das zuständige Amt.",
+		"start_over": "Prüfung neu starten"
 	}
 }
