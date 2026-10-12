@@ -57,7 +57,7 @@ def _collect_identifier_roots(node: Any, out: set[str]) -> None:
     if node is None or isinstance(node, Literal):
         return
     if isinstance(node, Identifier):
-        if node.subject is None:
+        if node.subject is None and node.value != "null":
             out.add(node.value)
         else:
             _collect_identifier_roots(node.subject, out)
@@ -73,9 +73,9 @@ def _collect_identifier_roots(node: Any, out: set[str]) -> None:
             _collect_identifier_roots(value, out)
 
 
-# Derived keys that carry a money grid's optional free-text extras.
-# A fully answered profile still leaves all of these empty, so counting
-# them would put a floor under the readiness ratio that no profile could ever clear.
+# Derived keys that carry a money grid's optional free-text extras, plus optional contact
+# details. A fully answered profile still leaves these empty, so counting them would put a
+# floor under the readiness ratio that no profile could ever clear.
 _OPTIONAL_CONTEXT_FIELDS = frozenset(
     {
         "documents",
@@ -85,8 +85,24 @@ _OPTIONAL_CONTEXT_FIELDS = frozenset(
         "asset_descriptions",
         "pending_benefit_claims",
         "expected_one_time_payments",
+        "birth_name",
+        "email",
     }
 )
+
+# Follow-up answers that are required, but only when the question they hang off was
+# answered "yes". Maps each one to that gating question.
+_CONDITIONAL_CONTEXT_FIELDS = {
+    "care_level": "is_care_dependent",
+    "commercially_used_area_sqm": "is_living_area_used_commercially",
+    "one_time_payments_expected_type": "are_one_time_payments_expected",
+    "one_time_payments_expected_amount": "are_one_time_payments_expected",
+    "one_time_payments_expected_date": "are_one_time_payments_expected",
+    "benefits_awaiting_decision_type": "has_applied_for_benefits_awaiting_decision",
+    "employer_name": "is_currently_employed",
+    "inpatient_facility_assigned_until": "has_inpatient_facility_accommodation",
+    "inpatient_facility_move_in_date": "has_inpatient_facility_accommodation",
+}
 
 
 def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set[str]:
@@ -364,6 +380,11 @@ class FormService:
             return 0, 0
 
         context, _application = self._build_base_context(form_type, user)
+        required_fields = {
+            field
+            for field in required_fields
+            if field not in _CONDITIONAL_CONTEXT_FIELDS or context.get(_CONDITIONAL_CONTEXT_FIELDS[field]) is True
+        }
         filled = sum(1 for field in required_fields if _is_context_value_filled(context.get(field)))
         return filled, len(required_fields)
 

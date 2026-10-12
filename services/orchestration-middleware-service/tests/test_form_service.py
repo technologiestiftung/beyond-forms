@@ -742,6 +742,28 @@ async def test_get_completeness_ignores_documents_namespace(form_service, mock_u
     assert (filled, total) == (0, 0)
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "context, expected",
+    [
+        ({"first_name": "Max", "is_care_dependent": False}, (1, 1)),
+        ({"first_name": "Max", "is_care_dependent": True}, (1, 2)),
+        ({"first_name": "Max", "is_care_dependent": True, "care_level": "Level 2"}, (2, 2)),
+    ],
+)
+async def test_get_completeness_counts_follow_up_fields_only_when_gate_is_yes(form_service, mock_user, context, expected):
+    mock_mapping = {
+        "p1_check": "{{ first_name != null ? first_name : '' }}",
+        "p1_care": "{{ care_level ? care_level : '' }}",
+    }
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch.object(form_service, "_build_base_context", return_value=(context, None)),
+    ):
+        assert await form_service.get_completeness("test_form", mock_user) == expected
+
+
 def test_person_context_splits_household_from_partner():
     """A partner living elsewhere belongs under `partner` but not `household_members`,
     and the German label fields come along so form slots need no translation chain."""
@@ -974,4 +996,3 @@ def test_expense_total_is_reachable_per_person():
         jexl.evaluate("partner && partner.monthly_expenses_total ? partner.monthly_expenses_total : ''", empty_ctx)
         == ""
     )
-
