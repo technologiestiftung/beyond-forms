@@ -163,6 +163,12 @@ class DemoSeedService:
             personas.append(persona)
         return personas
 
+    def slug_for_phone(self, phone_number: str) -> Optional[str]:
+        for persona in self.list_personas():
+            if persona["phone_number"] == phone_number:
+                return persona["slug"]
+        return None
+
     def _fixture_hash(self, slug: str) -> str:
         """
         Content hash of a persona's fixture file, so a change to `demo/personas/<slug>.json`

@@ -242,6 +242,40 @@ def login_user():
     pass
 
 
+@router.post("/demo/reseed")
+def reseed_demo_profile(
+    current_user: AuthUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Resets the calling account to its demo persona fixture. Only available where
+    DEMO_SEED_ENABLED is set, and only to accounts whose phone number belongs to a persona.
+    """
+    from src.services.demo_seed_service import DemoSeedError, DemoSeedService
+
+    if os.environ.get("DEMO_SEED_ENABLED", "").strip().lower() != "true":
+        raise HTTPException(status_code=404, detail="Not found")
+
+    try:
+        storage_client = get_gcs_client()
+    except Exception as exc:
+        logger.warning("Demo reseed: no GCS client (%s); document blobs will not be uploaded", exc)
+        storage_client = None
+
+    seed_service = DemoSeedService(db, storage_client=storage_client)
+    slug = seed_service.slug_for_phone(current_user.user_name)
+    db_user = db.query(DbUser).filter(DbUser.phone_number == current_user.user_name).first()
+    if slug is None or db_user is None:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    try:
+        seed_service.seed(db_user.id, slug, reset=True)
+    except DemoSeedError as exc:
+        logger.error("Demo reseed failed for %s: %s", slug, exc)
+        raise HTTPException(status_code=500, detail="Demo reseed failed")
+    return {"persona": slug}
+
+
 @router.post("/register")
 def register_user():
     """

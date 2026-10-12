@@ -10,6 +10,7 @@ import { PageContainer } from "../../components/Layout/PageContainer";
 import type { PersonalData } from "../../schemas/profile.schema";
 import { doesDocumentMatchSlot } from "../../utils/profile";
 import { REQUIRED_DOCUMENT_SLOTS } from "../../config/applicationConfig";
+import { DemoReseedButton } from "../../components/Profile/DemoReseedButton";
 import { GreetingHeader } from "../../components/Layout/GreetingHeader";
 
 const STATUS_LABEL: Record<SectionStatus, [string, string]> = {
@@ -123,6 +124,8 @@ export const ProfileHub: React.FC = () => {
 					data-testid="section-settings"
 				/>
 			</div>
+
+			<DemoReseedButton />
 		</PageContainer>
 	);
 };

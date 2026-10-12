@@ -442,3 +442,11 @@ def test_demo_routes_are_not_mounted():
     client = TestClient(app)
     assert client.get("/api/v1/demo/personas").status_code == 404
     assert client.post("/api/v1/demo/seed", json={"persona": "helmut"}).status_code == 404
+
+
+def test_slug_for_phone_resolves_persona_and_rejects_unknown_numbers():
+    service = DemoSeedService(MagicMock(), personas_dir=PERSONAS_DIR)
+    helmut_phone = json.loads((PERSONAS_DIR / "helmut.json").read_text(encoding="utf-8"))["phone_number"]
+
+    assert service.slug_for_phone(helmut_phone) == "helmut"
+    assert service.slug_for_phone("+4915100000000") is None
