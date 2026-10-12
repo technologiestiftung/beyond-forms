@@ -75,7 +75,7 @@ test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 		await completePensionerCheck(page);
 
 		await expect(page.getByTestId("outcome-title")).toContainText(
-			/Ersteinschätzung|initial assessment/i,
+			/zustehen|initial assessment/i,
 		);
 		await expect(
 			page.getByTestId("benefit-grundsicherung_alter"),
@@ -150,7 +150,7 @@ test.describe("Eligibility Navigator - Principal Journey Audit", () => {
 		page,
 	}) => {
 		await completePensionerCheck(page);
-		await page.getByText(/Von vorne anfangen|Start over/i).click();
+		await page.getByText(/Prüfung neu starten|Start over/i).click();
 
 		const landingCta = page.getByTestId("start-button");
 		await expect(landingCta).toBeVisible({ timeout: 15000 });
