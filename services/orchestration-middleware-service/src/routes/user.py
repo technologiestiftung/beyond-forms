@@ -271,6 +271,7 @@ def reseed_demo_profile(
     try:
         seed_service.seed(db_user.id, slug, reset=True)
     except DemoSeedError as exc:
+        db.rollback()
         logger.error("Demo reseed failed for %s: %s", slug, exc)
         raise HTTPException(status_code=500, detail="Demo reseed failed")
     return {"persona": slug}

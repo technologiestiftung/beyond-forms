@@ -1030,3 +1030,19 @@ async def test_get_completeness_counts_unmapped_required_fields_as_unfilled(form
         patch.object(form_service, "_build_base_context", return_value=({"first_name": "Max"}, None)),
     ):
         assert await form_service.get_completeness("test_form", mock_user) == (1, 2)
+
+
+def test_count_unmapped_required_fields_rereads_an_edited_mapping(tmp_path):
+    import os
+
+    from src.services.form_service import _count_unmapped_required_fields
+
+    mapping_file = tmp_path / "form.toml"
+    mapping_file.write_text('["p1_unmapped"]\ntype = "radio"\nvalue = ""\n', encoding="utf-8")
+    assert _count_unmapped_required_fields(str(mapping_file)) == 1
+
+    mapping_file.write_text('["p1_unmapped"]\ntype = "radio"\nvalue = ""\noptional = true\n', encoding="utf-8")
+    stat = mapping_file.stat()
+    os.utime(mapping_file, ns=(stat.st_atime_ns, stat.st_mtime_ns + 1_000_000))
+
+    assert _count_unmapped_required_fields(str(mapping_file)) == 0

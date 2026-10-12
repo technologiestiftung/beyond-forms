@@ -9,10 +9,13 @@ import {
 	generateOwnDramaNumber,
 } from "../../config/demoPersonas";
 import { env } from "../../config/env.config";
+import { URL_PARAMS } from "../../constants/routes";
 import { getMockProfileStorageKey } from "../../utils/profile";
 
 interface PersonaPickerProps {
 	onUsePhoneNumber: () => void;
+	/** The `origin` query param of the auth route, see URL_PARAMS.ORIGIN. */
+	origin?: string | null;
 }
 
 // Drama numbers skip SMS verification and accept any 6-digit code, on both
@@ -23,11 +26,12 @@ const AUTO_VERIFY_CODE = "482913" as OTP;
 
 export const PersonaPicker: React.FC<PersonaPickerProps> = ({
 	onUsePhoneNumber,
+	origin,
 }) => {
 	const { t } = useTranslation("auth");
 	const [error, setError] = useState<string | null>(null);
 
-	const loginInstantly = async (phone: string) => {
+	const loginInstantly = async (phone: string, onSuccess?: () => void) => {
 		setError(null);
 		try {
 			await useAuthStore.getState().login(phone as PhoneNumber);
@@ -39,6 +43,10 @@ export const PersonaPicker: React.FC<PersonaPickerProps> = ({
 				return;
 			}
 			await useAuthStore.getState().verify(AUTO_VERIFY_CODE);
+			const { status } = useAuthStore.getState();
+			if (status === "SUCCESS_NEW" || status === "SUCCESS_RETURNING") {
+				onSuccess?.();
+			}
 		} catch (e) {
 			console.error("Instant persona login failed:", e);
 			setError(t("persona_picker.login_failed", "Anmeldung fehlgeschlagen."));
@@ -48,17 +56,23 @@ export const PersonaPicker: React.FC<PersonaPickerProps> = ({
 	const handlePersonaClick = async (
 		persona: (typeof DEMO_PERSONAS)[number],
 	) => {
-		useEligibilityStore.getState().setAnswers(persona.eligibilityAnswers);
 		if (env.VITE_USE_MOCK_AUTH) {
 			localStorage.setItem(
 				getMockProfileStorageKey(persona.phoneNumber),
 				JSON.stringify(persona.getProfile()),
 			);
 		}
-		await loginInstantly(persona.phoneNumber);
+		await loginInstantly(persona.phoneNumber, () =>
+			useEligibilityStore.getState().setAnswers(persona.eligibilityAnswers),
+		);
 	};
 
 	const handleCreateNewClick = async () => {
+		// Keep a guest's check answers when they log in from the eligibility result, but
+		// don't let a previous persona's answers carry over to a fresh profile.
+		if (origin !== URL_PARAMS.ORIGIN_ELIGIBILITY) {
+			useEligibilityStore.getState().resetForm();
+		}
 		await loginInstantly(generateOwnDramaNumber());
 	};
 

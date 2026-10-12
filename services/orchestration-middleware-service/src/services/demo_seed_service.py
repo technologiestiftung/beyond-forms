@@ -291,7 +291,8 @@ class DemoSeedService:
                 setattr(db_user, column.name, None)
         db_user.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
-        self.db.commit()
+        # No commit here: `seed` commits once the persona is applied, so a failure part-way
+        # rolls the reset back instead of leaving the account wiped.
         return {
             "documents_deleted": len(rows),
             "blobs_deleted": deleted_blobs,

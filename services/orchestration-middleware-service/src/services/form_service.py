@@ -106,7 +106,6 @@ _CONDITIONAL_CONTEXT_FIELDS = {
 }
 
 
-@functools.lru_cache(maxsize=None)
 def _count_unmapped_required_fields(mapping_file: str) -> int:
     """
     Counts form fields that no profile data can fill: an empty `value` on a field widget,
@@ -114,10 +113,16 @@ def _count_unmapped_required_fields(mapping_file: str) -> int:
     a form with any of them is never complete.
     """
     try:
-        with open(mapping_file, "rb") as f:
-            raw_mapping = tomllib.load(f)
+        return _count_unmapped_required_fields_at(mapping_file, os.stat(mapping_file).st_mtime_ns)
     except FileNotFoundError:
         return 0
+
+
+# Keyed by modification time so an edited mapping is re-read without a restart.
+@functools.lru_cache(maxsize=None)
+def _count_unmapped_required_fields_at(mapping_file: str, _mtime_ns: int) -> int:
+    with open(mapping_file, "rb") as f:
+        raw_mapping = tomllib.load(f)
     return sum(
         1
         for field_info in raw_mapping.values()
