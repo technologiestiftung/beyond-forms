@@ -153,6 +153,23 @@ def test_fill_grunsicherung_bezirksamt_sets_option_index():
     assert "(Mitte) Tj" in _decode_appearance_stream(ap_n)
 
 
+def test_fill_nested_field_sets_value_on_terminal_field_not_ancestor():
+    pdf_path = os.path.join(os.path.dirname(__file__), "../../../../forms/pdfs/antrag_grundsicherung_im_alter.pdf")
+    if not os.path.exists(pdf_path):
+        pytest.skip("antrag_grundsicherung_im_alter.pdf not available")
+
+    with open(pdf_path, "rb") as f:
+        pdf_bytes = f.read()
+
+    # "Leistungen nach Nr" is only a name prefix; the radio itself is its kid " VII beantragt?".
+    filled_pdf = fill_pdf_form(pdf_bytes, {"p6_leistungen_nach_nr._vii_beantragt?": "Nein"}, ignore_read_only=True)
+    field = discover_fields(pdfrw.PdfReader(fdata=filled_pdf))["Leistungen nach Nr. VII beantragt?"]
+    terminal = field.widgets[0]["/Parent"]
+    assert terminal["/T"].to_unicode() == " VII beantragt?"
+    assert str(terminal["/V"]) == "/Nein"
+    assert terminal["/Parent"].get("/V") is None
+
+
 def test_fill_bewohnerparkausweis_bezirk_sets_export_value_not_display_label():
     pdf_path = os.path.join(
         os.path.dirname(__file__), "../../../../forms/pdfs/antrag_bewohnerparkausweis.pdf"

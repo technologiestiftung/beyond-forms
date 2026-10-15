@@ -324,6 +324,31 @@ async def test_fill_form_documents_namespace_isolated_from_users(form_service, m
 
 
 @pytest.mark.asyncio
+async def test_fill_form_formats_document_dates_like_profile_dates(form_service, mock_user):
+    _set_application_query(form_service, _mock_application({}))
+    _set_documents_query(
+        form_service,
+        [_mock_document("identity_document", {"valid_until": "2031-03-14", "id_number": "2024-01-01X"}, "verified")],
+    )
+
+    mock_mapping = {
+        "p1_valid": "{{ documents.identity_document.valid_until ? documents.identity_document.valid_until : '' }}",
+        "p1_id": "{{ documents.identity_document.id_number }}",
+    }
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch("httpx.AsyncClient.post") as mock_post,
+    ):
+        mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
+        await form_service.fill_form("test_form", mock_user)
+
+        values = mock_post.call_args.kwargs["json"]["field_values"]
+        assert values["p1_valid"] == "14.03.2031"
+        assert values["p1_id"] == "2024-01-01X"
+
+
+@pytest.mark.asyncio
 async def test_fill_form_ignores_unverified_documents(form_service, mock_user):
     _set_application_query(form_service, _mock_application({}))
     _set_documents_query(
@@ -454,7 +479,7 @@ async def test_fill_form_resolves_dis_type_from_a_slot_id_document(form_service,
         mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
         await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
 
-        assert mock_post.call_args.kwargs["json"]["field_values"]["p1_id_valid"] == "2030-05-19"
+        assert mock_post.call_args.kwargs["json"]["field_values"]["p1_id_valid"] == "19.05.2030"
 
 
 @pytest.mark.asyncio

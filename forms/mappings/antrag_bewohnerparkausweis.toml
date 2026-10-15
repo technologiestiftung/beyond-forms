@@ -27,14 +27,24 @@ value = "Bitte Bezirk auswählen:"
 # (Zeile 1 is narrow — it sits on the same row as the static "Bezirksamt" label — Zeile
 # 2-5 are full-width lines below), plus separate FAX/E-Mail fields to the right. Cramming
 # the whole address into Zeile 1 alone clipped it; each line below now carries one part.
-# Only the Tempelhof-Schöneberg address is verified (real, from berlin.de) so far; other
-# districts fall back to blank rather than guessing an unverified address.
+# Postal addresses for written applications, each verified on berlin.de / service.berlin.de.
+# Charlottenburg-Wilmersdorf splits written applications by the applicant's surname (A-K
+# Hohenzollerndamm, L-P Wilmersdorfer Straße, Q-Z Heerstraße). Mitte accepts them at three
+# Bürgerämter; Rathaus Mitte is used since the Vignettenstelle sits there. Neukölln is not in
+# this PDF's district list but issues permits (its own form names the address below).
+# Lichtenberg, Marzahn-Hellersdorf, Reinickendorf and Treptow-Köpenick have no parking zone
+# yet (Geoportal Berlin, Oct 2026), so they stay blank.
 ["p1_anschrift_bezirk_zeile_1"]
 type = "string"
 nearby_label = "An das Bezirksamt"
 read_only = true
 default_value = ""
-value = "{{ district == 'Tempelhof-Schöneberg' ? 'Tempelhof-Schöneberg von Berlin' : '' }}"
+value = """{{
+  district == 'Tempelhof-Schöneberg' || district == 'Mitte' || district == 'Friedrichshain-Kreuzberg'
+  || district == 'Charlottenburg-Wilmersdorf' || district == 'Pankow' || district == 'Steglitz-Zehlendorf'
+  || district == 'Spandau' || district == 'Neukölln'
+  ? district + ' von Berlin' : ''
+}}"""
 
 ["p1_fax"]
 optional = true
@@ -47,25 +57,64 @@ value = ""
 type = "string"
 read_only = true
 default_value = ""
-value = "Vignettenstelle"
+value = """{{
+  district == 'Tempelhof-Schöneberg' ? 'Vignettenstelle'
+  : district == 'Mitte' ? 'Bürgeramt Rathaus Mitte'
+  : district == 'Friedrichshain-Kreuzberg' ? 'Bürgeramt'
+  : district == 'Charlottenburg-Wilmersdorf' ? (last_name && ((last_name[0] >= 'A' && last_name[0] <= 'K') || (last_name[0] >= 'a' && last_name[0] <= 'k') || last_name[0] == 'Ä' || last_name[0] == 'ä') ? 'Bürgeramt Hohenzollerndamm' : (last_name && ((last_name[0] >= 'L' && last_name[0] <= 'P') || (last_name[0] >= 'l' && last_name[0] <= 'p') || last_name[0] == 'Ö' || last_name[0] == 'ö') ? 'Bürgeramt Wilmersdorfer Straße' : 'Bürgeramt Heerstraße'))
+  : district == 'Pankow' ? 'Bürgeramt Prenzlauer Berg'
+  : district == 'Steglitz-Zehlendorf' ? 'Amt für Bürgerdienste'
+  : district == 'Spandau' ? 'Bürgeramt Rathaus Spandau'
+  : district == 'Neukölln' ? 'Bürgeramt'
+  : ''
+}}"""
 
 ["p1_anschrift_bezirk_zeile_3"]
 type = "string"
 read_only = true
 default_value = ""
-value = "{{ district == 'Tempelhof-Schöneberg' ? 'Tempelhofer Damm 165' : '' }}"
+value = """{{
+  district == 'Tempelhof-Schöneberg' ? 'Tempelhofer Damm 165'
+  : district == 'Mitte' ? 'Karl-Marx-Allee 31'
+  : district == 'Friedrichshain-Kreuzberg' ? 'Postfach 35 07 01'
+  : district == 'Charlottenburg-Wilmersdorf' ? (last_name && ((last_name[0] >= 'A' && last_name[0] <= 'K') || (last_name[0] >= 'a' && last_name[0] <= 'k') || last_name[0] == 'Ä' || last_name[0] == 'ä') ? 'Hohenzollerndamm 177' : (last_name && ((last_name[0] >= 'L' && last_name[0] <= 'P') || (last_name[0] >= 'l' && last_name[0] <= 'p') || last_name[0] == 'Ö' || last_name[0] == 'ö') ? 'Wilmersdorfer Straße 46' : 'Heerstraße 12'))
+  : district == 'Pankow' ? 'Postfach 73 01 13'
+  : district == 'Spandau' ? 'Carl-Schurz-Straße 2/6'
+  : district == 'Neukölln' ? 'Karl-Marx-Straße 83'
+  : ''
+}}"""
 
 ["p1_anschrift_bezirk_zeile_4"]
 type = "string"
 read_only = true
 default_value = ""
-value = "{{ district == 'Tempelhof-Schöneberg' ? '12099 Berlin' : '' }}"
+value = """{{
+  district == 'Tempelhof-Schöneberg' ? '12099 Berlin'
+  : district == 'Mitte' ? '10178 Berlin'
+  : district == 'Friedrichshain-Kreuzberg' ? '10216 Berlin'
+  : district == 'Charlottenburg-Wilmersdorf' ? (last_name && ((last_name[0] >= 'A' && last_name[0] <= 'K') || (last_name[0] >= 'a' && last_name[0] <= 'k') || last_name[0] == 'Ä' || last_name[0] == 'ä') ? '10713 Berlin' : (last_name && ((last_name[0] >= 'L' && last_name[0] <= 'P') || (last_name[0] >= 'l' && last_name[0] <= 'p') || last_name[0] == 'Ö' || last_name[0] == 'ö') ? '10627 Berlin' : '14052 Berlin'))
+  : district == 'Pankow' ? '13062 Berlin'
+  : district == 'Steglitz-Zehlendorf' ? '14160 Berlin'
+  : district == 'Spandau' ? '13597 Berlin'
+  : district == 'Neukölln' ? '12040 Berlin'
+  : ''
+}}"""
 
 ["p1_e-mail"]
 type = "string"
 read_only = true
 default_value = ""
-value = "{{ district == 'Tempelhof-Schöneberg' ? 'post-buergeramt@ba-ts.berlin.de' : '' }}"
+value = """{{
+  district == 'Tempelhof-Schöneberg' ? 'post-buergeramt@ba-ts.berlin.de'
+  : district == 'Mitte' ? 'buergeramt@ba-mitte.berlin.de'
+  : district == 'Friedrichshain-Kreuzberg' ? 'buea.vignetten@ba-fk.berlin.de'
+  : district == 'Charlottenburg-Wilmersdorf' ? 'buergeramt@charlottenburg-wilmersdorf.de'
+  : district == 'Pankow' ? 'bewohnervignetten@ba-pankow.berlin.de'
+  : district == 'Steglitz-Zehlendorf' ? 'parkausweise@ba-sz.berlin.de'
+  : district == 'Spandau' ? 'buergeramt@ba-spandau.berlin.de'
+  : district == 'Neukölln' ? 'Bewohnerparkausweis@bezirksamt-neukoelln.de'
+  : ''
+}}"""
 
 ["p1_anschrift_bezirk_zeile_5"]
 optional = true
@@ -120,7 +169,7 @@ value = "{{ phone_number ? phone_number : '' }}"
 type = "string"
 description = "Diese Angabe ist freiwillig. Bitte geben Sie Ihre E-Mail-Adresse für eventuelle Rückfragen an."
 default_value = ""
-value = "{{ phone_number ? '' : '' }}"
+value = "{{ email ? email : '' }}"
 
 ["p1_kennzeichen_alt"]
 optional = true
