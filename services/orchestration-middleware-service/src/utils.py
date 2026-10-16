@@ -15,6 +15,14 @@ def ndjson_error(message: str) -> str:
     return json.dumps({"type": "error", "content": message}) + "\n"
 
 
+def ndjson_a2ui(message: dict[str, Any]) -> str:
+    return json.dumps({"type": "a2ui", "message": message}) + "\n"
+
+
+def ndjson_eligibility_answer(field: str, value: str) -> str:
+    return json.dumps({"type": "eligibility_answer", "field": field, "value": value}) + "\n"
+
+
 def get_google_id_token(audience: str) -> str | None:
     """
     Fetches an OIDC ID token from the Google Cloud Metadata Server using google-auth.

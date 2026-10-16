@@ -30,7 +30,8 @@ from src.services.rag_service import search_knowledge_base
 from beyondforms.auth import User as AuthUser, get_current_user, require_authenticated_user
 from src.schemas import AssociatedPersonSchema, UserInformationUpdateSchema
 from src.tools import AVAILABLE_TOOLS
-from src.utils import ndjson_done, ndjson_error, ndjson_token
+from src.ui_tools import UI_TOOL_HANDLERS, UI_TOOLS, guided_check_prompt
+from src.utils import ndjson_a2ui, ndjson_done, ndjson_eligibility_answer, ndjson_error, ndjson_token
 
 
 _USER_FIELD_NAMES: frozenset[str] = frozenset(UserInformationUpdateSchema.model_fields)
@@ -238,8 +239,14 @@ async def berlin_social_services_knowledge_base(question: str) -> str:
         return f"Error: The knowledge base is temporarily unavailable. Details: {str(e)}"
 
 
+class GuidedCheckContext(BaseModel):
+    current_field: Optional[str] = None
+
+
 class ChatRequest(BaseModel):
     content: str
+    locale: str = "de"
+    guided_check: Optional[GuidedCheckContext] = None
 
     @field_validator("content")
     @classmethod
@@ -255,13 +262,13 @@ class ChatResponse(BaseModel):
     conversation_id: uuid.UUID
 
 
-def _prepare_chat_messages(context_messages: list[dict]) -> list[dict]:
+def _prepare_chat_messages(context_messages: list[dict], extra_system_prompt: str = "") -> list[dict]:
     """
     Constructs the final, immutable messages payload for LiteLLM inference,
     prepending the unified System Prompt and pre-cached dynamic tool instructions
     without modifying execution state.
     """
-    final_system_prompt = SYSTEM_PROMPT + generate_tool_usage_prompt()
+    final_system_prompt = SYSTEM_PROMPT + generate_tool_usage_prompt() + extra_system_prompt
     messages = [{"role": "system", "content": final_system_prompt}]
     messages.extend(context_messages)
     return messages
@@ -441,7 +448,7 @@ async def handle_chat_stream(
 
     context_messages = conv_service.get_conversation_context(conversation_id, limit=CHAT_CONTEXT_WINDOW_SIZE)
 
-    available_tools = AVAILABLE_TOOLS
+    available_tools = AVAILABLE_TOOLS + UI_TOOLS
 
     tool_name_to_function_dict = {
         "get_user_table_schema": get_user_table_schema,
@@ -451,7 +458,11 @@ async def handle_chat_stream(
         "berlin_social_services_knowledge_base": berlin_social_services_knowledge_base,
     }
 
-    messages = _prepare_chat_messages(context_messages)
+    guided_check = chat_request.guided_check
+    messages = _prepare_chat_messages(
+        context_messages,
+        guided_check_prompt(guided_check.current_field) if guided_check else "",
+    )
 
     async def generate():
         nonlocal messages
@@ -511,8 +522,20 @@ async def handle_chat_stream(
                 for tc in tool_calls_list:
                     function_name = tc["function"]["name"]
                     function_args = json.loads(tc["function"]["arguments"]) if tc["function"]["arguments"] else {}
+                    ui_handler = UI_TOOL_HANDLERS.get(function_name)
                     fn = tool_name_to_function_dict.get(function_name)
-                    if fn is None:
+                    if ui_handler is not None:
+                        try:
+                            ui_result = ui_handler(locale=chat_request.locale, **function_args)
+                        except TypeError as fn_err:
+                            result = {"error": f"Invalid arguments for {function_name}: {fn_err}"}
+                        else:
+                            for a2ui_message in ui_result.a2ui_messages:
+                                yield ndjson_a2ui(a2ui_message)
+                            if ui_result.answer:
+                                yield ndjson_eligibility_answer(**ui_result.answer)
+                            result = ui_result.result
+                    elif fn is None:
                         result = {"error": f"Unknown function: {function_name}"}
                     else:
                         try:
