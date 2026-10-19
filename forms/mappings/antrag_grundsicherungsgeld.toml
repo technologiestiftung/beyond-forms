@@ -621,7 +621,7 @@ options = [
   "1"
 ]
 option_labels = { "0" = "Ja", "1" = "Nein" }
-value = "{{ documents.income_declaration && documents.income_declaration.has_self_employment_income != null ? (documents.income_declaration.has_self_employment_income ? '0' : '1') : (was_self_employed_last_5_years == true || income['Business'] || income['Agriculture and Forestry'] || income['Other Self-Employment'] ? '0' : (was_self_employed_last_5_years == false ? '1' : '')) }}"
+value = "{{ documents.income_declaration && documents.income_declaration.has_self_employment_income != null ? (documents.income_declaration.has_self_employment_income ? '0' : (was_self_employed_last_5_years == true ? '0' : '1')) : (was_self_employed_last_5_years == true || income['Business'] || income['Agriculture and Forestry'] || income['Other Self-Employment'] ? '0' : (was_self_employed_last_5_years == false ? '1' : '')) }}"
 
 ["p5_rbtnentgeltersatz"]
 type = "radio"
