@@ -46,7 +46,7 @@ for file in "$PERSONAS_DIR"/*.json; do
     case "$url" in "$API_URL"*) dl_auth=(-H "$auth") ;; esac
 
     if [ -n "$url" ]; then
-      if curl -sSL --max-time 120 "${dl_auth[@]}" "$url" -o "$out/$form_type.pdf" 2>/dev/null && [ -s "$out/$form_type.pdf" ]; then
+      if curl -sSL --max-time 120 ${dl_auth[@]+"${dl_auth[@]}"} "$url" -o "$out/$form_type.pdf" 2>/dev/null && [ -s "$out/$form_type.pdf" ]; then
         size=$(wc -c < "$out/$form_type.pdf" | tr -d ' ')
         echo "  ✓ $form_type.pdf ($size bytes)"
       else
