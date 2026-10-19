@@ -1356,12 +1356,28 @@ value = ""
 ["p7_mz1.3-cb_freibschwerbenein"]
 type = "checkbox"
 description = "Nein"
-value = "{{ has_disability_id == false && is_victim_of_national_socialist_persecution == false && !is_care_dependent && !care_level && !(household_members[0] && (household_members[0].has_disability_id || household_members[0].is_care_dependent || household_members[0].care_level != null)) ? true : '' }}"
+value = "{{ 
+  !(
+    has_disability_id 
+    || is_care_dependent 
+    || care_level 
+    || is_victim_of_national_socialist_persecution 
+    || (household_members && household_members.some && household_members.some(m => m && (m.has_disability_id || m.is_care_dependent || m.care_level != null)))
+  ) ? true : '' 
+}}"
 
 ["p7_mz1.3-cb_freibschwerbeja"]
 type = "checkbox"
 description = "Ja "
-value = "{{ (has_disability_id || is_care_dependent || care_level || is_victim_of_national_socialist_persecution) || (household_members[0] && (household_members[0].has_disability_id || household_members[0].is_care_dependent || household_members[0].care_level != null)) ? true : false }}"
+value = "{{ 
+  (
+    has_disability_id 
+    || is_care_dependent 
+    || care_level 
+    || is_victim_of_national_socialist_persecution 
+    || (household_members && household_members.some && household_members.some(m => m && (m.has_disability_id || m.is_care_dependent || m.care_level != null)))
+  ) ? true : false 
+}}"
 
 ["p7_mz1.3-et_freibschwerbehhm1familienname"]
 type = "string"
