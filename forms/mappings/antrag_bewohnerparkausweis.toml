@@ -97,7 +97,7 @@ value = """{{
   : district == 'Pankow' ? '13062 Berlin'
   : district == 'Steglitz-Zehlendorf' ? '14160 Berlin'
   : district == 'Spandau' ? '13597 Berlin'
-  : district == 'Neukölln' ? '12040 Berlin'
+  : district == 'Neukölln' ? '12043 Berlin'
   : ''
 }}"""
 
