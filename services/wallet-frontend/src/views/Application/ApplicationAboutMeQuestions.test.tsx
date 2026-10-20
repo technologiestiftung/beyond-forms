@@ -64,7 +64,7 @@ const MOCK_TRANSLATIONS: Record<string, string> = {
 vi.mock("react-i18next", () => ({
 	useTranslation: () => ({
 		t: (key: string, options?: Record<string, unknown>) => {
-			if (key === "personal.steps.step_x_of_y") {
+			if (key === "common:step_x_of_y") {
 				return `Step ${options?.current} of ${options?.total}`;
 			}
 			if (key === "common:next") {
@@ -278,7 +278,7 @@ describe("ApplicationAboutMeQuestions", () => {
 		);
 
 		// Page 1: Name
-		expect(screen.getByRole("progressbar")).toBeInTheDocument();
+		expect(screen.getByText(/Step 1 of/)).toBeInTheDocument();
 		expect(screen.getByText("Wie ist Dein Name?")).toBeInTheDocument();
 		fireEvent.change(screen.getByPlaceholderText("Vorname eingeben"), {
 			target: { value: "Helmut" },
@@ -290,7 +290,7 @@ describe("ApplicationAboutMeQuestions", () => {
 
 		// Page 2: Birth
 		await screen.findByText("Wann und wo bist Du geboren?");
-		expect(screen.getByRole("progressbar")).toBeInTheDocument();
+		expect(screen.getByText(/Step 2 of/)).toBeInTheDocument();
 		const dateInput = container.querySelector('input[type="date"]');
 		if (!dateInput) {
 			throw new Error("dateInput not found");

@@ -23,61 +23,6 @@ import { PrimaryButton } from "../../components/ui/PrimaryButton";
 import { env } from "../../config/env.config";
 import { authenticatedFetch } from "../../utils/apiClient";
 
-const SegmentedProgressBar: React.FC<{ milestoneLevel: number }> = ({
-	milestoneLevel,
-}) => {
-	const { t } = useTranslation("application");
-	return (
-		<div
-			className="flex gap-2 w-full mt-2"
-			data-testid="segmented-progress-bar"
-		>
-			<div className="flex-1 flex flex-col gap-1">
-				<div
-					className={`h-2.5 rounded-full transition-all duration-300 ${
-						milestoneLevel >= 1 ? "bg-primary-blue-500" : "bg-slate-200"
-					}`}
-				/>
-				<span
-					className={`text-[9px] font-black uppercase tracking-wider text-center ${
-						milestoneLevel >= 1 ? "text-primary-blue-500" : "text-brand-grey"
-					}`}
-				>
-					{t("levels.pills.incomplete", "Unvollständig")}
-				</span>
-			</div>
-			<div className="flex-1 flex flex-col gap-1">
-				<div
-					className={`h-2.5 rounded-full transition-all duration-300 ${
-						milestoneLevel >= 2 ? "bg-primary-blue-500" : "bg-slate-200"
-					}`}
-				/>
-				<span
-					className={`text-[9px] font-black uppercase tracking-wider text-center ${
-						milestoneLevel >= 2 ? "text-primary-blue-500" : "text-brand-grey"
-					}`}
-				>
-					{t("levels.pills.advanced", "Fortgeschritten")}
-				</span>
-			</div>
-			<div className="flex-1 flex flex-col gap-1">
-				<div
-					className={`h-2.5 rounded-full transition-all duration-300 ${
-						milestoneLevel === 3 ? "bg-primary-blue-500" : "bg-slate-200"
-					}`}
-				/>
-				<span
-					className={`text-[9px] font-black uppercase tracking-wider text-center ${
-						milestoneLevel === 3 ? "text-primary-blue-500" : "text-brand-grey"
-					}`}
-				>
-					{t("levels.pills.ready", "Startklar")}
-				</span>
-			</div>
-		</div>
-	);
-};
-
 interface ExportUrls {
 	signed_open_url: string;
 	signed_download_url: string;
@@ -94,7 +39,11 @@ async function fetchGrundsicherungExport(): Promise<ExportUrls> {
 		}
 		const blob = new Blob([bytes], { type: "application/pdf" });
 		const url = URL.createObjectURL(blob);
-		return { signed_open_url: url, signed_download_url: url, expires_in_seconds: 60 };
+		return {
+			signed_open_url: url,
+			signed_download_url: url,
+			expires_in_seconds: 60,
+		};
 	}
 
 	const response = await authenticatedFetch(
@@ -107,7 +56,8 @@ async function fetchGrundsicherungExport(): Promise<ExportUrls> {
 	const headers = response.headers as unknown as Record<string, string>;
 	const contentType =
 		(typeof response.headers.get === "function"
-			? response.headers.get("content-type") || response.headers.get("Content-Type")
+			? response.headers.get("content-type") ||
+				response.headers.get("Content-Type")
 			: headers["content-type"] || headers["Content-Type"]) || "";
 
 	if (contentType.includes("application/json")) {
@@ -116,13 +66,17 @@ async function fetchGrundsicherungExport(): Promise<ExportUrls> {
 
 	const blob = await response.blob();
 	const url = URL.createObjectURL(blob);
-	return { signed_open_url: url, signed_download_url: url, expires_in_seconds: 60 };
+	return {
+		signed_open_url: url,
+		signed_download_url: url,
+		expires_in_seconds: 60,
+	};
 }
 
-const GenerateButtonLabel: React.FC<{ isGenerating: boolean; label: string }> = ({
-	isGenerating,
-	label,
-}) => (
+const GenerateButtonLabel: React.FC<{
+	isGenerating: boolean;
+	label: string;
+}> = ({ isGenerating, label }) => (
 	<>
 		{isGenerating && <Loader2 className="size-5 animate-spin mr-2 shrink-0" />}
 		{label}
@@ -165,7 +119,7 @@ const AutoVerifiedDocumentBanner: React.FC<AutoVerifiedDocumentBannerProps> = ({
 		return null;
 	}
 	return (
-		<div className="px-6 pt-4 animate-in fade-in duration-300">
+		<div className="px-6 pt-4 animate-in fade-in duration-300 lg:px-0 lg:pt-0">
 			<div className="p-4 bg-green-50 border border-green-200 rounded-2xl flex items-center justify-between gap-3 text-green-950 font-medium text-sm text-left shadow-sm">
 				<div className="flex items-center gap-3">
 					<CheckCircle2 className="w-5 h-5 shrink-0 text-green-600" />
@@ -212,63 +166,63 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 		return null;
 	}
 	return (
-	<div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-110 flex items-center justify-center p-4 animate-fadeIn">
-		<div
-			role="dialog"
-			aria-modal="true"
-			aria-labelledby="confirm-modal-title"
-			className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl border border-slate-100 animate-scaleUp text-left"
-		>
-			<div className="flex items-start justify-between gap-4">
-				<div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center shrink-0 border border-amber-200 shadow-sm">
-					<AlertTriangle className="w-6 h-6 text-amber-600" />
+		<div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-110 flex items-center justify-center p-4 animate-fadeIn">
+			<div
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="confirm-modal-title"
+				className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl border border-slate-100 animate-scaleUp text-left"
+			>
+				<div className="flex items-start justify-between gap-4">
+					<div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center shrink-0 border border-amber-200 shadow-sm">
+						<AlertTriangle className="w-6 h-6 text-amber-600" />
+					</div>
+					<button
+						onClick={onClose}
+						className="p-2 -mr-2 text-brand-grey hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
+						aria-label={t("overview.close_modal_button", "Schließen")}
+					>
+						<X className="w-5 h-5" />
+					</button>
 				</div>
-				<button
-					onClick={onClose}
-					className="p-2 -mr-2 text-brand-grey hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
-					aria-label={t("overview.close_modal_button", "Schließen")}
-				>
-					<X className="w-5 h-5" />
-				</button>
-			</div>
 
-			<div className="flex flex-col gap-2">
-				<h3
-					id="confirm-modal-title"
-					className="text-xl font-extrabold text-slate-900 tracking-tight"
-				>
-					{t("overview.warning_modal_title", "Antrag unvollständig")}
-				</h3>
-				<p className="text-slate-600 leading-relaxed">
-					{t(
-						"overview.warning_modal_description",
-						"Du hast noch nicht alle empfohlenen Felder ausgefüllt. Ein unvollständiger Antrag kann die Bearbeitung durch das Amt verzögern. Möchtest du den Antrag trotzdem jetzt schon generieren?",
-					)}
-				</p>
-			</div>
+				<div className="flex flex-col gap-2">
+					<h3
+						id="confirm-modal-title"
+						className="text-xl font-extrabold text-slate-900 tracking-tight"
+					>
+						{t("overview.warning_modal_title", "Antrag unvollständig")}
+					</h3>
+					<p className="text-slate-600 leading-relaxed">
+						{t(
+							"overview.warning_modal_description",
+							"Du hast noch nicht alle empfohlenen Felder ausgefüllt. Ein unvollständiger Antrag kann die Bearbeitung durch das Amt verzögern. Möchtest du den Antrag trotzdem jetzt schon generieren?",
+						)}
+					</p>
+				</div>
 
-			<div className="flex flex-col sm:flex-row gap-3 pt-2">
-				<button
-					type="button"
-					onClick={onClose}
-					className="px-5 py-3 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition-colors cursor-pointer w-full"
-				>
-					{t("overview.warning_modal_cancel", "Zurück zum Antrag")}
-				</button>
-				<PrimaryButton
-					data-testid="confirm-modal-submit"
-					onClick={onConfirm}
-					disabled={isGenerating}
-					className="w-full bg-amber-600 hover:bg-amber-700 focus-visible:ring-amber-500"
-				>
-					{isGenerating && (
-						<Loader2 className="size-5 animate-spin mr-2 shrink-0" />
-					)}
-					{t("overview.warning_modal_confirm", "Trotzdem generieren")}
-				</PrimaryButton>
+				<div className="flex flex-col sm:flex-row gap-3 pt-2">
+					<button
+						type="button"
+						onClick={onClose}
+						className="px-5 py-3 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition-colors cursor-pointer w-full"
+					>
+						{t("overview.warning_modal_cancel", "Zurück zum Antrag")}
+					</button>
+					<PrimaryButton
+						data-testid="confirm-modal-submit"
+						onClick={onConfirm}
+						disabled={isGenerating}
+						className="w-full bg-amber-600 hover:bg-amber-700 focus-visible:ring-amber-500"
+					>
+						{isGenerating && (
+							<Loader2 className="size-5 animate-spin mr-2 shrink-0" />
+						)}
+						{t("overview.warning_modal_confirm", "Trotzdem generieren")}
+					</PrimaryButton>
+				</div>
 			</div>
 		</div>
-	</div>
 	);
 };
 
@@ -336,6 +290,7 @@ export const ApplicationOverview: React.FC = () => {
 	}, [pdfUrl]);
 
 	const infoSections = getMappedInformationSections(profileData || {});
+	const isAlmostReady = milestoneLevel >= 2;
 
 	const handleCategoryClick = (id: string) => {
 		const matched = infoSections.find((s) => s.id === id);
@@ -399,46 +354,40 @@ export const ApplicationOverview: React.FC = () => {
 				onBack: () => navigate(AppRoutes.Dashboard),
 				showLanguageSwitcher: true,
 				colorVariant: "green",
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
 			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
 		>
-			<div className="flex flex-col gap-6 py-4 w-full min-w-0 max-w-md mx-auto min-h-screen bg-brand-bg">
-				<div className="flex flex-col gap-6 px-6">
+			<div className="flex flex-col gap-6 py-4 w-full min-w-0 max-w-md mx-auto min-h-screen bg-brand-bg lg:max-w-180 lg:min-h-0 lg:py-2">
+				<div className="flex flex-col gap-6 px-6 lg:px-0">
 					<GenerationErrorBanner error={generationError} />
-					<div className="flex flex-col gap-4 px-1 mt-1 text-left">
-						<h1 className="text-[32px] font-extrabold text-brand-black tracking-tight leading-[38px] max-w-xs">
+					<div className="flex flex-col gap-3 px-1 mt-1 text-left lg:gap-4 lg:px-0">
+						<h1 className="text-[32px] font-extrabold text-brand-black tracking-tight leading-[38px] max-w-xs lg:max-w-none lg:text-[2.5rem] lg:leading-12">
 							{t("overview.main_title", "Antrag auf Grundsicherung")}
 						</h1>
-						<div className="bg-white p-5 rounded-3xl shadow-sm flex flex-col gap-3 w-full">
-							<h2 className="text-base font-extrabold text-brand-black">
-								{t(
-									"overview.progress_card_title",
-									"Dein Antrag Schritt für Schritt zum Ziel",
-								)}
-							</h2>
-							<SegmentedProgressBar milestoneLevel={milestoneLevel} />
-						</div>
 					</div>
 
-					<button
-						type="button"
-						onClick={scrollToGenerateButton}
-						className={`bg-secondary-orange-200 flex flex-row gap-2 p-3.5 rounded-xl shadow-sm text-left w-full cursor-pointer hover:bg-secondary-orange-300/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue-500 focus-visible:ring-offset-2 mb-4
-								${milestoneLevel >= 2 ? "block" : "hidden"}`}
-						aria-label={t(
-							"overview.generate_notice_scroll_label",
-							"Zum Antrag generieren scrollen",
-						)}
-					>
-						<p className="text-body-lg font-semibold text-brand-black">
-							{t(
-								"overview.generate_notice_title",
-								"Dein Antrag ist fast fertig! Du kannst ihn jederzeit runterladen.",
+					{isAlmostReady && (
+						<button
+							type="button"
+							onClick={scrollToGenerateButton}
+							className="bg-secondary-orange-200 flex flex-row gap-2 p-3.5 rounded-xl shadow-sm text-left w-full cursor-pointer hover:bg-secondary-orange-300/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue-500 focus-visible:ring-offset-2 mb-4 lg:hidden"
+							aria-label={t(
+								"overview.generate_notice_scroll_label",
+								"Zum Antrag generieren scrollen",
 							)}
-						</p>
-					</button>
+						>
+							<p className="text-body-lg font-semibold text-brand-black">
+								{t(
+									"overview.generate_notice_title",
+									"Dein Antrag ist fast fertig! Du kannst ihn jederzeit runterladen.",
+								)}
+							</p>
+						</button>
+					)}
 				</div>
 
-				<div className="flex flex-col gap-4 px-6">
+				<div className="flex flex-col gap-4 px-6 lg:px-0">
 					<QuestionnaireStatusList onCategoryClick={handleCategoryClick} />
 				</div>
 
@@ -450,15 +399,34 @@ export const ApplicationOverview: React.FC = () => {
 
 				<div
 					ref={generateButtonContainerRef}
-					className="px-6 pt-2 pb-6"
+					className="px-6 pt-2 pb-6 lg:flex lg:items-center lg:justify-between lg:gap-8 lg:rounded-3xl lg:bg-primary-blue-500 lg:px-8 lg:py-6"
 					id="generate-application-button-container"
 				>
+					<p className="hidden lg:block text-body-lg text-white/90 max-w-[52ch]">
+						<span className="block text-xl font-semibold text-white">
+							{isAlmostReady
+								? t(
+										"overview.cta_band.almost_ready_title",
+										"Dein Antrag ist fast fertig!",
+									)
+								: t("overview.cta_band.title", "Antrag als PDF")}
+						</span>
+						{isAlmostReady
+							? t(
+									"overview.cta_band.almost_ready_description",
+									"Du kannst ihn jederzeit als PDF runterladen.",
+								)
+							: t(
+									"overview.cta_band.description",
+									"Du kannst den Antrag jederzeit generieren. Unvollständige Anträge dauern in der Bearbeitung länger.",
+								)}
+					</p>
 					<PrimaryButton
 						ref={generateButtonRef}
 						onClick={handleGenerateClick}
 						disabled={isGenerating}
 						data-testid="generate-application-button"
-						className="w-full"
+						className="w-full lg:w-auto lg:shrink-0 lg:px-8 lg:focus-visible:outline-white"
 					>
 						<GenerateButtonLabel
 							isGenerating={isGenerating}

@@ -14,6 +14,7 @@ import {
 import { AppRoutes } from "../../constants/routes";
 import { PageContainer } from "../../components/Layout/PageContainer";
 import { PrimaryButton } from "../../components/ui/PrimaryButton";
+import { OptionCard as SharedOptionCard } from "../../components/ui/OptionCard";
 import { useScrollToTop, scrollToTop } from "../../utils/scroll";
 import type {
 	HouseholdData,
@@ -21,58 +22,11 @@ import type {
 	Profile,
 } from "../../schemas/profile.schema";
 
-interface OptionCardProps {
-	id: string;
-	title: string;
-	hinweis?: string;
-	selected: boolean;
-	onClick: () => void;
-}
-
-const OptionCard: React.FC<OptionCardProps> = ({
-	id,
-	title,
-	hinweis,
-	selected,
-	onClick,
-}) => {
-	const { t } = useTranslation("common");
-	return (
-		<button
-			type="button"
-			onClick={onClick}
-			data-testid={`household-option-${id}`}
-			className={`w-full p-5 rounded-3xl border text-left flex gap-4 transition-all active:scale-[0.98] ${
-				selected
-					? "bg-green-50/40 border-green-600 shadow-sm"
-					: "bg-white border-slate-200 hover:border-slate-300"
-			}`}
-		>
-			<div className="pt-1 shrink-0">
-				<div
-					className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${
-						selected ? "border-green-600" : "border-slate-300"
-					}`}
-				>
-					{selected && (
-						<div className="w-3 h-3 bg-green-600 rounded-full animate-scaleUp" />
-					)}
-				</div>
-			</div>
-			<div className="flex flex-col gap-1.5">
-				<span className="text-base font-bold text-slate-800 leading-snug">
-					{title}
-				</span>
-				{hinweis ? (
-					<span className="text-xs font-medium text-slate-500 leading-relaxed">
-						<strong className="text-slate-600">{t("note")}: </strong>
-						{hinweis}
-					</span>
-				) : null}
-			</div>
-		</button>
-	);
-};
+const OptionCard: React.FC<React.ComponentProps<typeof SharedOptionCard>> = (
+	props,
+) => (
+	<SharedOptionCard {...props} dataTestId={`household-option-${props.id}`} />
+);
 
 const getSupportOption = (
 	hasCustodian?: boolean | null,
@@ -562,12 +516,14 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 			topBarProps={{
 				onBack: handleBack,
 				showLanguageSwitcher: true,
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
 			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
 		>
 			{(isUpdating || saveSuccess) && (
 				<div
 					role="status"
-					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100 animate-in fade-in duration-300"
+					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100 animate-in fade-in duration-300 lg:left-[calc(50%+var(--spacing)*36)] lg:-translate-x-1/2"
 				>
 					{isUpdating ? (
 						<>
@@ -588,17 +544,17 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 			)}
 
 			{saveError && (
-				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm mx-auto text-left shadow-sm">
+				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm mx-auto text-left shadow-sm lg:max-w-180 lg:mx-auto">
 					<AlertCircle className="w-5 h-5 shrink-0 text-rose-500" />
 					<p>{saveError}</p>
 				</div>
 			)}
 
-			<div className="w-full max-w-md flex flex-col gap-6 mx-auto">
+			<div className="w-full max-w-md flex flex-col gap-6 mx-auto lg:max-w-180 lg:mx-auto lg:bg-white lg:rounded-3xl lg:border lg:border-brand-border-subtle lg:shadow-cards lg:px-10 lg:py-8">
 				{/* Step Progress Badge */}
 				<div className="text-left">
 					<span className="text-xs font-semibold text-brand-grey mb-1 block">
-						{t("household.steps.step_x_of_y", {
+						{t("common:step_x_of_y", {
 							current: currentPage,
 							total: 5,
 						})}
@@ -608,7 +564,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 				{/* Page 1: Legal Support */}
 				{currentPage === 1 && (
 					<div className="flex flex-col gap-5 text-left animate-in slide-in-from-right duration-300">
-						<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+						<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 							{t("personal.questions.support_title")}
 						</h1>
 
@@ -644,6 +600,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 
 						<div className="mt-2 animate-in fade-in duration-300">
 							<PrimaryButton
+								className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
 								type="button"
 								onClick={savePage1}
 								disabled={!supportOption}
@@ -657,7 +614,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 				{/* Page 2: Displaced Status */}
 				{currentPage === 2 && (
 					<div className="flex flex-col gap-5 text-left animate-in slide-in-from-right duration-300">
-						<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+						<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 							{t("personal.questions.displaced_title")}
 						</h1>
 
@@ -747,6 +704,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 
 						<div className="mt-2 animate-in fade-in duration-300">
 							<PrimaryButton
+								className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
 								type="button"
 								onClick={savePage2}
 								disabled={
@@ -766,7 +724,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 				{/* Page 3: Insurance */}
 				{currentPage === 3 && (
 					<div className="flex flex-col gap-5 text-left animate-in slide-in-from-right duration-300 pb-10">
-						<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+						<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 							{t("personal.questions.insurance_title")}
 						</h1>
 						<p className="text-slate-600 text-sm leading-relaxed -mt-1 font-medium">
@@ -885,6 +843,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 
 						<div className="mt-4 animate-in fade-in duration-300">
 							<PrimaryButton
+								className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
 								type="button"
 								onClick={savePage3}
 								disabled={
@@ -907,7 +866,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 				{/* Page 4: Household Members count */}
 				{currentPage === 4 && (
 					<div className="flex flex-col gap-5 text-left">
-						<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+						<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 							{t("household.questions.members_title")}
 						</h1>
 
@@ -945,7 +904,11 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 							</div>
 						</div>
 
-						<PrimaryButton type="button" onClick={savePage4}>
+						<PrimaryButton
+							className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+							type="button"
+							onClick={savePage4}
+						>
 							{t("common:next")}
 						</PrimaryButton>
 					</div>
@@ -954,7 +917,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 				{/* Page 5: Marital status */}
 				{currentPage === 5 && (
 					<div className="flex flex-col gap-5 text-left animate-in slide-in-from-right duration-300">
-						<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+						<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 							{t("household.questions.marital_status_title")}
 						</h1>
 
@@ -1043,7 +1006,11 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 						</div>
 
 						<div className="mt-2">
-							<PrimaryButton type="button" onClick={savePage5}>
+							<PrimaryButton
+								className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+								type="button"
+								onClick={savePage5}
+							>
 								{t("household.actions.finish")}
 							</PrimaryButton>
 						</div>

@@ -18,7 +18,6 @@ import {
 import { AppRoutes } from "../../constants/routes";
 import { PageContainer } from "../../components/Layout/PageContainer";
 import { PrimaryButton } from "../../components/ui/PrimaryButton";
-import { ProgressBar } from "../../components/ui/ProgressBar";
 import { useScrollToTop, scrollToTop } from "../../utils/scroll";
 import { OptionCard as SharedOptionCard } from "../../components/ui/OptionCard";
 
@@ -52,7 +51,7 @@ const FormField: React.FC<FieldProps> = ({
 	error,
 }) => {
 	return (
-		<div className="flex flex-col gap-1 text-left relative pb-3 border-b border-slate-100 last:border-b-0 focus-within:border-primary-green-300 transition-all">
+		<div className="flex flex-col gap-1 text-left relative pb-3 border-b border-slate-100 last:border-b-0 focus-within:border-primary-blue-300 transition-all">
 			<label
 				htmlFor={id}
 				className="text-xs font-bold text-slate-600 uppercase tracking-wide"
@@ -325,6 +324,10 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 	const totalPages = 8;
 	const calculatedProgress = currentPage > 1.5 ? Math.floor(currentPage) : 1;
+	const stepLabel = t("common:step_x_of_y", {
+		current: calculatedProgress,
+		total: totalPages,
+	});
 
 	const handleSaveField = async (
 		section: "address" | "housing",
@@ -489,9 +492,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 		switch (currentPage) {
 			case 1:
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"housing.questions.address_title",
 									"Wie lautet Deine aktuelle Wohnadresse?",
@@ -513,7 +516,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 											e.target.checked ? "ohne feste Adresse" : "",
 										);
 									}}
-									className="size-5 rounded border-slate-300 text-primary-green-600 focus:ring-primary-green-500"
+									className="size-5 rounded border-slate-300 text-primary-blue-500 focus:ring-primary-blue-500"
 								/>
 								<label
 									htmlFor="noFixedAddress"
@@ -584,9 +587,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 			case 1.5:
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"housing.questions.last_fixed_address_title",
 									"Wo hast Du zuletzt fest gewohnt?",
@@ -616,9 +619,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 			case 2:
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"housing.questions.accomodation_type_title",
 									"Wie wohnst Du zurzeit?",
@@ -697,9 +700,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 			case 3:
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"housing.questions.tenancy_status_title",
 									"Bist Du Haupt- oder Untermieter?",
@@ -799,9 +802,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 			case 4: {
 				const isJaSublet = (values.subletRoomCount ?? 0) > 0;
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"housing.questions.sublet_title",
 									"Vermietest Du Zimmer unter?",
@@ -880,9 +883,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 			case 5: {
 				const isArrears = !!values.rentPaidUntil;
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"housing.questions.arrears_title",
 									"Hast Du Mietrückstände?",
@@ -947,9 +950,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 			case 6:
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"housing.questions.costs_title",
 									"Wie hoch sind Deine monatlichen Wohnkosten?",
@@ -1022,9 +1025,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 			case 7:
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"housing.questions.size_title",
 									"Wie groß ist Deine Wohnung/Haus?",
@@ -1085,9 +1088,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 					Ofenheizung: "heating_ofenheizung",
 				};
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"housing.questions.heating_type_title",
 									"Wie wird Deine Wohnung beheizt?",
@@ -1131,12 +1134,17 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 	return (
 		<PageContainer
-			topBarProps={{ onBack: onPreviousPage, showLanguageSwitcher: true }}
+			topBarProps={{
+				onBack: onPreviousPage,
+				showLanguageSwitcher: true,
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
+			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
 		>
 			{(isUpdating || saveSuccess) && (
 				<div
 					role="status"
-					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100"
+					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100 lg:left-[calc(50%+var(--spacing)*36)] lg:-translate-x-1/2"
 				>
 					{isUpdating ? (
 						<>
@@ -1156,45 +1164,34 @@ export const ApplicationHousingQuestions: React.FC = () => {
 				</div>
 			)}
 
-			<ProgressBar
-				current={calculatedProgress}
-				total={totalPages}
-				colorVariant="green"
-				ariaLabel={t("common:step_page", {
-					current: calculatedProgress,
-					total: totalPages,
-					defaultValue: `${calculatedProgress} von ${totalPages} Seiten`,
-				})}
-			/>
-			<div className="w-full max-w-md flex flex-col gap-1.5 mb-6 -mt-4">
-				<div className="text-left text-[10px] font-bold text-slate-600 tracking-wider uppercase">
-					{t("common:step_page", {
-						current: calculatedProgress,
-						total: totalPages,
-						defaultValue: `${calculatedProgress} von ${totalPages} Seiten`,
-					})}
-				</div>
-			</div>
-
 			{saveError && (
-				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm">
+				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm lg:max-w-180 lg:mx-auto">
 					<AlertCircle className="w-5 h-5 shrink-0 text-rose-500" />
 					<p>{saveError}</p>
 				</div>
 			)}
 
-			{renderPageContent()}
+			<div className="w-full max-w-md flex flex-col gap-6 lg:max-w-180 lg:mx-auto lg:bg-white lg:rounded-3xl lg:border lg:border-brand-border-subtle lg:shadow-cards lg:px-10 lg:py-8">
+				<div className="text-left">
+					<span className="text-xs font-semibold text-brand-grey mb-1 block">
+						{stepLabel}
+					</span>
+				</div>
 
-			<div className="pt-6 w-full max-w-md">
-				<PrimaryButton
-					data-testid="next-button"
-					type="button"
-					onClick={onNextPage}
-				>
-					{currentPage >= 8
-						? t("common.done", "Geschafft!")
-						: t("common.save_and_continue", "Speichern und weiter")}
-				</PrimaryButton>
+				{renderPageContent()}
+
+				<div className="w-full">
+					<PrimaryButton
+						className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+						data-testid="next-button"
+						type="button"
+						onClick={onNextPage}
+					>
+						{currentPage >= 8
+							? t("common.done", "Geschafft!")
+							: t("common.save_and_continue", "Speichern und weiter")}
+					</PrimaryButton>
+				</div>
 			</div>
 		</PageContainer>
 	);

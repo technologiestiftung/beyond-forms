@@ -1,8 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { ApplicationUploadOptions } from "./ApplicationUploadOptions";
 import { AppRoutes } from "../../constants/routes";
+import { useIsDesktop } from "../../hooks/useIsDesktop";
+
+vi.mock("../../hooks/useIsDesktop", () => ({
+	useIsDesktop: vi.fn(() => false),
+}));
+
+const UploadPage = () => {
+	const state = useLocation().state as {
+		backgroundLocation?: { pathname: string };
+	} | null;
+	return (
+		<div data-testid="upload-page">
+			{state?.backgroundLocation?.pathname ?? "no-background"}
+		</div>
+	);
+};
 
 // Mock react-i18next
 vi.mock("react-i18next", () => ({
@@ -15,6 +31,7 @@ vi.mock("react-i18next", () => ({
 describe("ApplicationUploadOptions", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		vi.mocked(useIsDesktop).mockReturnValue(false);
 	});
 
 	const renderComponent = (
@@ -33,7 +50,7 @@ describe("ApplicationUploadOptions", () => {
 					/>
 					<Route
 						path={AppRoutes.ProfilePersonalDataUpload}
-						element={<div data-testid="upload-page">Upload Page</div>}
+						element={<UploadPage />}
 					/>
 					<Route
 						path={AppRoutes.ApplicationOverview}
@@ -92,5 +109,26 @@ describe("ApplicationUploadOptions", () => {
 		fireEvent.click(cameraBtn);
 
 		expect(screen.getByTestId("upload-page")).toBeInTheDocument();
+	});
+
+	it("opens the upload as a full page on mobile", () => {
+		renderComponent();
+
+		fireEvent.click(screen.getByText("Dokument hochladen"));
+
+		expect(screen.getByTestId("upload-page")).toHaveTextContent(
+			"no-background",
+		);
+	});
+
+	it("opens the upload in the document dialog over the options on desktop", () => {
+		vi.mocked(useIsDesktop).mockReturnValue(true);
+		renderComponent();
+
+		fireEvent.click(screen.getByText("Dokument hochladen"));
+
+		expect(screen.getByTestId("upload-page")).toHaveTextContent(
+			AppRoutes.ApplicationUploadOptions,
+		);
 	});
 });

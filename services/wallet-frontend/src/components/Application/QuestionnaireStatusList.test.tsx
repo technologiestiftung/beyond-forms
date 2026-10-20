@@ -5,9 +5,17 @@ import { useProfile } from "../../hooks/useProfile";
 import type { Profile } from "../../schemas/profile.schema";
 
 // Mock react-i18next
+const interpolate = (text: unknown, values?: Record<string, unknown>) =>
+	typeof text === "string"
+		? text.replace(/\{\{(\w+)\}\}/g, (_, name: string) =>
+				String(values?.[name]),
+			)
+		: text;
+
 vi.mock("react-i18next", () => ({
 	useTranslation: () => ({
-		t: (_key: string, defaultText: string) => defaultText,
+		t: (_key: string, defaultText: string, values?: Record<string, unknown>) =>
+			interpolate(defaultText, values),
 		i18n: { language: "de", changeLanguage: vi.fn() },
 	}),
 }));

@@ -41,7 +41,7 @@ const Page1AwaitingBenefits: React.FC<Page1AwaitingBenefitsProps> = ({
 	savePage1,
 }) => (
 	<div className="flex flex-col gap-5">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("financial.questions.awaiting_benefits_title")}
 		</h1>
 		<div className="flex flex-col gap-3">
@@ -151,7 +151,10 @@ const Page1AwaitingBenefits: React.FC<Page1AwaitingBenefitsProps> = ({
 				</div>
 			</div>
 		)}
-		<PrimaryButton onClick={savePage1}>
+		<PrimaryButton
+			className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+			onClick={savePage1}
+		>
 			{t("financial.intro.continue")}
 		</PrimaryButton>
 	</div>
@@ -183,7 +186,7 @@ const Page2PreviousBenefits: React.FC<Page2PreviousBenefitsProps> = ({
 	savePage2,
 }) => (
 	<div className="flex flex-col gap-5">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("financial.questions.previous_benefits_title")}
 		</h1>
 		<div className="flex flex-col gap-3">
@@ -259,7 +262,10 @@ const Page2PreviousBenefits: React.FC<Page2PreviousBenefitsProps> = ({
 				</div>
 			</div>
 		)}
-		<PrimaryButton onClick={savePage2}>
+		<PrimaryButton
+			className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+			onClick={savePage2}
+		>
 			{t("financial.intro.continue")}
 		</PrimaryButton>
 	</div>
@@ -289,7 +295,7 @@ const Page3Pension: React.FC<Page3PensionProps> = ({
 	savePage3,
 }) => (
 	<div className="flex flex-col gap-5">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("financial.questions.pension_title")}
 		</h1>
 		<div className="flex flex-col gap-3">
@@ -362,7 +368,11 @@ const Page3Pension: React.FC<Page3PensionProps> = ({
 				</div>
 			</div>
 		)}
-		<PrimaryButton onClick={savePage3} disabled={pensionTypes.length === 0}>
+		<PrimaryButton
+			className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+			onClick={savePage3}
+			disabled={pensionTypes.length === 0}
+		>
 			{t("financial.intro.continue")}
 		</PrimaryButton>
 	</div>
@@ -394,7 +404,7 @@ const Page4Employment: React.FC<Page4EmploymentProps> = ({
 	savePage4,
 }) => (
 	<div className="flex flex-col gap-5">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("financial.questions.employment_title")}
 		</h1>
 		<div className="flex flex-col gap-3">
@@ -497,7 +507,11 @@ const Page4Employment: React.FC<Page4EmploymentProps> = ({
 					</div>
 				</div>
 			)}
-		<PrimaryButton onClick={savePage4} disabled={!employmentStatus}>
+		<PrimaryButton
+			className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+			onClick={savePage4}
+			disabled={!employmentStatus}
+		>
 			{t("financial.intro.continue")}
 		</PrimaryButton>
 	</div>
@@ -527,7 +541,7 @@ const Page5OtherIncome: React.FC<Page5OtherIncomeProps> = ({
 	savePage5,
 }) => (
 	<div className="flex flex-col gap-5">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("financial.questions.other_income_title")}
 		</h1>
 		<div className="flex flex-col gap-3">
@@ -606,7 +620,10 @@ const Page5OtherIncome: React.FC<Page5OtherIncomeProps> = ({
 				</div>
 			</div>
 		)}
-		<PrimaryButton onClick={savePage5}>
+		<PrimaryButton
+			className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+			onClick={savePage5}
+		>
 			{t("financial.intro.continue")}
 		</PrimaryButton>
 	</div>
@@ -638,7 +655,7 @@ const Page6OneTime: React.FC<Page6OneTimeProps> = ({
 	savePage6,
 }) => (
 	<div className="flex flex-col gap-5">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("financial.questions.one_time_payment_title")}
 		</h1>
 		<div className="flex flex-col gap-3">
@@ -716,7 +733,10 @@ const Page6OneTime: React.FC<Page6OneTimeProps> = ({
 				</div>
 			</div>
 		)}
-		<PrimaryButton onClick={savePage6}>
+		<PrimaryButton
+			className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+			onClick={savePage6}
+		>
 			{t("financial.intro.continue")}
 		</PrimaryButton>
 	</div>
@@ -752,7 +772,7 @@ const Page7Bank: React.FC<Page7BankProps> = ({
 	savePage7,
 }) => (
 	<div className="flex flex-col gap-5">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("financial.questions.bank_title")}
 		</h1>
 
@@ -835,6 +855,7 @@ const Page7Bank: React.FC<Page7BankProps> = ({
 		</div>
 
 		<PrimaryButton
+			className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
 			onClick={savePage7}
 			disabled={!accountHolder || !bankName || !iban}
 		>
@@ -1687,12 +1708,14 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 			topBarProps={{
 				onBack: handleBack,
 				showLanguageSwitcher: true,
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
 			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
 		>
 			{(isUpdating || saveSuccess) && (
 				<div
 					role="status"
-					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100"
+					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100 lg:left-[calc(50%+var(--spacing)*36)] lg:-translate-x-1/2"
 				>
 					{isUpdating ? (
 						<>
@@ -1713,17 +1736,17 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 			)}
 
 			{saveError && (
-				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm animate-fadeIn">
+				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm animate-fadeIn lg:max-w-180 lg:mx-auto">
 					<AlertCircle className="w-5 h-5 shrink-0 text-rose-500" />
 					<p>{saveError}</p>
 				</div>
 			)}
 
-			<div className="w-full max-w-md flex flex-col gap-6 text-left">
+			<div className="w-full max-w-md flex flex-col gap-6 text-left lg:max-w-180 lg:mx-auto lg:bg-white lg:rounded-3xl lg:border lg:border-brand-border-subtle lg:shadow-cards lg:px-10 lg:py-8">
 				{/* Step label */}
 				<div>
 					<span className="text-xs font-semibold text-brand-grey mb-1 block">
-						{t("financial.steps.step_x_of_y", {
+						{t("common:step_x_of_y", {
 							current: currentPage,
 							total: 7,
 						})}

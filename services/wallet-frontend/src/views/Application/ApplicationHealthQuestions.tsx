@@ -6,20 +6,13 @@ import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { AppRoutes } from "../../constants/routes";
 import { PageContainer } from "../../components/Layout/PageContainer";
 import { PrimaryButton } from "../../components/ui/PrimaryButton";
+import { OptionCard as SharedOptionCard } from "../../components/ui/OptionCard";
 import { useScrollToTop } from "../../utils/scroll";
 import type {
 	AbilityToWorkType,
 	DisabilityMerkzeichenType,
 	Profile,
 } from "../../schemas/profile.schema";
-
-interface OptionCardProps {
-	id: string;
-	title: string;
-	hinweis?: string;
-	selected: boolean;
-	onClick: () => void;
-}
 
 interface HealthQuestionState {
 	isCareDependent?: boolean;
@@ -36,50 +29,9 @@ interface HealthQuestionState {
 	hasCostlyMedicalNutrition?: boolean;
 }
 
-const OptionCard: React.FC<OptionCardProps> = ({
-	id,
-	title,
-	hinweis,
-	selected,
-	onClick,
-}) => {
-	const { t } = useTranslation("common");
-	return (
-		<button
-			type="button"
-			onClick={onClick}
-			data-testid={`health-option-${id}`}
-			className={`w-full p-5 rounded-3xl border text-left flex gap-4 transition-all active:scale-[0.98] ${
-				selected
-					? "bg-green-50/40 border-green-600 shadow-sm"
-					: "bg-white border-slate-200 hover:border-slate-300"
-			}`}
-		>
-			<div className="pt-1 shrink-0">
-				<div
-					className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${
-						selected ? "border-green-600" : "border-slate-300"
-					}`}
-				>
-					{selected && (
-						<div className="w-3 h-3 bg-green-600 rounded-full animate-scaleUp" />
-					)}
-				</div>
-			</div>
-			<div className="flex flex-col gap-1.5">
-				<span className="text-base font-bold text-slate-800 leading-snug">
-					{title}
-				</span>
-				{hinweis ? (
-					<span className="text-xs font-medium text-slate-500 leading-relaxed">
-						<strong className="text-slate-600">{t("note")}: </strong>
-						{hinweis}
-					</span>
-				) : null}
-			</div>
-		</button>
-	);
-};
+const OptionCard: React.FC<React.ComponentProps<typeof SharedOptionCard>> = (
+	props,
+) => <SharedOptionCard {...props} dataTestId={`health-option-${props.id}`} />;
 
 const getNextPage = (current: number, state: HealthQuestionState): number => {
 	switch (current) {
@@ -412,9 +364,10 @@ export const ApplicationHealthQuestions: React.FC = () => {
 	};
 	const visitable = getVisitablePages(currentState);
 	const stepIndex = visitable.indexOf(currentPage);
-	const progressPercentage = Math.round(
-		((stepIndex + 1) / visitable.length) * 100,
-	);
+	const stepLabel = t("common:step_x_of_y", {
+		current: stepIndex + 1,
+		total: visitable.length,
+	});
 
 	if (isLoading && !profileData) {
 		return (
@@ -428,12 +381,17 @@ export const ApplicationHealthQuestions: React.FC = () => {
 
 	return (
 		<PageContainer
-			topBarProps={{ onBack: handleBack, showLanguageSwitcher: true }}
+			topBarProps={{
+				onBack: handleBack,
+				showLanguageSwitcher: true,
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
+			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
 		>
 			{(isUpdating || saveSuccess) && (
 				<div
 					role="status"
-					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100"
+					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100 lg:left-[calc(50%+var(--spacing)*36)] lg:-translate-x-1/2"
 				>
 					{isUpdating ? (
 						<>
@@ -453,35 +411,25 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				</div>
 			)}
 
-			<div className="w-full max-w-md flex flex-col gap-1.5 mb-6">
-				<div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden relative">
-					<div
-						className="h-full bg-primary-green-500 rounded-full transition-all duration-300"
-						style={{ width: `${progressPercentage}%` }}
-					/>
-				</div>
-				<div className="text-left text-[10px] font-bold text-slate-600 tracking-wider uppercase">
-					{t("step_page", {
-						current: stepIndex + 1,
-						total: visitable.length,
-						defaultValue: `${stepIndex + 1} von ${visitable.length} Seiten`,
-					})}
-				</div>
-			</div>
-
 			{saveError && (
-				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm">
+				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm lg:max-w-180 lg:mx-auto">
 					<AlertCircle className="w-5 h-5 shrink-0 text-rose-500" />
 					<p>{saveError}</p>
 				</div>
 			)}
 
-			<div className="w-full max-w-md flex flex-col gap-5">
+			<div className="w-full max-w-md flex flex-col gap-5 lg:max-w-180 lg:mx-auto lg:bg-white lg:rounded-3xl lg:border lg:border-brand-border-subtle lg:shadow-cards lg:px-10 lg:py-8">
+				<div className="text-left">
+					<span className="text-xs font-semibold text-brand-grey mb-1 block">
+						{stepLabel}
+					</span>
+				</div>
+
 				{/* PAGE 1: CARE DEPENDENCY */}
 				{currentPage === 1 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 								{t("health.care_dependency.title", "Bist Du pflegebedürftig?")}
 							</h1>
 						</div>
@@ -514,7 +462,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 2 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"health.inpatient.title",
 									"Wohnst Du in einer vollstationären Pflegeeinrichtung?",
@@ -550,7 +498,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 3 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"health.inpatient_details.title",
 									"Details zur stationären Einrichtung",
@@ -568,7 +516,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									onChange={(e) =>
 										setInpatientFacilityMoveInDate(e.target.value)
 									}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 							<div className="flex flex-col gap-1.5">
@@ -588,7 +536,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									onChange={(e) =>
 										setInpatientFacilityLastResidence(e.target.value)
 									}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 						</div>
@@ -599,7 +547,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 4 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"health.earning_capacity.title",
 									"Wie schätzt Du Deine Erwerbsfähigkeit ein?",
@@ -642,7 +590,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 5 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"health.earning_temp.title",
 									"Details zur vorübergehenden Erwerbsminderung",
@@ -660,7 +608,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									onChange={(e) =>
 										setReducedWorkCapacityStartDate(e.target.value)
 									}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 							<div className="flex flex-col gap-1.5">
@@ -673,7 +621,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									onChange={(e) =>
 										setReducedWorkCapacityEndDate(e.target.value)
 									}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 							<div className="flex flex-col gap-1.5">
@@ -691,7 +639,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									)}
 									value={reducedWorkCapacityReason}
 									onChange={(e) => setReducedWorkCapacityReason(e.target.value)}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 						</div>
@@ -702,7 +650,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 6 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"health.earning_perm.title",
 									"Details zur dauerhaften Erwerbsminderung",
@@ -720,7 +668,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									onChange={(e) =>
 										setReducedWorkCapacityStartDate(e.target.value)
 									}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 							<div className="flex flex-col gap-1.5">
@@ -738,7 +686,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									)}
 									value={reducedWorkCapacityReason}
 									onChange={(e) => setReducedWorkCapacityReason(e.target.value)}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 							<div className="flex flex-col gap-4 mt-2">
@@ -769,7 +717,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 7 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 								{t("health.disability.title", "Angaben zum Behindertenausweis")}
 							</h1>
 						</div>
@@ -782,7 +730,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									type="date"
 									value={disabilityValidUntil}
 									onChange={(e) => setDisabilityValidUntil(e.target.value)}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 							<div className="flex flex-col gap-1.5">
@@ -800,7 +748,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 												DisabilityMerkzeichenType | undefined,
 										)
 									}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all bg-white"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all bg-white"
 								>
 									<option value="">
 										{t(
@@ -830,7 +778,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 8 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 								{t(
 									"health.nutrition.title",
 									"Benötigst Du aus medizinischen Gründen eine kostenaufwändige Ernährung?",
@@ -868,6 +816,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 
 				<div className="pt-4 w-full">
 					<PrimaryButton
+						className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
 						data-testid={currentPage === 8 ? "done-button" : "next-button"}
 						type="button"
 						onClick={handleNext}

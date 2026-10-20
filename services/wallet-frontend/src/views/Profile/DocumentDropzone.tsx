@@ -60,6 +60,22 @@ export const DocumentDropzone: React.FC = () => {
 		return getSharedExitRoute(origin, category, "upload");
 	};
 
+	const flowState = location.state as {
+		returnToPrevious?: boolean;
+		backgroundLocation?: unknown;
+	} | null;
+	const cameFromUploadOptions =
+		origin === Origins.WIZARD &&
+		Boolean(flowState?.returnToPrevious || flowState?.backgroundLocation);
+
+	const handleBack = () => {
+		if (cameFromUploadOptions) {
+			navigate(-1);
+		} else {
+			navigate(getSharedExitRoute(origin, category, "back"), { replace: true });
+		}
+	};
+
 	const [files, setFiles] = useState<File[]>([]);
 	const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 	const [status, setStatus] = useState<
@@ -841,9 +857,7 @@ export const DocumentDropzone: React.FC = () => {
 	};
 
 	return (
-		<StepLayout
-			onBack={() => navigate(getTargetExitRoute(), { replace: true })}
-		>
+		<StepLayout onBack={handleBack}>
 			<div className="max-w-md w-full mx-auto">{renderContent()}</div>
 		</StepLayout>
 	);

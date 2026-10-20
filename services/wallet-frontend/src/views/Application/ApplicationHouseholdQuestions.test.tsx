@@ -51,7 +51,7 @@ const MOCK_TRANSLATIONS: Record<string, string> = {
 vi.mock("react-i18next", () => ({
 	useTranslation: () => ({
 		t: (key: string, options?: Record<string, unknown>) => {
-			if (key === "household.steps.step_x_of_y") {
+			if (key === "common:step_x_of_y") {
 				return `Step ${options?.current} of ${options?.total}`;
 			}
 			if (key === "common:next") {

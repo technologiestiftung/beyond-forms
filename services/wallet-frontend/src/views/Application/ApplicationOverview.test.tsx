@@ -16,10 +16,17 @@ const MOCK_TRANSLATIONS: Record<string, string> = {
 	"overview.warning_modal_title": "Antrag vorzeitig generieren?",
 };
 
+const interpolate = (text: unknown, values?: Record<string, unknown>) =>
+	typeof text === "string"
+		? text.replace(/\{\{(\w+)\}\}/g, (_, name: string) =>
+				String(values?.[name]),
+			)
+		: text;
+
 vi.mock("react-i18next", () => ({
 	useTranslation: () => ({
-		t: (key: string, defaultText: string) =>
-			MOCK_TRANSLATIONS[key] || defaultText,
+		t: (key: string, defaultText: string, values?: Record<string, unknown>) =>
+			interpolate(MOCK_TRANSLATIONS[key] || defaultText, values),
 		i18n: { language: "de", changeLanguage: vi.fn() },
 	}),
 }));
@@ -110,14 +117,6 @@ describe("ApplicationOverview", () => {
 	it("renders QuestionnaireStatusList per overview layout rules", () => {
 		renderComponent();
 		expect(screen.getByTestId("questionnaire-status-list")).toBeInTheDocument();
-	});
-
-	it("renders the progress status card with progress bar", () => {
-		renderComponent();
-		expect(
-			screen.getByText("Dein Antrag Schritt für Schritt zum Ziel"),
-		).toBeInTheDocument();
-		expect(screen.getByTestId("segmented-progress-bar")).toBeInTheDocument();
 	});
 
 	it("calls useDocumentProcessingSocket to initiate websocket connection", () => {
@@ -223,9 +222,11 @@ describe("ApplicationOverview", () => {
 		expect(useProfileStore.getState().applicationStatus).toBe("idle");
 	});
 
-	it("renders the SegmentedProgressBar and not the legacy progress container", () => {
+	it("does not render a progress indicator", () => {
 		renderComponent();
-		expect(screen.getByTestId("segmented-progress-bar")).toBeInTheDocument();
+		expect(
+			screen.queryByTestId("completeness-indicator"),
+		).not.toBeInTheDocument();
 		expect(screen.queryByText("Antragsfortschritt")).not.toBeInTheDocument();
 	});
 });
