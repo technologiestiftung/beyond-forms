@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { AppRoutes } from "../../constants/routes";
-import { SectionIntroLayout } from "../../components/Application/SectionIntroLayout";
+import { AppRoutes } from "../../../constants/routes";
+import { SectionIntroLayout } from "../../../components/Application/SectionIntroLayout";
 
 export const ApplicationHousingIntro: React.FC = () => {
 	const { t } = useTranslation("application");

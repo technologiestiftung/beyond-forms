@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useProfile } from "../../hooks/useProfile";
+import { useProfile } from "../../../hooks/useProfile";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
-import { AppRoutes } from "../../constants/routes";
-import { PageContainer } from "../../components/Layout/PageContainer";
-import { PrimaryButton } from "../../components/ui/PrimaryButton";
-import { OptionCard as SharedOptionCard } from "../../components/ui/OptionCard";
-import { useScrollToTop } from "../../utils/scroll";
+import { AppRoutes } from "../../../constants/routes";
+import { PageContainer } from "../../../components/Layout/PageContainer";
+import { PrimaryButton } from "../../../components/ui/PrimaryButton";
+import { OptionCard } from "../../../components/ui/OptionCard";
+import { useScrollToTop } from "../../../utils/scroll";
 import type {
 	AbilityToWorkType,
 	DisabilityMerkzeichenType,
 	Profile,
-} from "../../schemas/profile.schema";
+} from "../../../schemas/profile.schema";
 
 interface HealthQuestionState {
 	isCareDependent?: boolean;
@@ -28,10 +28,6 @@ interface HealthQuestionState {
 	merkzeichen?: DisabilityMerkzeichenType;
 	hasCostlyMedicalNutrition?: boolean;
 }
-
-const OptionCard: React.FC<React.ComponentProps<typeof SharedOptionCard>> = (
-	props,
-) => <SharedOptionCard {...props} dataTestId={`health-option-${props.id}`} />;
 
 const getNextPage = (current: number, state: HealthQuestionState): number => {
 	switch (current) {
@@ -443,12 +439,14 @@ export const ApplicationHealthQuestions: React.FC = () => {
 						</div>
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="health-option"
 								id="care-yes"
 								title={t("common.yes", "Ja")}
 								selected={isCareDependent === true}
 								onClick={() => setIsCareDependent(true)}
 							/>
 							<OptionCard
+								testIdPrefix="health-option"
 								id="care-no"
 								title={t("common.no", "Nein")}
 								selected={isCareDependent === false}
@@ -479,12 +477,14 @@ export const ApplicationHealthQuestions: React.FC = () => {
 						</div>
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="health-option"
 								id="inpatient-yes"
 								title={t("common.yes", "Ja")}
 								selected={hasInpatientFacilityAccommodation === true}
 								onClick={() => setHasInpatientFacilityAccommodation(true)}
 							/>
 							<OptionCard
+								testIdPrefix="health-option"
 								id="inpatient-no"
 								title={t("common.no", "Nein")}
 								selected={hasInpatientFacilityAccommodation === false}
@@ -556,6 +556,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 						</div>
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="health-option"
 								id="work-fully"
 								title={t(
 									"health.earning_capacity.fully_able",
@@ -565,6 +566,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 								onClick={() => setAbilityToWork("Fully able")}
 							/>
 							<OptionCard
+								testIdPrefix="health-option"
 								id="work-temporary"
 								title={t(
 									"health.earning_capacity.temporary",
@@ -574,6 +576,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 								onClick={() => setAbilityToWork("Temporarily disabled")}
 							/>
 							<OptionCard
+								testIdPrefix="health-option"
 								id="work-permanent"
 								title={t(
 									"health.earning_capacity.permanent",
@@ -697,12 +700,14 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									)}
 								</label>
 								<OptionCard
+									testIdPrefix="health-option"
 									id="disability-yes"
 									title={t("common.yes", "Ja")}
 									selected={hasDisabilityId === true}
 									onClick={() => setHasDisabilityId(true)}
 								/>
 								<OptionCard
+									testIdPrefix="health-option"
 									id="disability-no"
 									title={t("common.no", "Nein")}
 									selected={hasDisabilityId === false}
@@ -795,6 +800,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 						</div>
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="health-option"
 								id="nutrition-yes"
 								title={t("common.yes", "Ja")}
 								hinweis={t(
@@ -805,6 +811,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 								onClick={() => setHasCostlyMedicalNutrition(true)}
 							/>
 							<OptionCard
+								testIdPrefix="health-option"
 								id="nutrition-no"
 								title={t("common.no", "Nein")}
 								selected={hasCostlyMedicalNutrition === false}

@@ -862,7 +862,10 @@ export const getTargetExitRoute = (
 	stage: "back" | "upload" | "review_success",
 ): string => {
 	if (origin === "wizard") {
-		const section = category ? WIZARD_SECTION_ROUTES[category] : undefined;
+		const section =
+			category && Object.hasOwn(WIZARD_SECTION_ROUTES, category)
+				? WIZARD_SECTION_ROUTES[category]
+				: undefined;
 		if (!section) {
 			return AppRoutes.ApplicationOverview;
 		}

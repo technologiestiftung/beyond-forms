@@ -44,8 +44,8 @@ export const SectionIntroLayout: React.FC<SectionIntroLayoutProps> = ({
 					{recommendedDocsTitle}
 				</h2>
 				<ul className="list-disc pl-5 flex flex-col gap-2 text-sm font-medium text-slate-800 lg:text-body-lg lg:font-normal">
-					{documents.map((document) => (
-						<li key={document}>{document}</li>
+					{documents.map((label, index) => (
+						<li key={index}>{label}</li>
 					))}
 				</ul>
 			</div>

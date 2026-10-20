@@ -46,6 +46,9 @@ describe("getTargetExitRoute", () => {
 		expect(getTargetExitRoute("wizard", null, "upload")).toBe(
 			AppRoutes.ApplicationOverview,
 		);
+		expect(getTargetExitRoute("wizard", "constructor", "upload")).toBe(
+			AppRoutes.ApplicationOverview,
+		);
 	});
 
 	it("returns to the profile documents outside the wizard", () => {

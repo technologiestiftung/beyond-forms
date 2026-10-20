@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { ApplicationHouseholdQuestions } from "./ApplicationHouseholdQuestions";
-import { useProfile } from "../../hooks/useProfile";
-import type { Profile } from "../../schemas/profile.schema";
+import { useProfile } from "../../../hooks/useProfile";
+import type { Profile } from "../../../schemas/profile.schema";
 
 // Mock react-i18next
 const MOCK_TRANSLATIONS: Record<string, string> = {
@@ -66,7 +66,7 @@ vi.mock("react-i18next", () => ({
 	}),
 }));
 
-vi.mock("../../hooks/useProfile", () => ({
+vi.mock("../../../hooks/useProfile", () => ({
 	useProfile: vi.fn(),
 }));
 

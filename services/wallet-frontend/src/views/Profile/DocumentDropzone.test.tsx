@@ -410,9 +410,22 @@ describe("DocumentDropzone", () => {
 	it("steps back in history when opened from the wizard's upload options", () => {
 		mockSearch = "?origin=wizard&category=housing&mode=upload";
 		mockState = { returnToPrevious: true };
+		window.history.replaceState({ idx: 1 }, "");
 		renderWithRouter(<DocumentDropzone />);
 		fireEvent.click(screen.getByTestId("tutorial-back"));
 		expect(mockNavigate).toHaveBeenCalledWith(-1);
+		window.history.replaceState(null, "");
+	});
+
+	it("falls back to the upload options route when there is no earlier history entry", () => {
+		mockSearch = "?origin=wizard&category=housing&mode=upload";
+		mockState = { returnToPrevious: true };
+		renderWithRouter(<DocumentDropzone />);
+		fireEvent.click(screen.getByTestId("tutorial-back"));
+		expect(mockNavigate).toHaveBeenCalledWith(
+			"/dashboard/application/upload-options?category=housing&origin=wizard",
+			{ replace: true },
+		);
 	});
 
 	it("redirects contextually to specific category after processing timeout (Path B) when category param is present", async () => {

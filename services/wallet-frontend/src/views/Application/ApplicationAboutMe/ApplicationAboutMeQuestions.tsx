@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useProfile } from "../../hooks/useProfile";
-import { useAutoVerification } from "../../hooks/useAutoVerification";
+import { useProfile } from "../../../hooks/useProfile";
+import { useAutoVerification } from "../../../hooks/useAutoVerification";
 import {
 	AlertCircle,
 	CheckCircle2,
@@ -12,30 +12,27 @@ import {
 	Calendar,
 	Home,
 } from "lucide-react";
-import { AppRoutes } from "../../constants/routes";
-import { COUNTRY_OPTIONS } from "../../constants/countries";
-import { PageContainer } from "../../components/Layout/PageContainer";
-import { PrimaryButton } from "../../components/ui/PrimaryButton";
-import { OptionCard as SharedOptionCard } from "../../components/ui/OptionCard";
+import { AppRoutes } from "../../../constants/routes";
+import { COUNTRY_OPTIONS } from "../../../constants/countries";
+import { PageContainer } from "../../../components/Layout/PageContainer";
+import { PrimaryButton } from "../../../components/ui/PrimaryButton";
+import { OptionCard } from "../../../components/ui/OptionCard";
 
-const OptionCard: React.FC<React.ComponentProps<typeof SharedOptionCard>> = (
-	props,
-) => <SharedOptionCard {...props} dataTestId={`about-me-option-${props.id}`} />;
-import { useScrollToTop, scrollToTop } from "../../utils/scroll";
+import { useScrollToTop, scrollToTop } from "../../../utils/scroll";
 import type {
 	Profile,
 	PersonalData,
 	Address,
 	GenderType,
 	WalletDocument,
-} from "../../schemas/profile.schema";
-import type { ProfileResponse } from "../../services/profile/IProfileService";
+} from "../../../schemas/profile.schema";
+import type { ProfileResponse } from "../../../services/profile/IProfileService";
 import {
 	parseAddressString,
 	mapBackendDocTypeToSlotId,
-} from "../../utils/profile";
-import { authenticatedFetch } from "../../utils/apiClient";
-import { env } from "../../config/env.config";
+} from "../../../utils/profile";
+import { authenticatedFetch } from "../../../utils/apiClient";
+import { env } from "../../../config/env.config";
 
 const GERMAN_COUNTRY_NAMES: Record<string, string> = {
 	DE: "Deutschland",
@@ -406,18 +403,21 @@ const Page3Gender: React.FC<Page3GenderProps> = ({
 
 		<div className="flex flex-col gap-3">
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="Female"
 				title={t("personal.options.female")}
 				selected={legalGender === "Female"}
 				onClick={() => savePage3("Female")}
 			/>
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="Male"
 				title={t("personal.options.male")}
 				selected={legalGender === "Male"}
 				onClick={() => savePage3("Male")}
 			/>
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="Diverse"
 				title={t("personal.options.diverse")}
 				selected={legalGender === "Diverse"}
@@ -527,6 +527,7 @@ const Page4Address: React.FC<Page4AddressProps> = ({
 			<div className="border-t border-slate-100 my-2" />
 
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="no_fixed_address"
 				title={t("personal.questions.no_fixed_address_label")}
 				selected={noFixedAddress}
@@ -644,6 +645,7 @@ const Page6Citizenship: React.FC<Page6CitizenshipProps> = ({
 
 		<div className="flex flex-col gap-4">
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="german"
 				title={t("personal.options.german", {
 					defaultValue: "Ich habe die deutsche Staatsangehörigkeit.",
@@ -656,6 +658,7 @@ const Page6Citizenship: React.FC<Page6CitizenshipProps> = ({
 				}}
 			/>
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="eu_5"
 				title={t("personal.options.eu_5", {
 					defaultValue:
@@ -692,6 +695,7 @@ const Page6Citizenship: React.FC<Page6CitizenshipProps> = ({
 			)}
 
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="permit"
 				title={t("personal.options.permit", {
 					defaultValue: "Mein Aufenthaltstitel für Deutschland ist gültig.",

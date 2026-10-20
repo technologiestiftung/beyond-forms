@@ -64,8 +64,11 @@ export const DocumentDropzone: React.FC = () => {
 		returnToPrevious?: boolean;
 		backgroundLocation?: unknown;
 	} | null;
+	const hasPreviousEntry =
+		((window.history.state as { idx?: number } | null)?.idx ?? 0) > 0;
 	const cameFromUploadOptions =
 		origin === Origins.WIZARD &&
+		hasPreviousEntry &&
 		Boolean(flowState?.returnToPrevious || flowState?.backgroundLocation);
 
 	const handleBack = () => {

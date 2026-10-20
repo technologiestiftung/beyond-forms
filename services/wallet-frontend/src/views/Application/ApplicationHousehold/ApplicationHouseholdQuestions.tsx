@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useProfile } from "../../hooks/useProfile";
+import { useProfile } from "../../../hooks/useProfile";
 import {
 	AlertCircle,
 	CheckCircle2,
@@ -11,22 +11,16 @@ import {
 	Calendar,
 	MapPin,
 } from "lucide-react";
-import { AppRoutes } from "../../constants/routes";
-import { PageContainer } from "../../components/Layout/PageContainer";
-import { PrimaryButton } from "../../components/ui/PrimaryButton";
-import { OptionCard as SharedOptionCard } from "../../components/ui/OptionCard";
-import { useScrollToTop, scrollToTop } from "../../utils/scroll";
+import { AppRoutes } from "../../../constants/routes";
+import { PageContainer } from "../../../components/Layout/PageContainer";
+import { PrimaryButton } from "../../../components/ui/PrimaryButton";
+import { OptionCard } from "../../../components/ui/OptionCard";
+import { useScrollToTop, scrollToTop } from "../../../utils/scroll";
 import type {
 	HouseholdData,
 	PersonalData,
 	Profile,
-} from "../../schemas/profile.schema";
-
-const OptionCard: React.FC<React.ComponentProps<typeof SharedOptionCard>> = (
-	props,
-) => (
-	<SharedOptionCard {...props} dataTestId={`household-option-${props.id}`} />
-);
+} from "../../../schemas/profile.schema";
 
 const getSupportOption = (
 	hasCustodian?: boolean | null,
@@ -570,6 +564,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 
 						<div className="flex flex-col gap-3">
 							<OptionCard
+								testIdPrefix="household-option"
 								id="custodian"
 								title={t("personal.options.custodian")}
 								selected={supportOption === "custodian"}
@@ -579,6 +574,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="household-option"
 								id="guardian"
 								title={t("personal.options.guardian")}
 								selected={supportOption === "guardian"}
@@ -588,6 +584,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="household-option"
 								id="none"
 								title={t("personal.options.none")}
 								selected={supportOption === "none"}
@@ -620,6 +617,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 
 						<div className="flex flex-col gap-3">
 							<OptionCard
+								testIdPrefix="household-option"
 								id="yes"
 								title={t("personal.options.yes")}
 								selected={displacedOption === "yes"}
@@ -692,6 +690,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 								</div>
 							)}
 							<OptionCard
+								testIdPrefix="household-option"
 								id="no"
 								title={t("personal.options.no")}
 								selected={displacedOption === "no"}
@@ -733,6 +732,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 
 						<div className="flex flex-col gap-3">
 							<OptionCard
+								testIdPrefix="household-option"
 								id="social"
 								title={t("personal.options.social")}
 								selected={checkSocial}
@@ -774,6 +774,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 							)}
 
 							<OptionCard
+								testIdPrefix="household-option"
 								id="health"
 								title={t("personal.options.health")}
 								selected={checkHealth}
@@ -826,6 +827,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 							)}
 
 							<OptionCard
+								testIdPrefix="household-option"
 								id="none"
 								title={t("personal.options.not_insured")}
 								selected={checkNone}
@@ -923,6 +925,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 
 						<div className="flex flex-col gap-3">
 							<OptionCard
+								testIdPrefix="household-option"
 								id="Single"
 								title={t("household.options.single")}
 								selected={maritalStatus === "Single"}
@@ -932,6 +935,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="household-option"
 								id="Married"
 								title={t("household.options.married")}
 								selected={maritalStatus === "Married"}
@@ -977,6 +981,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 								</div>
 							)}
 							<OptionCard
+								testIdPrefix="household-option"
 								id="Divorced"
 								title={t("household.options.divorced")}
 								selected={maritalStatus === "Divorced"}
@@ -986,6 +991,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="household-option"
 								id="Widowed"
 								title={t("household.options.widowed")}
 								selected={maritalStatus === "Widowed"}
@@ -995,6 +1001,7 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="household-option"
 								id="RegisteredPartnership"
 								title={t("household.options.partnership")}
 								selected={maritalStatus === "Registered Civil Partnership"}

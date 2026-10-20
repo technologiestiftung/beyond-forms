@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { ApplicationAboutMeIntro } from "./ApplicationAboutMeIntro";
-import { AppRoutes } from "../../constants/routes";
+import { AppRoutes } from "../../../constants/routes";
 
 // Mock react-i18next
 vi.mock("react-i18next", () => ({

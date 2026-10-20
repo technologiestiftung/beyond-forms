@@ -6,8 +6,8 @@ import type { UseFormRegisterReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { useProfile } from "../../hooks/useProfile";
-import type { Profile } from "../../schemas/profile.schema";
+import { useProfile } from "../../../hooks/useProfile";
+import type { Profile } from "../../../schemas/profile.schema";
 import {
 	AlertCircle,
 	CheckCircle2,
@@ -15,21 +15,11 @@ import {
 	Pencil,
 	Calendar,
 } from "lucide-react";
-import { AppRoutes } from "../../constants/routes";
-import { PageContainer } from "../../components/Layout/PageContainer";
-import { PrimaryButton } from "../../components/ui/PrimaryButton";
-import { useScrollToTop, scrollToTop } from "../../utils/scroll";
-import { OptionCard as SharedOptionCard } from "../../components/ui/OptionCard";
-
-const OptionCard: React.FC<{
-	id: string;
-	title: string;
-	hinweis?: string;
-	selected: boolean;
-	onClick: () => void;
-}> = (props) => (
-	<SharedOptionCard {...props} dataTestId={`housing-option-${props.id}`} />
-);
+import { AppRoutes } from "../../../constants/routes";
+import { PageContainer } from "../../../components/Layout/PageContainer";
+import { PrimaryButton } from "../../../components/ui/PrimaryButton";
+import { useScrollToTop, scrollToTop } from "../../../utils/scroll";
+import { OptionCard } from "../../../components/ui/OptionCard";
 
 interface FieldProps {
 	id: string;
@@ -631,6 +621,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="Rental Apartment"
 								title={t(
 									"housing.options.accomodation_rental",
@@ -647,6 +638,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="Own Home"
 								title={t(
 									"housing.options.accomodation_own",
@@ -663,6 +655,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="Shared Household"
 								title={t(
 									"housing.options.accomodation_care",
@@ -679,6 +672,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="Relative"
 								title={t(
 									"housing.options.accomodation_relative",
@@ -712,6 +706,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="Main Tenant"
 								title={t("housing.options.tenancy_main", "Ich bin Hauptmieter")}
 								selected={values.tenancyStatus === "Main Tenant"}
@@ -725,6 +720,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="Subtenant"
 								title={t("housing.options.tenancy_sub", "Ich bin Untermieter")}
 								selected={values.tenancyStatus === "Subtenant"}
@@ -734,6 +730,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="FreeLodging"
 								title={t(
 									"housing.options.tenancy_free",
@@ -814,6 +811,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="sublet-no"
 								title={t("common.no", "Nein")}
 								selected={
@@ -826,6 +824,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="sublet-yes"
 								title={t("common.yes", "Ja")}
 								selected={isJaSublet}
@@ -895,6 +894,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="arrears-no"
 								title={t("common.no", "Nein")}
 								selected={!isArrears}
@@ -904,6 +904,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="arrears-yes"
 								title={t("common.yes", "Ja")}
 								selected={isArrears}
@@ -1101,6 +1102,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 						<div className="flex flex-col gap-4">
 							{heatingTypes.map((ht) => (
 								<OptionCard
+									testIdPrefix="housing-option"
 									key={ht}
 									id={`heating-${ht}`}
 									title={t(`housing.options.${heatingTypeKeys[ht]}`, ht)}

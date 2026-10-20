@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { ApplicationIncomeAssetsQuestions } from "./ApplicationIncomeAssetsQuestions";
-import { useProfile } from "../../hooks/useProfile";
-import type { Profile } from "../../schemas/profile.schema";
+import { useProfile } from "../../../hooks/useProfile";
+import type { Profile } from "../../../schemas/profile.schema";
 
 // Mock translation labels
 const MOCK_TRANSLATIONS: Record<string, string> = {
@@ -103,7 +103,7 @@ vi.mock("react-i18next", () => ({
 	}),
 }));
 
-vi.mock("../../hooks/useProfile", () => ({
+vi.mock("../../../hooks/useProfile", () => ({
 	useProfile: vi.fn(),
 }));
 
@@ -261,6 +261,8 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 				section: "personalData",
 				data: {
 					isCurrentlyEmployed: false,
+					workScopeAndType: null,
+					employerName: null,
 					validateEntireForm: false,
 				},
 			});
@@ -400,7 +402,7 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 		// Click Nein
 		fireEvent.click(screen.getByRole("button", { name: "Nein" }));
 
-		// Click Weiter (which calls savePage1 and receives the mocked next_step mapping to Page 6!)
+		// Click Weiter (which calls saveAwaitingBenefits and receives the mocked next_step mapping to Page 6!)
 		fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
 
 		// Assert it skipped to Page 6!
@@ -485,6 +487,8 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 				section: "personalData",
 				data: {
 					isCurrentlyEmployed: false,
+					workScopeAndType: null,
+					employerName: null,
 					validateEntireForm: false,
 				},
 			});
@@ -565,6 +569,49 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 			expect(mockNavigate).toHaveBeenCalledWith(
 				"/dashboard/application/overview",
 			);
+		});
+	});
+
+	it("saves the employer and job title for employed applicants", async () => {
+		render(
+			<MemoryRouter>
+				<ApplicationIncomeAssetsQuestions />
+			</MemoryRouter>,
+		);
+
+		fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+		await screen.findByText(
+			"Hast Du in den letzten zwei Jahren Sozialleistungen erhalten?",
+		);
+		fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+		await screen.findByText("Beziehst Du eine Rente?");
+		fireEvent.click(screen.getByText("Nein, ich erhalte keine Rente"));
+		fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+		await screen.findByText("Wie ist Deine Erwerbssituation?");
+
+		fireEvent.click(
+			screen.getByText(
+				"Angestellt (Vollzeit / Teilzeit / Minijob / Werkstudierende)",
+			),
+		);
+		fireEvent.change(await screen.findByLabelText("Name des Arbeitgebers"), {
+			target: { value: " ACME GmbH " },
+		});
+		fireEvent.change(screen.getByLabelText("Berufsbezeichnung"), {
+			target: { value: "Koch" },
+		});
+		fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+
+		await waitFor(() => {
+			expect(mockUpdateSection).toHaveBeenCalledWith({
+				section: "personalData",
+				data: {
+					isCurrentlyEmployed: true,
+					workScopeAndType: "Koch",
+					employerName: "ACME GmbH",
+					validateEntireForm: false,
+				},
+			});
 		});
 	});
 
