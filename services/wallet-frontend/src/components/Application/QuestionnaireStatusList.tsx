@@ -180,7 +180,9 @@ export const QuestionnaireStatusList: React.FC<
 													: section.title}
 											</span>
 											{section.subtitleKey || section.subtitle ? (
-												<p className="text-xs text-brand-black leading-relaxed lg:row-start-2 lg:col-start-2 lg:self-start lg:max-w-[60ch] lg:text-body lg:text-brand-grey">
+												<p
+													className={`text-xs text-brand-black leading-relaxed lg:row-start-2 lg:col-start-2 lg:self-start lg:max-w-[60ch] lg:text-body ${section.locked ? "" : "lg:text-brand-grey"}`}
+												>
 													{section.subtitleKey
 														? t(section.subtitleKey, section.subtitle)
 														: section.subtitle}
