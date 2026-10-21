@@ -22,7 +22,6 @@
 	"save_next": "Speichern und weiter",
 	"save_close": "Speichern und schließen",
 	"step_page": "{{current}} von {{total}} Fragen",
-	"step_x_of_y": "Schritt {{current}} von {{total}}",
 	"done": "Geschafft!",
 	"next": "Weiter",
 	"back": "Zurück",

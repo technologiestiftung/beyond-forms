@@ -28,34 +28,34 @@ export const OtherIncomeStep: React.FC<OtherIncomeStepProps> = ({
 			</h1>
 			<div className="flex flex-col gap-3">
 				<OptionCard
-					id="krankengeld"
+					id="sick_pay"
 					title={t("financial.options.other_sick")}
 					type="checkbox"
-					selected={otherIncomeTypes.includes("Krankengeld")}
+					selected={otherIncomeTypes.includes("sick_pay")}
 					onClick={() =>
-						setOtherIncomeTypes(toggleOption(otherIncomeTypes, "Krankengeld"))
+						setOtherIncomeTypes(toggleOption(otherIncomeTypes, "sick_pay"))
 					}
 				/>
 				<OptionCard
-					id="unterhalt"
+					id="alimony"
 					title={t("financial.options.other_alimony")}
 					type="checkbox"
-					selected={otherIncomeTypes.includes("Unterhalt")}
+					selected={otherIncomeTypes.includes("alimony")}
 					onClick={() =>
-						setOtherIncomeTypes(toggleOption(otherIncomeTypes, "Unterhalt"))
+						setOtherIncomeTypes(toggleOption(otherIncomeTypes, "alimony"))
 					}
 				/>
 				<OptionCard
-					id="sonstige_einnahmen"
+					id="other_income"
 					title={t("financial.options.other_rent")}
 					type="checkbox"
-					selected={otherIncomeTypes.includes("Sonstige")}
+					selected={otherIncomeTypes.includes("other")}
 					onClick={() =>
-						setOtherIncomeTypes(toggleOption(otherIncomeTypes, "Sonstige"))
+						setOtherIncomeTypes(toggleOption(otherIncomeTypes, "other"))
 					}
 				/>
 				<OptionCard
-					id="keine_einnahmen"
+					id="no_other_income"
 					title={t("financial.options.other_none")}
 					type="checkbox"
 					selected={otherIncomeTypes.includes("none")}

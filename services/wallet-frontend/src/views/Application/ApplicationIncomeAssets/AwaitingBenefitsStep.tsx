@@ -39,13 +39,13 @@ export const AwaitingBenefitsStep: React.FC<AwaitingBenefitsStepProps> = ({
 			</h1>
 			<div className="flex flex-col gap-3">
 				<OptionCard
-					id="ja"
+					id="yes"
 					title={t("financial.options.yes")}
 					selected={hasAppliedForBenefitsAwaitingDecision === true}
 					onClick={() => setHasAppliedForBenefitsAwaitingDecision(true)}
 				/>
 				<OptionCard
-					id="nein"
+					id="no"
 					title={t("financial.options.no")}
 					selected={hasAppliedForBenefitsAwaitingDecision === false}
 					onClick={() => setHasAppliedForBenefitsAwaitingDecision(false)}

@@ -697,7 +697,7 @@ export const DocumentReviewView: React.FC = () => {
 					<button
 						type="button"
 						onClick={() =>
-							navigate(getTargetExitRoute(origin, category, "back"), {
+							navigate(getTargetExitRoute(origin, category, "upload"), {
 								replace: true,
 							})
 						}

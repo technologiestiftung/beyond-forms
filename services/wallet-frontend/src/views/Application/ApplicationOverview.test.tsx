@@ -14,6 +14,8 @@ const { mockProfileState } = vi.hoisted(() => ({
 
 const MOCK_TRANSLATIONS: Record<string, string> = {
 	"overview.warning_modal_title": "Antrag vorzeitig generieren?",
+	"overview.generate_notice_ready_title":
+		"Dein Antrag ist fertig! Du kannst ihn jetzt runterladen.",
 };
 
 const interpolate = (text: unknown, values?: Record<string, unknown>) =>
@@ -222,11 +224,30 @@ describe("ApplicationOverview", () => {
 		expect(useProfileStore.getState().applicationStatus).toBe("idle");
 	});
 
-	it("does not render a progress indicator", () => {
+	it("shows the almost-ready copy below a complete application", () => {
+		mockProfileState.milestoneLevel = 2;
+		useProfileStore.setState({ milestoneLevel: 2 });
 		renderComponent();
 		expect(
-			screen.queryByTestId("completeness-indicator"),
+			screen.getByText("Dein Antrag ist fast fertig!"),
+		).toBeInTheDocument();
+		expect(
+			screen.queryByText("Dein Antrag ist fertig!"),
 		).not.toBeInTheDocument();
-		expect(screen.queryByText("Antragsfortschritt")).not.toBeInTheDocument();
+	});
+
+	it("shows the ready copy instead of the almost-ready copy once complete", () => {
+		mockProfileState.milestoneLevel = 3;
+		useProfileStore.setState({ milestoneLevel: 3 });
+		renderComponent();
+		expect(screen.getByText("Dein Antrag ist fertig!")).toBeInTheDocument();
+		expect(
+			screen.getByText(
+				"Dein Antrag ist fertig! Du kannst ihn jetzt runterladen.",
+			),
+		).toBeInTheDocument();
+		expect(
+			screen.queryByText(/Dein Antrag ist fast fertig!/),
+		).not.toBeInTheDocument();
 	});
 });

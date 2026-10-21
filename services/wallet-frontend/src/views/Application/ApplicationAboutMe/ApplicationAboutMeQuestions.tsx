@@ -1478,19 +1478,6 @@ export const ApplicationAboutMeQuestions: React.FC = () => {
 		}
 	};
 
-	const getActiveStep = () => {
-		if (noFixedAddress) {
-			return currentPage;
-		}
-		if (currentPage > 4) {
-			return currentPage - 1;
-		}
-		return currentPage;
-	};
-	const activeStep = getActiveStep();
-
-	const totalSteps = noFixedAddress ? 6 : 5;
-
 	if ((isLoading && !profileData) || autoVerifying) {
 		return (
 			<PageContainer topBarProps={{ showLanguageSwitcher: true }}>
@@ -1542,16 +1529,6 @@ export const ApplicationAboutMeQuestions: React.FC = () => {
 			)}
 
 			<div className="w-full max-w-md flex flex-col gap-6 mx-auto lg:max-w-180 lg:mx-auto lg:bg-white lg:rounded-3xl lg:border lg:border-brand-border-subtle lg:shadow-cards lg:px-10 lg:py-8">
-				{/* Step Progress Badge */}
-				<div className="text-left">
-					<span className="text-xs font-semibold text-brand-grey mb-1 block">
-						{t("common:step_x_of_y", {
-							current: activeStep,
-							total: totalSteps,
-						})}
-					</span>
-				</div>
-
 				{/* Page 1: Name */}
 				{currentPage === 1 && (
 					<Page1Name

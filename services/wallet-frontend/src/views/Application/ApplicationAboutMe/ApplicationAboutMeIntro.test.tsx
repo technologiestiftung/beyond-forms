@@ -4,10 +4,21 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { ApplicationAboutMeIntro } from "./ApplicationAboutMeIntro";
 import { AppRoutes } from "../../../constants/routes";
 
-// Mock react-i18next
+import deApplication from "../../../locales/de/application.json";
+
+const translate = (key: string, defaultText?: string) => {
+	const value = key
+		.split(".")
+		.reduce<unknown>(
+			(node, part) => (node as Record<string, unknown> | undefined)?.[part],
+			deApplication,
+		);
+	return typeof value === "string" ? value : (defaultText ?? key);
+};
+
 vi.mock("react-i18next", () => ({
 	useTranslation: () => ({
-		t: (_key: string, defaultText: string) => defaultText,
+		t: translate,
 		i18n: { language: "de", changeLanguage: vi.fn() },
 	}),
 }));

@@ -12,7 +12,10 @@ import { PageContainer } from "../../../components/Layout/PageContainer";
 import { useScrollToTop, scrollToTop } from "../../../utils/scroll";
 import {
 	END_PAGE,
+	LEGACY_OTHER_INCOME_SOURCE_KEYS,
+	PENSION_SOURCE_KEYS,
 	calculateTotalIncome,
+	countIncomeCategories,
 	getNextPage,
 	isInvalidAmount,
 	isWithoutEmployment,
@@ -111,7 +114,7 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 
 	const initPension = React.useCallback(
 		// eslint-disable-next-line complexity
-		(financial: Partial<FinancialData>, sources: string[]) => {
+		(storedIncome: string, sources: string[]) => {
 			const cachedPension = sessionStorage.getItem(
 				"income_assets_pension_amount",
 			);
@@ -119,23 +122,17 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 			const types = sources
 				.filter((s) => s.startsWith("pension_"))
 				.map((s) => s.replace("pension_", ""));
-			const capitalizedTypes = types.map(
-				(typeStr) => typeStr.charAt(0).toUpperCase() + typeStr.slice(1),
-			);
-			if (
-				sources.includes("Altersrente") &&
-				!capitalizedTypes.includes("Retirement")
-			) {
-				capitalizedTypes.push("Retirement");
+			if (sources.includes("Altersrente") && !types.includes("retirement")) {
+				types.push("retirement");
 			}
 			if (
 				sources.includes("Erwerbsminderungsrente") &&
-				!capitalizedTypes.includes("Reduced")
+				!types.includes("reduced")
 			) {
-				capitalizedTypes.push("Reduced");
+				types.push("reduced");
 			}
-			if (capitalizedTypes.length > 0) {
-				setPensionTypes(capitalizedTypes);
+			if (types.length > 0) {
+				setPensionTypes(types);
 			} else if (
 				sources.includes("pension") ||
 				(extracted &&
@@ -143,7 +140,7 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 						extracted.monthly_amount ||
 						extracted.amount_pension))
 			) {
-				setPensionTypes(["Retirement"]);
+				setPensionTypes(["retirement"]);
 			} else if (sources.includes("none_pension")) {
 				setPensionTypes(["none"]);
 			}
@@ -168,12 +165,8 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 					sources.push("pension");
 					setSelectedSources([...sources]);
 				}
-			} else if (
-				sources.includes("pension") ||
-				sources.includes("Altersrente") ||
-				sources.includes("Erwerbsminderungsrente")
-			) {
-				setPensionAmount(String(financial.monthlyIncome || ""));
+			} else if (sources.some((s) => PENSION_SOURCE_KEYS.includes(s))) {
+				setPensionAmount(storedIncome);
 			}
 		},
 		[extracted],
@@ -181,7 +174,7 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 
 	const initEmployment = React.useCallback(
 		(
-			financial: Partial<FinancialData>,
+			storedIncome: string,
 			personal: Partial<PersonalData>,
 			sources: string[],
 		) => {
@@ -189,19 +182,19 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 				"income_assets_employment_amount",
 			);
 			if (sources.includes("employment_employed")) {
-				setEmploymentType("Angestellt");
+				setEmploymentType("employed");
 			} else if (sources.includes("employment_self")) {
-				setEmploymentType("Selbststaendig");
+				setEmploymentType("self_employed");
 			} else if (sources.includes("employment_student")) {
-				setEmploymentType("Ausbildung");
+				setEmploymentType("training");
 			} else if (sources.includes("employment_unemployed")) {
-				setEmploymentType("Arbeitslos");
+				setEmploymentType("unemployed");
 			} else if (sources.includes("employment_none")) {
-				setEmploymentType("Nichts davon");
+				setEmploymentType("none");
 			} else if (personal.isCurrentlyEmployed === true) {
-				setEmploymentType("Angestellt");
+				setEmploymentType("employed");
 			} else if (personal.isCurrentlyEmployed === false) {
-				setEmploymentType("Arbeitslos");
+				setEmploymentType("unemployed");
 			}
 
 			setJobTitle(personal.workScopeAndType || "");
@@ -210,36 +203,32 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 			if (cachedEmployment !== null) {
 				setEmploymentAmount(cachedEmployment);
 			} else if (personal.isCurrentlyEmployed === true) {
-				setEmploymentAmount(String(financial.monthlyIncome || ""));
+				setEmploymentAmount(storedIncome);
 			}
 		},
 		[],
 	);
 
 	const initOther = React.useCallback(
-		(financial: Partial<FinancialData>, sources: string[]) => {
+		(storedIncome: string, sources: string[]) => {
 			const cachedOther = sessionStorage.getItem("income_assets_other_amount");
 			const otherTypes: string[] = [];
 			if (sources.includes("other_sick")) {
-				otherTypes.push("Krankengeld");
+				otherTypes.push("sick_pay");
 			}
 			if (sources.includes("other_alimony")) {
-				otherTypes.push("Unterhalt");
+				otherTypes.push("alimony");
 			}
 			if (sources.includes("other_rent")) {
-				otherTypes.push("Sonstige");
+				otherTypes.push("other");
 			}
 
 			if (otherTypes.length > 0) {
 				setOtherIncomeTypes(otherTypes);
 			} else if (
-				sources.includes("other_benefits") ||
-				sources.includes("other") ||
-				sources.includes("Krankengeld") ||
-				sources.includes("Arbeitslosengeld") ||
-				sources.includes("Kindergeld")
+				sources.some((s) => LEGACY_OTHER_INCOME_SOURCE_KEYS.includes(s))
 			) {
-				setOtherIncomeTypes(["Sonstige"]);
+				setOtherIncomeTypes(["other"]);
 			} else if (sources.includes("none_other")) {
 				setOtherIncomeTypes(["none"]);
 			}
@@ -247,7 +236,7 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 			if (cachedOther !== null) {
 				setOtherIncomeAmount(cachedOther);
 			} else if (otherTypes.length > 0) {
-				setOtherIncomeAmount(String(financial.monthlyIncome || ""));
+				setOtherIncomeAmount(storedIncome);
 			}
 		},
 		[],
@@ -257,6 +246,12 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 		const financial: Partial<FinancialData> = profileData?.financial ?? {};
 		const personal: Partial<PersonalData> = profileData?.personalData ?? {};
 		const sources = [...(financial.incomeSources || [])];
+		const incomeCategoryCount = countIncomeCategories(
+			sources,
+			personal.isCurrentlyEmployed,
+		);
+		const storedIncome =
+			incomeCategoryCount === 1 ? String(financial.monthlyIncome || "") : "";
 		setSelectedSources(sources);
 
 		const setAwaiting = () => {
@@ -340,9 +335,9 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 
 		setAwaiting();
 		setPrevious();
-		initPension(financial, sources);
-		initEmployment(financial, personal, sources);
-		initOther(financial, sources);
+		initPension(storedIncome, sources);
+		initEmployment(storedIncome, personal, sources);
+		initOther(storedIncome, sources);
 		setOneTime();
 		setBank();
 
@@ -575,9 +570,10 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 
 	const saveBankDetails = async () => {
 		clearErrors();
+		const normalizedIban = iban.replace(/\s+/g, "").toUpperCase();
 		if (
-			iban.trim() &&
-			!/^[A-Z]{2}[0-9]{2}[A-Z0-9]{12,30}$/i.test(iban.trim())
+			normalizedIban &&
+			!/^[A-Z]{2}[0-9]{2}[A-Z0-9]{12,30}$/i.test(normalizedIban)
 		) {
 			setFieldErrors({
 				iban: t("financial.errors.bank_iban_invalid", "Ungültige IBAN"),
@@ -586,6 +582,15 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 			return;
 		}
 
+		const totalIncome = calculateTotalIncome({
+			pensionTypes,
+			pensionAmount,
+			employmentType,
+			employmentAmount,
+			otherIncomeTypes,
+			otherIncomeAmount,
+		});
+
 		try {
 			const result = await updateSection({
 				section: "financial",
@@ -593,17 +598,10 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 					bankDetails: {
 						bankName: bankName.trim() || null,
 						accountHolder: accountHolder.trim() || null,
-						iban: iban.trim() || null,
-						bic: bic.trim() || null,
+						iban: normalizedIban || null,
+						bic: bic.replace(/\s+/g, "").toUpperCase() || null,
 					},
-					monthlyIncome: calculateTotalIncome({
-						pensionTypes,
-						pensionAmount,
-						employmentType,
-						employmentAmount,
-						otherIncomeTypes,
-						otherIncomeAmount,
-					}),
+					...(totalIncome !== null && { monthlyIncome: totalIncome }),
 					validateEntireForm: false,
 				},
 			});
@@ -680,16 +678,6 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 			)}
 
 			<div className="w-full max-w-md flex flex-col gap-6 text-left lg:max-w-180 lg:mx-auto lg:bg-white lg:rounded-3xl lg:border lg:border-brand-border-subtle lg:shadow-cards lg:px-10 lg:py-8">
-				{/* Step label */}
-				<div>
-					<span className="text-xs font-semibold text-brand-grey mb-1 block">
-						{t("common:step_x_of_y", {
-							current: currentPage,
-							total: 7,
-						})}
-					</span>
-				</div>
-
 				{/* STEP 1: Awaiting benefits decision */}
 				{currentPage === 1 && (
 					<AwaitingBenefitsStep

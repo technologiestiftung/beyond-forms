@@ -35,40 +35,40 @@ export const EmploymentStep: React.FC<EmploymentStepProps> = ({
 			</h1>
 			<div className="flex flex-col gap-3">
 				<OptionCard
-					id="angestellt"
+					id="employed"
 					title={t("financial.options.emp_employed")}
-					selected={employmentStatus === "Angestellt"}
-					onClick={() => setEmploymentStatus("Angestellt")}
+					selected={employmentStatus === "employed"}
+					onClick={() => setEmploymentStatus("employed")}
 				/>
 				<OptionCard
-					id="selbststaendig"
+					id="self_employed"
 					title={t("financial.options.emp_self")}
-					selected={employmentStatus === "Selbststaendig"}
-					onClick={() => setEmploymentStatus("Selbststaendig")}
+					selected={employmentStatus === "self_employed"}
+					onClick={() => setEmploymentStatus("self_employed")}
 				/>
 				<OptionCard
-					id="ausbildung"
+					id="training"
 					title={t("financial.options.emp_student")}
-					selected={employmentStatus === "Ausbildung"}
-					onClick={() => setEmploymentStatus("Ausbildung")}
+					selected={employmentStatus === "training"}
+					onClick={() => setEmploymentStatus("training")}
 				/>
 				<OptionCard
-					id="arbeitslos"
+					id="unemployed"
 					title={t("financial.options.emp_unemployed")}
-					selected={employmentStatus === "Arbeitslos"}
-					onClick={() => setEmploymentStatus("Arbeitslos")}
+					selected={employmentStatus === "unemployed"}
+					onClick={() => setEmploymentStatus("unemployed")}
 				/>
 				<OptionCard
-					id="nichts_davon"
+					id="no_employment"
 					title={t("financial.options.emp_none")}
-					selected={employmentStatus === "Nichts davon"}
-					onClick={() => setEmploymentStatus("Nichts davon")}
+					selected={employmentStatus === "none"}
+					onClick={() => setEmploymentStatus("none")}
 				/>
 			</div>
 
 			{employmentStatus !== "" &&
-				employmentStatus !== "Arbeitslos" &&
-				employmentStatus !== "Nichts davon" && (
+				employmentStatus !== "unemployed" &&
+				employmentStatus !== "none" && (
 					<div className="flex flex-col gap-4 mt-2 p-5 bg-slate-50 rounded-2xl border border-slate-100 animate-fadeIn">
 						<div className="flex flex-col gap-1.5">
 							<label

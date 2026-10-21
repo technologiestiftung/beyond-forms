@@ -22,7 +22,6 @@
 	"save_next": "Save and continue",
 	"save_close": "Save and close",
 	"step_page": "Question {{current}} of {{total}}",
-	"step_x_of_y": "Step {{current}} of {{total}}",
 	"done": "Done!",
 	"next": "Next",
 	"back": "Back",

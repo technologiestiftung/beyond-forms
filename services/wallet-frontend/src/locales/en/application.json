@@ -10,12 +10,15 @@
 		"main_title": "Basic Income Application",
 		"document_auto_verified_banner": "Your application was updated based on your document \"{{documentName}}\".",
 		"generate_notice_title": "Your application is almost ready! You can download it at any time.",
+		"generate_notice_ready_title": "Your application is complete! You can download it now.",
 		"generate_notice_scroll_label": "Scroll to generate application",
 		"cta_band": {
 			"almost_ready_title": "Your application is almost ready!",
 			"almost_ready_description": "You can download it as a PDF at any time.",
 			"title": "Application as PDF",
-			"description": "You can generate the application at any time. Incomplete applications take longer to process."
+			"description": "You can generate the application at any time. Incomplete applications take longer to process.",
+			"ready_title": "Your application is complete!",
+			"ready_description": "You can now download it as a PDF and submit it."
 		},
 		"step_by_step_illustration_alt": "Illustration of a step-by-step checklist",
 		"intro_text": "Here you can upload documents and fill out the basic income application faster.",
@@ -98,6 +101,8 @@
 			"housing": {
 				"title": "Your Housing",
 				"subtitle": "We clarify what information and documents you need for your living situation.",
+				"intro_desc": "Upload documents.\nThe assistant will auto-populate many details. You can review them later.",
+				"recommended_docs": "Recommended Documents",
 				"docs_list": {
 					"rental_contract": "Rental agreement / Sublease agreement",
 					"heating_proof": "Heating cost statement / Gas bill",

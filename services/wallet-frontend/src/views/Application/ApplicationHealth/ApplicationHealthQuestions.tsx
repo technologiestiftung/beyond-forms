@@ -90,20 +90,6 @@ const getPrevPage = (current: number, state: HealthQuestionState): number => {
 	}
 };
 
-const getVisitablePages = (state: HealthQuestionState): number[] => {
-	const pages = [1];
-	let curr = 1;
-	while (true) {
-		const next = getNextPage(curr, state);
-		if (next === -1) {
-			break;
-		}
-		pages.push(next);
-		curr = next;
-	}
-	return pages;
-};
-
 const hydrateHealthData = (health?: Profile["health"]): HealthQuestionState => {
 	if (!health) {
 		return {};
@@ -344,27 +330,6 @@ export const ApplicationHealthQuestions: React.FC = () => {
 		return false;
 	};
 
-	const currentState = {
-		isCareDependent,
-		hasInpatientFacilityAccommodation,
-		inpatientFacilityMoveInDate,
-		inpatientFacilityLastResidence,
-		abilityToWork,
-		reducedWorkCapacityStartDate,
-		reducedWorkCapacityEndDate,
-		reducedWorkCapacityReason,
-		hasDisabilityId,
-		disabilityValidUntil,
-		merkzeichen,
-		hasCostlyMedicalNutrition,
-	};
-	const visitable = getVisitablePages(currentState);
-	const stepIndex = visitable.indexOf(currentPage);
-	const stepLabel = t("common:step_x_of_y", {
-		current: stepIndex + 1,
-		total: visitable.length,
-	});
-
 	if (isLoading && !profileData) {
 		return (
 			<PageContainer topBarProps={{ showLanguageSwitcher: true }}>
@@ -415,12 +380,6 @@ export const ApplicationHealthQuestions: React.FC = () => {
 			)}
 
 			<div className="w-full max-w-md flex flex-col gap-5 lg:max-w-180 lg:mx-auto lg:bg-white lg:rounded-3xl lg:border lg:border-brand-border-subtle lg:shadow-cards lg:px-10 lg:py-8">
-				<div className="text-left">
-					<span className="text-xs font-semibold text-brand-grey mb-1 block">
-						{stepLabel}
-					</span>
-				</div>
-
 				{/* PAGE 1: CARE DEPENDENCY */}
 				{currentPage === 1 && (
 					<>

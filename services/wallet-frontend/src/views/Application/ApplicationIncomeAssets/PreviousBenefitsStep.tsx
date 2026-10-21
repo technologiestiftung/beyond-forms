@@ -35,13 +35,13 @@ export const PreviousBenefitsStep: React.FC<PreviousBenefitsStepProps> = ({
 			</h1>
 			<div className="flex flex-col gap-3">
 				<OptionCard
-					id="ja"
+					id="yes"
 					title={t("financial.options.yes")}
 					selected={hasReceivedPreviousBenefits === true}
 					onClick={() => setHasReceivedPreviousBenefits(true)}
 				/>
 				<OptionCard
-					id="nein"
+					id="no"
 					title={t("financial.options.no")}
 					selected={hasReceivedPreviousBenefits === false}
 					onClick={() => setHasReceivedPreviousBenefits(false)}

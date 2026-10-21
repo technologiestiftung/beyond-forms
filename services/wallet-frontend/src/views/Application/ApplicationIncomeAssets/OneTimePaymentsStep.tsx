@@ -35,13 +35,13 @@ export const OneTimePaymentsStep: React.FC<OneTimePaymentsStepProps> = ({
 			</h1>
 			<div className="flex flex-col gap-3">
 				<OptionCard
-					id="ja"
+					id="yes"
 					title={t("financial.options.yes")}
 					selected={areOneTimePaymentsExpected === true}
 					onClick={() => setAreOneTimePaymentsExpected(true)}
 				/>
 				<OptionCard
-					id="nein"
+					id="no"
 					title={t("financial.options.no")}
 					selected={areOneTimePaymentsExpected === false}
 					onClick={() => setAreOneTimePaymentsExpected(false)}

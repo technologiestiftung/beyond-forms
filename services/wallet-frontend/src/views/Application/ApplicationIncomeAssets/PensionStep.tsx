@@ -28,32 +28,32 @@ export const PensionStep: React.FC<PensionStepProps> = ({
 			</h1>
 			<div className="flex flex-col gap-3">
 				<OptionCard
-					id="altersrente"
+					id="retirement"
 					title={t("financial.options.pension_retirement")}
 					type="checkbox"
-					selected={pensionTypes.includes("Retirement")}
+					selected={pensionTypes.includes("retirement")}
 					onClick={() =>
-						setPensionTypes(toggleOption(pensionTypes, "Retirement"))
+						setPensionTypes(toggleOption(pensionTypes, "retirement"))
 					}
 				/>
 				<OptionCard
-					id="erwerbsminderungsrente"
+					id="reduced_earning_capacity"
 					title={t("financial.options.pension_reduced")}
 					type="checkbox"
-					selected={pensionTypes.includes("Reduced")}
-					onClick={() => setPensionTypes(toggleOption(pensionTypes, "Reduced"))}
+					selected={pensionTypes.includes("reduced")}
+					onClick={() => setPensionTypes(toggleOption(pensionTypes, "reduced"))}
 				/>
 				<OptionCard
-					id="witwenrente"
+					id="survivor"
 					title={t("financial.options.pension_survivor")}
 					type="checkbox"
-					selected={pensionTypes.includes("Survivor")}
+					selected={pensionTypes.includes("survivor")}
 					onClick={() =>
-						setPensionTypes(toggleOption(pensionTypes, "Survivor"))
+						setPensionTypes(toggleOption(pensionTypes, "survivor"))
 					}
 				/>
 				<OptionCard
-					id="none"
+					id="no_pension"
 					title={t("financial.options.none_of_these")}
 					type="checkbox"
 					selected={pensionTypes.includes("none")}

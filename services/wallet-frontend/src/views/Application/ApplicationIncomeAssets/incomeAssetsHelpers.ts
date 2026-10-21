@@ -56,20 +56,60 @@ export const toggleOption = (list: string[], value: string): string[] => {
 };
 
 export const isWithoutEmployment = (employmentType: string) =>
-	employmentType === "Arbeitslos" || employmentType === "Nichts davon";
+	employmentType === "unemployed" || employmentType === "none";
 
 const EMPLOYMENT_SOURCES: Record<string, string> = {
-	Angestellt: "employment_employed",
-	Selbststaendig: "employment_self",
-	Ausbildung: "employment_student",
-	Arbeitslos: "employment_unemployed",
-	"Nichts davon": "employment_none",
+	employed: "employment_employed",
+	self_employed: "employment_self",
+	training: "employment_student",
+	unemployed: "employment_unemployed",
+	none: "employment_none",
 };
 
 const OTHER_INCOME_SOURCES: Record<string, string> = {
-	Krankengeld: "other_sick",
-	Unterhalt: "other_alimony",
-	Sonstige: "other_rent",
+	sick_pay: "other_sick",
+	alimony: "other_alimony",
+	other: "other_rent",
+};
+
+export const PENSION_SOURCE_KEYS = [
+	"pension",
+	"Altersrente",
+	"Erwerbsminderungsrente",
+];
+
+export const LEGACY_OTHER_INCOME_SOURCE_KEYS = [
+	"other_benefits",
+	"other",
+	"Krankengeld",
+	"Arbeitslosengeld",
+	"Kindergeld",
+];
+
+const OTHER_INCOME_SOURCE_KEYS = [
+	...Object.values(OTHER_INCOME_SOURCES),
+	...LEGACY_OTHER_INCOME_SOURCE_KEYS,
+];
+
+const EMPLOYED_SOURCES = [
+	EMPLOYMENT_SOURCES.employed,
+	EMPLOYMENT_SOURCES.self_employed,
+	EMPLOYMENT_SOURCES.training,
+];
+
+export const countIncomeCategories = (
+	sources: string[],
+	isCurrentlyEmployed?: boolean | null,
+): number => {
+	const hasEmploymentSource = sources.some((s) => s.startsWith("employment_"));
+	const isEmployed = hasEmploymentSource
+		? sources.some((s) => EMPLOYED_SOURCES.includes(s))
+		: isCurrentlyEmployed === true;
+	return [
+		sources.some((s) => PENSION_SOURCE_KEYS.includes(s)),
+		isEmployed,
+		sources.some((s) => OTHER_INCOME_SOURCE_KEYS.includes(s)),
+	].filter(Boolean).length;
 };
 
 export const withPensionSources = (
@@ -84,7 +124,7 @@ export const withPensionSources = (
 	} else if (pensionTypes.length > 0) {
 		updated.push("pension");
 		pensionTypes.forEach((type) => {
-			updated.push(`pension_${type.toLowerCase()}`);
+			updated.push(`pension_${type}`);
 		});
 	}
 	return updated;
@@ -117,12 +157,12 @@ export const withOtherIncomeSources = (
 		updated.push("none_other");
 	} else if (otherIncomeTypes.length > 0) {
 		if (
-			otherIncomeTypes.includes("Krankengeld") ||
-			otherIncomeTypes.includes("Unterhalt")
+			otherIncomeTypes.includes("sick_pay") ||
+			otherIncomeTypes.includes("alimony")
 		) {
 			updated.push("other_benefits");
 		}
-		if (otherIncomeTypes.includes("Sonstige")) {
+		if (otherIncomeTypes.includes("other")) {
 			updated.push("other");
 		}
 		otherIncomeTypes.forEach((type) => {
@@ -152,20 +192,29 @@ export const calculateTotalIncome = ({
 	otherIncomeTypes,
 	otherIncomeAmount,
 }: IncomeAnswers): number | null => {
+	const incomes: Array<[boolean, string]> = [
+		[pensionTypes.length > 0 && !pensionTypes.includes("none"), pensionAmount],
+		[
+			employmentType !== "" && !isWithoutEmployment(employmentType),
+			employmentAmount,
+		],
+		[
+			otherIncomeTypes.length > 0 && !otherIncomeTypes.includes("none"),
+			otherIncomeAmount,
+		],
+	];
 	const isAnswered =
 		pensionTypes.length > 0 ||
 		employmentType !== "" ||
 		otherIncomeTypes.length > 0;
-	if (!isAnswered) {
+	const hasMissingAmount = incomes.some(
+		([hasIncome, amount]) => hasIncome && amount.trim() === "",
+	);
+	if (!isAnswered || hasMissingAmount) {
 		return null;
 	}
-
-	const amountOrZero = (value: string, isNone: boolean) =>
-		value === "" || isNone ? 0 : parseAmount(value);
-
-	return (
-		amountOrZero(pensionAmount, pensionTypes.includes("none")) +
-		amountOrZero(employmentAmount, isWithoutEmployment(employmentType)) +
-		amountOrZero(otherIncomeAmount, otherIncomeTypes.includes("none"))
+	return incomes.reduce(
+		(sum, [hasIncome, amount]) => sum + (hasIncome ? parseAmount(amount) : 0),
+		0,
 	);
 };

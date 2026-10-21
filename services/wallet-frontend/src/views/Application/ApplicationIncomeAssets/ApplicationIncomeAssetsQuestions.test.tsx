@@ -93,10 +93,7 @@ const MOCK_TRANSLATIONS: Record<string, string> = {
 
 vi.mock("react-i18next", () => ({
 	useTranslation: () => ({
-		t: (key: string, options?: Record<string, unknown>) => {
-			if (key === "common:step_x_of_y") {
-				return `Schritt ${options?.current} von ${options?.total}`;
-			}
+		t: (key: string) => {
 			return MOCK_TRANSLATIONS[key] || key;
 		},
 		i18n: { language: "de", changeLanguage: vi.fn() },
@@ -158,7 +155,6 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 				"Wartest Du im Moment auf eine Bewilligung für eine Sozialhilfeleistung?",
 			),
 		).toBeInTheDocument();
-		expect(screen.getByText("Schritt 1 von 7")).toBeInTheDocument();
 
 		// Choose "Ja"
 		fireEvent.click(screen.getByRole("button", { name: "Ja" }));
@@ -193,7 +189,6 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 				"Hast Du in den letzten zwei Jahren Sozialleistungen erhalten?",
 			),
 		).toBeInTheDocument();
-		expect(screen.getByText("Schritt 2 von 7")).toBeInTheDocument();
 
 		// Choose "Ja"
 		fireEvent.click(screen.getByRole("button", { name: "Ja" }));
@@ -225,7 +220,6 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 		expect(
 			await screen.findByText("Beziehst Du eine Rente?"),
 		).toBeInTheDocument();
-		expect(screen.getByText("Schritt 3 von 7")).toBeInTheDocument();
 
 		// Check Altersrente
 		fireEvent.click(screen.getByText("Altersrente (gesetzlich)"));
@@ -249,7 +243,6 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 		expect(
 			await screen.findByText("Wie ist Deine Erwerbssituation?"),
 		).toBeInTheDocument();
-		expect(screen.getByText("Schritt 4 von 7")).toBeInTheDocument();
 
 		// Click "Arbeitslos"
 		fireEvent.click(screen.getByText("Arbeitslos"));
@@ -283,7 +276,6 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 		expect(
 			await screen.findByText("Hast Du weitere regelmäßige Einnahmen?"),
 		).toBeInTheDocument();
-		expect(screen.getByText("Schritt 5 von 7")).toBeInTheDocument();
 
 		// Choose "Nein, keine weiteren Einkünfte"
 		fireEvent.click(screen.getByText("Nein, keine weiteren Einkünfte"));
@@ -309,7 +301,6 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 		expect(
 			await screen.findByText("Erwartest Du eine größere einmalige Zahlung?"),
 		).toBeInTheDocument();
-		expect(screen.getByText("Schritt 6 von 7")).toBeInTheDocument();
 
 		// Choose "Nein"
 		fireEvent.click(screen.getByRole("button", { name: "Nein" }));
@@ -333,7 +324,6 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 		expect(
 			await screen.findByText("Wie lautet Deine Bankverbindung?"),
 		).toBeInTheDocument();
-		expect(screen.getByText("Schritt 7 von 7")).toBeInTheDocument();
 
 		// Fill in bank details
 		fireEvent.change(screen.getByPlaceholderText("Helmut Klar"), {
@@ -343,7 +333,7 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 			target: { value: "Sparkasse" },
 		});
 		fireEvent.change(screen.getByPlaceholderText("z.B. DE89 3704 0044 ..."), {
-			target: { value: "DE89370400441234567890" },
+			target: { value: "DE89 3704 0044 1234 5678 90" },
 		});
 		fireEvent.change(screen.getByPlaceholderText("z.B. WELADED1BER"), {
 			target: { value: "WELADED1BER" },
@@ -397,7 +387,6 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 				"Wartest Du im Moment auf eine Bewilligung für eine Sozialhilfeleistung?",
 			),
 		).toBeInTheDocument();
-		expect(screen.getByText("Schritt 1 von 7")).toBeInTheDocument();
 
 		// Click Nein
 		fireEvent.click(screen.getByRole("button", { name: "Nein" }));
@@ -409,7 +398,6 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 		expect(
 			await screen.findByText("Erwartest Du eine größere einmalige Zahlung?"),
 		).toBeInTheDocument();
-		expect(screen.getByText("Schritt 6 von 7")).toBeInTheDocument();
 	});
 
 	it("allows submitting empty pages without validation errors to verify fields are optional", async () => {
@@ -739,12 +727,12 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 		).toBeInTheDocument();
 
 		// Altersrente (gesetzlich) card should be selected (has border-primary-blue-500 class)
-		const altersrenteCard = screen.getByTestId("option-card-altersrente");
+		const altersrenteCard = screen.getByTestId("option-card-retirement");
 		expect(altersrenteCard).toHaveClass("border-primary-blue-500");
 
 		// Erwerbsminderungsrente card should be selected (has border-primary-blue-500 class)
 		const reducedCard = screen.getByTestId(
-			"option-card-erwerbsminderungsrente",
+			"option-card-reduced_earning_capacity",
 		);
 		expect(reducedCard).toHaveClass("border-primary-blue-500");
 
@@ -753,6 +741,51 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 			"z.B. 650.00",
 		) as HTMLInputElement;
 		expect(pensionAmt.value).toBe("650");
+	});
+
+	it("leaves the amounts empty when the stored total covers several income categories", async () => {
+		sessionStorage.clear();
+		vi.mocked(useProfile).mockReturnValue({
+			profileData: {
+				personalData: { isCurrentlyEmployed: true },
+				address: {},
+				household: {},
+				financial: {
+					incomeSources: ["pension", "pension_retirement"],
+					monthlyIncome: 1650.0,
+				},
+			} as unknown as Profile,
+			isLoading: false,
+			isError: false,
+			refetch: mockRefetch,
+			updateSection: mockUpdateSection,
+			isUpdating: false,
+			updateError: null,
+			deleteDocument: vi.fn(),
+			isDeleting: false,
+			submitProfile: vi.fn(),
+			completionPercentage: 0,
+			documents: [],
+			milestoneLevel: 0,
+		});
+
+		render(
+			<MemoryRouter>
+				<ApplicationIncomeAssetsQuestions />
+			</MemoryRouter>,
+		);
+
+		fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+		await screen.findByText(
+			"Hast Du in den letzten zwei Jahren Sozialleistungen erhalten?",
+		);
+		fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+		await screen.findByText("Beziehst Du eine Rente?");
+
+		const pensionAmt = screen.getByPlaceholderText(
+			"z.B. 650.00",
+		) as HTMLInputElement;
+		expect(pensionAmt.value).toBe("");
 	});
 
 	it("correctly handles German comma decimal input values without failing validation", async () => {

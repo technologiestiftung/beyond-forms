@@ -545,16 +545,6 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 			)}
 
 			<div className="w-full max-w-md flex flex-col gap-6 mx-auto lg:max-w-180 lg:mx-auto lg:bg-white lg:rounded-3xl lg:border lg:border-brand-border-subtle lg:shadow-cards lg:px-10 lg:py-8">
-				{/* Step Progress Badge */}
-				<div className="text-left">
-					<span className="text-xs font-semibold text-brand-grey mb-1 block">
-						{t("common:step_x_of_y", {
-							current: currentPage,
-							total: 5,
-						})}
-					</span>
-				</div>
-
 				{/* Page 1: Legal Support */}
 				{currentPage === 1 && (
 					<div className="flex flex-col gap-5 text-left animate-in slide-in-from-right duration-300">

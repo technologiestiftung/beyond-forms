@@ -312,13 +312,6 @@ export const ApplicationHousingQuestions: React.FC = () => {
 		return 0; // Exit to overview
 	};
 
-	const totalPages = 8;
-	const calculatedProgress = currentPage > 1.5 ? Math.floor(currentPage) : 1;
-	const stepLabel = t("common:step_x_of_y", {
-		current: calculatedProgress,
-		total: totalPages,
-	});
-
 	const handleSaveField = async (
 		section: "address" | "housing",
 		key: string,
@@ -1174,12 +1167,6 @@ export const ApplicationHousingQuestions: React.FC = () => {
 			)}
 
 			<div className="w-full max-w-md flex flex-col gap-6 lg:max-w-180 lg:mx-auto lg:bg-white lg:rounded-3xl lg:border lg:border-brand-border-subtle lg:shadow-cards lg:px-10 lg:py-8">
-				<div className="text-left">
-					<span className="text-xs font-semibold text-brand-grey mb-1 block">
-						{stepLabel}
-					</span>
-				</div>
-
 				{renderPageContent()}
 
 				<div className="w-full">

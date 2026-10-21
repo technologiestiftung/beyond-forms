@@ -10,12 +10,15 @@
 		"main_title": "Antrag auf Grundsicherung",
 		"document_auto_verified_banner": "Dein Antrag wurde basierend auf deinem Dokument \"{{documentName}}\" aktualisiert.",
 		"generate_notice_title": "Dein Antrag ist fast fertig! Du kannst ihn jederzeit runterladen.",
+		"generate_notice_ready_title": "Dein Antrag ist fertig! Du kannst ihn jetzt runterladen.",
 		"generate_notice_scroll_label": "Zum Antrag generieren scrollen",
 		"cta_band": {
 			"almost_ready_title": "Dein Antrag ist fast fertig!",
 			"almost_ready_description": "Du kannst ihn jederzeit als PDF runterladen.",
 			"title": "Antrag als PDF",
-			"description": "Du kannst den Antrag jederzeit generieren. Unvollständige Anträge dauern in der Bearbeitung länger."
+			"description": "Du kannst den Antrag jederzeit generieren. Unvollständige Anträge dauern in der Bearbeitung länger.",
+			"ready_title": "Dein Antrag ist fertig!",
+			"ready_description": "Du kannst ihn jetzt als PDF runterladen und einreichen."
 		},
 		"step_by_step_illustration_alt": "Illustration einer Schritt-für-Schritt-Checkliste",
 		"intro_text": "Hier kannst Du Dokumente hochladen und den Antrag zur Grundsicherung schneller ausfüllen.",
@@ -98,6 +101,8 @@
 			"housing": {
 				"title": "Dein Wohnen",
 				"subtitle": "Wir klären, welche Angaben und Unterlagen Du zu Deiner Wohnsituation brauchst.",
+				"intro_desc": "Lade Dokumente hoch.\nDer Assistent übernimmt viele Angaben automatisch. Du kannst sie später prüfen.",
+				"recommended_docs": "Empfohlene Dokumente",
 				"docs_list": {
 					"rental_contract": "Mietvertrag / Untermietvertrag",
 					"heating_proof": "Heizkostennachweis / Gasrechnung",

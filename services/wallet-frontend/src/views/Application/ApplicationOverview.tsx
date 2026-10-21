@@ -290,7 +290,38 @@ export const ApplicationOverview: React.FC = () => {
 	}, [pdfUrl]);
 
 	const infoSections = getMappedInformationSections(profileData || {});
-	const isAlmostReady = milestoneLevel >= 2;
+	const isComplete = milestoneLevel >= MAX_MILESTONE_LEVEL;
+	const isAlmostReady = milestoneLevel >= 2 && !isComplete;
+
+	let ctaBandTitle = t("overview.cta_band.title", "Antrag als PDF");
+	let ctaBandDescription = t(
+		"overview.cta_band.description",
+		"Du kannst den Antrag jederzeit generieren. Unvollständige Anträge dauern in der Bearbeitung länger.",
+	);
+	let generateNotice = t(
+		"overview.generate_notice_title",
+		"Dein Antrag ist fast fertig! Du kannst ihn jederzeit runterladen.",
+	);
+	if (isComplete) {
+		generateNotice = t("overview.generate_notice_ready_title");
+		ctaBandTitle = t(
+			"overview.cta_band.ready_title",
+			"Dein Antrag ist fertig!",
+		);
+		ctaBandDescription = t(
+			"overview.cta_band.ready_description",
+			"Du kannst ihn jetzt als PDF runterladen und einreichen.",
+		);
+	} else if (isAlmostReady) {
+		ctaBandTitle = t(
+			"overview.cta_band.almost_ready_title",
+			"Dein Antrag ist fast fertig!",
+		);
+		ctaBandDescription = t(
+			"overview.cta_band.almost_ready_description",
+			"Du kannst ihn jederzeit als PDF runterladen.",
+		);
+	}
 
 	const handleCategoryClick = (id: string) => {
 		const matched = infoSections.find((s) => s.id === id);
@@ -367,7 +398,7 @@ export const ApplicationOverview: React.FC = () => {
 						</h1>
 					</div>
 
-					{isAlmostReady && (
+					{milestoneLevel >= 2 && (
 						<button
 							type="button"
 							onClick={scrollToGenerateButton}
@@ -378,10 +409,7 @@ export const ApplicationOverview: React.FC = () => {
 							)}
 						>
 							<p className="text-body-lg font-semibold text-brand-black">
-								{t(
-									"overview.generate_notice_title",
-									"Dein Antrag ist fast fertig! Du kannst ihn jederzeit runterladen.",
-								)}
+								{generateNotice}
 							</p>
 						</button>
 					)}
@@ -404,22 +432,9 @@ export const ApplicationOverview: React.FC = () => {
 				>
 					<p className="hidden lg:block text-body-lg text-white/90 max-w-[52ch]">
 						<span className="block text-xl font-semibold text-white">
-							{isAlmostReady
-								? t(
-										"overview.cta_band.almost_ready_title",
-										"Dein Antrag ist fast fertig!",
-									)
-								: t("overview.cta_band.title", "Antrag als PDF")}
+							{ctaBandTitle}
 						</span>
-						{isAlmostReady
-							? t(
-									"overview.cta_band.almost_ready_description",
-									"Du kannst ihn jederzeit als PDF runterladen.",
-								)
-							: t(
-									"overview.cta_band.description",
-									"Du kannst den Antrag jederzeit generieren. Unvollständige Anträge dauern in der Bearbeitung länger.",
-								)}
+						{ctaBandDescription}
 					</p>
 					<PrimaryButton
 						ref={generateButtonRef}

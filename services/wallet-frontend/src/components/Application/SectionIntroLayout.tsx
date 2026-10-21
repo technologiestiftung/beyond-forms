@@ -34,10 +34,7 @@ export const SectionIntroLayout: React.FC<SectionIntroLayoutProps> = ({
 			title={title}
 			description={description}
 			onBack={() => navigate(AppRoutes.ApplicationOverview)}
-			backAriaLabel={t(
-				"questionnaire.intro.back_to_overview",
-				"Zurück zur Übersicht",
-			)}
+			backAriaLabel={t("questionnaire.intro.back_to_overview")}
 		>
 			<div className="flex flex-col gap-2 lg:gap-3">
 				<h2 className="font-extrabold text-slate-900 text-sm tracking-wide lg:text-base">
@@ -53,14 +50,8 @@ export const SectionIntroLayout: React.FC<SectionIntroLayoutProps> = ({
 			<PathOptionGroup>
 				<PathOption
 					icon={Upload}
-					title={t(
-						"questionnaire.intro.path_upload_title",
-						"Dokumente hochladen",
-					)}
-					description={t(
-						"questionnaire.intro.path_upload_desc",
-						"Lade Nachweise hoch, um Angaben automatisch auszufüllen.",
-					)}
+					title={t("questionnaire.intro.path_upload_title")}
+					description={t("questionnaire.intro.path_upload_desc")}
 					onClick={() =>
 						navigate(
 							`${AppRoutes.ApplicationUploadOptions}?category=${uploadCategory}&origin=wizard`,
@@ -69,14 +60,8 @@ export const SectionIntroLayout: React.FC<SectionIntroLayoutProps> = ({
 				/>
 				<PathOption
 					icon={FileText}
-					title={t(
-						"questionnaire.intro.path_manual_title",
-						"Angaben manuell ausfüllen",
-					)}
-					description={t(
-						"questionnaire.intro.path_manual_desc",
-						"Trage Deine Daten Schritt für Schritt selbst ein.",
-					)}
+					title={t("questionnaire.intro.path_manual_title")}
+					description={t("questionnaire.intro.path_manual_desc")}
 					onClick={() => navigate(questionsRoute)}
 				/>
 			</PathOptionGroup>
