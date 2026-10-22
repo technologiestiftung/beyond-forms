@@ -13,6 +13,8 @@ import { i18nKeys } from "../i18n/i18nKeys";
 import { useRootStore } from "../store/useRootStore";
 import { useEligibilityOutcome } from "../hooks/useEligibilityOutcome";
 import { PrimaryButton } from "../components/ui/PrimaryButton";
+import { StartOverButton } from "../components/Eligibility/ResultParts";
+import { ITEM_STYLES } from "../components/Eligibility/resultItemStyles";
 import { ResultProfile } from "../schemas/eligibility.schema";
 import { useEligibilityStore } from "../store/useEligibilityStore";
 import { EligibilityEngine } from "../store/EligibilityEngine";
@@ -35,37 +37,6 @@ const STATUS_STYLES: Record<BenefitStatus, string> = {
 	[BenefitStatus.LIKELY]: "bg-primary-green-300 text-primary-blue-500",
 	[BenefitStatus.POSSIBLE]: "bg-primary-blue-50 text-primary-blue-500",
 	[BenefitStatus.NO]: "bg-brand-bg text-brand-black",
-};
-
-const StartOverButton: React.FC<{
-	onClick: () => void;
-	className?: string;
-}> = ({ onClick, className = "" }) => {
-	const { t } = useTranslation();
-
-	return (
-		<button
-			type="button"
-			onClick={onClick}
-			className={`text-body-lg text-primary-blue-400 font-medium underline decoration-solid hover:text-primary-blue-500 hover:decoration-2 transition-colors cursor-pointer ${className}`}
-		>
-			{t(i18nKeys.common.startOver)}
-		</button>
-	);
-};
-
-const ITEM_STYLES = {
-	card: {
-		item: "lg:gap-3 lg:rounded-2xl lg:border-brand-border-subtle lg:p-8 lg:shadow-cards",
-		title: "lg:text-2xl lg:leading-snug",
-		reason: "lg:text-body-lg",
-	},
-	row: {
-		item: "lg:flex-row lg:items-baseline lg:gap-4 lg:rounded-none lg:border-x-0 lg:border-t-0 lg:border-brand-border-subtle lg:last:border-b-0 lg:bg-transparent lg:px-6 lg:py-4",
-		title:
-			"lg:w-1/3 lg:shrink-0 lg:text-base lg:font-semibold lg:text-brand-grey",
-		reason: "lg:text-brand-grey",
-	},
 };
 
 const BenefitItem: React.FC<

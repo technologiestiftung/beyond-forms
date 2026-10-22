@@ -29,6 +29,7 @@ export const AppRoutes = {
 	ApplicationHealthIntro: "/dashboard/application/health",
 	ApplicationHealthQuestions: "/dashboard/application/health/questions",
 	ApplicationUploadOptions: "/dashboard/application/upload-options",
+	KnowledgeApplication: "/dashboard/forms/:applicationId/:step",
 
 	ProfilePersonalDataUpload: "/profile/personal/upload",
 	ProfileSettings: "/profile/settings",
@@ -51,5 +52,15 @@ export const URL_PARAMS = {
 /**
  * Utility to generate dynamic routes
  */
+/** A question of a form driven by the knowledge base, e.g. "/dashboard/forms/applicationKinderzuschlag/child0.firstName" */
+export const getKnowledgeApplicationRoute = (
+	applicationId: string,
+	step?: { individual: string; field: string },
+) =>
+	AppRoutes.KnowledgeApplication.replace(
+		":applicationId",
+		applicationId,
+	).replace(":step", step ? `${step.individual}.${step.field}` : "start");
+
 export const getEligibilityRoute = (questionId: string) =>
 	AppRoutes.EligibilityCheck.replace(":questionId", questionId);

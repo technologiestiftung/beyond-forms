@@ -10,7 +10,7 @@ import requests
 from sqlalchemy.orm import Session
 from src.db import get_db
 from src.models import Users as DbUser, UploadedFiles, UserDocuments
-from src.schemas import AssociatedPersonSchema, UserProfileValidationSchema
+from src.schemas import AssociatedPersonSchema, IncomeEntrySchema, UserProfileValidationSchema
 from src.services.user_service import (
     ProfileWriteError,
     RELATION_KEYS,
@@ -76,6 +76,9 @@ def get_profile(
         user_data["displaced_status"] = "none"
     user_data["associated_persons"] = [
         AssociatedPersonSchema.model_validate(person).model_dump(mode="json") for person in db_user.associated_persons
+    ]
+    user_data["income_entries"] = [
+        IncomeEntrySchema.model_validate(entry).model_dump(mode="json") for entry in db_user.income_entries
     ]
 
     return user_data

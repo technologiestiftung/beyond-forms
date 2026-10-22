@@ -8,7 +8,14 @@ import { searchForWorkspaceRoot } from "vite";
 export default defineConfig({
 	plugins: [react(), tailwindcss()],
 	server: {
-		fs: { allow: [searchForWorkspaceRoot(process.cwd()), "../../demo"] },
+		fs: {
+			allow: [
+				searchForWorkspaceRoot(process.cwd()),
+				"../../demo",
+				"../../knowledge",
+				"../../libs/eligibility-engine",
+			],
+		},
 		hmr: !process.env.VITE_E2E_TEST,
 		proxy: {
 			"/auth-proxy": {
@@ -28,6 +35,10 @@ export default defineConfig({
 		rollupOptions: {
 			output: {
 				manualChunks(id) {
+					// Keeps the RDF stack out of the vendor chunk every page loads
+					if (id.includes("libs/eligibility-engine")) {
+						return "eligibility-engine";
+					}
 					if (id.includes("node_modules")) {
 						return "vendor";
 					}

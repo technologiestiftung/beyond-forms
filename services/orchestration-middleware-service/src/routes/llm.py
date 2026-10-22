@@ -7,6 +7,7 @@ from typing import Optional
 import os
 import uuid
 
+import httpx
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
@@ -27,10 +28,10 @@ from src.services.user_service import (
 )
 from src.services.conversation_service import ConversationService, get_conversation_service
 from src.services.rag_service import search_knowledge_base
-from beyondforms.auth import User as AuthUser, get_current_user, require_authenticated_user
+from beyondforms.auth import User as AuthUser, require_authenticated_user
 from src.schemas import AssociatedPersonSchema, UserInformationUpdateSchema
 from src.tools import AVAILABLE_TOOLS
-from src.utils import ndjson_done, ndjson_error, ndjson_token
+from src.utils import get_google_id_token, ndjson_done, ndjson_error, ndjson_token
 
 
 _USER_FIELD_NAMES: frozenset[str] = frozenset(UserInformationUpdateSchema.model_fields)
@@ -208,25 +209,49 @@ async def get_user_table_schema() -> str:
     return f"{schema}\n\nEach entry of 'associated_persons' is an object with these fields:\n{person_fields}"
 
 
-async def check_progress_status(current_user: AuthUser = Depends(get_current_user)) -> dict:
-    """
-    Check the progress status of the user's data.
-    """
-    # TODO: Implement logic to check the progress status of the user's data
-    # user_id = current_user.id
-    """
-    form_id = current_user.form_id
-    progress_percentage = get_progress_percentage(user_id, form_id)
-    missing_fields = get_missing_fields(user_id, form_id)
-    return {
-        "progress_percentage": progress_percentage,
-        "missing_fields": missing_fields,
-    }
-    """
-    return {
-        "progress_percentage": 50,
-        "missing_fields": ["name", "email"],
-    }
+ENDPOINT_ELIGIBILITY_SERVICE = os.environ.get("ENDPOINT_ELIGIBILITY_SERVICE", "")
+
+
+async def _ask_eligibility_service(path: str, profile: dict) -> dict:
+    """The knowledge base decides eligibility and what a form still needs; the model only phrases it."""
+    if not ENDPOINT_ELIGIBILITY_SERVICE:
+        return {"error": "The eligibility service is not configured."}
+    headers = {}
+    token = await asyncio.to_thread(get_google_id_token, ENDPOINT_ELIGIBILITY_SERVICE)
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.post(
+                f"{ENDPOINT_ELIGIBILITY_SERVICE}{path}", json={"profile": profile, "lang": "de"}, headers=headers
+            )
+    except httpx.HTTPError:
+        logger.exception("Eligibility service not reachable")
+        return {"error": "The eligibility service is not reachable."}
+    if response.status_code != 200:
+        return {"error": f"The eligibility service answered {response.status_code}: {response.text[:200]}"}
+    return response.json()
+
+
+async def check_progress_status(
+    current_user: AuthUser,
+    db: Session,
+    user_service: UserService,
+    form_type: str = "antrag_kinderzuschlag",
+) -> dict:
+    """What the user's form still needs, with the next question and where its answer is stored."""
+    profile = await get_user_data(current_user, db, user_service)
+    if "error" in profile:
+        return profile
+    return await _ask_eligibility_service(f"/applications/{form_type}/progress", profile)
+
+
+async def check_eligibility(current_user: AuthUser, db: Session, user_service: UserService) -> dict:
+    """Which benefits the stored profile qualifies for, as computed by the knowledge base."""
+    profile = await get_user_data(current_user, db, user_service)
+    if "error" in profile:
+        return profile
+    return await _ask_eligibility_service("/eligibility", profile)
 
 
 async def berlin_social_services_knowledge_base(question: str) -> str:
@@ -294,7 +319,10 @@ async def handle_chat(
         "get_user_table_schema": get_user_table_schema,
         "update_user_data": partial(update_user_data, current_user=current_user, db=db, user_service=user_service),
         "get_user_data": partial(get_user_data, current_user=current_user, db=db, user_service=user_service),
-        "check_progress_status": partial(check_progress_status, current_user=current_user),
+        "check_progress_status": partial(
+            check_progress_status, current_user=current_user, db=db, user_service=user_service
+        ),
+        "check_eligibility": partial(check_eligibility, current_user=current_user, db=db, user_service=user_service),
         "berlin_social_services_knowledge_base": berlin_social_services_knowledge_base,
     }
 
@@ -447,7 +475,10 @@ async def handle_chat_stream(
         "get_user_table_schema": get_user_table_schema,
         "update_user_data": partial(update_user_data, current_user=current_user, db=db, user_service=user_service),
         "get_user_data": partial(get_user_data, current_user=current_user, db=db, user_service=user_service),
-        "check_progress_status": partial(check_progress_status, current_user=current_user),
+        "check_progress_status": partial(
+            check_progress_status, current_user=current_user, db=db, user_service=user_service
+        ),
+        "check_eligibility": partial(check_eligibility, current_user=current_user, db=db, user_service=user_service),
         "berlin_social_services_knowledge_base": berlin_social_services_knowledge_base,
     }
 

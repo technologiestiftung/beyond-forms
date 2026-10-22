@@ -45,6 +45,7 @@
 					"disability_hint": "Only needed if you apply for Grundsicherung due to reduced earning capacity."
 				}
 			},
+			"fill_button": "Complete your details",
 			"generate_button": "Generate application",
 			"generate_error": "Could not generate the application. Please try again later.",
 			"download_button": "Download application",

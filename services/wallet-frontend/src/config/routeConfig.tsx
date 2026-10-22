@@ -1,6 +1,7 @@
 import React, { lazy } from "react";
 import { matchPath } from "react-router-dom";
 import { AppRoutes } from "../constants/routes";
+import { env } from "./env.config";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function lazyWithRetry<T extends React.ComponentType<any>>(
@@ -61,6 +62,22 @@ const EligibilityResult = lazyWithRetry(() =>
 		default: m.EligibilityResult,
 	})),
 );
+const DiscoveryFlow = lazyWithRetry(() =>
+	import("../views/DiscoveryFlow").then((m) => ({
+		default: m.DiscoveryFlow,
+	})),
+);
+const DiscoveryResult = lazyWithRetry(() =>
+	import("../views/DiscoveryResult").then((m) => ({
+		default: m.DiscoveryResult,
+	})),
+);
+const ApplicationWizard = lazyWithRetry(() =>
+	import("../views/ApplicationWizard").then((m) => ({
+		default: m.ApplicationWizard,
+	})),
+);
+const knowledgeBaseEnabled = env.VITE_ELIGIBILITY_ENGINE === "shacl";
 const AuthView = lazyWithRetry(() =>
 	import("../views/AuthView").then((m) => ({ default: m.AuthView })),
 );
@@ -203,7 +220,7 @@ export const routeConfig: RouteDescriptor[] = [
 	},
 	{
 		path: AppRoutes.EligibilityCheck,
-		component: EligibilityFlow,
+		component: knowledgeBaseEnabled ? DiscoveryFlow : EligibilityFlow,
 		metadata: {
 			showNav: false,
 			layout: "step",
@@ -211,7 +228,7 @@ export const routeConfig: RouteDescriptor[] = [
 	},
 	{
 		path: AppRoutes.EligibilityResult,
-		component: EligibilityResult,
+		component: knowledgeBaseEnabled ? DiscoveryResult : EligibilityResult,
 		metadata: {
 			showNav: false,
 			layout: "step",
@@ -243,6 +260,19 @@ export const routeConfig: RouteDescriptor[] = [
 			requiresAuth: true,
 		},
 	},
+	...(knowledgeBaseEnabled
+		? [
+				{
+					path: AppRoutes.KnowledgeApplication,
+					component: ApplicationWizard,
+					metadata: {
+						showNav: false,
+						layout: "step" as const,
+						requiresAuth: true,
+					},
+				},
+			]
+		: []),
 	{
 		path: AppRoutes.ApplicationOverview,
 		component: ApplicationOverview,
