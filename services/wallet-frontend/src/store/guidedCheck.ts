@@ -8,6 +8,7 @@ import {
 	EligibilityCheckSchema,
 	type EligibilityCheck,
 } from "../schemas/eligibility.schema";
+import { GeneratedViewSchema } from "../schemas/generatedView.schema";
 import { EligibilityEngine, type FlowNode } from "./EligibilityEngine";
 import { useEligibilityStore } from "./useEligibilityStore";
 import { useGuidedCheckStore } from "./useGuidedCheckStore";
@@ -104,6 +105,15 @@ export const chatUiFromServer = (event: ChatUiEvent): ChatUi | null => {
 	}
 	if (event.component === ServerUiComponent.ELIGIBILITY_ANSWER) {
 		return applyProvisionalAnswer(event.props);
+	}
+	if (event.component === ServerUiComponent.GENERATED_VIEW) {
+		const view = GeneratedViewSchema.safeParse(event.props.components);
+		return view.success
+			? {
+					component: ChatUiComponent.GENERATED_VIEW,
+					props: { components: view.data },
+				}
+			: null;
 	}
 	return null;
 };

@@ -1,6 +1,7 @@
 import json
 
 from src.ui_tools import (
+    UI_TOOL_HANDLERS,
     UI_TOOLS,
     guided_check_prompt,
     record_eligibility_answer,
@@ -44,4 +45,4 @@ def test_guided_check_prompt_names_current_field():
 
 def test_ui_tools_are_named_like_their_handlers():
     names = {tool["function"]["name"] for tool in UI_TOOLS}
-    assert names == {"start_eligibility_check", "record_eligibility_answer"}
+    assert names == set(UI_TOOL_HANDLERS)

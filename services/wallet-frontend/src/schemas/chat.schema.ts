@@ -17,15 +17,17 @@ export type ChatStreamChunk = z.infer<typeof ChatStreamChunkSchema>;
 export const ServerUiComponent = {
 	ELIGIBILITY_CONSENT: "eligibility_consent",
 	ELIGIBILITY_ANSWER: "eligibility_answer",
+	GENERATED_VIEW: "generated_view",
 } as const;
 
-/** Components the chat renders, from the backend or from the eligibility engine. */
+/** Components the chat renders, from the backend, the eligibility engine or a view the model composed. */
 export const ChatUiComponent = {
 	ELIGIBILITY_CONSENT: "eligibility_consent",
 	ELIGIBILITY_QUESTION: "eligibility_question",
 	ELIGIBILITY_NOTED: "eligibility_noted",
 	ELIGIBILITY_CONFIRM: "eligibility_confirm",
 	ELIGIBILITY_RESULT: "eligibility_result",
+	GENERATED_VIEW: "generated_view",
 } as const;
 
 export type ChatUiComponent =

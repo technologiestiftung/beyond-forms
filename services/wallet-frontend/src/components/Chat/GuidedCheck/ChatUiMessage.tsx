@@ -8,6 +8,8 @@ import { QuestionMessage } from "./QuestionMessage";
 import { NotedMessage } from "./NotedMessage";
 import { ConfirmCard } from "./ConfirmCard";
 import { ResultCard } from "./ResultCard";
+import { GeneratedView } from "../GeneratedView";
+import type { ViewComponent } from "../../../schemas/generatedView.schema";
 
 /** Renders a card in the chat. Only the newest message takes input; older cards show what was answered. */
 export const ChatUiMessage: React.FC<{ id: string; ui: ChatUi }> = ({
@@ -34,6 +36,10 @@ export const ChatUiMessage: React.FC<{ id: string; ui: ChatUi }> = ({
 			return <NotedMessage field={ui.props.field as keyof EligibilityCheck} />;
 		case ChatUiComponent.ELIGIBILITY_CONFIRM:
 			return <ConfirmCard isActive={isActive} />;
+		case ChatUiComponent.GENERATED_VIEW:
+			return (
+				<GeneratedView components={ui.props.components as ViewComponent[]} />
+			);
 		default:
 			return <ResultCard />;
 	}

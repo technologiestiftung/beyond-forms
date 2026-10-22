@@ -86,6 +86,41 @@ describe("guidedCheck", () => {
 		expect(nextGuidedStep().component).toBe(ChatUiComponent.ELIGIBILITY_RESULT);
 	});
 
+	it("shows a view the model composed", () => {
+		const components = [
+			{ component: "Text", text: "Unterlagen" },
+			{
+				component: "Row",
+				children: [{ component: "Chip", label: "Mehr", sendText: "Mehr dazu" }],
+			},
+		];
+
+		expect(
+			chatUiFromServer({
+				component: ServerUiComponent.GENERATED_VIEW,
+				props: { components },
+			}),
+		).toEqual({
+			component: ChatUiComponent.GENERATED_VIEW,
+			props: { components },
+		});
+	});
+
+	it("drops a view with unknown components or external links", () => {
+		for (const components of [
+			[{ component: "Iframe", src: "https://example.com" }],
+			[{ component: "Link", label: "Weiter", href: "https://example.com" }],
+			[],
+		]) {
+			expect(
+				chatUiFromServer({
+					component: ServerUiComponent.GENERATED_VIEW,
+					props: { components },
+				}),
+			).toBeNull();
+		}
+	});
+
 	it("shows the consent card when the backend asks for it", () => {
 		expect(
 			chatUiFromServer({
