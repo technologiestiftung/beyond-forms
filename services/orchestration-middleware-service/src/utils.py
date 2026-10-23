@@ -15,6 +15,10 @@ def ndjson_error(message: str) -> str:
     return json.dumps({"type": "error", "content": message}) + "\n"
 
 
+def ndjson_ui(component: str, props: dict[str, Any]) -> str:
+    return json.dumps({"type": "ui", "component": component, "props": props}) + "\n"
+
+
 def get_google_id_token(audience: str) -> str | None:
     """
     Fetches an OIDC ID token from the Google Cloud Metadata Server using google-auth.
