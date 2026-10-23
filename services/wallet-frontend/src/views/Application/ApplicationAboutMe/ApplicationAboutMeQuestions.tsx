@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useProfile } from "../../hooks/useProfile";
-import { useAutoVerification } from "../../hooks/useAutoVerification";
+import { useProfile } from "../../../hooks/useProfile";
+import { useAutoVerification } from "../../../hooks/useAutoVerification";
 import {
 	AlertCircle,
 	CheckCircle2,
@@ -12,31 +12,27 @@ import {
 	Calendar,
 	Home,
 } from "lucide-react";
-import { AppRoutes } from "../../constants/routes";
-import { COUNTRY_OPTIONS } from "../../constants/countries";
-import { PageContainer } from "../../components/Layout/PageContainer";
-import { PrimaryButton } from "../../components/ui/PrimaryButton";
-import { ProgressBar } from "../../components/ui/ProgressBar";
-import { OptionCard as SharedOptionCard } from "../../components/ui/OptionCard";
+import { AppRoutes } from "../../../constants/routes";
+import { COUNTRY_OPTIONS } from "../../../constants/countries";
+import { PageContainer } from "../../../components/Layout/PageContainer";
+import { PrimaryButton } from "../../../components/ui/PrimaryButton";
+import { OptionCard } from "../../../components/ui/OptionCard";
 
-const OptionCard: React.FC<React.ComponentProps<typeof SharedOptionCard>> = (
-	props,
-) => <SharedOptionCard {...props} dataTestId={`about-me-option-${props.id}`} />;
-import { useScrollToTop, scrollToTop } from "../../utils/scroll";
+import { useScrollToTop, scrollToTop } from "../../../utils/scroll";
 import type {
 	Profile,
 	PersonalData,
 	Address,
 	GenderType,
 	WalletDocument,
-} from "../../schemas/profile.schema";
-import type { ProfileResponse } from "../../services/profile/IProfileService";
+} from "../../../schemas/profile.schema";
+import type { ProfileResponse } from "../../../services/profile/IProfileService";
 import {
 	parseAddressString,
 	mapBackendDocTypeToSlotId,
-} from "../../utils/profile";
-import { authenticatedFetch } from "../../utils/apiClient";
-import { env } from "../../config/env.config";
+} from "../../../utils/profile";
+import { authenticatedFetch } from "../../../utils/apiClient";
+import { env } from "../../../config/env.config";
 
 const GERMAN_COUNTRY_NAMES: Record<string, string> = {
 	DE: "Deutschland",
@@ -221,7 +217,7 @@ const Page1Name: React.FC<Page1NameProps> = ({
 	t,
 }) => (
 	<div className="flex flex-col gap-5 text-left">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("personal.questions.name_title")}
 		</h1>
 
@@ -284,7 +280,11 @@ const Page1Name: React.FC<Page1NameProps> = ({
 			</div>
 		</div>
 
-		<PrimaryButton type="button" onClick={savePage1}>
+		<PrimaryButton
+			className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+			type="button"
+			onClick={savePage1}
+		>
 			{t("common:next")}
 		</PrimaryButton>
 	</div>
@@ -312,7 +312,7 @@ const Page2Birth: React.FC<Page2BirthProps> = ({
 	t,
 }) => (
 	<div className="flex flex-col gap-5 text-left">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("personal.questions.birth_title")}
 		</h1>
 
@@ -375,7 +375,11 @@ const Page2Birth: React.FC<Page2BirthProps> = ({
 			</div>
 		</div>
 
-		<PrimaryButton type="button" onClick={savePage2}>
+		<PrimaryButton
+			className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+			type="button"
+			onClick={savePage2}
+		>
 			{t("common:next")}
 		</PrimaryButton>
 	</div>
@@ -393,24 +397,27 @@ const Page3Gender: React.FC<Page3GenderProps> = ({
 	savePage3,
 }) => (
 	<div className="flex flex-col gap-5 text-left">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("personal.questions.gender_title")}
 		</h1>
 
 		<div className="flex flex-col gap-3">
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="Female"
 				title={t("personal.options.female")}
 				selected={legalGender === "Female"}
 				onClick={() => savePage3("Female")}
 			/>
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="Male"
 				title={t("personal.options.male")}
 				selected={legalGender === "Male"}
 				onClick={() => savePage3("Male")}
 			/>
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="Diverse"
 				title={t("personal.options.diverse")}
 				selected={legalGender === "Diverse"}
@@ -420,6 +427,7 @@ const Page3Gender: React.FC<Page3GenderProps> = ({
 
 		<div className="mt-2 animate-in fade-in duration-300">
 			<PrimaryButton
+				className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
 				type="button"
 				onClick={() =>
 					savePage3(legalGender as "Male" | "Female" | "Diverse" | null | "")
@@ -461,7 +469,7 @@ const Page4Address: React.FC<Page4AddressProps> = ({
 	savePage4,
 }) => (
 	<div className="flex flex-col gap-5 text-left animate-in slide-in-from-right duration-300">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("personal.questions.address_title")}
 		</h1>
 
@@ -519,6 +527,7 @@ const Page4Address: React.FC<Page4AddressProps> = ({
 			<div className="border-t border-slate-100 my-2" />
 
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="no_fixed_address"
 				title={t("personal.questions.no_fixed_address_label")}
 				selected={noFixedAddress}
@@ -535,7 +544,11 @@ const Page4Address: React.FC<Page4AddressProps> = ({
 			/>
 		</div>
 
-		<PrimaryButton type="button" onClick={savePage4}>
+		<PrimaryButton
+			className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+			type="button"
+			onClick={savePage4}
+		>
 			{t("common:next")}
 		</PrimaryButton>
 	</div>
@@ -559,7 +572,7 @@ const Page5LastAddress: React.FC<Page5LastAddressProps> = ({
 	savePage5,
 }) => (
 	<div className="flex flex-col gap-5 text-left animate-in slide-in-from-right duration-300">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("personal.questions.last_fixed_address_title")}
 		</h1>
 
@@ -594,7 +607,11 @@ const Page5LastAddress: React.FC<Page5LastAddressProps> = ({
 			</div>
 		</div>
 
-		<PrimaryButton type="button" onClick={savePage5}>
+		<PrimaryButton
+			className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+			type="button"
+			onClick={savePage5}
+		>
 			{t("common:next")}
 		</PrimaryButton>
 	</div>
@@ -622,12 +639,13 @@ const Page6Citizenship: React.FC<Page6CitizenshipProps> = ({
 	currentLanguage,
 }) => (
 	<div className="flex flex-col gap-5 text-left animate-in slide-in-from-right duration-300">
-		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+		<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
 			{t("personal.questions.citizenship_title")}
 		</h1>
 
 		<div className="flex flex-col gap-4">
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="german"
 				title={t("personal.options.german", {
 					defaultValue: "Ich habe die deutsche Staatsangehörigkeit.",
@@ -640,6 +658,7 @@ const Page6Citizenship: React.FC<Page6CitizenshipProps> = ({
 				}}
 			/>
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="eu_5"
 				title={t("personal.options.eu_5", {
 					defaultValue:
@@ -676,6 +695,7 @@ const Page6Citizenship: React.FC<Page6CitizenshipProps> = ({
 			)}
 
 			<OptionCard
+				testIdPrefix="about-me-option"
 				id="permit"
 				title={t("personal.options.permit", {
 					defaultValue: "Mein Aufenthaltstitel für Deutschland ist gültig.",
@@ -711,6 +731,7 @@ const Page6Citizenship: React.FC<Page6CitizenshipProps> = ({
 
 		<div className="mt-2 animate-in fade-in duration-300">
 			<PrimaryButton
+				className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
 				type="button"
 				onClick={savePage6}
 				disabled={
@@ -1457,19 +1478,6 @@ export const ApplicationAboutMeQuestions: React.FC = () => {
 		}
 	};
 
-	const getActiveStep = () => {
-		if (noFixedAddress) {
-			return currentPage;
-		}
-		if (currentPage > 4) {
-			return currentPage - 1;
-		}
-		return currentPage;
-	};
-	const activeStep = getActiveStep();
-
-	const totalSteps = noFixedAddress ? 6 : 5;
-
 	if ((isLoading && !profileData) || autoVerifying) {
 		return (
 			<PageContainer topBarProps={{ showLanguageSwitcher: true }}>
@@ -1486,12 +1494,14 @@ export const ApplicationAboutMeQuestions: React.FC = () => {
 				onBack: handleBack,
 				showLanguageSwitcher: true,
 				colorVariant: "green",
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
 			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
 		>
 			{(isUpdating || saveSuccess) && (
 				<div
 					role="status"
-					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100 animate-in fade-in duration-300"
+					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100 animate-in fade-in duration-300 lg:left-[calc(50%+var(--spacing)*36)] lg:-translate-x-1/2"
 				>
 					{isUpdating ? (
 						<>
@@ -1512,34 +1522,13 @@ export const ApplicationAboutMeQuestions: React.FC = () => {
 			)}
 
 			{saveError && (
-				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm mx-auto text-left shadow-sm">
+				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm mx-auto text-left shadow-sm lg:max-w-180 lg:mx-auto">
 					<AlertCircle className="w-5 h-5 shrink-0 text-rose-500" />
 					<p>{saveError}</p>
 				</div>
 			)}
 
-			<ProgressBar
-				current={activeStep}
-				total={totalSteps}
-				colorVariant="blue"
-				ariaLabel={t("step_page", {
-					current: activeStep,
-					total: totalSteps,
-					defaultValue: `${activeStep} von ${totalSteps} Seiten`,
-				})}
-			/>
-
-			<div className="w-full max-w-md flex flex-col gap-6 mx-auto -mt-2">
-				{/* Step Progress Badge */}
-				<div className="text-left">
-					<span className="text-xs font-semibold text-brand-grey mb-1 block">
-						{t("personal.steps.step_x_of_y", {
-							current: activeStep,
-							total: totalSteps,
-						})}
-					</span>
-				</div>
-
+			<div className="w-full max-w-md flex flex-col gap-6 mx-auto lg:max-w-180 lg:mx-auto lg:bg-white lg:rounded-3xl lg:border lg:border-brand-border-subtle lg:shadow-cards lg:px-10 lg:py-8">
 				{/* Page 1: Name */}
 				{currentPage === 1 && (
 					<Page1Name

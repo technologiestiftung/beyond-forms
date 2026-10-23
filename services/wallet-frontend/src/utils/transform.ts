@@ -156,6 +156,8 @@ export const mapProfileToFrontend = (
 		previousBenefitsAuthority: getVal<string>("previousBenefitsAuthority"),
 		previousBenefitsRefNo: getVal<string>("previousBenefitsRefNo"),
 		isCurrentlyEmployed: getVal<boolean>("isCurrentlyEmployed"),
+		employerName: getVal<string>("employerName"),
+		workScopeAndType: getVal<string>("workScopeAndType"),
 		isResidentInGermany: getVal<boolean>("isResidentInGermany"),
 		isVictimOfNationalSocialistPersecution: getVal<boolean>(
 			"isVictimOfNationalSocialistPersecution",

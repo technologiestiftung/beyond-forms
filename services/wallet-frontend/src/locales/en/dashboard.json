@@ -25,6 +25,8 @@
 					"text": "Based on your answers, basic security might be suitable for you. You can now start preparing your application."
 				},
 				"actions": {
+					"complete": "Complete application",
+					"view_details": "View details",
 					"continue": "Continue",
 					"start": "Let's go",
 					"view_checklist": "View complete checklist",

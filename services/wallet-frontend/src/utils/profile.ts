@@ -830,33 +830,49 @@ export const mapBackendDocTypeToSlotId = (
 	return VALID_SLOT_IDS.includes(lower) ? lower : "OTHER";
 };
 
+const WIZARD_SECTION_ROUTES: Record<
+	string,
+	{ intro: string; questions: string }
+> = {
+	about_me: {
+		intro: AppRoutes.ApplicationAboutMeIntro,
+		questions: AppRoutes.ApplicationAboutMeQuestions,
+	},
+	housing: {
+		intro: AppRoutes.ApplicationHousingIntro,
+		questions: AppRoutes.ApplicationHousingQuestions,
+	},
+	income_assets: {
+		intro: AppRoutes.ApplicationIncomeAssetsIntro,
+		questions: AppRoutes.ApplicationIncomeAssetsQuestions,
+	},
+	health: {
+		intro: AppRoutes.ApplicationHealthIntro,
+		questions: AppRoutes.ApplicationHealthQuestions,
+	},
+	household: {
+		intro: AppRoutes.ApplicationHouseholdIntro,
+		questions: AppRoutes.ApplicationHouseholdQuestions,
+	},
+};
+
 export const getTargetExitRoute = (
 	origin: string | null,
 	category: string | null,
-	stage: "upload" | "review_success",
+	stage: "back" | "upload" | "review_success",
 ): string => {
 	if (origin === "wizard") {
-		if (category === "about_me") {
-			return stage === "review_success"
-				? AppRoutes.ApplicationAboutMeQuestions
-				: AppRoutes.ApplicationAboutMeIntro;
+		const section =
+			category && Object.hasOwn(WIZARD_SECTION_ROUTES, category)
+				? WIZARD_SECTION_ROUTES[category]
+				: undefined;
+		if (!section) {
+			return AppRoutes.ApplicationOverview;
 		}
-		if (category === "housing") {
-			return stage === "review_success"
-				? AppRoutes.ApplicationHousingQuestions
-				: AppRoutes.ApplicationHousingIntro;
+		if (stage === "back") {
+			return `${AppRoutes.ApplicationUploadOptions}?category=${category}&origin=wizard`;
 		}
-		if (category === "income_assets") {
-			return stage === "review_success"
-				? AppRoutes.ApplicationIncomeAssetsQuestions
-				: AppRoutes.ApplicationIncomeAssetsIntro;
-		}
-		if (category === "health") {
-			return stage === "review_success"
-				? AppRoutes.ApplicationHealthQuestions
-				: AppRoutes.ApplicationHealthIntro;
-		}
-		return AppRoutes.ApplicationOverview;
+		return stage === "review_success" ? section.questions : section.intro;
 	}
 	if (category) {
 		return AppRoutes.ProfileDocumentsCategory.replace(":categoryId", category);

@@ -685,7 +685,7 @@ export const DocumentReviewView: React.FC = () => {
 		<PageContainer
 			topBarProps={{
 				onBack: () =>
-					navigate(getTargetExitRoute(origin, category, "upload"), {
+					navigate(getTargetExitRoute(origin, category, "back"), {
 						replace: true,
 					}),
 				middleElement: (

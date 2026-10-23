@@ -1,10 +1,5 @@
 {
 	"levels": {
-		"pills": {
-			"incomplete": "Incomplete",
-			"advanced": "Advanced",
-			"ready": "Ready"
-		},
 		"status": {
 			"started": "Started",
 			"missing": "Something missing",
@@ -13,10 +8,18 @@
 	},
 	"overview": {
 		"main_title": "Basic Income Application",
-		"progress_card_title": "Your application step-by-step to the goal",
 		"document_auto_verified_banner": "Your application was updated based on your document \"{{documentName}}\".",
 		"generate_notice_title": "Your application is almost ready! You can download it at any time.",
+		"generate_notice_ready_title": "Your application is complete! You can download it now.",
 		"generate_notice_scroll_label": "Scroll to generate application",
+		"cta_band": {
+			"almost_ready_title": "Your application is almost ready!",
+			"almost_ready_description": "You can download it as a PDF at any time.",
+			"title": "Application as PDF",
+			"description": "You can generate the application at any time. Incomplete applications take longer to process.",
+			"ready_title": "Your application is complete!",
+			"ready_description": "You can now download it as a PDF and submit it."
+		},
 		"step_by_step_illustration_alt": "Illustration of a step-by-step checklist",
 		"intro_text": "Here you can upload documents and fill out the basic income application faster.",
 		"filters": {
@@ -98,6 +101,8 @@
 			"housing": {
 				"title": "Your Housing",
 				"subtitle": "We clarify what information and documents you need for your living situation.",
+				"intro_desc": "Upload documents.\nThe assistant will auto-populate many details. You can review them later.",
+				"recommended_docs": "Recommended Documents",
 				"docs_list": {
 					"rental_contract": "Rental agreement / Sublease agreement",
 					"heating_proof": "Heating cost statement / Gas bill",
@@ -116,7 +121,8 @@
 				"title": "Health and additional needs",
 				"subtitle": "We clarify whether you can receive more support due to illness or disability."
 			}
-		}
+		},
+		"questions_count": "Questions: {{answered}}/{{total}}"
 	},
 	"docs": {
 		"overview_header_title": "Documents",
@@ -254,9 +260,6 @@
 		}
 	},
 	"personal": {
-		"steps": {
-			"step_x_of_y": "Step {{current}} of {{total}}"
-		},
 		"questions": {
 			"name_title": "What is your full name?",
 			"birth_title": "When and where were you born?",
@@ -324,9 +327,6 @@
 		}
 	},
 	"household": {
-		"steps": {
-			"step_x_of_y": "Step {{current}} of {{total}}"
-		},
 		"questions": {
 			"members_title": "How many people live in your household?",
 			"marital_status_title": "What is your marital status?",
@@ -346,9 +346,6 @@
 		}
 	},
 	"financial": {
-		"steps": {
-			"step_x_of_y": "Step {{current}} of {{total}}"
-		},
 		"intro": {
 			"back_aria": "Back to overview",
 			"intro_desc": "Upload your documents.\nThe assistant automatically fills in many fields. You can verify them later.",

@@ -7,8 +7,7 @@ import { useProfileStore } from "../../store/useProfileStore";
 const { mockProfileReturn } = vi.hoisted(() => ({
 	mockProfileReturn: {
 		profileData: { personalData: { firstName: "Jane" } } as
-			| { personalData: { firstName: string } }
-			| undefined,
+			{ personalData: { firstName: string } } | undefined,
 		milestoneLevel: 0,
 		isLoading: false,
 		isError: false,
@@ -106,7 +105,10 @@ describe("DashboardView", () => {
 				"Starte mit Deinem Antrag. Klaro zeigt Dir Schritt-für-Schritt, was wichtig ist.",
 			),
 		).toBeInTheDocument();
-		expect(screen.getByTestId("lets-go-button")).toHaveTextContent(
+		expect(screen.getByTestId("application-overview-button")).toHaveTextContent(
+			"Antrag vervollständigen",
+		);
+		expect(screen.getByTestId("application-generate-button")).toHaveTextContent(
 			"Antrag generieren",
 		);
 		expect(screen.getByTestId("language-switcher")).toBeInTheDocument();

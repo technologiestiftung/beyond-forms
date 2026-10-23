@@ -43,6 +43,7 @@ vi.mock("heic2any", () => ({
 
 const mockNavigate = vi.fn();
 let mockSearch = "";
+let mockState: unknown = null;
 vi.mock("react-router-dom", async () => {
 	const actual = await vi.importActual("react-router-dom");
 	return {
@@ -52,7 +53,7 @@ vi.mock("react-router-dom", async () => {
 			pathname: "/",
 			search: mockSearch,
 			hash: "",
-			state: null,
+			state: mockState,
 			key: "default",
 		}),
 	};
@@ -77,6 +78,7 @@ describe("DocumentDropzone", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		mockSearch = "";
+		mockState = null;
 		useAuthStore.setState({ token: "mock-valid-token" });
 		useProfileStore.getState().reset();
 		localStorage.clear();
@@ -391,6 +393,37 @@ describe("DocumentDropzone", () => {
 		fireEvent.click(cancelBtn);
 		expect(mockNavigate).toHaveBeenCalledWith(
 			"/profile/documents/category/identity",
+			{ replace: true },
+		);
+	});
+
+	it("goes back to the upload options when opened from the application wizard", () => {
+		mockSearch = "?origin=wizard&category=housing&mode=upload";
+		renderWithRouter(<DocumentDropzone />);
+		fireEvent.click(screen.getByTestId("tutorial-back"));
+		expect(mockNavigate).toHaveBeenCalledWith(
+			"/dashboard/application/upload-options?category=housing&origin=wizard",
+			{ replace: true },
+		);
+	});
+
+	it("steps back in history when opened from the wizard's upload options", () => {
+		mockSearch = "?origin=wizard&category=housing&mode=upload";
+		mockState = { returnToPrevious: true };
+		window.history.replaceState({ idx: 1 }, "");
+		renderWithRouter(<DocumentDropzone />);
+		fireEvent.click(screen.getByTestId("tutorial-back"));
+		expect(mockNavigate).toHaveBeenCalledWith(-1);
+		window.history.replaceState(null, "");
+	});
+
+	it("falls back to the upload options route when there is no earlier history entry", () => {
+		mockSearch = "?origin=wizard&category=housing&mode=upload";
+		mockState = { returnToPrevious: true };
+		renderWithRouter(<DocumentDropzone />);
+		fireEvent.click(screen.getByTestId("tutorial-back"));
+		expect(mockNavigate).toHaveBeenCalledWith(
+			"/dashboard/application/upload-options?category=housing&origin=wizard",
 			{ replace: true },
 		);
 	});

@@ -131,6 +131,8 @@ export const DraftPersonalDataSchema = z.object({
 	previousBenefitsAuthority: z.string().max(255).optional().nullable(),
 	previousBenefitsRefNo: z.string().max(255).optional().nullable(),
 	isCurrentlyEmployed: z.boolean().optional().nullable(),
+	employerName: z.string().max(255).optional().nullable(),
+	workScopeAndType: z.string().max(255).optional().nullable(),
 	isResidentInGermany: z.boolean().optional().nullable(),
 	isVictimOfNationalSocialistPersecution: z.boolean().optional().nullable(),
 	healthInsuranceProvider: z.string().max(255).optional().nullable(),

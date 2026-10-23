@@ -25,6 +25,8 @@
 					"text": "Nach Deinen Antworten könnte Grundsicherung für Dich infrage kommen. Du kannst jetzt mit der Vorbereitung Deines Antrags beginnen."
 				},
 				"actions": {
+					"complete": "Antrag vervollständigen",
+					"view_details": "Angaben ansehen",
 					"continue": "Fortfahren",
 					"start": "Los geht's",
 					"view_checklist": "Vollständige Checkliste ansehen",

@@ -3,10 +3,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ApplicationHousingQuestions } from "./ApplicationHousingQuestions";
 import { BrowserRouter } from "react-router-dom";
-import { useProfile } from "../../hooks/useProfile";
-import { AppRoutes } from "../../constants/routes";
+import { useProfile } from "../../../hooks/useProfile";
+import { AppRoutes } from "../../../constants/routes";
 
-vi.mock("../../hooks/useProfile", () => ({
+vi.mock("../../../hooks/useProfile", () => ({
 	useProfile: vi.fn(),
 }));
 
