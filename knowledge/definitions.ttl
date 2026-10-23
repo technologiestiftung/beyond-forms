@@ -1,0 +1,103 @@
+@prefix bf: <https://beyond-forms.example/ns#> .
+@prefix ff: <https://foerderfunke.org/default#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# Classes
+
+bf:Citizen a rdfs:Class ;
+    rdfs:label "Antragsteller*in"@de , "Applicant"@en ;
+    skos:exactMatch ff:Citizen .
+
+bf:Child a rdfs:Class ;
+    rdfs:label "Kind"@de , "Child"@en ;
+    skos:exactMatch ff:Child .
+
+bf:DataField a rdfs:Class ;
+    rdfs:comment "A fact about a person that a citizen answers directly."@en .
+
+bf:DerivedDataField a rdfs:Class ;
+    rdfs:comment "A fact that a materialization rule derives from other data fields. Never asked directly."@en .
+
+bf:AnswerOption a rdfs:Class .
+
+bf:RequirementProfile a rdfs:Class ;
+    rdfs:comment "Eligibility rules of one benefit. Its main shape is a SHACL NodeShape targeting bf:Citizen."@en ;
+    skos:exactMatch ff:RequirementProfile .
+
+bf:MaterializationRule a rdfs:Class ;
+    rdfs:comment "A SPARQL CONSTRUCT query deriving bf:output from bf:input. $TODAY is replaced by the evaluation date as xsd:date. If the output stays missing, the engine asks for missing bf:input fields first, then for missing bf:optionalInput fields."@en .
+
+bf:Constant a rdfs:Class ;
+    rdfs:comment "One dated value of a bf:ConstantSeries. The current value is the one with the latest bf:validFrom not after the evaluation date; a value without bf:validFrom is valid from the beginning."@en .
+
+bf:ConstantSeries a rdfs:Class ;
+    rdfs:comment "A legal amount that changes over time, e.g. a Regelbedarfsstufe. Grouped by bf:key, optionally restricted by age or birth year ranges (inclusive)."@en .
+
+bf:Law a rdfs:Class .
+bf:ProvidingAgency a rdfs:Class .
+
+# Laws
+
+bf:sgb-ii a bf:Law ;
+    rdfs:label "SGB II"@de , "SGB II"@en ;
+    rdfs:seeAlso <https://www.gesetze-im-internet.de/sgb_2/> .
+
+bf:sgb-vi a bf:Law ;
+    rdfs:label "SGB VI"@de , "SGB VI"@en ;
+    rdfs:seeAlso <https://www.gesetze-im-internet.de/sgb_6/> .
+
+bf:sgb-xii a bf:Law ;
+    rdfs:label "SGB XII"@de , "SGB XII"@en ;
+    rdfs:seeAlso <https://www.gesetze-im-internet.de/sgb_12/> ;
+    skos:exactMatch ff:sgb-xii .
+
+bf:wogg a bf:Law ;
+    rdfs:label "Wohngeldgesetz"@de , "Housing Benefit Act"@en ;
+    rdfs:seeAlso <https://www.gesetze-im-internet.de/wogg/> ;
+    skos:exactMatch ff:wohngeldgesetz .
+
+bf:bkgg a bf:Law ;
+    rdfs:label "Bundeskindergeldgesetz"@de , "Federal Child Benefit Act"@en ;
+    rdfs:seeAlso <https://www.gesetze-im-internet.de/bkgg_1996/> ;
+    skos:exactMatch ff:bundeskindergeldgesetz .
+
+# Providing agencies
+
+bf:jobcenter a bf:ProvidingAgency ;
+    rdfs:label "Jobcenter"@de , "Job Center"@en ;
+    skos:exactMatch ff:jobcenter .
+
+bf:sozialamt a bf:ProvidingAgency ;
+    rdfs:label "Sozialamt"@de , "Social Welfare Office"@en ;
+    skos:exactMatch ff:sozialamt .
+
+bf:wohngeldbehoerde a bf:ProvidingAgency ;
+    rdfs:label "Wohngeldstelle"@de , "Housing Benefit Office"@en ;
+    skos:exactMatch ff:wohngeldbehoerde .
+
+bf:familienkasse a bf:ProvidingAgency ;
+    rdfs:label "Familienkasse"@de , "Family Benefits Office"@en ;
+    skos:exactMatch ff:familienkasse .
+
+bf:Partner a rdfs:Class ;
+    rdfs:label "Partner*in"@de , "Partner"@en ;
+    rdfs:comment "Created by bf:rulePartner for couples, so forms can ask for the partner's details."@en .
+
+bf:MarriedApplicant a rdfs:Class ;
+    rdfs:comment "An applicant whose marital status has a start date the forms ask for."@en .
+
+bf:ApplicationProfile a rdfs:Class ;
+    rdfs:comment "The fields one form needs. Its bf:hasShape shapes require them with sh:minCount 1 and check their format; bf:forForm names the form_type of the PDF mapping."@en .
+
+bf:Section a rdfs:Class ;
+    rdfs:comment "Groups the questions of a form; sh:order sets the order in which forms ask them."@en .
+
+# Sections of the application forms
+
+bf:sectionPersonal a bf:Section ; sh:order 1 ; rdfs:label "Angaben zu Dir"@de , "About you"@en .
+bf:sectionAddress a bf:Section ; sh:order 2 ; rdfs:label "Adresse"@de , "Address"@en .
+bf:sectionFamily a bf:Section ; sh:order 3 ; rdfs:label "Familie"@de , "Family"@en .
+bf:sectionChildBenefit a bf:Section ; sh:order 4 ; rdfs:label "Kindergeld"@de , "Child benefit"@en .
+bf:sectionBank a bf:Section ; sh:order 5 ; rdfs:label "Bankverbindung"@de , "Bank details"@en .

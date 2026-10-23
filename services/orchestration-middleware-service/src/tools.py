@@ -40,7 +40,26 @@ AVAILABLE_TOOLS = [
         "type": "function",
         "function": {
             "name": "check_progress_status",
-            "description": "Checks the progress of the user's application and returns the completed percentage and missing fields.",
+            "description": "Checks what the user's application form still needs. Returns whether it is complete, answers with a format \
+            error, and the next field to ask for: its question, tip, answer options and where to store the answer (stored_as).",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "form_type": {
+                        "type": "string",
+                        "enum": ["antrag_kinderzuschlag"],
+                        "description": "The form to check",
+                    },
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "check_eligibility",
+            "description": "Checks which benefits the user's stored profile qualifies for, using the rules of the knowledge base. \
+            Returns per benefit the status (eligible, ineligible, missingData) and the reasons, plus the next question to ask.",
             "parameters": {},
         },
     },

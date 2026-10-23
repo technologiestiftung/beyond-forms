@@ -45,6 +45,7 @@
 					"disability_hint": "Nur nötig, wenn Du Grundsicherung wegen Erwerbsminderung beantragst."
 				}
 			},
+			"fill_button": "Angaben ergänzen",
 			"generate_button": "Antrag generieren",
 			"generate_error": "Konnte den Antrag nicht generieren. Bitte versuche es später noch einmal.",
 			"download_button": "Antrag herunterladen",

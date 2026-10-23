@@ -9,6 +9,7 @@ import {
 import { DashboardSkeleton } from "./DashboardSkeleton";
 import { PageContainer } from "../../components/Layout/PageContainer";
 import { PrimaryButton } from "../../components/ui/PrimaryButton";
+import { getKnowledgeApplicationRoute } from "../../constants/routes";
 import { ApplicationCard } from "./ApplicationCard";
 import { SimpleApplicationCard } from "./SimpleApplicationCard";
 import { GreetingHeader } from "../../components/Layout/GreetingHeader";
@@ -21,6 +22,10 @@ import {
 } from "../../store/benefitRules";
 import { ResultProfile } from "../../schemas/eligibility.schema";
 import type { EligibilityCheck } from "../../schemas/eligibility.schema";
+import type { MatchResult } from "@beyond-forms/eligibility-engine";
+import { env } from "../../config/env.config";
+import { useDiscoveryMatch } from "../../hooks/useDiscovery";
+import { useDiscoveryStore } from "../../store/useDiscoveryStore";
 
 function applicationCardStatusForMilestone(
 	milestoneLevel?: number,
@@ -52,6 +57,28 @@ function ruledOutBenefits(answers: Partial<EligibilityCheck>): Set<Benefit> {
 	return new Set();
 }
 
+const KNOWLEDGE_BASE_BENEFITS: Record<string, Benefit> = {
+	grundsicherungsgeld: Benefit.GRUNDSICHERUNGSGELD,
+	grundsicherungImAlter: Benefit.GRUNDSICHERUNG_ALTER,
+	wohngeld: Benefit.WOHNGELD,
+	kinderzuschlag: Benefit.KINDERZUSCHLAG,
+};
+
+/** Same as ruledOutBenefits, for the check on the knowledge base */
+function ruledOutByKnowledgeBase(match?: MatchResult): Set<Benefit> {
+	if (!match || match.missingCount > 0) {
+		return new Set();
+	}
+	return new Set(
+		match.benefits
+			.filter((b) => b.status === "ineligible")
+			.map((b) => KNOWLEDGE_BASE_BENEFITS[b.id])
+			.filter((benefit): benefit is Benefit => benefit !== undefined),
+	);
+}
+
+const knowledgeBaseEnabled = env.VITE_ELIGIBILITY_ENGINE === "shacl";
+
 const CARD_GRID_CLASS =
 	"flex flex-col gap-6 w-full min-w-0 lg:grid lg:grid-cols-[repeat(auto-fit,minmax(288px,1fr))] lg:gap-5";
 
@@ -78,6 +105,12 @@ export const DashboardView: React.FC = () => {
 
 	const setMilestoneLevel = useProfileStore((s) => s.setMilestoneLevel);
 	const eligibilityAnswers = useEligibilityStore((s) => s.answers);
+	const hasDiscoveryAnswers = useDiscoveryStore(
+		(s) => Object.keys(s.answers).length > 0,
+	);
+	const { data: discoveryMatch } = useDiscoveryMatch({
+		enabled: knowledgeBaseEnabled && hasDiscoveryAnswers,
+	});
 
 	const milestoneLevel =
 		rawMilestoneLevel === 0 && (hasCompletedOnboarding || !!profileData)
@@ -122,7 +155,9 @@ export const DashboardView: React.FC = () => {
 		? t("onboarding.checklist.greeting_named", { name: trimmedFirstName })
 		: t("onboarding.checklist.greeting_anonymous");
 
-	const ruledOut = ruledOutBenefits(eligibilityAnswers);
+	const ruledOut = knowledgeBaseEnabled
+		? ruledOutByKnowledgeBase(discoveryMatch)
+		: ruledOutBenefits(eligibilityAnswers);
 	const cards: { benefit?: Benefit; card: React.ReactNode }[] = [
 		{
 			benefit: Benefit.GRUNDSICHERUNG_ALTER,
@@ -196,6 +231,14 @@ export const DashboardView: React.FC = () => {
 						"Beantrage Kinderzuschlag direkt mit Deinen hinterlegten Angaben.",
 					)}
 					formType="antrag_kinderzuschlag"
+					fillRoute={
+						knowledgeBaseEnabled
+							? getKnowledgeApplicationRoute("applicationKinderzuschlag")
+							: undefined
+					}
+					knowledgeApplicationId={
+						knowledgeBaseEnabled ? "applicationKinderzuschlag" : undefined
+					}
 				/>
 			),
 		},
