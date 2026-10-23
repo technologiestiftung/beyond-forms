@@ -932,7 +932,7 @@ value = "{{ heating_type == 'Sammelheizung' }}"
 ["p4_zentrale_warmwasserversorgung"]
 type = "checkbox"
 description = "Zentrale Warmwasserversorgung"
-value = ""
+value = "{{ heating_type == 'Zentrale Warmwasserversorgung' }}"
 
 ["p4_ofenheizung"]
 type = "checkbox"
@@ -942,7 +942,7 @@ value = "{{ heating_type == 'Ofenheizung' }}"
 ["p4_nachtstrom"]
 type = "checkbox"
 description = "Nachtstrom"
-value = "{{ heating_type == 'Nachtstrom' }}"
+value = "{{ heating_type == 'Nachtstrom' || heating_type == 'Nachtstromspeicher' }}"
 
 ["p4_gasheizung"]
 type = "checkbox"
@@ -1548,7 +1548,7 @@ options = [
   "Nein"
 ]
 option_labels = { "Ja" = "Ja", "Nein" = "Nein" }
-value = "{{ partner && partner.has_any_income ? 'Nein' : 'Ja' }}"
+value = "{{ partner ? (partner.has_any_income ? 'Nein' : 'Ja') : '' }}"
 
 ["p6_leistungen_nach_nr._vii_beantragt?"]
 type = "radio"

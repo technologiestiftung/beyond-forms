@@ -1,4 +1,5 @@
 import datetime
+import re
 from typing import Any, Dict, Iterable, List
 
 from src.models import (
@@ -28,6 +29,49 @@ def _blz_from_iban(iban: Any) -> Any:
     return cleaned[4:12]
 
 
+_DATE_RE = re.compile(r"\d{2}\.\d{2}\.\d{4}")
+_ZIP_CITY_RE = re.compile(r"^(\d{5})\s+(.+)$")
+_STREET_RE = re.compile(r"^(.+?)\s+(\d+\s*[a-zA-Z]?(?:\s*[-/]\s*\d+\s*[a-zA-Z]?)?)$")
+
+
+def previous_benefits_context(user_row: Dict[str, Any]) -> Dict[str, Any]:
+    """Splits the free-text period and authority the form asks for field by field. A period
+    with a single date is read as its end, matching how the demo personas record an ongoing
+    claim. The authority is "Name, ..., Straße Nr, PLZ Ort"; whatever does not parse stays
+    whole in the name rather than being guessed into a wrong field."""
+    dates = _DATE_RE.findall(user_row.get("previous_benefits_period") or "")
+    parts = [part.strip() for part in (user_row.get("previous_benefits_authority") or "").split(",") if part.strip()]
+    zip_code = city = street = house_number = None
+    if len(parts) > 2 and (zip_city := _ZIP_CITY_RE.match(parts[-1])) and (street_nr := _STREET_RE.match(parts[-2])):
+        zip_code, city = zip_city.groups()
+        street, house_number = street_nr.groups()
+        parts = parts[:-2]
+    # The profile only says *that* benefits were received, while the Jobcenter form asks
+    # about Bürgergeld/Sozialhilfe specifically. The awarding office is the only hint at the
+    # kind: an unrecognised office stays unknown instead of being read either way.
+    authority = (user_row.get("previous_benefits_authority") or "").lower()
+    if not user_row.get("has_received_previous_benefits"):
+        previous_kind = None
+    elif "jobcenter" in authority:
+        previous_kind = "Bürgergeld"
+    elif "sozialamt" in authority or "amt für soziales" in authority:
+        previous_kind = "Sozialhilfe"
+    elif "wohngeld" in authority:
+        previous_kind = "Wohngeld"
+    else:
+        previous_kind = None
+    return {
+        "previous_benefits_kind": previous_kind,
+        "previous_benefits_from": dates[0] if len(dates) > 1 else None,
+        "previous_benefits_until": dates[-1] if dates else None,
+        "previous_benefits_authority_name": ", ".join(parts) or None,
+        "previous_benefits_authority_street": street,
+        "previous_benefits_authority_house_number": house_number,
+        "previous_benefits_authority_zip_code": zip_code,
+        "previous_benefits_authority_city": city,
+    }
+
+
 def row_to_dict(row: Any) -> Dict[str, Any]:
     """A mapped row as {column_name: value}, the shape the JEXL context is built from."""
     return {column.name: getattr(row, column.name) for column in row.__table__.columns}
@@ -54,7 +98,17 @@ def person_context(people: List[AssociatedPersons], money_entries: Iterable[Any]
         person = row_to_dict(row)
         person.update(label_context(person))
         person.update(money_context(money_entries if row.id is not None else (), row.id))
+        # `monthly_pension_income` predates the per-person money grid; without this a pension
+        # recorded only there reaches Wohngeld (which reads the column) but not the forms
+        # that read `income`.
+        if (
+            person.get("monthly_pension_income") is not None
+            and "Pension" not in person["income"]
+        ):
+            person["income"] = {**person["income"], "Pension": person["monthly_pension_income"]}
+            person["has_any_income"] = True
         people.append(person)
+   
     partners = [person for person in people if person["association_type"] in PARTNER_TYPES]
     household = [person for person in people if person["lives_in_household"]]
     household_children = [
@@ -160,6 +214,7 @@ def derived_context(
         "today": datetime.date.today(),
         "blz": _blz_from_iban(user_row.get("iban")),
         **age_context(user_row.get("date_of_birth")),
+        **previous_benefits_context(user_row),
         **label_context(user_row),
         **money_context(money_entries, None),
         **person_context(people, money_entries),

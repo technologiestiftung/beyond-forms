@@ -9,6 +9,7 @@
   "profile": {
     "first_name": "Helmut",
     "last_name": "Klar",
+    "email": "helmut.klar@example.org",
     "date_of_birth": "1947-02-14",
     "place_of_birth": "Berlin",
     "legal_gender": "Male",
@@ -68,7 +69,8 @@
     ],
     "has_assets": true,
     "asset_entries": [
-      { "asset_type": "Savings and Cash", "amount": 5267.56 }
+      { "asset_type": "Savings and Cash", "amount": 5267.56 },
+      { "asset_type": "Motor Vehicle", "amount": 1200.0, "description": "Opel Corsa, Baujahr 2004, geschätzter Wert ca. 1.200 EUR" }
     ],
     "assets_description": null,
     "bank_name": "Sparkasse Musterstadt",
@@ -139,7 +141,12 @@
     "expects_rent_change": false,
     "wohngeld_payment_to_applicant": true,
     "consents_to_bank_statement_retention": true,
-    "consents_to_registry_verification": true
+    "consents_to_registry_verification": true,
+    "has_unavoidable_special_need": false,
+    "was_self_employed_last_5_years": false,
+    "received_wage_replacement_last_5_years": false,
+    "did_military_or_voluntary_service_last_5_years": false,
+    "cared_for_relatives_last_5_years": false
   },
   "applications": [
     {

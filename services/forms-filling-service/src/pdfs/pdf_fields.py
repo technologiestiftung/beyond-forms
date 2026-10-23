@@ -9,14 +9,17 @@ class DiscoveredField(NamedTuple):
 
     metadata: Dict[str, Any]
     widgets: List[pdfrw.PdfDict]
-    root: pdfrw.PdfDict  # The logical root field dictionary (holds /V)
+    root: pdfrw.PdfDict  # The terminal field dictionary (holds /V)
     on_values: Dict[int, str]  # id(widget) -> internal PDF export value
 
 
 def _get_root(field: pdfrw.PdfDict) -> pdfrw.PdfDict:
-    """Finds the root logical field dictionary by tracing up the parent chain."""
+    """Finds the terminal field that owns /V: the nearest dictionary in the parent chain
+    that carries its own /T. Walking to the topmost ancestor instead puts /V on a mere
+    name-prefix node for nested fields such as "Leistungen nach Nr" > " VII beantragt?",
+    leaving the real field without a value."""
     curr = field
-    while curr.get("/Parent"):
+    while curr.get("/T") is None and curr.get("/Parent"):
         curr = curr["/Parent"]
     return curr
 

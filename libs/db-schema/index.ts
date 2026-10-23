@@ -797,6 +797,7 @@ export type Database = {
           assets_description: string | null
           assets_exceed_wohngeld_threshold: boolean | null
           authentik_id: string | null
+          azr_number: string | null
           bank_name: string | null
           benefits_awaiting_decision_application_date: string | null
           benefits_awaiting_decision_office: string | null
@@ -807,6 +808,7 @@ export type Database = {
           cable_tv_costs: number | null
           can_work_at_least_3h_daily: boolean | null
           care_level: Database["public"]["Enums"]["care_level_type"] | null
+          cared_for_relatives_last_5_years: boolean | null
           city: string | null
           commercially_used_area_sqm: number | null
           commute_distance_km: number | null
@@ -815,6 +817,7 @@ export type Database = {
           created_at: string
           date_of_birth: string | null
           demo_seed_fixture_hash: string | null
+          did_military_or_voluntary_service_last_5_years: boolean | null
           disability_application_pending: boolean | null
           disability_valid_until: string | null
           displaced_issued_by: string | null
@@ -851,6 +854,7 @@ export type Database = {
           has_permanent_reduction_in_earning_capacity: boolean | null
           has_received_previous_benefits: boolean | null
           has_secondary_residence: boolean | null
+          has_unavoidable_special_need: boolean | null
           have_parents_substantial_joint_income: boolean | null
           health_insurance_provider: string | null
           health_insurance_status:
@@ -910,6 +914,7 @@ export type Database = {
           previous_benefits_period: string | null
           previous_benefits_ref_no: string | null
           professional_expenses: number | null
+          received_wage_replacement_last_5_years: boolean | null
           receives_other_transfer_benefits: boolean | null
           receives_rent_contribution_from_others: boolean | null
           receives_support_from_others: boolean | null
@@ -944,6 +949,7 @@ export type Database = {
           updated_at: string
           vehicle_make: string | null
           vehicle_year: string | null
+          was_self_employed_last_5_years: boolean | null
           wohngeld_payment_to_applicant: boolean | null
           work_scope_and_type: string | null
           zip_code: string | null
@@ -961,6 +967,7 @@ export type Database = {
           assets_description?: string | null
           assets_exceed_wohngeld_threshold?: boolean | null
           authentik_id?: string | null
+          azr_number?: string | null
           bank_name?: string | null
           benefits_awaiting_decision_application_date?: string | null
           benefits_awaiting_decision_office?: string | null
@@ -971,6 +978,7 @@ export type Database = {
           cable_tv_costs?: number | null
           can_work_at_least_3h_daily?: boolean | null
           care_level?: Database["public"]["Enums"]["care_level_type"] | null
+          cared_for_relatives_last_5_years?: boolean | null
           city?: string | null
           commercially_used_area_sqm?: number | null
           commute_distance_km?: number | null
@@ -979,6 +987,7 @@ export type Database = {
           created_at?: string
           date_of_birth?: string | null
           demo_seed_fixture_hash?: string | null
+          did_military_or_voluntary_service_last_5_years?: boolean | null
           disability_application_pending?: boolean | null
           disability_valid_until?: string | null
           displaced_issued_by?: string | null
@@ -1015,6 +1024,7 @@ export type Database = {
           has_permanent_reduction_in_earning_capacity?: boolean | null
           has_received_previous_benefits?: boolean | null
           has_secondary_residence?: boolean | null
+          has_unavoidable_special_need?: boolean | null
           have_parents_substantial_joint_income?: boolean | null
           health_insurance_provider?: string | null
           health_insurance_status?:
@@ -1074,6 +1084,7 @@ export type Database = {
           previous_benefits_period?: string | null
           previous_benefits_ref_no?: string | null
           professional_expenses?: number | null
+          received_wage_replacement_last_5_years?: boolean | null
           receives_other_transfer_benefits?: boolean | null
           receives_rent_contribution_from_others?: boolean | null
           receives_support_from_others?: boolean | null
@@ -1108,6 +1119,7 @@ export type Database = {
           updated_at?: string
           vehicle_make?: string | null
           vehicle_year?: string | null
+          was_self_employed_last_5_years?: boolean | null
           wohngeld_payment_to_applicant?: boolean | null
           work_scope_and_type?: string | null
           zip_code?: string | null
@@ -1125,6 +1137,7 @@ export type Database = {
           assets_description?: string | null
           assets_exceed_wohngeld_threshold?: boolean | null
           authentik_id?: string | null
+          azr_number?: string | null
           bank_name?: string | null
           benefits_awaiting_decision_application_date?: string | null
           benefits_awaiting_decision_office?: string | null
@@ -1135,6 +1148,7 @@ export type Database = {
           cable_tv_costs?: number | null
           can_work_at_least_3h_daily?: boolean | null
           care_level?: Database["public"]["Enums"]["care_level_type"] | null
+          cared_for_relatives_last_5_years?: boolean | null
           city?: string | null
           commercially_used_area_sqm?: number | null
           commute_distance_km?: number | null
@@ -1143,6 +1157,7 @@ export type Database = {
           created_at?: string
           date_of_birth?: string | null
           demo_seed_fixture_hash?: string | null
+          did_military_or_voluntary_service_last_5_years?: boolean | null
           disability_application_pending?: boolean | null
           disability_valid_until?: string | null
           displaced_issued_by?: string | null
@@ -1179,6 +1194,7 @@ export type Database = {
           has_permanent_reduction_in_earning_capacity?: boolean | null
           has_received_previous_benefits?: boolean | null
           has_secondary_residence?: boolean | null
+          has_unavoidable_special_need?: boolean | null
           have_parents_substantial_joint_income?: boolean | null
           health_insurance_provider?: string | null
           health_insurance_status?:
@@ -1238,6 +1254,7 @@ export type Database = {
           previous_benefits_period?: string | null
           previous_benefits_ref_no?: string | null
           professional_expenses?: number | null
+          received_wage_replacement_last_5_years?: boolean | null
           receives_other_transfer_benefits?: boolean | null
           receives_rent_contribution_from_others?: boolean | null
           receives_support_from_others?: boolean | null
@@ -1272,6 +1289,7 @@ export type Database = {
           updated_at?: string
           vehicle_make?: string | null
           vehicle_year?: string | null
+          was_self_employed_last_5_years?: boolean | null
           wohngeld_payment_to_applicant?: boolean | null
           work_scope_and_type?: string | null
           zip_code?: string | null
