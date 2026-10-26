@@ -32,8 +32,9 @@ RESEARCH_DIR = REPO_ROOT / "demo" / "research"
 PERSONA_FILES = sorted(PERSONAS_DIR.glob("*.json"))
 USER_COLUMNS = {column.name for column in Users.__table__.columns}
 
-# The four codes DatenPrufenForm.tsx renders a message for. Anything else shows the
-# generic fallback, which defeats the point of seeding a specific failure state.
+# The four codes with a review.warnings message in the wallet-frontend profile
+# locales. Anything else gets the generic fallback, which defeats the point of
+# seeding a specific failure state.
 KNOWN_ERROR_CODES = {
     "PAGINATION_MISSING_PAGES",
     "LEGIBILITY_ISSUES",
@@ -148,7 +149,7 @@ def test_error_codes_are_renderable(persona):
         code = doc.get("user_error_code")
         if code is not None:
             assert code in KNOWN_ERROR_CODES, (
-                f"{data['slug']} / {doc['document_type']}: {code} has no message in DatenPrufenForm.tsx"
+                f"{data['slug']} / {doc['document_type']}: {code} has no review.warnings message in the wallet-frontend locales"
             )
 
 
