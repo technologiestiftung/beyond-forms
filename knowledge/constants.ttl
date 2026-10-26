@@ -1,0 +1,469 @@
+@prefix bf: <https://beyond-forms.example/ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# bf:verified true means checked against bf:verifiedAgainst (checked 2026-10-21); bf:verified false means not yet checked.
+# Age and birth year ranges are inclusive. A missing bound means unbounded.
+
+# Regelbedarfsstufen, Anlage zu § 28 SGB XII
+
+bf:regelbedarf-rbs1 a bf:ConstantSeries ; bf:key bf:regelbedarfSingle ; bf:legalSource "Anlage zu § 28 SGB XII, Regelbedarfsstufe 1" .
+bf:regelbedarf-rbs1-2026 a bf:Constant ; bf:series bf:regelbedarf-rbs1 ; bf:value 563 ; bf:validFrom "2026-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_12/anlage.html> .
+
+bf:regelbedarf-rbs2 a bf:ConstantSeries ; bf:key bf:regelbedarfPartner ; bf:legalSource "Anlage zu § 28 SGB XII, Regelbedarfsstufe 2" .
+bf:regelbedarf-rbs2-2026 a bf:Constant ; bf:series bf:regelbedarf-rbs2 ; bf:value 506 ; bf:validFrom "2026-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_12/anlage.html> .
+
+bf:regelbedarf-rbs3 a bf:ConstantSeries ; bf:key bf:regelbedarfChild ; bf:minAge 18 ; bf:legalSource "Anlage zu § 28 SGB XII, Regelbedarfsstufe 3" .
+bf:regelbedarf-rbs3-2026 a bf:Constant ; bf:series bf:regelbedarf-rbs3 ; bf:value 451 ; bf:validFrom "2026-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_12/anlage.html> .
+
+bf:regelbedarf-rbs4 a bf:ConstantSeries ; bf:key bf:regelbedarfChild ; bf:minAge 14 ; bf:maxAge 17 ; bf:legalSource "Anlage zu § 28 SGB XII, Regelbedarfsstufe 4" .
+bf:regelbedarf-rbs4-2026 a bf:Constant ; bf:series bf:regelbedarf-rbs4 ; bf:value 471 ; bf:validFrom "2026-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_12/anlage.html> .
+
+bf:regelbedarf-rbs5 a bf:ConstantSeries ; bf:key bf:regelbedarfChild ; bf:minAge 6 ; bf:maxAge 13 ; bf:legalSource "Anlage zu § 28 SGB XII, Regelbedarfsstufe 5" .
+bf:regelbedarf-rbs5-2026 a bf:Constant ; bf:series bf:regelbedarf-rbs5 ; bf:value 390 ; bf:validFrom "2026-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_12/anlage.html> .
+
+bf:regelbedarf-rbs6 a bf:ConstantSeries ; bf:key bf:regelbedarfChild ; bf:minAge 0 ; bf:maxAge 5 ; bf:legalSource "Anlage zu § 28 SGB XII, Regelbedarfsstufe 6" .
+bf:regelbedarf-rbs6-2026 a bf:Constant ; bf:series bf:regelbedarf-rbs6 ; bf:value 357 ; bf:validFrom "2026-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_12/anlage.html> .
+
+# Schonvermögen per household member in the Grundsicherungsgeld, by age. The higher amount applies from the
+# start of the month the age is reached ("bis zur Vollendung des 30. Lebensjahres", "ab dem 31. Lebensjahr", ...).
+
+bf:schonvermoegen-sgb2-under30 a bf:ConstantSeries ; bf:key bf:assetAllowanceSgb2PerPerson ; bf:maxAge 29 ; bf:legalSource "§ 12 Abs. 2 SGB II" .
+bf:schonvermoegen-sgb2-under30-2026-07 a bf:Constant ; bf:series bf:schonvermoegen-sgb2-under30 ; bf:value 5000 ; bf:validFrom "2026-07-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_2/__12.html> .
+
+bf:schonvermoegen-sgb2-30to39 a bf:ConstantSeries ; bf:key bf:assetAllowanceSgb2PerPerson ; bf:minAge 30 ; bf:maxAge 39 ; bf:legalSource "§ 12 Abs. 2 SGB II" .
+bf:schonvermoegen-sgb2-30to39-2026-07 a bf:Constant ; bf:series bf:schonvermoegen-sgb2-30to39 ; bf:value 10000 ; bf:validFrom "2026-07-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_2/__12.html> .
+
+bf:schonvermoegen-sgb2-40to49 a bf:ConstantSeries ; bf:key bf:assetAllowanceSgb2PerPerson ; bf:minAge 40 ; bf:maxAge 49 ; bf:legalSource "§ 12 Abs. 2 SGB II" .
+bf:schonvermoegen-sgb2-40to49-2026-07 a bf:Constant ; bf:series bf:schonvermoegen-sgb2-40to49 ; bf:value 12500 ; bf:validFrom "2026-07-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_2/__12.html> .
+
+bf:schonvermoegen-sgb2-from50 a bf:ConstantSeries ; bf:key bf:assetAllowanceSgb2PerPerson ; bf:minAge 50 ; bf:legalSource "§ 12 Abs. 2 SGB II" .
+bf:schonvermoegen-sgb2-from50-2026-07 a bf:Constant ; bf:series bf:schonvermoegen-sgb2-from50 ; bf:value 20000 ; bf:validFrom "2026-07-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_2/__12.html> .
+
+# Schonvermögen in the Sozialhilfe (SGB XII): per adult, and per person the adults mainly support
+
+bf:schonvermoegen-sgb12-adult a bf:ConstantSeries ; bf:key bf:assetAllowanceSgb12PerAdult ; bf:legalSource "§ 1 Satz 1 Nr. 1 VO zur Durchführung des § 90 Abs. 2 Nr. 9 SGB XII" .
+bf:schonvermoegen-sgb12-adult-2023 a bf:Constant ; bf:series bf:schonvermoegen-sgb12-adult ; bf:value 10000 ; bf:validFrom "2023-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/bshg_88abs2dv_1988/BJNR001500988.html> .
+
+bf:schonvermoegen-sgb12-dependent a bf:ConstantSeries ; bf:key bf:assetAllowanceSgb12PerDependent ; bf:legalSource "§ 1 Satz 1 Nr. 2 VO zur Durchführung des § 90 Abs. 2 Nr. 9 SGB XII" .
+bf:schonvermoegen-sgb12-dependent-current a bf:Constant ; bf:series bf:schonvermoegen-sgb12-dependent ; bf:value 500 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/bshg_88abs2dv_1988/BJNR001500988.html> .
+
+# Mindesteinkommen Kinderzuschlag, gross per month
+
+bf:kiz-min-gross-single-parent a bf:ConstantSeries ; bf:key bf:kizMinGrossSingleParent ; bf:legalSource "§ 6a Abs. 1 Nr. 2 BKGG; counts income per § 11 SGB II without Kindergeld, Wohngeld and Kinderzuschlag, before § 11b deductions" .
+bf:kiz-min-gross-single-parent-current a bf:Constant ; bf:series bf:kiz-min-gross-single-parent ; bf:value 600 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/bkgg_1996/__6a.html> .
+
+bf:kiz-min-gross-couple a bf:ConstantSeries ; bf:key bf:kizMinGrossCouple ; bf:legalSource "§ 6a Abs. 1 Nr. 2 BKGG; counts income per § 11 SGB II without Kindergeld, Wohngeld and Kinderzuschlag, before § 11b deductions" .
+bf:kiz-min-gross-couple-current a bf:Constant ; bf:series bf:kiz-min-gross-couple ; bf:value 900 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/bkgg_1996/__6a.html> .
+
+# Regelaltersgrenze in months by birth year, § 235 SGB VI
+
+bf:retirement-age-to1946 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:maxBirthYear 1946 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-to1946-current a bf:Constant ; bf:series bf:retirement-age-to1946 ; bf:value 780 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1947 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1947 ; bf:maxBirthYear 1947 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1947-current a bf:Constant ; bf:series bf:retirement-age-1947 ; bf:value 781 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1948 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1948 ; bf:maxBirthYear 1948 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1948-current a bf:Constant ; bf:series bf:retirement-age-1948 ; bf:value 782 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1949 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1949 ; bf:maxBirthYear 1949 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1949-current a bf:Constant ; bf:series bf:retirement-age-1949 ; bf:value 783 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1950 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1950 ; bf:maxBirthYear 1950 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1950-current a bf:Constant ; bf:series bf:retirement-age-1950 ; bf:value 784 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1951 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1951 ; bf:maxBirthYear 1951 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1951-current a bf:Constant ; bf:series bf:retirement-age-1951 ; bf:value 785 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1952 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1952 ; bf:maxBirthYear 1952 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1952-current a bf:Constant ; bf:series bf:retirement-age-1952 ; bf:value 786 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1953 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1953 ; bf:maxBirthYear 1953 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1953-current a bf:Constant ; bf:series bf:retirement-age-1953 ; bf:value 787 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1954 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1954 ; bf:maxBirthYear 1954 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1954-current a bf:Constant ; bf:series bf:retirement-age-1954 ; bf:value 788 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1955 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1955 ; bf:maxBirthYear 1955 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1955-current a bf:Constant ; bf:series bf:retirement-age-1955 ; bf:value 789 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1956 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1956 ; bf:maxBirthYear 1956 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1956-current a bf:Constant ; bf:series bf:retirement-age-1956 ; bf:value 790 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1957 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1957 ; bf:maxBirthYear 1957 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1957-current a bf:Constant ; bf:series bf:retirement-age-1957 ; bf:value 791 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1958 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1958 ; bf:maxBirthYear 1958 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1958-current a bf:Constant ; bf:series bf:retirement-age-1958 ; bf:value 792 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1959 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1959 ; bf:maxBirthYear 1959 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1959-current a bf:Constant ; bf:series bf:retirement-age-1959 ; bf:value 794 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1960 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1960 ; bf:maxBirthYear 1960 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1960-current a bf:Constant ; bf:series bf:retirement-age-1960 ; bf:value 796 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1961 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1961 ; bf:maxBirthYear 1961 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1961-current a bf:Constant ; bf:series bf:retirement-age-1961 ; bf:value 798 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1962 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1962 ; bf:maxBirthYear 1962 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1962-current a bf:Constant ; bf:series bf:retirement-age-1962 ; bf:value 800 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-1963 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1963 ; bf:maxBirthYear 1963 ; bf:legalSource "§ 235 SGB VI" .
+bf:retirement-age-1963-current a bf:Constant ; bf:series bf:retirement-age-1963 ; bf:value 802 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__235.html> .
+bf:retirement-age-from1964 a bf:ConstantSeries ; bf:key bf:retirementAgeMonths ; bf:minBirthYear 1964 ; bf:legalSource "§ 35 SGB VI" .
+bf:retirement-age-from1964-current a bf:Constant ; bf:series bf:retirement-age-from1964 ; bf:value 804 ; bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/sgb_6/__35.html> .
+
+# Wohngeld (§ 19 WoGG). Amounts per household size; for larger households the "PerAdditionalMember" amount is added per member above 5.
+
+bf:mietenstufe-berlin a bf:ConstantSeries ; bf:key bf:mietenstufe ; bf:legalSource "Anlage zu § 1 Abs. 3 WoGV, Land Berlin: Berlin, Stadt" .
+bf:mietenstufe-berlin-current a bf:Constant ; bf:series bf:mietenstufe-berlin ; bf:value 4 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogv/anlage.html> .
+
+bf:wohngeld-minimum-amount a bf:ConstantSeries ; bf:key bf:wohngeldMinimumAmount ; bf:legalSource "§ 21 Nr. 1 WoGG" .
+bf:wohngeld-minimum-amount-current a bf:Constant ; bf:series bf:wohngeld-minimum-amount ; bf:value 10 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__21.html> .
+
+bf:wohngeld-single-parent-allowance a bf:ConstantSeries ; bf:key bf:wohngeldSingleParentAllowancePerYear ; bf:legalSource "§ 17 Nr. 3 WoGG" .
+bf:wohngeld-single-parent-allowance-current a bf:Constant ; bf:series bf:wohngeld-single-parent-allowance ; bf:value 1320 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__17.html> .
+
+# Anlagen 1 to 3 as amended by the Zweite Verordnung zur Fortschreibung des Wohngeldes (BGBl. 2024 I Nr. 314), in force since 2025-01-01
+bf:wohngeld-max-rent-1-I a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 1 ; bf:mietenstufe 1 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-1-I-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-1-I ; bf:value 361 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-1-II a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 1 ; bf:mietenstufe 2 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-1-II-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-1-II ; bf:value 408 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-1-III a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 1 ; bf:mietenstufe 3 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-1-III-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-1-III ; bf:value 456 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-1-IV a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 1 ; bf:mietenstufe 4 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-1-IV-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-1-IV ; bf:value 511 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-1-V a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 1 ; bf:mietenstufe 5 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-1-V-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-1-V ; bf:value 562 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-1-VI a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 1 ; bf:mietenstufe 6 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-1-VI-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-1-VI ; bf:value 615 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-1-VII a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 1 ; bf:mietenstufe 7 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-1-VII-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-1-VII ; bf:value 677 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-2-I a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 2 ; bf:mietenstufe 1 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-2-I-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-2-I ; bf:value 437 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-2-II a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 2 ; bf:mietenstufe 2 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-2-II-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-2-II ; bf:value 493 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-2-III a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 2 ; bf:mietenstufe 3 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-2-III-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-2-III ; bf:value 551 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-2-IV a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 2 ; bf:mietenstufe 4 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-2-IV-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-2-IV ; bf:value 619 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-2-V a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 2 ; bf:mietenstufe 5 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-2-V-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-2-V ; bf:value 680 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-2-VI a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 2 ; bf:mietenstufe 6 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-2-VI-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-2-VI ; bf:value 745 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-2-VII a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 2 ; bf:mietenstufe 7 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-2-VII-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-2-VII ; bf:value 820 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-3-I a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 3 ; bf:mietenstufe 1 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-3-I-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-3-I ; bf:value 521 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-3-II a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 3 ; bf:mietenstufe 2 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-3-II-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-3-II ; bf:value 587 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-3-III a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 3 ; bf:mietenstufe 3 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-3-III-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-3-III ; bf:value 657 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-3-IV a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 3 ; bf:mietenstufe 4 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-3-IV-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-3-IV ; bf:value 737 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-3-V a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 3 ; bf:mietenstufe 5 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-3-V-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-3-V ; bf:value 809 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-3-VI a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 3 ; bf:mietenstufe 6 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-3-VI-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-3-VI ; bf:value 887 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-3-VII a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 3 ; bf:mietenstufe 7 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-3-VII-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-3-VII ; bf:value 975 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-4-I a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 4 ; bf:mietenstufe 1 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-4-I-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-4-I ; bf:value 608 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-4-II a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 4 ; bf:mietenstufe 2 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-4-II-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-4-II ; bf:value 686 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-4-III a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 4 ; bf:mietenstufe 3 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-4-III-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-4-III ; bf:value 766 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-4-IV a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 4 ; bf:mietenstufe 4 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-4-IV-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-4-IV ; bf:value 858 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-4-V a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 4 ; bf:mietenstufe 5 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-4-V-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-4-V ; bf:value 946 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-4-VI a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 4 ; bf:mietenstufe 6 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-4-VI-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-4-VI ; bf:value 1035 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-4-VII a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 4 ; bf:mietenstufe 7 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-4-VII-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-4-VII ; bf:value 1139 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-5-I a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 5 ; bf:mietenstufe 1 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-5-I-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-5-I ; bf:value 694 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-5-II a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 5 ; bf:mietenstufe 2 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-5-II-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-5-II ; bf:value 782 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-5-III a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 5 ; bf:mietenstufe 3 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-5-III-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-5-III ; bf:value 875 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-5-IV a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 5 ; bf:mietenstufe 4 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-5-IV-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-5-IV ; bf:value 982 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-5-V a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 5 ; bf:mietenstufe 5 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-5-V-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-5-V ; bf:value 1080 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-5-VI a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 5 ; bf:mietenstufe 6 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-5-VI-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-5-VI ; bf:value 1183 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-5-VII a bf:ConstantSeries ; bf:key bf:wohngeldMaxRent ; bf:householdSize 5 ; bf:mietenstufe 7 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-5-VII-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-5-VII ; bf:value 1302 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-extra-I a bf:ConstantSeries ; bf:key bf:wohngeldMaxRentPerAdditionalMember ; bf:mietenstufe 1 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-extra-I-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-extra-I ; bf:value 82 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-extra-II a bf:ConstantSeries ; bf:key bf:wohngeldMaxRentPerAdditionalMember ; bf:mietenstufe 2 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-extra-II-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-extra-II ; bf:value 94 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-extra-III a bf:ConstantSeries ; bf:key bf:wohngeldMaxRentPerAdditionalMember ; bf:mietenstufe 3 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-extra-III-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-extra-III ; bf:value 106 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-extra-IV a bf:ConstantSeries ; bf:key bf:wohngeldMaxRentPerAdditionalMember ; bf:mietenstufe 4 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-extra-IV-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-extra-IV ; bf:value 119 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-extra-V a bf:ConstantSeries ; bf:key bf:wohngeldMaxRentPerAdditionalMember ; bf:mietenstufe 5 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-extra-V-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-extra-V ; bf:value 129 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-extra-VI a bf:ConstantSeries ; bf:key bf:wohngeldMaxRentPerAdditionalMember ; bf:mietenstufe 6 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-extra-VI-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-extra-VI ; bf:value 149 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-max-rent-extra-VII a bf:ConstantSeries ; bf:key bf:wohngeldMaxRentPerAdditionalMember ; bf:mietenstufe 7 ; bf:legalSource "Anlage 1 zu § 12 Abs. 1 WoGG" .
+bf:wohngeld-max-rent-extra-VII-2025 a bf:Constant ; bf:series bf:wohngeld-max-rent-extra-VII ; bf:value 163 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_1.html> .
+bf:wohngeld-heating-1 a bf:ConstantSeries ; bf:key bf:wohngeldHeatingRelief ; bf:householdSize 1 ; bf:legalSource "§ 12 Abs. 6 WoGG" .
+bf:wohngeld-heating-1-current a bf:Constant ; bf:series bf:wohngeld-heating-1 ; bf:value 110.40 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__12.html> .
+bf:wohngeld-heating-2 a bf:ConstantSeries ; bf:key bf:wohngeldHeatingRelief ; bf:householdSize 2 ; bf:legalSource "§ 12 Abs. 6 WoGG" .
+bf:wohngeld-heating-2-current a bf:Constant ; bf:series bf:wohngeld-heating-2 ; bf:value 142.60 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__12.html> .
+bf:wohngeld-heating-3 a bf:ConstantSeries ; bf:key bf:wohngeldHeatingRelief ; bf:householdSize 3 ; bf:legalSource "§ 12 Abs. 6 WoGG" .
+bf:wohngeld-heating-3-current a bf:Constant ; bf:series bf:wohngeld-heating-3 ; bf:value 170.20 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__12.html> .
+bf:wohngeld-heating-4 a bf:ConstantSeries ; bf:key bf:wohngeldHeatingRelief ; bf:householdSize 4 ; bf:legalSource "§ 12 Abs. 6 WoGG" .
+bf:wohngeld-heating-4-current a bf:Constant ; bf:series bf:wohngeld-heating-4 ; bf:value 197.80 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__12.html> .
+bf:wohngeld-heating-5 a bf:ConstantSeries ; bf:key bf:wohngeldHeatingRelief ; bf:householdSize 5 ; bf:legalSource "§ 12 Abs. 6 WoGG" .
+bf:wohngeld-heating-5-current a bf:Constant ; bf:series bf:wohngeld-heating-5 ; bf:value 225.40 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__12.html> .
+bf:wohngeld-heating-extra a bf:ConstantSeries ; bf:key bf:wohngeldHeatingReliefPerAdditionalMember ; bf:legalSource "§ 12 Abs. 6 WoGG" .
+bf:wohngeld-heating-extra-current a bf:Constant ; bf:series bf:wohngeld-heating-extra ; bf:value 27.60 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__12.html> .
+bf:wohngeld-climate-1 a bf:ConstantSeries ; bf:key bf:wohngeldClimateComponent ; bf:householdSize 1 ; bf:legalSource "§ 12 Abs. 7 WoGG" .
+bf:wohngeld-climate-1-current a bf:Constant ; bf:series bf:wohngeld-climate-1 ; bf:value 19.20 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__12.html> .
+bf:wohngeld-climate-2 a bf:ConstantSeries ; bf:key bf:wohngeldClimateComponent ; bf:householdSize 2 ; bf:legalSource "§ 12 Abs. 7 WoGG" .
+bf:wohngeld-climate-2-current a bf:Constant ; bf:series bf:wohngeld-climate-2 ; bf:value 24.80 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__12.html> .
+bf:wohngeld-climate-3 a bf:ConstantSeries ; bf:key bf:wohngeldClimateComponent ; bf:householdSize 3 ; bf:legalSource "§ 12 Abs. 7 WoGG" .
+bf:wohngeld-climate-3-current a bf:Constant ; bf:series bf:wohngeld-climate-3 ; bf:value 29.60 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__12.html> .
+bf:wohngeld-climate-4 a bf:ConstantSeries ; bf:key bf:wohngeldClimateComponent ; bf:householdSize 4 ; bf:legalSource "§ 12 Abs. 7 WoGG" .
+bf:wohngeld-climate-4-current a bf:Constant ; bf:series bf:wohngeld-climate-4 ; bf:value 34.40 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__12.html> .
+bf:wohngeld-climate-5 a bf:ConstantSeries ; bf:key bf:wohngeldClimateComponent ; bf:householdSize 5 ; bf:legalSource "§ 12 Abs. 7 WoGG" .
+bf:wohngeld-climate-5-current a bf:Constant ; bf:series bf:wohngeld-climate-5 ; bf:value 39.20 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__12.html> .
+bf:wohngeld-climate-extra a bf:ConstantSeries ; bf:key bf:wohngeldClimateComponentPerAdditionalMember ; bf:legalSource "§ 12 Abs. 7 WoGG" .
+bf:wohngeld-climate-extra-current a bf:Constant ; bf:series bf:wohngeld-climate-extra ; bf:value 4.80 ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/__12.html> .
+bf:wohngeld-a-1 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientA ; bf:householdSize 1 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-a-1-2025 a bf:Constant ; bf:series bf:wohngeld-a-1 ; bf:value 0.04 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-a-2 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientA ; bf:householdSize 2 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-a-2-2025 a bf:Constant ; bf:series bf:wohngeld-a-2 ; bf:value 0.03 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-a-3 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientA ; bf:householdSize 3 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-a-3-2025 a bf:Constant ; bf:series bf:wohngeld-a-3 ; bf:value 0.02 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-a-4 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientA ; bf:householdSize 4 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-a-4-2025 a bf:Constant ; bf:series bf:wohngeld-a-4 ; bf:value 0.01 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-a-5 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientA ; bf:householdSize 5 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-a-5-2025 a bf:Constant ; bf:series bf:wohngeld-a-5 ; bf:value 0 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-a-6 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientA ; bf:householdSize 6 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-a-6-2025 a bf:Constant ; bf:series bf:wohngeld-a-6 ; bf:value -0.01 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-a-7 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientA ; bf:householdSize 7 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-a-7-2025 a bf:Constant ; bf:series bf:wohngeld-a-7 ; bf:value -0.02 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-a-8 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientA ; bf:householdSize 8 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-a-8-2025 a bf:Constant ; bf:series bf:wohngeld-a-8 ; bf:value -0.03 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-a-9 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientA ; bf:householdSize 9 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-a-9-2025 a bf:Constant ; bf:series bf:wohngeld-a-9 ; bf:value -0.04 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-a-10 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientA ; bf:householdSize 10 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-a-10-2025 a bf:Constant ; bf:series bf:wohngeld-a-10 ; bf:value -0.06 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-a-11 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientA ; bf:householdSize 11 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-a-11-2025 a bf:Constant ; bf:series bf:wohngeld-a-11 ; bf:value -0.09 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-a-12 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientA ; bf:householdSize 12 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-a-12-2025 a bf:Constant ; bf:series bf:wohngeld-a-12 ; bf:value -0.12 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-b-1 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientB ; bf:householdSize 1 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-b-1-2025 a bf:Constant ; bf:series bf:wohngeld-b-1 ; bf:value 0.0004797 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-b-2 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientB ; bf:householdSize 2 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-b-2-2025 a bf:Constant ; bf:series bf:wohngeld-b-2 ; bf:value 0.0003571 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-b-3 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientB ; bf:householdSize 3 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-b-3-2025 a bf:Constant ; bf:series bf:wohngeld-b-3 ; bf:value 0.0002917 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-b-4 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientB ; bf:householdSize 4 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-b-4-2025 a bf:Constant ; bf:series bf:wohngeld-b-4 ; bf:value 0.0002163 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-b-5 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientB ; bf:householdSize 5 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-b-5-2025 a bf:Constant ; bf:series bf:wohngeld-b-5 ; bf:value 0.0001907 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-b-6 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientB ; bf:householdSize 6 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-b-6-2025 a bf:Constant ; bf:series bf:wohngeld-b-6 ; bf:value 0.0001722 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-b-7 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientB ; bf:householdSize 7 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-b-7-2025 a bf:Constant ; bf:series bf:wohngeld-b-7 ; bf:value 0.0001592 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-b-8 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientB ; bf:householdSize 8 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-b-8-2025 a bf:Constant ; bf:series bf:wohngeld-b-8 ; bf:value 0.0001583 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-b-9 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientB ; bf:householdSize 9 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-b-9-2025 a bf:Constant ; bf:series bf:wohngeld-b-9 ; bf:value 0.0001376 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-b-10 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientB ; bf:householdSize 10 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-b-10-2025 a bf:Constant ; bf:series bf:wohngeld-b-10 ; bf:value 0.0001249 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-b-11 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientB ; bf:householdSize 11 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-b-11-2025 a bf:Constant ; bf:series bf:wohngeld-b-11 ; bf:value 0.0001141 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-b-12 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientB ; bf:householdSize 12 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-b-12-2025 a bf:Constant ; bf:series bf:wohngeld-b-12 ; bf:value 0.0001107 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-c-1 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientC ; bf:householdSize 1 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-c-1-2025 a bf:Constant ; bf:series bf:wohngeld-c-1 ; bf:value 0.0000408 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-c-2 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientC ; bf:householdSize 2 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-c-2-2025 a bf:Constant ; bf:series bf:wohngeld-c-2 ; bf:value 0.0000304 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-c-3 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientC ; bf:householdSize 3 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-c-3-2025 a bf:Constant ; bf:series bf:wohngeld-c-3 ; bf:value 0.0000245 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-c-4 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientC ; bf:householdSize 4 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-c-4-2025 a bf:Constant ; bf:series bf:wohngeld-c-4 ; bf:value 0.0000176 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-c-5 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientC ; bf:householdSize 5 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-c-5-2025 a bf:Constant ; bf:series bf:wohngeld-c-5 ; bf:value 0.0000172 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-c-6 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientC ; bf:householdSize 6 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-c-6-2025 a bf:Constant ; bf:series bf:wohngeld-c-6 ; bf:value 0.0000166 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-c-7 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientC ; bf:householdSize 7 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-c-7-2025 a bf:Constant ; bf:series bf:wohngeld-c-7 ; bf:value 0.0000165 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-c-8 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientC ; bf:householdSize 8 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-c-8-2025 a bf:Constant ; bf:series bf:wohngeld-c-8 ; bf:value 0.0000165 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-c-9 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientC ; bf:householdSize 9 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-c-9-2025 a bf:Constant ; bf:series bf:wohngeld-c-9 ; bf:value 0.0000166 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-c-10 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientC ; bf:householdSize 10 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-c-10-2025 a bf:Constant ; bf:series bf:wohngeld-c-10 ; bf:value 0.0000166 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-c-11 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientC ; bf:householdSize 11 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-c-11-2025 a bf:Constant ; bf:series bf:wohngeld-c-11 ; bf:value 0.0000196 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-c-12 a bf:ConstantSeries ; bf:key bf:wohngeldCoefficientC ; bf:householdSize 12 ; bf:legalSource "Anlage 2 zu § 19 Abs. 1 WoGG" .
+bf:wohngeld-c-12-2025 a bf:Constant ; bf:series bf:wohngeld-c-12 ; bf:value 0.0000221 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_2.html> .
+bf:wohngeld-floor-m-1 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumRent ; bf:householdSize 1 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-m-1-2025 a bf:Constant ; bf:series bf:wohngeld-floor-m-1 ; bf:value 54 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-m-2 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumRent ; bf:householdSize 2 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-m-2-2025 a bf:Constant ; bf:series bf:wohngeld-floor-m-2 ; bf:value 67 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-m-3 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumRent ; bf:householdSize 3 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-m-3-2025 a bf:Constant ; bf:series bf:wohngeld-floor-m-3 ; bf:value 79 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-m-4 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumRent ; bf:householdSize 4 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-m-4-2025 a bf:Constant ; bf:series bf:wohngeld-floor-m-4 ; bf:value 92 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-m-5 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumRent ; bf:householdSize 5 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-m-5-2025 a bf:Constant ; bf:series bf:wohngeld-floor-m-5 ; bf:value 103 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-m-6 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumRent ; bf:householdSize 6 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-m-6-2025 a bf:Constant ; bf:series bf:wohngeld-floor-m-6 ; bf:value 103 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-m-7 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumRent ; bf:householdSize 7 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-m-7-2025 a bf:Constant ; bf:series bf:wohngeld-floor-m-7 ; bf:value 115 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-m-8 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumRent ; bf:householdSize 8 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-m-8-2025 a bf:Constant ; bf:series bf:wohngeld-floor-m-8 ; bf:value 128 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-m-9 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumRent ; bf:householdSize 9 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-m-9-2025 a bf:Constant ; bf:series bf:wohngeld-floor-m-9 ; bf:value 140 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-m-10 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumRent ; bf:householdSize 10 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-m-10-2025 a bf:Constant ; bf:series bf:wohngeld-floor-m-10 ; bf:value 152 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-m-11 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumRent ; bf:householdSize 11 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-m-11-2025 a bf:Constant ; bf:series bf:wohngeld-floor-m-11 ; bf:value 187 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-m-12 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumRent ; bf:householdSize 12 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-m-12-2025 a bf:Constant ; bf:series bf:wohngeld-floor-m-12 ; bf:value 298 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-y-1 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumIncome ; bf:householdSize 1 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-y-1-2025 a bf:Constant ; bf:series bf:wohngeld-floor-y-1 ; bf:value 396 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-y-2 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumIncome ; bf:householdSize 2 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-y-2-2025 a bf:Constant ; bf:series bf:wohngeld-floor-y-2 ; bf:value 679 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-y-3 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumIncome ; bf:householdSize 3 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-y-3-2025 a bf:Constant ; bf:series bf:wohngeld-floor-y-3 ; bf:value 906 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-y-4 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumIncome ; bf:householdSize 4 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-y-4-2025 a bf:Constant ; bf:series bf:wohngeld-floor-y-4 ; bf:value 1132 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-y-5 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumIncome ; bf:householdSize 5 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-y-5-2025 a bf:Constant ; bf:series bf:wohngeld-floor-y-5 ; bf:value 1358 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-y-6 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumIncome ; bf:householdSize 6 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-y-6-2025 a bf:Constant ; bf:series bf:wohngeld-floor-y-6 ; bf:value 1585 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-y-7 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumIncome ; bf:householdSize 7 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-y-7-2025 a bf:Constant ; bf:series bf:wohngeld-floor-y-7 ; bf:value 1811 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-y-8 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumIncome ; bf:householdSize 8 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-y-8-2025 a bf:Constant ; bf:series bf:wohngeld-floor-y-8 ; bf:value 2037 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-y-9 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumIncome ; bf:householdSize 9 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-y-9-2025 a bf:Constant ; bf:series bf:wohngeld-floor-y-9 ; bf:value 2264 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-y-10 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumIncome ; bf:householdSize 10 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-y-10-2025 a bf:Constant ; bf:series bf:wohngeld-floor-y-10 ; bf:value 2490 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-y-11 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumIncome ; bf:householdSize 11 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-y-11-2025 a bf:Constant ; bf:series bf:wohngeld-floor-y-11 ; bf:value 2717 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .
+bf:wohngeld-floor-y-12 a bf:ConstantSeries ; bf:key bf:wohngeldMinimumIncome ; bf:householdSize 12 ; bf:legalSource "Anlage 3 Nr. 1 zu § 19 Abs. 2 WoGG" .
+bf:wohngeld-floor-y-12-2025 a bf:Constant ; bf:series bf:wohngeld-floor-y-12 ; bf:value 2943 ; bf:validFrom "2025-01-01"^^xsd:date ;
+    bf:verified true ; bf:verifiedAgainst <https://www.gesetze-im-internet.de/wogg/anlage_3.html> .

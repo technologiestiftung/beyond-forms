@@ -1,0 +1,34 @@
+@prefix bf: <https://beyond-forms.example/ns#> .
+@prefix ff: <https://foerderfunke.org/default#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# Wohngeld is calculated with the formula of § 19 WoGG (see materialization.ttl); there is no claim below 10 euros (§ 21 Nr. 1).
+# Not modelled: exclusion of recipients of other benefits (§ 7), "erhebliches Vermögen" (§ 21 Nr. 3), the authorities' plausibility check of the income.
+bf:wohngeld a bf:RequirementProfile ;
+    rdfs:label "Wohngeld"@de , "Housing benefit (Wohngeld)"@en ;
+    bf:leikaId "99107023037000" ;
+    bf:legalBasis bf:wogg ;
+    bf:providingAgency bf:wohngeldbehoerde ;
+    bf:eligibleReasonKey "wohngeld_calculated" ;
+    bf:eligibleReason "Nach der Wohngeld-Formel ergibt sich voraussichtlich ein Anspruch von mindestens 10 Euro im Monat."@de ,
+        "According to the housing benefit formula you are likely entitled to at least 10 euros per month."@en ;
+    skos:closeMatch ff:wog ;
+    bf:hasMainShape bf:wohngeldShape .
+
+bf:wohngeldShape a sh:NodeShape ;
+    sh:targetClass bf:Citizen ;
+    sh:property [
+        sh:path bf:livesInGermany ; sh:minCount 1 ; sh:in ( true ) ;
+        sh:order 0 ; bf:reasonKey "not_living_in_germany" ;
+        sh:message "Du wohnst nicht in Deutschland."@de , "You do not live in Germany."@en
+    ] ;
+    sh:property [
+        sh:path bf:wohngeldAboveMinimum ; sh:minCount 1 ; sh:in ( true ) ;
+        sh:order 1 ; bf:reasonKey "wohngeld_below_minimum" ;
+        sh:message "Nach der Wohngeld-Formel ergäbe sich weniger als 10 Euro im Monat. Dann wird kein Wohngeld gezahlt."@de , "The housing benefit formula gives less than 10 euros per month, and no housing benefit is paid below that."@en
+    ] ;
+    sh:property [
+        sh:path bf:residenceStatusAnswered ; sh:minCount 1
+    ] .

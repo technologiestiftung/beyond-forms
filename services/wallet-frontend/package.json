@@ -13,6 +13,7 @@
 		"e2e": "playwright test"
 	},
 	"dependencies": {
+		"@beyond-forms/eligibility-engine": "file:../../libs/eligibility-engine",
 		"@hookform/resolvers": "5.4.0",
 		"@tanstack/react-query": "5.100.14",
 		"framer-motion": "12.40.0",
