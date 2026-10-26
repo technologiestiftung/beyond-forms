@@ -175,7 +175,7 @@ test.describe("Bank Statement Mock Auto-Verification", () => {
 
 		// Go to Application Income/Assets wizard page directly and check it is empty
 		await page.goto("/dashboard/application/income-assets/questions");
-		await expect(page.getByTestId("option-card-ja")).toBeVisible({
+		await expect(page.getByTestId("option-card-yes")).toBeVisible({
 			timeout: 15000,
 		});
 
@@ -236,7 +236,7 @@ test.describe("Bank Statement Mock Auto-Verification", () => {
 
 		// Navigate back to the Income/Assets wizard flow
 		await page.goto("/dashboard/application/income-assets/questions");
-		await expect(page.getByTestId("option-card-ja")).toBeVisible({
+		await expect(page.getByTestId("option-card-yes")).toBeVisible({
 			timeout: 15000,
 		});
 
@@ -259,7 +259,7 @@ test.describe("Bank Statement Mock Auto-Verification", () => {
 			page.getByRole("heading", { name: /Erwerbssituation/i }),
 		).toBeVisible();
 
-		await page.getByTestId("option-card-nichts_davon").click();
+		await page.getByTestId("option-card-no_employment").click();
 		await page.getByRole("button", { name: "Weiter", exact: true }).click(); // Page 4 -> Page 5
 		await expect(
 			page.getByRole("heading", { name: /weitere regelmäßige Einnahmen/i }),

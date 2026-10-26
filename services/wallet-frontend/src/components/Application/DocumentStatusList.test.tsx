@@ -9,14 +9,6 @@ import {
 
 import { Origins } from "../../constants/origin";
 
-// Mock translations
-vi.mock("react-i18next", () => ({
-	useTranslation: () => ({
-		t: (_key: string, defaultText: string) => defaultText,
-		i18n: { language: "de" },
-	}),
-}));
-
 // Mock useProfile hook
 vi.mock("../../hooks/useProfile", () => ({
 	useProfile: () => ({
@@ -71,8 +63,8 @@ describe("DocumentStatusList", () => {
 		);
 
 		const row = screen.getByTestId("slot-btn-id_card");
-		expect(row).toHaveTextContent("Prüfen");
-		expect(row).not.toHaveTextContent("Hinzufügen");
+		expect(row).toHaveTextContent("docs.review");
+		expect(row).not.toHaveTextContent("docs.add_short");
 	});
 
 	it("displays no required checklist slots for application wizard (WIZARD origin)", () => {
@@ -99,9 +91,7 @@ describe("DocumentStatusList", () => {
 				<DocumentStatusList documents={[bankDoc]} />
 			</MemoryRouter>,
 		);
-		expect(
-			screen.queryByText("Kürzlich hochgeladene Dokumente (Unsortiert)"),
-		).not.toBeInTheDocument();
+		expect(screen.queryByText("docs.unsorted_title")).not.toBeInTheDocument();
 	});
 
 	it("correctly matches PENSION_STATEMENT to pension_notice slot", () => {
@@ -117,9 +107,7 @@ describe("DocumentStatusList", () => {
 				<DocumentStatusList documents={[pensionDoc]} />
 			</MemoryRouter>,
 		);
-		expect(
-			screen.queryByText("Kürzlich hochgeladene Dokumente (Unsortiert)"),
-		).not.toBeInTheDocument();
+		expect(screen.queryByText("docs.unsorted_title")).not.toBeInTheDocument();
 	});
 
 	it("respects the showDelete prop and hides trash icons when false", () => {
@@ -153,7 +141,7 @@ describe("DocumentStatusList", () => {
 		expect(screen.getByTestId("delete-btn-doc-123")).toBeInTheDocument();
 	});
 
-	it("renders pulsing orange badge 'Verarbeitung...' in triage section for PROCESSING or PENDING documents and uses aria-live", () => {
+	it("renders pulsing orange processing badge in triage section for PROCESSING or PENDING documents and uses aria-live", () => {
 		const processingDoc: WalletDocument = {
 			id: "doc-processing",
 			name: "test_statement.pdf",
@@ -173,16 +161,16 @@ describe("DocumentStatusList", () => {
 			</MemoryRouter>,
 		);
 
-		// 1. Should display "Verarbeitung..." badge
-		expect(screen.getByText("Verarbeitung...")).toBeInTheDocument();
-		// 2. Should NOT display "Prüfen" button
+		// 1. Should display the processing badge
+		expect(screen.getByText("docs.processing")).toBeInTheDocument();
+		// 2. Should NOT display the review button
 		expect(
-			screen.queryByRole("button", { name: /Prüfen/i }),
+			screen.queryByRole("button", { name: "docs.review" }),
 		).not.toBeInTheDocument();
 
 		// 3. Accessibility check: status indicators must be wrapped in an aria-live polite container
 		const container = screen
-			.getByText("Verarbeitung...")
+			.getByText("docs.processing")
 			.closest("[aria-live='polite']");
 		expect(container).toBeInTheDocument();
 	});
@@ -233,7 +221,7 @@ describe("DocumentStatusList", () => {
 		expect(screen.queryByText("mietvertrag.pdf")).not.toBeInTheDocument();
 	});
 
-	it("disables clicking, displays 'Verarbeitung...' inside slot card, and uses aria-live if matched file is PROCESSING", () => {
+	it("disables clicking, displays the processing badge inside slot card, and uses aria-live if matched file is PROCESSING", () => {
 		const processingSlotDoc: WalletDocument = {
 			id: "doc-pension",
 			name: "pension_notice.pdf",
@@ -258,10 +246,10 @@ describe("DocumentStatusList", () => {
 		expect(pensionCard).toBeInTheDocument();
 		expect(pensionCard).toBeDisabled();
 
-		// Verify slot card renders "Verarbeitung..." instead of a Chevron right
+		// Verify slot card renders the processing badge instead of a Chevron right
 		expect(pensionCard).not.toBeNull();
 		if (pensionCard) {
-			const indicator = within(pensionCard).getByText("Verarbeitung...");
+			const indicator = within(pensionCard).getByText("docs.processing");
 			expect(indicator).toBeInTheDocument();
 			// Accessibility check: verify status region is aria-live="polite"
 			expect(indicator.closest("[aria-live='polite']")).toBeInTheDocument();

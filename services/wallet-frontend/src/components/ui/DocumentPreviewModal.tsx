@@ -18,8 +18,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 	onClose,
 }) => {
 	const { t } = useTranslation("profile");
-	const displayTitle =
-		title || t("documents.preview_title", "Dokument-Vorschau");
+	const displayTitle = title || t("documents.preview_title");
 	const modalRef = useRef<HTMLDivElement>(null);
 	const blobUrlRef = useRef<string | null>(null);
 	const [blobUrl, setBlobUrl] = useState<string | null>(null);
@@ -94,19 +93,9 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 					return;
 				}
 				if (err instanceof DocumentNotFoundError) {
-					setError(
-						t(
-							"documents.errors.previewUnavailableDueToTTL",
-							"Dieses Dokument ist aus Datenschutzgründen oder durch automatische Speicherfristen nicht mehr als Live-Vorschau verfügbar. Deine verifizierten Daten sind jedoch weiterhin sicher in deinem Profil gespeichert.",
-						),
-					);
+					setError(t("documents.errors.previewUnavailableDueToTTL"));
 				} else {
-					setError(
-						t(
-							"documents.errors.loadFailed",
-							"Fehler beim Laden des Dokuments.",
-						),
-					);
+					setError(t("documents.errors.loadFailed"));
 				}
 				setIsLoading(false);
 			});
@@ -215,7 +204,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 						type="button"
 						onClick={onClose}
 						className="size-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center active:scale-90 transition-all shrink-0"
-						aria-label={t("common.close", "Schließen")}
+						aria-label={t("common.close")}
 					>
 						<X className="w-4 h-4 text-slate-500" />
 					</button>
@@ -230,10 +219,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 						>
 							<div className="size-10 border-4 border-primary-blue-500 border-t-transparent rounded-full animate-spin" />
 							<p className="text-xs font-bold text-brand-grey uppercase tracking-wider">
-								{t(
-									"documents.errors.loading_document",
-									"Dokument wird geladen...",
-								)}
+								{t("documents.errors.loading_document")}
 							</p>
 						</div>
 					)}
@@ -253,7 +239,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 								<iframe
 									data-testid="document-preview-iframe"
 									src={`${blobUrl}#toolbar=0`}
-									title={t("documents.pdf_preview_title", "PDF Vorschau")}
+									title={t("documents.pdf_preview_title")}
 									className="w-full h-[65vh] rounded-2xl border border-slate-200 shadow-inner"
 								/>
 							) : (
@@ -277,7 +263,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 							className="h-12 px-6 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold rounded-2xl shadow-sm active:scale-98 transition-all flex items-center justify-center gap-2 text-sm shrink-0"
 						>
 							<Download className="size-4.5" />
-							<span>{t("common.download", "Herunterladen")}</span>
+							<span>{t("common.download")}</span>
 						</a>
 					)}
 					<button
@@ -286,7 +272,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 						data-testid="preview-close-button"
 						className="w-full h-12 bg-primary-blue-500 hover:bg-primary-blue-600 active:bg-primary-blue-700 text-white font-bold rounded-2xl shadow-md active:scale-98 transition-all flex items-center justify-center text-sm flex-1"
 					>
-						{t("common.close", "Schließen")}
+						{t("common.close")}
 					</button>
 				</div>
 			</div>

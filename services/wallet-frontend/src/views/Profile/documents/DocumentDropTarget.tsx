@@ -58,18 +58,16 @@ export const DocumentDropTarget: React.FC<DocumentDropTargetProps> = ({
 			<p className="text-body-lg font-bold text-brand-black">
 				{t("docs.dropzone_title", {
 					ns: "application",
-					defaultValue: "Dokument hierher ziehen",
 				})}
 			</p>
 			<p className="text-sm text-brand-grey">
 				{t("docs.dropzone_hint", {
 					ns: "application",
-					defaultValue: "oder wähle eine Datei von Deinem Computer aus.",
 				})}
 			</p>
 
 			<p className="text-xs text-primary-blue-400">
-				{t("personal.upload.formats", "PDF, JPG, PNG oder HEIC (max. 10 MB)")}
+				{t("personal.upload.formats")}
 			</p>
 
 			{rejection && (
@@ -86,7 +84,6 @@ export const DocumentDropTarget: React.FC<DocumentDropTargetProps> = ({
 			<PrimaryButton onClick={onOpen} className="lg:w-fit mt-2">
 				{t("docs.add_document", {
 					ns: "application",
-					defaultValue: "Dokument hinzufügen",
 				})}
 			</PrimaryButton>
 		</div>

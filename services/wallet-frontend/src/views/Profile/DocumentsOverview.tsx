@@ -43,7 +43,7 @@ export const DocumentsOverview: React.FC = () => {
 					<div className="flex flex-col items-center gap-4">
 						<div className="w-10 h-10 border-4 border-primary-blue-500 border-t-transparent rounded-full animate-spin" />
 						<p className="text-brand-grey text-xs font-bold tracking-wider uppercase">
-							{t("common.loading", "Lade...")}
+							{t("common.loading")}
 						</p>
 					</div>
 				</div>
@@ -56,17 +56,15 @@ export const DocumentsOverview: React.FC = () => {
 			<PageContainer>
 				<div className="w-full max-w-md flex flex-col items-center px-2 gap-6 pt-32 text-center">
 					<h2 className="text-xl font-extrabold text-slate-900">
-						{t("common.error_title", "Fehler")}
+						{t("common.error_title")}
 					</h2>
-					<p className="text-brand-grey text-sm">
-						{t("common.error_desc", "Fehler beim Laden der Dokumente.")}
-					</p>
+					<p className="text-brand-grey text-sm">{t("common.error_desc")}</p>
 					<button
 						type="button"
 						onClick={() => void refetch()}
 						className="h-12 px-8 bg-white border border-slate-200 text-slate-800 font-bold rounded-2xl shadow-sm active:scale-98 transition-all"
 					>
-						{t("common.retry", "Erneut versuchen")}
+						{t("common.retry")}
 					</button>
 				</div>
 			</PageContainer>
@@ -83,7 +81,7 @@ export const DocumentsOverview: React.FC = () => {
 					<button
 						type="button"
 						onClick={() => navigate(AppRoutes.Profile)}
-						aria-label={t("common.back", "Zurück")}
+						aria-label={t("common.back")}
 						className="w-10 h-10 bg-white hover:bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-all"
 					>
 						<X className="w-5 h-5 text-slate-700" />
@@ -96,13 +94,10 @@ export const DocumentsOverview: React.FC = () => {
 			<div className="w-full max-w-md mx-auto flex flex-col items-center px-2 gap-6 lg:max-w-none lg:items-start lg:px-0 lg:flex-1 lg:min-h-0">
 				<div className="w-full flex flex-col gap-2 lg:gap-3 lg:shrink-0">
 					<h1 className="text-h1 font-bold text-brand-black text-center lg:text-left lg:text-[32px] lg:leading-10">
-						{t("sections.documents.title", "Meine Dokumente")}
+						{t("sections.documents.title")}
 					</h1>
 					<p className="hidden lg:block text-body-lg text-brand-grey">
-						{t(
-							"sections.documents.subtitle",
-							"Lade Deine Dokumente einmal hoch. Klaro verwendet sie dann für alle passenden Anträge.",
-						)}
+						{t("sections.documents.subtitle")}
 					</p>
 				</div>
 
@@ -153,20 +148,17 @@ export const DocumentsOverview: React.FC = () => {
 										<span className="text-body-lg font-extrabold text-slate-900 leading-snug">
 											{t(category.titleKey, {
 												ns: "application",
-												defaultValue: category.defaultTitle,
 											})}
 										</span>
 										<span className="text-xs text-brand-grey truncate leading-normal">
 											{t(category.descriptionKey, {
 												ns: "application",
-												defaultValue: category.defaultDescription,
 											})}
 										</span>
 										<span className="text-[10px] font-bold text-primary-blue-500 tracking-wide uppercase mt-1">
 											{t("docs.selected_documents", {
 												ns: "application",
 												count: documentCount,
-												defaultValue: `Ausgewählte Dokumente: ${documentCount}`,
 											})}
 										</span>
 									</div>

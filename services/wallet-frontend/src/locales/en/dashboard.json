@@ -25,6 +25,8 @@
 					"text": "Based on your answers, basic security might be suitable for you. You can now start preparing your application."
 				},
 				"actions": {
+					"complete": "Complete application",
+					"view_details": "View details",
 					"continue": "Continue",
 					"start": "Let's go",
 					"view_checklist": "View complete checklist",
@@ -56,6 +58,14 @@
 			"housing_allowance": {
 				"title": "Housing allowance",
 				"description": "Apply for housing allowance (Wohngeld) directly with your saved details."
+			},
+			"basic_income": {
+				"title": "Basic income support",
+				"description": "Apply for basic income support directly with your saved details."
+			},
+			"child_allowance": {
+				"title": "Child supplement",
+				"description": "Apply for the child supplement directly with your saved details."
 			}
 		}
 	},

@@ -73,21 +73,34 @@
 			"go_to_page_2": "Gehe zu Frage 2 von 2"
 		},
 		"care_dependency": {
-			"title": "Bist Du pflegebedürftig?"
+			"title": "Bist Du pflegebedürftig?",
+			"desc": "Diese Information wird benötigt, um eventuelle Pflegezuschüsse oder stationäre Leistungen zu bestimmen."
 		},
 		"inpatient_details": {
-			"move_in_date": "Einzugsdatum"
+			"move_in_date": "Einzugsdatum",
+			"title": "Details zur stationären Einrichtung",
+			"last_residence": "Letzter Wohnort vor der Heimaufnahme",
+			"last_residence_placeholder": "Adresse der letzten Wohnung"
 		},
 		"earning_temp": {
 			"start_date": "Beginn",
-			"end_date": "Voraussichtliches Ende"
+			"end_date": "Voraussichtliches Ende",
+			"title": "Details zur vorübergehenden Erwerbsminderung",
+			"reason": "Grund (z.B. Krankheit, ärztliches Attest)",
+			"reason_placeholder": "Z.B. Längere Erkrankung"
 		},
 		"earning_perm": {
-			"start_date": "Beginn"
+			"start_date": "Beginn",
+			"title": "Details zur dauerhaften Erwerbsminderung",
+			"reason": "Grund (z.B. Rentenbescheid)",
+			"reason_placeholder": "Z.B. Bescheid über Erwerbsminderungsrente",
+			"disability_question": "Besitzt Du einen offiziellen Behindertenausweis?"
 		},
 		"disability": {
 			"title": "Angaben zum Behindertenausweis",
-			"valid_until": "Gültig bis"
+			"valid_until": "Gültig bis",
+			"merkzeichen": "Eingetragenes Merkzeichen (falls zutreffend)",
+			"no_merkzeichen": "-- Kein Merkzeichen --"
 		},
 		"marks": {
 			"G": "G (Erhebliche Gehbehinderung)",
@@ -102,6 +115,21 @@
 			"EB": "EB (Entschädigungsberechtigt)",
 			"VB": "VB (Versorgungsberechtigt)",
 			"T": "T (Teilnahmeberechtigt)"
+		},
+		"inpatient": {
+			"title": "Wohnst Du in einer vollstationären Pflegeeinrichtung?",
+			"desc": "Wenn Du in einem Pflegeheim oder einer stationären Einrichtung lebst, gelten andere Miet- und Betreuungspauschalen."
+		},
+		"earning_capacity": {
+			"title": "Wie schätzt Du Deine Erwerbsfähigkeit ein?",
+			"fully_able": "Ich kann voll arbeiten (mind. 3 Std./Tag)",
+			"temporary": "Ich bin vorübergehend weniger als 3 Std. arbeitsfähig",
+			"permanent": "Ich bin dauerhaft voll erwerbsgemindert"
+		},
+		"nutrition": {
+			"title": "Benötigst Du aus medizinischen Gründen eine kostenaufwändige Ernährung?",
+			"desc": "Bei bestimmten Krankheiten (z.B. Zöliakie, Niereninsuffizienz) kannst Du einen finanziellen Mehrbedarf erhalten.",
+			"yes_hinweis": "Du erhältst dafür später ein Formular für Deinen Arzt zur Bescheinigung."
 		}
 	},
 	"welcome": "Hallo {{name}}!",
@@ -203,7 +231,82 @@
 			"houseNumber": "Hausnummer",
 			"city": "Stadt",
 			"state": "Bundesland",
-			"zipCode": "Postleitzahl"
+			"zipCode": "Postleitzahl",
+			"email": "E-Mail-Adresse",
+			"phoneNumber": "Telefonnummer",
+			"monthlyIncome": "Monatliches Einkommen (€)",
+			"incomeSources": "Einkommensarten",
+			"hasAssets": "Ich besitze Ersparnisse, Immobilien oder Wertgegenstände",
+			"assetsDescription": "Beschreibung des Vermögens",
+			"professionalExpenses": "Werbungskosten (€)",
+			"hasChildcareExpenses": "Ich habe Kinderbetreuungskosten",
+			"gaveAwayAssetsLast10Years": "Ich habe in den letzten 10 Jahren Vermögen verschenkt",
+			"grossNegligenceLast10Years": "Ich habe in den letzten 10 Jahren grob fahrlässig Vermögen verringert",
+			"hasAppliedForBenefitsAwaitingDecision": "Ich warte auf die Entscheidung über einen anderen Antrag",
+			"benefitsAwaitingDecisionType": "Art der beantragten Leistung",
+			"benefitsAwaitingDecisionApplicationDate": "Antragsdatum",
+			"benefitsAwaitingDecisionOffice": "Zuständige Behörde",
+			"benefitsAwaitingDecisionReference": "Aktenzeichen",
+			"areOneTimePaymentsExpected": "Ich erwarte eine einmalige Zahlung",
+			"oneTimePaymentsExpectedType": "Art der einmaligen Zahlung",
+			"oneTimePaymentsExpectedAmount": "Höhe der einmaligen Zahlung (€)",
+			"oneTimePaymentsExpectedDate": "Datum der einmaligen Zahlung",
+			"bankName": "Bank",
+			"accountHolder": "Kontoinhaber(in)",
+			"iban": "IBAN",
+			"bic": "BIC",
+			"abilityToWork": "Erwerbsfähigkeit",
+			"reducedWorkCapacityStartDate": "Beginn der Erwerbsminderung",
+			"reducedWorkCapacityEndDate": "Voraussichtliches Ende der Erwerbsminderung",
+			"reducedWorkCapacityReason": "Grund der Erwerbsminderung",
+			"hasPermanentReductionInEarningCapacity": "Ich habe eine dauerhafte Erwerbsminderung",
+			"hasDisabilityId": "Ich habe einen Schwerbehindertenausweis",
+			"merkzeichen": "Merkzeichen",
+			"disabilityApplicationPending": "Der Antrag auf einen Schwerbehindertenausweis läuft noch",
+			"hasCostlyMedicalNutrition": "Ich benötige eine kostenaufwändige Ernährung",
+			"hasInpatientFacilityAccommodation": "Ich lebe in einer stationären Einrichtung",
+			"inpatientFacilityLastResidence": "Letzter Wohnort vor dem Einzug",
+			"personsInHouseholdCount": "Personen im Haushalt",
+			"marriedSince": "Verheiratet seit",
+			"accomodationType": "Wohnform",
+			"hotWaterCosts": "Warmwasserkosten (€)",
+			"cableTvCosts": "Kabel-/TV-Kosten (€)",
+			"landlordName": "Vermieter(in)",
+			"heatingType": "Heizungsart",
+			"rentPaidUntil": "Miete bezahlt bis",
+			"subletRoomCount": "Untervermietete Zimmer",
+			"subletRentIncome": "Einnahmen aus Untervermietung (€)",
+			"freeHousingRightHolder": "Inhaber(in) des freien Wohnrechts",
+			"isSubsidizedHousing": "Ich wohne in einer öffentlich geförderten Wohnung",
+			"hasOtherResidence": "Ich habe eine weitere Unterkunft",
+			"hasSecondaryResidence": "Ich habe einen Zweitwohnsitz",
+			"hasGarageCosts": "Ich zahle Kosten für eine Garage/einen Stellplatz",
+			"garageCosts": "Garagenkosten (€)",
+			"hasHouseholdEnergyCosts": "Ich zahle Haushaltsenergiekosten",
+			"householdEnergyCosts": "Haushaltsenergiekosten (€)",
+			"isLivingAreaUsedCommercially": "Ein Teil der Wohnfläche wird gewerblich genutzt",
+			"commerciallyUsedAreaSqm": "Gewerblich genutzte Fläche (m²)",
+			"isGermanCitizen": "Ich bin deutsche(r) Staatsbürger(in)",
+			"isResidentInGermany": "Ich habe meinen gewöhnlichen Aufenthalt in Deutschland",
+			"isVictimOfNationalSocialistPersecution": "Ich bin Verfolgte(r) des Nationalsozialismus",
+			"socialSecurityType": "Sozialversicherung",
+			"healthInsuranceStatus": "Art der Krankenversicherung",
+			"healthInsuranceProvider": "Krankenkasse",
+			"pensionInsuranceProvider": "Rentenversicherungsträger",
+			"pensionInsuranceNo": "Rentenversicherungsnummer",
+			"isCurrentlyEmployed": "Ich bin aktuell erwerbstätig",
+			"isStudentOrTrainee": "Ich bin Schüler(in), Studierende(r) oder Auszubildende(r)",
+			"hasAppliedForAsylumBenefits": "Ich habe Leistungen nach dem Asylbewerberleistungsgesetz beantragt",
+			"hasReceivedPreviousBenefits": "Ich habe bereits einmal Sozialleistungen erhalten",
+			"previousBenefitsAuthority": "Bewilligende Behörde",
+			"previousBenefitsPeriod": "Bewilligungszeitraum",
+			"previousBenefitsRefNo": "Aktenzeichen",
+			"displacedStatus": "Vertriebenenstatus",
+			"hasGuardian": "Ich werde rechtlich betreut",
+			"hasCustodian": "Ich habe Beistand",
+			"licensePlate": "Kfz-Kennzeichen",
+			"licensePlate_placeholder": "z. B. B-XY 1234",
+			"licensePlate_hint": "Wird für den Bewohnerparkausweis benötigt."
 		},
 		"step_title": {
 			"1": "Persönliche Angaben",
@@ -247,7 +350,8 @@
 			"page": "Seite",
 			"add_page": "Weitere Seite",
 			"confirm": "Dokument verarbeiten",
-			"confirm_camera": "Foto verwenden & verarbeiten"
+			"confirm_camera": "Foto verwenden & verarbeiten",
+			"camera_hint": "Bitte das Dokument gut ausgeleuchtet und flach hinlegen."
 		},
 		"countries": {
 			"DE": "Deutschland",
@@ -349,6 +453,7 @@
 		"remove_file": "Entfernen",
 		"download": "Herunterladen",
 		"edit_field": "{{field}} bearbeiten",
+		"verify_field": "{{field}} verifizieren",
 		"open": "Öffnen"
 	},
 	"success": {
@@ -359,7 +464,8 @@
 			"saved": "Dokument gespeichert",
 			"updated": "Antrag aktualisiert"
 		},
-		"back_action": "Weiter"
+		"back_action": "Weiter",
+		"subtext": "Deine Angaben wurden erfolgreich analysiert, validiert und in Deine Akte übertragen."
 	},
 	"review": {
 		"title": "Daten prüfen",
@@ -590,7 +696,14 @@
 		"upload_failed": "Upload fehlgeschlagen",
 		"system_error": "Ein Systemfehler ist aufgetreten",
 		"file_type_invalid": "Dieses Dateiformat wird nicht unterstützt. Erlaubt sind PDF, JPG, PNG oder HEIC.",
-		"file_too_large": "Die Datei ist zu groß. Erlaubt sind maximal 10 MB."
+		"file_too_large": "Die Datei ist zu groß. Erlaubt sind maximal 10 MB.",
+		"processing_failed": "Dokumentenverarbeitung fehlgeschlagen.",
+		"codes": {
+			"DIS_INVOCATION_FAILED": "Das Dokument konnte nicht ausgelesen werden. Bitte versuche es noch einmal.",
+			"GCS_BLOB_MISSING": "Die Datei ist nicht mehr verfügbar. Bitte lade das Dokument noch einmal hoch.",
+			"PROCESSING_TIMEOUT": "Die Verarbeitung hat zu lange gedauert. Bitte lade das Dokument noch einmal hoch.",
+			"PUBLISH_FAILED": "Das Dokument konnte nicht zur Verarbeitung übermittelt werden. Bitte versuche es noch einmal."
+		}
 	},
 	"logout": "Abmelden",
 	"settings": {
@@ -600,7 +713,8 @@
 				"title": "Konto unwiderruflich löschen?",
 				"desc": "Bist Du sicher, dass Du Dein Konto löschen möchtest? Alle Deine persönlichen Daten und Dokumente werden sofort und unwiderruflich vom Gerät entfernt.",
 				"confirm": "Konto löschen",
-				"cancel": "Abbrechen"
+				"cancel": "Abbrechen",
+				"error": "Fehler beim Löschen des Kontos. Bitte versuche es später noch einmal."
 			}
 		},
 		"account": {
@@ -778,5 +892,10 @@
 			"loadFailed": "Fehler beim Laden der Dokumenten-Vorschau.",
 			"loading_document": "Dokument wird geladen..."
 		}
+	},
+	"docs": {
+		"back_to_overview_aria": "Zurück zu meine Dokumente",
+		"close_aria": "Schließen",
+		"add_document": "Dokument hinzufügen"
 	}
 }

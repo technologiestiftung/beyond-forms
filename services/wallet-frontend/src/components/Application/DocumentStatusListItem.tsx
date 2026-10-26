@@ -72,7 +72,7 @@ export const DocumentStatusListItem = ({
 
 	const isRow = variant === "row";
 	const styles = VARIANT_STYLES[variant];
-	const slotTitle = t(slot.titleKey, slot.defaultTitle);
+	const slotTitle = t(slot.titleKey);
 	const openRoute: (path: string) => void = onOpenFlow ?? navigate;
 	const hasUploadedFile = slot.matchedFiles.length > 0;
 	const uploadedFile = slot.matchedFiles[0];
@@ -143,18 +143,15 @@ export const DocumentStatusListItem = ({
 		if (isVerified) {
 			return t("docs.view_slot_aria", {
 				title: slotTitle,
-				defaultValue: `${slotTitle} ansehen`,
 			});
 		}
 		if (hasUploadedFile) {
 			return t("docs.review_slot_aria", {
 				title: slotTitle,
-				defaultValue: `${slotTitle} prüfen`,
 			});
 		}
 		return t("docs.add_slot_aria", {
 			title: slotTitle,
-			defaultValue: `${slotTitle} hinzufügen`,
 		});
 	};
 
@@ -162,14 +159,14 @@ export const DocumentStatusListItem = ({
 		if (isProcessing) {
 			return (
 				<span className="text-xs font-semibold text-secondary-orange-500 animate-pulse shrink-0">
-					{t("docs.processing", "Verarbeitung...")}
+					{t("docs.processing")}
 				</span>
 			);
 		}
 		if (uploadedFile?.status === ProcessingStatusEnum.enum.FAILED) {
 			return (
 				<span className="text-xs text-rose-500 font-bold shrink-0">
-					{t("docs.failed", "Fehler")}
+					{t("docs.failed")}
 				</span>
 			);
 		}
@@ -179,9 +176,7 @@ export const DocumentStatusListItem = ({
 		if (isRow) {
 			return (
 				<span className="flex items-center gap-3 font-bold text-primary-blue-500">
-					{hasUploadedFile
-						? t("docs.review", "Prüfen")
-						: t("docs.add_short", "Hinzufügen")}
+					{hasUploadedFile ? t("docs.review") : t("docs.add_short")}
 					<ChevronRight className="size-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
 				</span>
 			);
@@ -222,9 +217,7 @@ export const DocumentStatusListItem = ({
 							{slotTitle}
 						</span>
 						<div className="flex items-center gap-2 mt-0.5">
-							<span className={styles.badge}>
-								{t(slot.badgeKey, slot.defaultBadge)}
-							</span>
+							<span className={styles.badge}>{t(slot.badgeKey)}</span>
 						</div>
 					</div>
 					<div
@@ -241,7 +234,7 @@ export const DocumentStatusListItem = ({
 						onClick={handleDelete}
 						data-testid={`delete-btn-${uploadedFile.id}`}
 						className="p-2 hover:bg-rose-50 text-brand-grey hover:text-rose-600 rounded-lg transition-colors shrink-0"
-						aria-label={t("docs.delete_aria", "Dokument löschen")}
+						aria-label={t("docs.delete_aria")}
 					>
 						<Trash2 className="size-4.5" />
 					</button>
@@ -249,13 +242,10 @@ export const DocumentStatusListItem = ({
 
 				<ConfirmationModal
 					isOpen={showDeleteModal}
-					title={t("docs.delete_title", "Dokument löschen?")}
-					message={t(
-						"docs.delete_confirm",
-						"Möchtest Du dieses Dokument wirklich löschen?",
-					)}
-					confirmLabel={t("common.delete", "Löschen")}
-					cancelLabel={t("common.cancel", "Abbrechen")}
+					title={t("docs.delete_title")}
+					message={t("docs.delete_confirm")}
+					confirmLabel={t("common.delete")}
+					cancelLabel={t("common.cancel")}
 					onConfirm={handleConfirmDelete}
 					onCancel={() => setShowDeleteModal(false)}
 				/>
@@ -263,7 +253,7 @@ export const DocumentStatusListItem = ({
 				<DocumentPreviewModal
 					isOpen={previewDocId !== null}
 					documentId={previewDocId || ""}
-					title={uploadedFile?.name || t(slot.titleKey, slot.defaultTitle)}
+					title={uploadedFile?.name || t(slot.titleKey)}
 					onClose={() => setPreviewDocId(null)}
 				/>
 			</div>

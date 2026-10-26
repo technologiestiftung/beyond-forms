@@ -215,5 +215,8 @@
 		"residence_hint": "If you are in the asylum procedure or have a toleration permit (Duldung), you receive benefits under the Asylum Seekers' Benefits Act. Contact the State Office for Refugee Affairs or the social welfare office.",
 		"disclaimer": "This is a non-binding, automatic initial assessment and not legal advice. The responsible office decides whether you are entitled.",
 		"start_over": "Start over"
+	},
+	"nav": {
+		"mainNavigation": "Main navigation"
 	}
 }

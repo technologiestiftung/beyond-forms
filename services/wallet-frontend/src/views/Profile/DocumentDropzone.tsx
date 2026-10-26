@@ -36,6 +36,7 @@ import {
 } from "../../utils/profile";
 import { env } from "../../config/env.config";
 import { authenticatedFetch } from "../../utils/apiClient";
+import { getDocumentFailureMessage } from "../../utils/documentMessages";
 import {
 	DOCUMENT_ACCEPT_ATTRIBUTE,
 	validateDocumentFile,
@@ -58,6 +59,25 @@ export const DocumentDropzone: React.FC = () => {
 
 	const getTargetExitRoute = () => {
 		return getSharedExitRoute(origin, category, "upload");
+	};
+
+	const flowState = location.state as {
+		returnToPrevious?: boolean;
+		backgroundLocation?: unknown;
+	} | null;
+	const hasPreviousEntry =
+		((window.history.state as { idx?: number } | null)?.idx ?? 0) > 0;
+	const cameFromUploadOptions =
+		origin === Origins.WIZARD &&
+		hasPreviousEntry &&
+		Boolean(flowState?.returnToPrevious || flowState?.backgroundLocation);
+
+	const handleBack = () => {
+		if (cameFromUploadOptions) {
+			navigate(-1);
+		} else {
+			navigate(getSharedExitRoute(origin, category, "back"), { replace: true });
+		}
 	};
 
 	const [files, setFiles] = useState<File[]>([]);
@@ -320,11 +340,7 @@ export const DocumentDropzone: React.FC = () => {
 				if (activeMatch.status === "FAILED") {
 					setStatus("ERROR");
 					setErrorMessage(
-						activeMatch.user_error_code ||
-							t(
-								"errors.processing_failed",
-								"Dokumentenverarbeitung fehlgeschlagen.",
-							),
+						getDocumentFailureMessage(t, activeMatch.user_error_code),
 					);
 					if (processingTimeoutRef.current) {
 						clearTimeout(processingTimeoutRef.current);
@@ -490,7 +506,7 @@ export const DocumentDropzone: React.FC = () => {
 			const applicationId = await fileService.ensureApplication();
 			if (!applicationId) {
 				setStatus("ERROR");
-				setErrorMessage(t("errors.upload_failed", "Upload failed"));
+				setErrorMessage(t("errors.upload_failed"));
 				return;
 			}
 
@@ -526,9 +542,7 @@ export const DocumentDropzone: React.FC = () => {
 					return;
 				}
 				setStatus("ERROR");
-				setErrorMessage(
-					response.message || t("errors.upload_failed", "Upload failed"),
-				);
+				setErrorMessage(response.message || t("errors.upload_failed"));
 			}
 		} catch (error) {
 			if (controller.signal.aborted) {
@@ -539,7 +553,7 @@ export const DocumentDropzone: React.FC = () => {
 				return;
 			}
 			setStatus("ERROR");
-			setErrorMessage(t("errors.system_error", "A system error occurred"));
+			setErrorMessage(t("errors.system_error"));
 			console.error("Upload error:", error);
 		} finally {
 			if (abortControllerRef.current === controller) {
@@ -581,14 +595,9 @@ export const DocumentDropzone: React.FC = () => {
 			</div>
 			<div className="flex flex-col gap-2">
 				<h2 className="text-2xl font-bold text-brand-carbon">
-					{t("personal.upload.success_title", "Dokument hochgeladen!")}
+					{t("personal.upload.success_title")}
 				</h2>
-				<p className="text-brand-slate">
-					{t(
-						"personal.upload.success_desc",
-						"Wir verarbeiten Dein Dokument jetzt. Du wirst gleich weitergeleitet.",
-					)}
-				</p>
+				<p className="text-brand-slate">{t("personal.upload.success_desc")}</p>
 			</div>
 		</div>
 	);
@@ -601,14 +610,11 @@ export const DocumentDropzone: React.FC = () => {
 			<div className="flex flex-col gap-2">
 				<h2 className="text-2xl font-bold text-brand-carbon">
 					{status === "UPLOADING"
-						? t("personal.upload.uploading", "Wird hochgeladen...")
-						: t("personal.upload.processing", "Wird verarbeitet...")}
+						? t("personal.upload.uploading")
+						: t("personal.upload.processing")}
 				</h2>
 				<p className="text-brand-slate animate-pulse">
-					{t(
-						"personal.upload.processing_desc",
-						"Dies dauert normalerweise nur wenige Sekunden.",
-					)}
+					{t("personal.upload.processing_desc")}
 				</p>
 			</div>
 		</div>
@@ -653,7 +659,7 @@ export const DocumentDropzone: React.FC = () => {
 								</div>
 								<div className="w-full flex flex-col items-center">
 									<span className="text-xs font-medium text-brand-slate text-center">
-										{t("personal.upload.page", "Seite")} {index + 1}
+										{t("personal.upload.page")} {index + 1}
 									</span>
 								</div>
 							</div>
@@ -673,7 +679,7 @@ export const DocumentDropzone: React.FC = () => {
 										<Upload className="size-5" />
 									</div>
 									<span className="text-sm font-medium text-brand-black">
-										{t("personal.upload.add_page", "Weitere Seite")}
+										{t("personal.upload.add_page")}
 									</span>
 								</button>
 							)}
@@ -690,13 +696,10 @@ export const DocumentDropzone: React.FC = () => {
 					</div>
 					<div className="flex flex-col gap-1">
 						<p className="font-bold text-brand-black">
-							{t("personal.choice.camera.button", "Kamera öffnen")}
+							{t("personal.choice.camera.button")}
 						</p>
 						<p className="text-sm text-brand-black/70">
-							{t(
-								"personal.upload.camera_hint",
-								"Bitte das Dokument gut ausgeleuchtet und flach hinlegen.",
-							)}
+							{t("personal.upload.camera_hint")}
 						</p>
 					</div>
 				</div>
@@ -713,10 +716,7 @@ export const DocumentDropzone: React.FC = () => {
 						{t("personal.upload.drag_drop")}
 					</p>
 					<p className="text-sm text-brand-black/70">
-						{t(
-							"personal.upload.formats",
-							"PDF, JPG, PNG oder HEIC (max. 10 MB)",
-						)}
+						{t("personal.upload.formats")}
 					</p>
 				</div>
 			</div>
@@ -750,19 +750,13 @@ export const DocumentDropzone: React.FC = () => {
 				<div className="flex flex-col gap-4 text-center">
 					<h1 className="text-3xl font-bold text-brand-black leading-tight">
 						{mode === "camera"
-							? t("personal.choice.camera.title", "Mit Kamera scannen")
-							: t("personal.choice.upload.title", "Dokument hochladen")}
+							? t("personal.choice.camera.title")
+							: t("personal.choice.upload.title")}
 					</h1>
 					<p className="text-lg text-brand-black/70">
 						{mode === "camera"
-							? t(
-									"personal.choice.camera.desc",
-									"Lade ein Foto Deines Dokuments hoch.",
-								)
-							: t(
-									"personal.choice.upload.desc",
-									"Lade ein Foto oder PDF Deines Dokuments hoch.",
-								)}
+							? t("personal.choice.camera.desc")
+							: t("personal.choice.upload.desc")}
 					</p>
 				</div>
 
@@ -841,9 +835,7 @@ export const DocumentDropzone: React.FC = () => {
 	};
 
 	return (
-		<StepLayout
-			onBack={() => navigate(getTargetExitRoute(), { replace: true })}
-		>
+		<StepLayout onBack={handleBack}>
 			<div className="max-w-md w-full mx-auto">{renderContent()}</div>
 		</StepLayout>
 	);

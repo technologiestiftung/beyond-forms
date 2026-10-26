@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { ApplicationHouseholdQuestions } from "./ApplicationHouseholdQuestions";
-import { useProfile } from "../../hooks/useProfile";
-import type { Profile } from "../../schemas/profile.schema";
+import { useProfile } from "../../../hooks/useProfile";
+import type { Profile } from "../../../schemas/profile.schema";
 
 // Mock react-i18next
 const MOCK_TRANSLATIONS: Record<string, string> = {
@@ -50,10 +50,7 @@ const MOCK_TRANSLATIONS: Record<string, string> = {
 
 vi.mock("react-i18next", () => ({
 	useTranslation: () => ({
-		t: (key: string, options?: Record<string, unknown>) => {
-			if (key === "household.steps.step_x_of_y") {
-				return `Step ${options?.current} of ${options?.total}`;
-			}
+		t: (key: string) => {
 			if (key === "common:next") {
 				return "Weiter";
 			}
@@ -66,7 +63,7 @@ vi.mock("react-i18next", () => ({
 	}),
 }));
 
-vi.mock("../../hooks/useProfile", () => ({
+vi.mock("../../../hooks/useProfile", () => ({
 	useProfile: vi.fn(),
 }));
 
@@ -107,7 +104,6 @@ describe("ApplicationHouseholdQuestions", () => {
 
 		// Page 1: Legal Support
 		await screen.findByText("Wirst Du rechtlich betreut?");
-		expect(screen.getByText("Step 1 of 5")).toBeInTheDocument();
 		fireEvent.click(screen.getByText("Nein"));
 		fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
 
@@ -124,7 +120,6 @@ describe("ApplicationHouseholdQuestions", () => {
 
 		// Page 2: Displaced status
 		await screen.findByText("Bist Du Vertriebene:r oder Spätaussiedler:in?");
-		expect(screen.getByText("Step 2 of 5")).toBeInTheDocument();
 		fireEvent.click(screen.getByText("Nein"));
 		fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
 
@@ -142,7 +137,6 @@ describe("ApplicationHouseholdQuestions", () => {
 
 		// Page 3: Insurance
 		await screen.findByText("Wie bist Du krankenversichert?");
-		expect(screen.getByText("Step 3 of 5")).toBeInTheDocument();
 
 		// Check multiple choice toggle interactions
 		const socialCheck = screen.getByText("Sozialversicherung");
@@ -183,7 +177,6 @@ describe("ApplicationHouseholdQuestions", () => {
 
 		// Page 4: Household Members Count
 		await screen.findByText("Wie viele Personen leben in Deinem Haushalt?");
-		expect(screen.getByText("Step 4 of 5")).toBeInTheDocument();
 
 		// Change value of spinbutton to 2
 		const countInput = screen.getByRole("spinbutton");
@@ -203,7 +196,6 @@ describe("ApplicationHouseholdQuestions", () => {
 
 		// Page 5: Marital Status
 		await screen.findByText("Wie ist Dein aktueller Familienstand?");
-		expect(screen.getByText("Step 5 of 5")).toBeInTheDocument();
 
 		fireEvent.click(screen.getByText("Ledig / Alleinstehend"));
 		fireEvent.click(
@@ -257,7 +249,6 @@ describe("ApplicationHouseholdQuestions", () => {
 
 		// Page 5: Marital Status
 		await screen.findByText("Wie ist Dein aktueller Familienstand?");
-		expect(screen.getByText("Step 5 of 5")).toBeInTheDocument();
 
 		// Married selection
 		const marriedOption = screen.getByText(

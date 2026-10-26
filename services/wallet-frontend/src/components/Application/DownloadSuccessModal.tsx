@@ -170,7 +170,7 @@ export const DownloadSuccessModal: React.FC<DownloadSuccessModalProps> = ({
 					<button
 						onClick={onClose}
 						className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"
-						aria-label={t("docs.close_aria", "Schließen")}
+						aria-label={t("docs.close_aria")}
 					>
 						<X className="w-4 h-4" />
 					</button>
@@ -181,36 +181,24 @@ export const DownloadSuccessModal: React.FC<DownloadSuccessModalProps> = ({
 						id="success-modal-title"
 						className="text-h2 font-extrabold text-brand-black mb-2 leading-tight"
 					>
-						{t("overview.success_modal.title", "PDF heruntergeladen!")}
+						{t("overview.success_modal.title")}
 					</h3>
 					<p className="text-body-md text-slate-600 leading-relaxed">
-						{t(
-							"overview.success_modal.subtitle",
-							"Dein Antrag liegt auf Deinem Gerät bereit zum Ausdrucken.",
-						)}
+						{t("overview.success_modal.subtitle")}
 					</p>
 				</div>
 
 				<div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm flex flex-col gap-4">
 					<h4 className="text-xs font-bold text-slate-700">
-						{t(
-							"overview.success_modal.card_title",
-							"Was du vor Ort erledigen kannst:",
-						)}
+						{t("overview.success_modal.card_title")}
 					</h4>
 
 					<div className="flex flex-col gap-1.5">
 						<h5 className="text-body-sm font-bold text-slate-800">
-							{t(
-								"overview.success_modal.step1_title",
-								"1. Antrag ausdrucken und unterschreiben:",
-							)}
+							{t("overview.success_modal.step1_title")}
 						</h5>
 						<p className="text-xs text-slate-500 leading-relaxed">
-							{t(
-								"overview.success_modal.step1_desc",
-								"Drucke die heruntergeladene PDF-Datei aus und unterzeichne sie handschriftlich auf der letzten Seite.",
-							)}
+							{t("overview.success_modal.step1_desc")}
 						</p>
 					</div>
 
@@ -218,16 +206,10 @@ export const DownloadSuccessModal: React.FC<DownloadSuccessModalProps> = ({
 
 					<div className="flex flex-col gap-2">
 						<h5 className="text-body-sm font-bold text-slate-800">
-							{t(
-								"overview.success_modal.step2_title",
-								"2. Unterlagen abgeben:",
-							)}
+							{t("overview.success_modal.step2_title")}
 						</h5>
 						<p className="text-xs text-slate-500 leading-relaxed mb-2">
-							{t(
-								"overview.success_modal.step2_desc",
-								"Du kannst die Unterlagen persönlich bei der Behörde in deiner Nähe abgeben oder per Post senden an:",
-							)}
+							{t("overview.success_modal.step2_desc")}
 						</p>
 
 						{office ? (
@@ -237,7 +219,7 @@ export const DownloadSuccessModal: React.FC<DownloadSuccessModalProps> = ({
 								<p>{office.zipCity}</p>
 								<div className="mt-2 pt-2 border-t border-slate-200/60 flex flex-col gap-0.5">
 									<p className="text-[10px] font-bold uppercase tracking-wider text-brand-grey">
-										{t("overview.success_modal.hours_label", "Öffnungszeiten:")}
+										{t("overview.success_modal.hours_label")}
 									</p>
 									{office.hours.map((line, idx) => (
 										<p key={idx}>{line}</p>
@@ -247,27 +229,16 @@ export const DownloadSuccessModal: React.FC<DownloadSuccessModalProps> = ({
 						) : (
 							<div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex flex-col gap-2 text-xs text-slate-700 font-medium">
 								<p className="font-bold text-slate-855">
-									{t(
-										"overview.success_modal.default_office_name",
-										"Zuständiges Sozialamt",
-									)}
+									{t("overview.success_modal.default_office_name")}
 								</p>
-								<p>
-									{t(
-										"overview.success_modal.default_office_desc",
-										"Bitte reiche den Antrag bei dem Sozialamt deines Bezirks ein.",
-									)}
-								</p>
+								<p>{t("overview.success_modal.default_office_desc")}</p>
 								<a
 									href={EXTERNAL_LINKS.SOZIALAMT}
 									target="_blank"
 									rel="noopener noreferrer"
 									className="text-primary-blue-500 hover:underline flex items-center font-bold"
 								>
-									{t(
-										"overview.success_modal.default_office_link",
-										"Zuständiges Sozialamt online suchen",
-									)}
+									{t("overview.success_modal.default_office_link")}
 								</a>
 							</div>
 						)}
@@ -275,10 +246,7 @@ export const DownloadSuccessModal: React.FC<DownloadSuccessModalProps> = ({
 				</div>
 
 				<PrimaryButton onClick={onClose} className="w-full mt-2">
-					{t(
-						"overview.success_modal.cta_button",
-						"Zurück zu Antrag auf Grundsicherung",
-					)}
+					{t("overview.success_modal.cta_button")}
 				</PrimaryButton>
 			</div>
 		</div>

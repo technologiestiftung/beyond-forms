@@ -12,18 +12,6 @@ const { mockProfileState } = vi.hoisted(() => ({
 	},
 }));
 
-const MOCK_TRANSLATIONS: Record<string, string> = {
-	"overview.warning_modal_title": "Antrag vorzeitig generieren?",
-};
-
-vi.mock("react-i18next", () => ({
-	useTranslation: () => ({
-		t: (key: string, defaultText: string) =>
-			MOCK_TRANSLATIONS[key] || defaultText,
-		i18n: { language: "de", changeLanguage: vi.fn() },
-	}),
-}));
-
 const mockUseDocumentProcessingSocket = vi.fn();
 vi.mock("../../hooks/useDocumentProcessingSocket", () => ({
 	useDocumentProcessingSocket: () => mockUseDocumentProcessingSocket(),
@@ -112,14 +100,6 @@ describe("ApplicationOverview", () => {
 		expect(screen.getByTestId("questionnaire-status-list")).toBeInTheDocument();
 	});
 
-	it("renders the progress status card with progress bar", () => {
-		renderComponent();
-		expect(
-			screen.getByText("Dein Antrag Schritt für Schritt zum Ziel"),
-		).toBeInTheDocument();
-		expect(screen.getByTestId("segmented-progress-bar")).toBeInTheDocument();
-	});
-
 	it("calls useDocumentProcessingSocket to initiate websocket connection", () => {
 		renderComponent();
 		expect(mockUseDocumentProcessingSocket).toHaveBeenCalled();
@@ -133,7 +113,7 @@ describe("ApplicationOverview", () => {
 		expect(button).toBeInTheDocument();
 	});
 
-	it("renders the Herunterladen button and triggers download", async () => {
+	it("renders the download button and triggers download", async () => {
 		mockProfileState.milestoneLevel = 3;
 		useProfileStore.setState({ milestoneLevel: 3 });
 		renderComponent();
@@ -141,7 +121,7 @@ describe("ApplicationOverview", () => {
 		fireEvent.click(button);
 
 		expect(
-			await screen.findByText("Antragsentwurf Vorschau"),
+			await screen.findByText("overview.preview_title"),
 		).toBeInTheDocument();
 
 		const downloadButton = screen.getByTestId("download-pdf-button");
@@ -173,7 +153,7 @@ describe("ApplicationOverview", () => {
 		fireEvent.click(button);
 
 		expect(
-			await screen.findByText("Antrag vorzeitig generieren?"),
+			await screen.findByText("overview.warning_modal_title"),
 		).toBeInTheDocument();
 	});
 
@@ -185,9 +165,9 @@ describe("ApplicationOverview", () => {
 		fireEvent.click(button);
 
 		expect(
-			await screen.findByText("Antragsentwurf Vorschau"),
+			await screen.findByText("overview.preview_title"),
 		).toBeInTheDocument();
-		expect(screen.getByTitle("PDF Vorschau")).toBeInTheDocument();
+		expect(screen.getByTitle("overview.pdf_preview_title")).toBeInTheDocument();
 	});
 
 	it("opens PDF Preview Modal after confirming warning dialog", async () => {
@@ -201,7 +181,7 @@ describe("ApplicationOverview", () => {
 		fireEvent.click(confirmButton);
 
 		expect(
-			await screen.findByText("Antragsentwurf Vorschau"),
+			await screen.findByText("overview.preview_title"),
 		).toBeInTheDocument();
 	});
 
@@ -213,19 +193,40 @@ describe("ApplicationOverview", () => {
 		fireEvent.click(button);
 
 		await waitFor(() => {
-			expect(screen.getByText("Antragsentwurf Vorschau")).toBeInTheDocument();
+			expect(screen.getByText("overview.preview_title")).toBeInTheDocument();
 		});
 
-		const downloadButton = screen.getByText("Herunterladen");
+		const downloadButton = screen.getByText("overview.download_button");
 		expect(downloadButton).toBeInTheDocument();
 
 		fireEvent.click(downloadButton);
 		expect(useProfileStore.getState().applicationStatus).toBe("idle");
 	});
 
-	it("renders the SegmentedProgressBar and not the legacy progress container", () => {
+	it("shows the almost-ready copy below a complete application", () => {
+		mockProfileState.milestoneLevel = 2;
+		useProfileStore.setState({ milestoneLevel: 2 });
 		renderComponent();
-		expect(screen.getByTestId("segmented-progress-bar")).toBeInTheDocument();
-		expect(screen.queryByText("Antragsfortschritt")).not.toBeInTheDocument();
+		expect(
+			screen.getByText("overview.cta_band.almost_ready_title"),
+		).toBeInTheDocument();
+		expect(
+			screen.queryByText("overview.cta_band.ready_title"),
+		).not.toBeInTheDocument();
+	});
+
+	it("shows the ready copy instead of the almost-ready copy once complete", () => {
+		mockProfileState.milestoneLevel = 3;
+		useProfileStore.setState({ milestoneLevel: 3 });
+		renderComponent();
+		expect(
+			screen.getByText("overview.cta_band.ready_title"),
+		).toBeInTheDocument();
+		expect(
+			screen.getByText("overview.generate_notice_ready_title"),
+		).toBeInTheDocument();
+		expect(
+			screen.queryByText("overview.cta_band.almost_ready_title"),
+		).not.toBeInTheDocument();
 	});
 });

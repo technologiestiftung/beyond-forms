@@ -26,16 +26,10 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 	const { handleGenerate, isGenerating, error, modal } =
 		useGeneratedPdfModal(formType);
 
-	const handleClick = () => {
-		navigate(AppRoutes.ApplicationOverview);
-	};
-
 	const { milestoneLevel: hookLevel } = useProfile();
 	const currentLevel = level !== undefined ? level : hookLevel;
 
 	let descKey = "sections.applications.basic_security.description.in_progress";
-	let fallbackDesc =
-		"Starte mit Deinem Antrag. Klaro zeigt Dir Schritt-für-Schritt, was wichtig ist.";
 	let activeLevel: 0 | 1 | 2 | 3;
 	if (status === "not_started") {
 		activeLevel = 0;
@@ -45,32 +39,45 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 		activeLevel = 2;
 	} else {
 		activeLevel = Math.max(0, Math.min(3, Math.floor(currentLevel))) as
-			| 0
-			| 1
-			| 2
-			| 3;
+			0 | 1 | 2 | 3;
 	}
 
 	if (status === "not_started") {
 		descKey = "sections.applications.basic_security.description.new";
-		fallbackDesc =
-			"Starte mit Deinem Antrag. Klaro zeigt Dir Schritt-für-Schritt, was wichtig ist.";
 	} else if (status === "completed") {
 		descKey = "sections.applications.basic_security.description.completed";
-		fallbackDesc =
-			"Dein Antrag ist fertig – Du kannst das Formular jetzt einreichen!";
 	} else if (currentLevel === 2) {
 		descKey = "sections.applications.basic_security.description.almost";
-		fallbackDesc =
-			"Fast fertig! Füge noch die fehlenden Angaben und Dokumente hinzu.";
 	}
+
+	const generateLabel = (
+		<>
+			{isGenerating && (
+				<Loader2 className="size-5 animate-spin mr-2 shrink-0" />
+			)}
+			{t("sections.applications.generate_button")}
+		</>
+	);
+	const openOverview = () => navigate(AppRoutes.ApplicationOverview);
+	const generate = () => void handleGenerate();
+
+	let overviewLabel = t(
+		"sections.applications.basic_security.actions.complete",
+	);
+	if (status === "not_started") {
+		overviewLabel = t("sections.applications.basic_security.actions.start");
+	} else if (status === "completed") {
+		overviewLabel = t(
+			"sections.applications.basic_security.actions.view_details",
+		);
+	}
+	const isGeneratePrimary = activeLevel >= 2;
 
 	return (
 		<>
 			<div
-				onClick={handleClick}
 				data-testid="application-card"
-				className="bg-white border border-brand-border-subtle rounded-2xl p-6 flex flex-col gap-6 shadow-sm cursor-pointer hover:border-brand-border transition-all"
+				className="bg-white border border-brand-border-subtle rounded-2xl p-6 flex flex-col gap-6 shadow-sm"
 			>
 				<div className="flex flex-col gap-3 min-w-0 flex-1">
 					<h2 className="font-semibold text-brand-black text-h2 min-w-0 wrap-break-word pr-2 lg:text-xl/7">
@@ -79,7 +86,7 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 
 					<div className="flex flex-row justify-between gap-2 min-w-0 items-start">
 						<p className="text-brand-black text-body-lg leading-relaxed mt-1 min-w-0 wrap-break-word">
-							{t(descKey, fallbackDesc)}
+							{t(descKey)}
 						</p>
 
 						<img
@@ -99,27 +106,49 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 					</p>
 				)}
 
-				<PrimaryButton
-					onClick={(e) => {
-						e.stopPropagation();
-						void handleGenerate();
-					}}
-					disabled={isGenerating}
-					data-testid="lets-go-button"
-				>
-					{isGenerating && (
-						<Loader2 className="size-5 animate-spin mr-2 shrink-0" />
+				<div className="flex flex-col items-center gap-3">
+					{isGeneratePrimary ? (
+						<>
+							<PrimaryButton
+								onClick={generate}
+								disabled={isGenerating}
+								data-testid="application-generate-button"
+							>
+								{generateLabel}
+							</PrimaryButton>
+							<button
+								type="button"
+								onClick={openOverview}
+								data-testid="application-overview-button"
+								className="inline-flex items-center text-body-lg text-primary-blue-400 font-medium underline decoration-solid hover:text-primary-blue-500 hover:decoration-2 transition-colors rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+							>
+								{overviewLabel}
+							</button>
+						</>
+					) : (
+						<>
+							<PrimaryButton
+								onClick={openOverview}
+								data-testid="application-overview-button"
+							>
+								{overviewLabel}
+							</PrimaryButton>
+							{status !== "not_started" && (
+								<button
+									type="button"
+									onClick={generate}
+									disabled={isGenerating}
+									data-testid="application-generate-button"
+									className="inline-flex items-center text-body-lg text-primary-blue-400 font-medium underline decoration-solid hover:text-primary-blue-500 hover:decoration-2 transition-colors rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									{generateLabel}
+								</button>
+							)}
+						</>
 					)}
-					{status === "not_started"
-						? t(
-								"sections.applications.basic_security.actions.start",
-								"Los geht's",
-							)
-						: t("sections.applications.generate_button", "Antrag generieren")}
-				</PrimaryButton>
+				</div>
 			</div>
 
-			{/* Rendered outside the clickable card so modal clicks don't bubble to the card's navigation onClick */}
 			{modal}
 		</>
 	);

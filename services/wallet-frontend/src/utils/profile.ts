@@ -1,5 +1,4 @@
 import React from "react";
-import type { TFunction } from "i18next";
 import type { Profile, WalletDocument } from "../schemas/profile.schema";
 import {
 	MVP_SKIPPED_CATEGORIES,
@@ -49,13 +48,10 @@ export const calculateCompletionPercentage = (
 
 export interface MappedInformationSection {
 	id: string;
-	titleKey?: string;
-	title: string;
+	titleKey: string;
 	icon: React.ElementType;
-	subtitleKey?: string;
-	subtitle: string;
-	badgeKey?: string;
-	badge: string;
+	subtitleKey: string;
+	badgeKey: string;
 	completed: boolean;
 	route: string;
 	questionsRoute?: string;
@@ -445,7 +441,6 @@ export const getQuestionnaireStats = (
 /* eslint-disable complexity */
 export const getMappedInformationSections = (
 	profile: Partial<Profile>,
-	t?: TFunction,
 ): MappedInformationSection[] => {
 	const hasValidAddress = !!(
 		(profile.address?.street &&
@@ -504,20 +499,9 @@ export const getMappedInformationSections = (
 		{
 			id: "about_me",
 			titleKey: "questionnaire.sections.about_me.title",
-			title:
-				t?.("questionnaire.sections.about_me.title", "Über Dich") ||
-				"Über Dich",
 			icon: UserIcon,
 			subtitleKey: "questionnaire.sections.about_me.subtitle",
-			subtitle:
-				t?.(
-					"questionnaire.sections.about_me.subtitle",
-					"Hier findest Du Deine personenbezogenen Daten.",
-				) || "Hier findest Du Deine personenbezogenen Daten.",
 			badgeKey: "questionnaire.badges.personal",
-			badge:
-				t?.("questionnaire.badges.personal", "Persönliche Angaben") ||
-				"Persönliche Angaben",
 			completed: hasPersonal,
 			route: AppRoutes.ApplicationAboutMeIntro,
 			questionsRoute: AppRoutes.ApplicationAboutMeQuestions,
@@ -527,23 +511,9 @@ export const getMappedInformationSections = (
 		{
 			id: "income_assets",
 			titleKey: "questionnaire.sections.income_assets.title",
-			title:
-				t?.(
-					"questionnaire.sections.income_assets.title",
-					"Dein Einkommen, Ersparnisse und Wertsachen",
-				) || "Dein Einkommen, Ersparnisse und Wertsachen",
 			icon: EuroIcon,
 			subtitleKey: "questionnaire.sections.income_assets.subtitle",
-			subtitle:
-				t?.(
-					"questionnaire.sections.income_assets.subtitle",
-					"Wir erfassen, welches Geld Du regelmäßig bekommst und was Du nachweisen musst und wir prüfen, was Du angeben musst und welche Nachweise dazu wichtig sind.",
-				) ||
-				"Wir erfassen, welches Geld Du regelmäßig bekommst und was Du nachweisen musst und wir prüfen, was Du angeben musst und welche Nachweise dazu wichtig sind.",
 			badgeKey: "questionnaire.badges.personal",
-			badge:
-				t?.("questionnaire.badges.personal", "Persönliche Angaben") ||
-				"Persönliche Angaben",
 			completed: hasIncomeAssets,
 			route: AppRoutes.ApplicationIncomeAssetsIntro,
 			questionsRoute: AppRoutes.ApplicationIncomeAssetsQuestions,
@@ -553,21 +523,9 @@ export const getMappedInformationSections = (
 		{
 			id: "housing",
 			titleKey: "questionnaire.sections.housing.title",
-			title:
-				t?.("questionnaire.sections.housing.title", "Dein Wohnen") ||
-				"Dein Wohnen",
 			icon: HouseIcon,
 			subtitleKey: "questionnaire.sections.housing.subtitle",
-			subtitle:
-				t?.(
-					"questionnaire.sections.housing.subtitle",
-					"Wir klären, welche Angaben und Unterlagen Du zu Deiner Wohnsituation brauchst.",
-				) ||
-				"Wir klären, welche Angaben und Unterlagen Du zu Deiner Wohnsituation brauchst.",
 			badgeKey: "questionnaire.badges.personal",
-			badge:
-				t?.("questionnaire.badges.personal", "Persönliche Angaben") ||
-				"Persönliche Angaben",
 			completed: hasHousing,
 			route: AppRoutes.ApplicationHousingIntro,
 			questionsRoute: AppRoutes.ApplicationHousingQuestions,
@@ -577,23 +535,9 @@ export const getMappedInformationSections = (
 		{
 			id: "health",
 			titleKey: "questionnaire.sections.health.title",
-			title:
-				t?.(
-					"questionnaire.sections.health.title",
-					"Gesundheit und zusätzlicher Bedarf",
-				) || "Gesundheit und zusätzlicher Bedarf",
 			icon: CrossIcon,
 			subtitleKey: "questionnaire.sections.health.subtitle",
-			subtitle:
-				t?.(
-					"questionnaire.sections.health.subtitle",
-					"Wir klären, ob Du wegen Krankheit oder Behinderung mehr Unterstützung bekommen kannst.",
-				) ||
-				"Wir klären, ob Du wegen Krankheit oder Behinderung mehr Unterstützung bekommen kannst.",
 			badgeKey: "questionnaire.badges.personal",
-			badge:
-				t?.("questionnaire.badges.personal", "Persönliche Angaben") ||
-				"Persönliche Angaben",
 			completed: hasHealth,
 			route: AppRoutes.ApplicationHealthIntro,
 			questionsRoute: AppRoutes.ApplicationHealthQuestions,
@@ -603,21 +547,9 @@ export const getMappedInformationSections = (
 		{
 			id: "household",
 			titleKey: "questionnaire.sections.household.title",
-			title:
-				t?.("questionnaire.sections.household.title", "Familie und Haushalt") ||
-				"Familie und Haushalt",
 			icon: UsersIcon,
 			subtitleKey: "questionnaire.sections.household.subtitle",
-			subtitle:
-				t?.(
-					"questionnaire.sections.household.subtitle",
-					"Wir erfassen Deine Wohn- und Lebenssituation und welche Bedarfe sich ergeben.",
-				) ||
-				"Wir erfassen Deine Wohn- und Lebenssituation und welche Bedarfe sich ergeben.",
 			badgeKey: "questionnaire.badges.personal",
-			badge:
-				t?.("questionnaire.badges.personal", "Persönliche Angaben") ||
-				"Persönliche Angaben",
 			completed: hasFamilyStatus,
 			route: AppRoutes.ApplicationHouseholdIntro,
 			questionsRoute: AppRoutes.ApplicationHouseholdQuestions,
@@ -830,33 +762,49 @@ export const mapBackendDocTypeToSlotId = (
 	return VALID_SLOT_IDS.includes(lower) ? lower : "OTHER";
 };
 
+const WIZARD_SECTION_ROUTES: Record<
+	string,
+	{ intro: string; questions: string }
+> = {
+	about_me: {
+		intro: AppRoutes.ApplicationAboutMeIntro,
+		questions: AppRoutes.ApplicationAboutMeQuestions,
+	},
+	housing: {
+		intro: AppRoutes.ApplicationHousingIntro,
+		questions: AppRoutes.ApplicationHousingQuestions,
+	},
+	income_assets: {
+		intro: AppRoutes.ApplicationIncomeAssetsIntro,
+		questions: AppRoutes.ApplicationIncomeAssetsQuestions,
+	},
+	health: {
+		intro: AppRoutes.ApplicationHealthIntro,
+		questions: AppRoutes.ApplicationHealthQuestions,
+	},
+	household: {
+		intro: AppRoutes.ApplicationHouseholdIntro,
+		questions: AppRoutes.ApplicationHouseholdQuestions,
+	},
+};
+
 export const getTargetExitRoute = (
 	origin: string | null,
 	category: string | null,
-	stage: "upload" | "review_success",
+	stage: "back" | "upload" | "review_success",
 ): string => {
 	if (origin === "wizard") {
-		if (category === "about_me") {
-			return stage === "review_success"
-				? AppRoutes.ApplicationAboutMeQuestions
-				: AppRoutes.ApplicationAboutMeIntro;
+		const section =
+			category && Object.hasOwn(WIZARD_SECTION_ROUTES, category)
+				? WIZARD_SECTION_ROUTES[category]
+				: undefined;
+		if (!section) {
+			return AppRoutes.ApplicationOverview;
 		}
-		if (category === "housing") {
-			return stage === "review_success"
-				? AppRoutes.ApplicationHousingQuestions
-				: AppRoutes.ApplicationHousingIntro;
+		if (stage === "back") {
+			return `${AppRoutes.ApplicationUploadOptions}?category=${category}&origin=wizard`;
 		}
-		if (category === "income_assets") {
-			return stage === "review_success"
-				? AppRoutes.ApplicationIncomeAssetsQuestions
-				: AppRoutes.ApplicationIncomeAssetsIntro;
-		}
-		if (category === "health") {
-			return stage === "review_success"
-				? AppRoutes.ApplicationHealthQuestions
-				: AppRoutes.ApplicationHealthIntro;
-		}
-		return AppRoutes.ApplicationOverview;
+		return stage === "review_success" ? section.questions : section.intro;
 	}
 	if (category) {
 		return AppRoutes.ProfileDocumentsCategory.replace(":categoryId", category);

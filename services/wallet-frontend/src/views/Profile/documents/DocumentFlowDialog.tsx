@@ -165,7 +165,7 @@ export const DocumentFlowDialog: React.FC<DocumentFlowDialogProps> = ({
 				role="dialog"
 				aria-modal="true"
 				tabIndex={-1}
-				aria-label={t("docs.upload_dialog_aria", "Dokument hinzufügen")}
+				aria-label={t("docs.upload_dialog_aria")}
 				data-testid="document-flow-dialog"
 				className="bg-white w-full max-w-2xl max-h-[88vh] overflow-y-auto rounded-3xl shadow-2xl animate-in zoom-in-95 duration-300"
 			>

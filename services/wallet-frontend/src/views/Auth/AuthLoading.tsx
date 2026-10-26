@@ -18,23 +18,23 @@ export const AuthLoading: React.FC<AuthLoadingProps> = ({
 	switch (authStatus) {
 		case "VERIFYING_USERNAME":
 			if (isDe) {
-				displayText = t("phone_verifying", "Telefonnummer wird überprüft...");
+				displayText = t("phone_verifying");
 			} else {
-				displayText = t("phone_verifying", "Phone number is being verified...");
+				displayText = t("phone_verifying");
 			}
 			break;
 		case "VERIFYING_CODE":
 			if (isDe) {
-				displayText = t("code_verifying", "Code wird überprüft...");
+				displayText = t("code_verifying");
 			} else {
-				displayText = t("code_verifying", "Code is being verified...");
+				displayText = t("code_verifying");
 			}
 			break;
 		default:
 			if (isDe) {
-				displayText = t("sync.loading_profile", "Dein Profil wird geladen...");
+				displayText = t("sync.loading_profile");
 			} else {
-				displayText = t("sync.loading_profile", "Loading your profile...");
+				displayText = t("sync.loading_profile");
 			}
 	}
 

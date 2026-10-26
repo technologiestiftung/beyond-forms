@@ -135,7 +135,9 @@ describe("DocumentReviewView - Validation & Smart Error Handling", () => {
 		expect(screen.getByText("15.10.2020")).toBeInTheDocument();
 
 		// Universal Affordance: explicit edit buttons should be fully accessible
-		const editBtn = screen.getByLabelText(/Edit.*date_of_birth/i);
+		const editBtn = screen.getByLabelText(
+			'common.edit_field {"field":"review.fields.date_of_birth"}',
+		);
 		expect(editBtn).toBeInTheDocument();
 
 		// Click directly on the date value text to trigger edit mode
@@ -372,5 +374,54 @@ describe("DocumentReviewView - Validation & Smart Error Handling", () => {
 		// Expect the input to appear
 		const input = screen.getByDisplayValue("Helmut") as HTMLInputElement;
 		expect(input).toBeInTheDocument();
+	});
+
+	it("shows a translated warning banner when the document has a warning code", async () => {
+		(
+			authenticatedFetch as unknown as ReturnType<typeof vi.fn>
+		).mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({
+				raw_data: { first_name: "Helmut" },
+				user_error_code: "PAGINATION_MISSING_PAGES",
+			}),
+		});
+
+		renderWithRouter(<DocumentReviewView />);
+
+		expect(await screen.findByText("review.warning_title")).toBeInTheDocument();
+		expect(
+			screen.getByText("review.warnings.PAGINATION_MISSING_PAGES"),
+		).toBeInTheDocument();
+		expect(
+			screen.queryByText("PAGINATION_MISSING_PAGES"),
+		).not.toBeInTheDocument();
+	});
+
+	it("shows no warning banner without a warning code", async () => {
+		(
+			authenticatedFetch as unknown as ReturnType<typeof vi.fn>
+		).mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({ raw_data: { first_name: "Helmut" } }),
+		});
+
+		renderWithRouter(<DocumentReviewView />);
+
+		expect(await screen.findByText("review.confirm_all")).toBeInTheDocument();
+		expect(screen.queryByText("review.warning_title")).not.toBeInTheDocument();
+	});
+
+	it("tells the user when no data was extracted", async () => {
+		(
+			authenticatedFetch as unknown as ReturnType<typeof vi.fn>
+		).mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({ raw_data: {} }),
+		});
+
+		renderWithRouter(<DocumentReviewView />);
+
+		expect(await screen.findByText("review.no_data")).toBeInTheDocument();
 	});
 });

@@ -9,13 +9,6 @@ vi.mock("../../services/profile/FileService", () => ({
 	},
 }));
 
-vi.mock("react-i18next", () => ({
-	useTranslation: () => ({
-		t: (key: string, defaultValue?: string) => defaultValue || key,
-		i18n: { language: "de", changeLanguage: vi.fn() },
-	}),
-}));
-
 describe("DocumentPreviewModal", () => {
 	const mockOnClose = vi.fn();
 
@@ -38,7 +31,7 @@ describe("DocumentPreviewModal", () => {
 		);
 
 		expect(screen.getByTestId("preview-loading-spinner")).toBeInTheDocument();
-		expect(screen.getByText("Dokument wird geladen...")).toBeInTheDocument();
+		expect(screen.getByText("documents.errors.loading_document")).toBeInTheDocument();
 	});
 
 	it("renders iframe for application/pdf", async () => {
@@ -62,7 +55,7 @@ describe("DocumentPreviewModal", () => {
 			).not.toBeInTheDocument();
 		});
 
-		const iframe = screen.getByTitle("PDF Vorschau");
+		const iframe = screen.getByTitle("documents.pdf_preview_title");
 		expect(iframe).toBeInTheDocument();
 		expect(iframe).toHaveAttribute(
 			"src",
@@ -91,7 +84,7 @@ describe("DocumentPreviewModal", () => {
 			).not.toBeInTheDocument();
 		});
 
-		const img = screen.getByAltText("Dokument-Vorschau");
+		const img = screen.getByAltText("documents.preview_title");
 		expect(img).toBeInTheDocument();
 		expect(img).toHaveAttribute("src", "blob:http://localhost/mock-url");
 	});

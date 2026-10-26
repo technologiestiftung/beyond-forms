@@ -1,25 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useProfile } from "../../hooks/useProfile";
+import { useProfile } from "../../../hooks/useProfile";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
-import { AppRoutes } from "../../constants/routes";
-import { PageContainer } from "../../components/Layout/PageContainer";
-import { PrimaryButton } from "../../components/ui/PrimaryButton";
-import { useScrollToTop } from "../../utils/scroll";
+import { AppRoutes } from "../../../constants/routes";
+import { PageContainer } from "../../../components/Layout/PageContainer";
+import { PrimaryButton } from "../../../components/ui/PrimaryButton";
+import { OptionCard } from "../../../components/ui/OptionCard";
+import { useScrollToTop } from "../../../utils/scroll";
 import type {
 	AbilityToWorkType,
 	DisabilityMerkzeichenType,
 	Profile,
-} from "../../schemas/profile.schema";
-
-interface OptionCardProps {
-	id: string;
-	title: string;
-	hinweis?: string;
-	selected: boolean;
-	onClick: () => void;
-}
+} from "../../../schemas/profile.schema";
 
 interface HealthQuestionState {
 	isCareDependent?: boolean;
@@ -35,51 +28,6 @@ interface HealthQuestionState {
 	merkzeichen?: DisabilityMerkzeichenType;
 	hasCostlyMedicalNutrition?: boolean;
 }
-
-const OptionCard: React.FC<OptionCardProps> = ({
-	id,
-	title,
-	hinweis,
-	selected,
-	onClick,
-}) => {
-	const { t } = useTranslation("common");
-	return (
-		<button
-			type="button"
-			onClick={onClick}
-			data-testid={`health-option-${id}`}
-			className={`w-full p-5 rounded-3xl border text-left flex gap-4 transition-all active:scale-[0.98] ${
-				selected
-					? "bg-green-50/40 border-green-600 shadow-sm"
-					: "bg-white border-slate-200 hover:border-slate-300"
-			}`}
-		>
-			<div className="pt-1 shrink-0">
-				<div
-					className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${
-						selected ? "border-green-600" : "border-slate-300"
-					}`}
-				>
-					{selected && (
-						<div className="w-3 h-3 bg-green-600 rounded-full animate-scaleUp" />
-					)}
-				</div>
-			</div>
-			<div className="flex flex-col gap-1.5">
-				<span className="text-base font-bold text-slate-800 leading-snug">
-					{title}
-				</span>
-				{hinweis ? (
-					<span className="text-xs font-medium text-slate-500 leading-relaxed">
-						<strong className="text-slate-600">{t("note")}: </strong>
-						{hinweis}
-					</span>
-				) : null}
-			</div>
-		</button>
-	);
-};
 
 const getNextPage = (current: number, state: HealthQuestionState): number => {
 	switch (current) {
@@ -140,20 +88,6 @@ const getPrevPage = (current: number, state: HealthQuestionState): number => {
 		default:
 			return -1;
 	}
-};
-
-const getVisitablePages = (state: HealthQuestionState): number[] => {
-	const pages = [1];
-	let curr = 1;
-	while (true) {
-		const next = getNextPage(curr, state);
-		if (next === -1) {
-			break;
-		}
-		pages.push(next);
-		curr = next;
-	}
-	return pages;
 };
 
 const hydrateHealthData = (health?: Profile["health"]): HealthQuestionState => {
@@ -396,26 +330,6 @@ export const ApplicationHealthQuestions: React.FC = () => {
 		return false;
 	};
 
-	const currentState = {
-		isCareDependent,
-		hasInpatientFacilityAccommodation,
-		inpatientFacilityMoveInDate,
-		inpatientFacilityLastResidence,
-		abilityToWork,
-		reducedWorkCapacityStartDate,
-		reducedWorkCapacityEndDate,
-		reducedWorkCapacityReason,
-		hasDisabilityId,
-		disabilityValidUntil,
-		merkzeichen,
-		hasCostlyMedicalNutrition,
-	};
-	const visitable = getVisitablePages(currentState);
-	const stepIndex = visitable.indexOf(currentPage);
-	const progressPercentage = Math.round(
-		((stepIndex + 1) / visitable.length) * 100,
-	);
-
 	if (isLoading && !profileData) {
 		return (
 			<PageContainer topBarProps={{ showLanguageSwitcher: true }}>
@@ -428,81 +342,69 @@ export const ApplicationHealthQuestions: React.FC = () => {
 
 	return (
 		<PageContainer
-			topBarProps={{ onBack: handleBack, showLanguageSwitcher: true }}
+			topBarProps={{
+				onBack: handleBack,
+				showLanguageSwitcher: true,
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
+			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
 		>
 			{(isUpdating || saveSuccess) && (
 				<div
 					role="status"
-					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100"
+					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100 lg:left-[calc(50%+var(--spacing)*36)] lg:-translate-x-1/2"
 				>
 					{isUpdating ? (
 						<>
 							<Loader2 className="w-4 h-4 animate-spin text-slate-800" />
 							<span className="text-xs font-bold text-slate-800">
-								{t("personal.actions.saving", "Speichern...")}
+								{t("personal.actions.saving")}
 							</span>
 						</>
 					) : (
 						<>
 							<CheckCircle2 className="w-4 h-4 text-green-600" />
 							<span className="text-xs font-bold text-slate-800">
-								{t("personal.actions.saved", "Gespeichert")}
+								{t("personal.actions.saved")}
 							</span>
 						</>
 					)}
 				</div>
 			)}
 
-			<div className="w-full max-w-md flex flex-col gap-1.5 mb-6">
-				<div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden relative">
-					<div
-						className="h-full bg-primary-green-500 rounded-full transition-all duration-300"
-						style={{ width: `${progressPercentage}%` }}
-					/>
-				</div>
-				<div className="text-left text-[10px] font-bold text-slate-600 tracking-wider uppercase">
-					{t("step_page", {
-						current: stepIndex + 1,
-						total: visitable.length,
-						defaultValue: `${stepIndex + 1} von ${visitable.length} Seiten`,
-					})}
-				</div>
-			</div>
-
 			{saveError && (
-				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm">
+				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm lg:max-w-180 lg:mx-auto">
 					<AlertCircle className="w-5 h-5 shrink-0 text-rose-500" />
 					<p>{saveError}</p>
 				</div>
 			)}
 
-			<div className="w-full max-w-md flex flex-col gap-5">
+			<div className="w-full max-w-md flex flex-col gap-5 lg:max-w-180 lg:mx-auto lg:bg-white lg:rounded-3xl lg:border lg:border-brand-border-subtle lg:shadow-cards lg:px-10 lg:py-8">
 				{/* PAGE 1: CARE DEPENDENCY */}
 				{currentPage === 1 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-								{t("health.care_dependency.title", "Bist Du pflegebedürftig?")}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
+								{t("health.care_dependency.title")}
 							</h1>
 						</div>
 						<div className="bg-brand-bg p-4 rounded-2xl border border-brand-border/40 text-left flex flex-col gap-1.5">
 							<p className="text-xs text-brand-grey leading-relaxed font-medium">
-								{t(
-									"health.care_dependency.desc",
-									"Diese Information wird benötigt, um eventuelle Pflegezuschüsse oder stationäre Leistungen zu bestimmen.",
-								)}
+								{t("health.care_dependency.desc")}
 							</p>
 						</div>
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="health-option"
 								id="care-yes"
-								title={t("common.yes", "Ja")}
+								title={t("common.yes")}
 								selected={isCareDependent === true}
 								onClick={() => setIsCareDependent(true)}
 							/>
 							<OptionCard
+								testIdPrefix="health-option"
 								id="care-no"
-								title={t("common.no", "Nein")}
+								title={t("common.no")}
 								selected={isCareDependent === false}
 								onClick={() => setIsCareDependent(false)}
 							/>
@@ -514,31 +416,27 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 2 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-								{t(
-									"health.inpatient.title",
-									"Wohnst Du in einer vollstationären Pflegeeinrichtung?",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
+								{t("health.inpatient.title")}
 							</h1>
 						</div>
 						<div className="bg-brand-bg p-4 rounded-2xl border border-brand-border/40 text-left flex flex-col gap-1.5">
 							<p className="text-xs text-brand-grey leading-relaxed font-medium">
-								{t(
-									"health.inpatient.desc",
-									"Wenn Du in einem Pflegeheim oder einer stationären Einrichtung lebst, gelten andere Miet- und Betreuungspauschalen.",
-								)}
+								{t("health.inpatient.desc")}
 							</p>
 						</div>
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="health-option"
 								id="inpatient-yes"
-								title={t("common.yes", "Ja")}
+								title={t("common.yes")}
 								selected={hasInpatientFacilityAccommodation === true}
 								onClick={() => setHasInpatientFacilityAccommodation(true)}
 							/>
 							<OptionCard
+								testIdPrefix="health-option"
 								id="inpatient-no"
-								title={t("common.no", "Nein")}
+								title={t("common.no")}
 								selected={hasInpatientFacilityAccommodation === false}
 								onClick={() => setHasInpatientFacilityAccommodation(false)}
 							/>
@@ -550,17 +448,14 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 3 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-								{t(
-									"health.inpatient_details.title",
-									"Details zur stationären Einrichtung",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
+								{t("health.inpatient_details.title")}
 							</h1>
 						</div>
 						<div className="flex flex-col gap-4 text-left">
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t("health.inpatient_details.move_in_date", "Einzugsdatum")}
+									{t("health.inpatient_details.move_in_date")}
 								</label>
 								<input
 									type="date"
@@ -568,27 +463,23 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									onChange={(e) =>
 										setInpatientFacilityMoveInDate(e.target.value)
 									}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t(
-										"health.inpatient_details.last_residence",
-										"Letzter Wohnort vor der Heimaufnahme",
-									)}
+									{t("health.inpatient_details.last_residence")}
 								</label>
 								<input
 									type="text"
 									placeholder={t(
 										"health.inpatient_details.last_residence_placeholder",
-										"Adresse der letzten Wohnung",
 									)}
 									value={inpatientFacilityLastResidence}
 									onChange={(e) =>
 										setInpatientFacilityLastResidence(e.target.value)
 									}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 						</div>
@@ -599,38 +490,29 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 4 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-								{t(
-									"health.earning_capacity.title",
-									"Wie schätzt Du Deine Erwerbsfähigkeit ein?",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
+								{t("health.earning_capacity.title")}
 							</h1>
 						</div>
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="health-option"
 								id="work-fully"
-								title={t(
-									"health.earning_capacity.fully_able",
-									"Ich kann voll arbeiten (mind. 3 Std./Tag)",
-								)}
+								title={t("health.earning_capacity.fully_able")}
 								selected={abilityToWork === "Fully able"}
 								onClick={() => setAbilityToWork("Fully able")}
 							/>
 							<OptionCard
+								testIdPrefix="health-option"
 								id="work-temporary"
-								title={t(
-									"health.earning_capacity.temporary",
-									"Ich bin vorübergehend weniger als 3 Std. arbeitsfähig",
-								)}
+								title={t("health.earning_capacity.temporary")}
 								selected={abilityToWork === "Temporarily disabled"}
 								onClick={() => setAbilityToWork("Temporarily disabled")}
 							/>
 							<OptionCard
+								testIdPrefix="health-option"
 								id="work-permanent"
-								title={t(
-									"health.earning_capacity.permanent",
-									"Ich bin dauerhaft voll erwerbsgemindert",
-								)}
+								title={t("health.earning_capacity.permanent")}
 								selected={abilityToWork === "Permanently disabled"}
 								onClick={() => setAbilityToWork("Permanently disabled")}
 							/>
@@ -642,17 +524,14 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 5 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-								{t(
-									"health.earning_temp.title",
-									"Details zur vorübergehenden Erwerbsminderung",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
+								{t("health.earning_temp.title")}
 							</h1>
 						</div>
 						<div className="flex flex-col gap-4 text-left">
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t("health.earning_temp.start_date", "Beginn")}
+									{t("health.earning_temp.start_date")}
 								</label>
 								<input
 									type="date"
@@ -660,12 +539,12 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									onChange={(e) =>
 										setReducedWorkCapacityStartDate(e.target.value)
 									}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t("health.earning_temp.end_date", "Voraussichtliches Ende")}
+									{t("health.earning_temp.end_date")}
 								</label>
 								<input
 									type="date"
@@ -673,25 +552,19 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									onChange={(e) =>
 										setReducedWorkCapacityEndDate(e.target.value)
 									}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t(
-										"health.earning_temp.reason",
-										"Grund (z.B. Krankheit, ärztliches Attest)",
-									)}
+									{t("health.earning_temp.reason")}
 								</label>
 								<input
 									type="text"
-									placeholder={t(
-										"health.earning_temp.reason_placeholder",
-										"Z.B. Längere Erkrankung",
-									)}
+									placeholder={t("health.earning_temp.reason_placeholder")}
 									value={reducedWorkCapacityReason}
 									onChange={(e) => setReducedWorkCapacityReason(e.target.value)}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 						</div>
@@ -702,17 +575,14 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 6 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-								{t(
-									"health.earning_perm.title",
-									"Details zur dauerhaften Erwerbsminderung",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
+								{t("health.earning_perm.title")}
 							</h1>
 						</div>
 						<div className="flex flex-col gap-4 text-left">
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t("health.earning_perm.start_date", "Beginn")}
+									{t("health.earning_perm.start_date")}
 								</label>
 								<input
 									type="date"
@@ -720,43 +590,36 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									onChange={(e) =>
 										setReducedWorkCapacityStartDate(e.target.value)
 									}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t(
-										"health.earning_perm.reason",
-										"Grund (z.B. Rentenbescheid)",
-									)}
+									{t("health.earning_perm.reason")}
 								</label>
 								<input
 									type="text"
-									placeholder={t(
-										"health.earning_perm.reason_placeholder",
-										"Z.B. Bescheid über Erwerbsminderungsrente",
-									)}
+									placeholder={t("health.earning_perm.reason_placeholder")}
 									value={reducedWorkCapacityReason}
 									onChange={(e) => setReducedWorkCapacityReason(e.target.value)}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 							<div className="flex flex-col gap-4 mt-2">
 								<label className="text-sm font-bold text-slate-700">
-									{t(
-										"health.earning_perm.disability_question",
-										"Besitzt Du einen offiziellen Behindertenausweis?",
-									)}
+									{t("health.earning_perm.disability_question")}
 								</label>
 								<OptionCard
+									testIdPrefix="health-option"
 									id="disability-yes"
-									title={t("common.yes", "Ja")}
+									title={t("common.yes")}
 									selected={hasDisabilityId === true}
 									onClick={() => setHasDisabilityId(true)}
 								/>
 								<OptionCard
+									testIdPrefix="health-option"
 									id="disability-no"
-									title={t("common.no", "Nein")}
+									title={t("common.no")}
 									selected={hasDisabilityId === false}
 									onClick={() => setHasDisabilityId(false)}
 								/>
@@ -769,28 +632,25 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 7 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-								{t("health.disability.title", "Angaben zum Behindertenausweis")}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
+								{t("health.disability.title")}
 							</h1>
 						</div>
 						<div className="flex flex-col gap-4 text-left">
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t("health.disability.valid_until", "Gültig bis")}
+									{t("health.disability.valid_until")}
 								</label>
 								<input
 									type="date"
 									value={disabilityValidUntil}
 									onChange={(e) => setDisabilityValidUntil(e.target.value)}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
 								/>
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t(
-										"health.disability.merkzeichen",
-										"Eingetragenes Merkzeichen (falls zutreffend)",
-									)}
+									{t("health.disability.merkzeichen")}
 								</label>
 								<select
 									value={merkzeichen || ""}
@@ -800,13 +660,10 @@ export const ApplicationHealthQuestions: React.FC = () => {
 												DisabilityMerkzeichenType | undefined,
 										)
 									}
-									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none text-slate-800 font-medium transition-all bg-white"
+									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all bg-white"
 								>
 									<option value="">
-										{t(
-											"health.disability.no_merkzeichen",
-											"-- Kein Merkzeichen --",
-										)}
+										{t("health.disability.no_merkzeichen")}
 									</option>
 									<option value="G">{t("health.marks.G")}</option>
 									<option value="aG">{t("health.marks.aG")}</option>
@@ -830,35 +687,28 @@ export const ApplicationHealthQuestions: React.FC = () => {
 				{currentPage === 8 && (
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-								{t(
-									"health.nutrition.title",
-									"Benötigst Du aus medizinischen Gründen eine kostenaufwändige Ernährung?",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
+								{t("health.nutrition.title")}
 							</h1>
 						</div>
 						<div className="bg-brand-bg p-4 rounded-2xl border border-brand-border/40 text-left flex flex-col gap-1.5">
 							<p className="text-xs text-brand-grey leading-relaxed font-medium">
-								{t(
-									"health.nutrition.desc",
-									"Bei bestimmten Krankheiten (z.B. Zöliakie, Niereninsuffizienz) kannst Du einen finanziellen Mehrbedarf erhalten.",
-								)}
+								{t("health.nutrition.desc")}
 							</p>
 						</div>
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="health-option"
 								id="nutrition-yes"
-								title={t("common.yes", "Ja")}
-								hinweis={t(
-									"health.nutrition.yes_hinweis",
-									"Du erhältst dafür später ein Formular für Deinen Arzt zur Bescheinigung.",
-								)}
+								title={t("common.yes")}
+								hinweis={t("health.nutrition.yes_hinweis")}
 								selected={hasCostlyMedicalNutrition === true}
 								onClick={() => setHasCostlyMedicalNutrition(true)}
 							/>
 							<OptionCard
+								testIdPrefix="health-option"
 								id="nutrition-no"
-								title={t("common.no", "Nein")}
+								title={t("common.no")}
 								selected={hasCostlyMedicalNutrition === false}
 								onClick={() => setHasCostlyMedicalNutrition(false)}
 							/>
@@ -868,14 +718,13 @@ export const ApplicationHealthQuestions: React.FC = () => {
 
 				<div className="pt-4 w-full">
 					<PrimaryButton
+						className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
 						data-testid={currentPage === 8 ? "done-button" : "next-button"}
 						type="button"
 						onClick={handleNext}
 						disabled={isNextDisabled()}
 					>
-						{currentPage === 8
-							? t("common.done", "Geschafft!")
-							: t("common.continue", "Weiter")}
+						{currentPage === 8 ? t("common.done") : t("common.continue")}
 					</PrimaryButton>
 				</div>
 			</div>

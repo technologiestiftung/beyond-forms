@@ -16,7 +16,6 @@ import {
 export interface ProfileCategory {
 	id: string;
 	labelKey: string;
-	labelFallback: string;
 	Section: FC<SectionProps>;
 	completionFields: string[];
 }
@@ -25,7 +24,6 @@ export const PROFILE_CATEGORIES: ProfileCategory[] = [
 	{
 		id: "identity",
 		labelKey: "personal.groups.identity",
-		labelFallback: "Rechtliche Identität",
 		Section: IdentitySection,
 		completionFields: [
 			"legalGender",
@@ -38,7 +36,6 @@ export const PROFILE_CATEGORIES: ProfileCategory[] = [
 	{
 		id: "status",
 		labelKey: "personal.groups.status",
-		labelFallback: "Staatsangehörigkeit und Status",
 		Section: StatusSection,
 		completionFields: [
 			"nationality",
@@ -51,28 +48,24 @@ export const PROFILE_CATEGORIES: ProfileCategory[] = [
 	{
 		id: "contact",
 		labelKey: "personal.groups.contact",
-		labelFallback: "Kontakt",
 		Section: ContactSection,
 		completionFields: ["email", "phoneNumber"],
 	},
 	{
 		id: "address",
 		labelKey: "personal.groups.address",
-		labelFallback: "Meldeadresse",
 		Section: AddressSection,
 		completionFields: ["street", "houseNumber", "zipCode", "city", "state"],
 	},
 	{
 		id: "vehicle",
 		labelKey: "personal.groups.vehicle",
-		labelFallback: "Fahrzeug",
 		Section: VehicleSection,
 		completionFields: ["licensePlate"],
 	},
 	{
 		id: "insurance",
 		labelKey: "personal.groups.insurance",
-		labelFallback: "Versicherung und Erwerbstätigkeit",
 		Section: InsuranceSection,
 		completionFields: [
 			"socialSecurityType",
@@ -85,14 +78,12 @@ export const PROFILE_CATEGORIES: ProfileCategory[] = [
 	{
 		id: "household",
 		labelKey: "personal.groups.household",
-		labelFallback: "Haushalt",
 		Section: HouseholdSection,
 		completionFields: ["personsInHouseholdCount"],
 	},
 	{
 		id: "housing",
 		labelKey: "personal.groups.housing",
-		labelFallback: "Wohnsituation",
 		Section: HousingSection,
 		completionFields: [
 			"accomodationType",
@@ -108,7 +99,6 @@ export const PROFILE_CATEGORIES: ProfileCategory[] = [
 	{
 		id: "financial",
 		labelKey: "personal.groups.financial",
-		labelFallback: "Einkommen und Vermögen",
 		Section: FinancialSection,
 		completionFields: [
 			"monthlyIncome",
@@ -121,7 +111,6 @@ export const PROFILE_CATEGORIES: ProfileCategory[] = [
 	{
 		id: "health",
 		labelKey: "personal.groups.health",
-		labelFallback: "Gesundheit und Pflege",
 		Section: HealthSection,
 		completionFields: ["abilityToWork"],
 	},

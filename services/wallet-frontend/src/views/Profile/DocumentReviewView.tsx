@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
-import { X, Edit3, Check, AlertCircle } from "lucide-react";
+import { X, Edit3, Check, AlertCircle, AlertTriangle } from "lucide-react";
 import { PageContainer } from "../../components/Layout/PageContainer";
 import { AppRoutes } from "../../constants/routes";
 import { env } from "../../config/env.config";
@@ -22,6 +22,7 @@ import {
 import type { WalletDocument } from "../../schemas/profile.schema";
 import { Origins, type OriginType } from "../../constants/origin";
 import { formatDateString, convertGermanToIsoDate } from "../../utils/date";
+import { getDocumentWarningMessage } from "../../utils/documentMessages";
 
 const ENUM_TRANSLATION_KEYS: Record<string, Record<string, string>> = {
 	health_insurance_status: {
@@ -109,9 +110,7 @@ const renderFieldValue = (
 	}
 	const boolValue = normalizeBooleanForUi(value);
 	if (boolValue !== undefined) {
-		return boolValue
-			? t("common.yes", { defaultValue: "Ja" })
-			: t("common.no", { defaultValue: "Nein" });
+		return boolValue ? t("common.yes") : t("common.no");
 	}
 	const enumMap = ENUM_TRANSLATION_KEYS[fieldKey];
 	if (enumMap && typeof value === "string" && enumMap[value]) {
@@ -230,6 +229,7 @@ export const DocumentReviewView: React.FC = () => {
 	const [editBuffer, setEditBuffer] = useState("");
 	const [saveError, setSaveError] = useState<string | null>(null);
 	const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+	const [warningCode, setWarningCode] = useState<string | null>(null);
 
 	useEffect(() => {
 		let active = true;
@@ -296,6 +296,7 @@ export const DocumentReviewView: React.FC = () => {
 					const data = await response.json();
 					const raw = data.raw_data || {};
 					setCorrectedData(raw);
+					setWarningCode(data.user_error_code ?? null);
 					// Prefill all extracted fields as checked/verified by default
 					setVerifiedFields(
 						Object.keys(raw).filter(
@@ -620,10 +621,7 @@ export const DocumentReviewView: React.FC = () => {
 					{ replace: true },
 				);
 			} else {
-				const fallbackMsg = t(
-					"review.errors.verification_failed",
-					"Fehler beim Bestätigen der Daten.",
-				);
+				const fallbackMsg = t("review.errors.verification_failed");
 				const errorMsg = await parseSubmitError({
 					response,
 					fallbackMsg,
@@ -637,10 +635,7 @@ export const DocumentReviewView: React.FC = () => {
 			}
 		} catch (err: unknown) {
 			console.error("Verification request failed:", err);
-			let errorMessage = t(
-				"review.errors.system_error",
-				"Ein unerwarteter Systemfehler ist aufgetreten.",
-			);
+			let errorMessage = t("review.errors.system_error");
 			if (err instanceof Error) {
 				errorMessage = err.message;
 			}
@@ -673,6 +668,11 @@ export const DocumentReviewView: React.FC = () => {
 		}
 	};
 
+	const displayedFieldKeys = Object.keys(correctedData).filter((fieldKey) => {
+		const val = correctedData[fieldKey];
+		return val !== null && val !== undefined;
+	});
+
 	if (loading) {
 		return (
 			<PageContainer>
@@ -685,12 +685,12 @@ export const DocumentReviewView: React.FC = () => {
 		<PageContainer
 			topBarProps={{
 				onBack: () =>
-					navigate(getTargetExitRoute(origin, category, "upload"), {
+					navigate(getTargetExitRoute(origin, category, "back"), {
 						replace: true,
 					}),
 				middleElement: (
 					<span className="text-sm font-extrabold text-slate-800 tracking-wide uppercase truncate">
-						{t("review.title", "Daten prüfen")}
+						{t("review.title")}
 					</span>
 				),
 				rightElement: (
@@ -711,10 +711,7 @@ export const DocumentReviewView: React.FC = () => {
 		>
 			<div className="w-full max-w-md flex flex-col items-center px-4">
 				<p className="text-xs text-brand-grey text-center mb-6 px-4 leading-relaxed">
-					{t(
-						"review.subtitle",
-						"Prüfe die ausgelesenen Daten und bestätige sie.",
-					)}
+					{t("review.subtitle")}
 				</p>
 
 				{saveError && (
@@ -727,13 +724,27 @@ export const DocumentReviewView: React.FC = () => {
 					</div>
 				)}
 
+				{warningCode && (
+					<div className="p-4 bg-yellow-50 border border-yellow-200 rounded-2xl flex items-start gap-3 w-full max-w-md mb-6 text-sm text-left shadow-sm">
+						<AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 text-yellow-500" />
+						<div>
+							<h3 className="font-bold text-yellow-900">
+								{t("review.warning_title")}
+							</h3>
+							<p className="mt-1 text-yellow-800">
+								{getDocumentWarningMessage(t, warningCode)}
+							</p>
+						</div>
+					</div>
+				)}
+
 				{/* Document Category Selection Card */}
 				<div className="w-full bg-white rounded-2xl border border-slate-100 p-4 shadow-sm mb-6 text-left">
 					<label
 						htmlFor="document-type-select"
 						className="block text-[10px] font-bold text-brand-grey uppercase tracking-wide mb-1.5"
 					>
-						{t("review.detected_type", "Es wurde ein Dokument erkannt")}
+						{t("review.detected_type")}
 					</label>
 					<div className="relative">
 						<select
@@ -744,7 +755,7 @@ export const DocumentReviewView: React.FC = () => {
 						>
 							{REQUIRED_DOCUMENT_SLOTS.map((slot) => (
 								<option key={slot.id} value={slot.id}>
-									{tApplication(slot.titleKey, slot.defaultTitle)}
+									{tApplication(slot.titleKey)}
 								</option>
 							))}
 							<option value="OTHER">{t("review.doc_type_other")}</option>
@@ -755,180 +766,183 @@ export const DocumentReviewView: React.FC = () => {
 				{/* Fields Headline */}
 				<div className="w-full text-left mb-3 px-1">
 					<h4 className="text-[11px] font-bold text-brand-grey uppercase tracking-wider">
-						{t("review.detected_data", "Es wurden folgende Daten erkannt")}
+						{t("review.detected_data")}
 					</h4>
 				</div>
 
 				{/* Fields List Layout Container */}
 				<div className="w-full flex flex-col bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden divide-y divide-slate-100 mb-8">
-					{Object.keys(correctedData)
-						.filter((fieldKey) => {
-							const val = correctedData[fieldKey];
-							return val !== null && val !== undefined;
-						})
-						.map((fieldKey) => {
-							const isEditing = editingField === fieldKey;
-							const isChecked = verifiedFields.includes(fieldKey);
-							const currentValue = correctedData[fieldKey];
-							const isBooleanField =
-								normalizeBooleanForUi(currentValue) !== undefined;
+					{displayedFieldKeys.length === 0 && (
+						<p className="p-8 text-center text-sm text-brand-grey">
+							{t("review.no_data")}
+						</p>
+					)}
+					{displayedFieldKeys.map((fieldKey) => {
+						const isEditing = editingField === fieldKey;
+						const isChecked = verifiedFields.includes(fieldKey);
+						const currentValue = correctedData[fieldKey];
+						const isBooleanField =
+							normalizeBooleanForUi(currentValue) !== undefined;
 
-							const errorMsg = fieldErrors[fieldKey];
+						const errorMsg = fieldErrors[fieldKey];
 
-							return (
-								<div
-									key={fieldKey}
-									className={`w-full p-4 flex flex-col transition-colors hover:bg-slate-50/30 text-left border-l-4 ${
-										errorMsg
-											? "border-l-rose-500 bg-rose-50/10"
-											: "border-l-transparent border-slate-100"
-									}`}
-								>
-									{isEditing ? (
-										// Inline Editing Mode Panel
-										<div className="w-full flex flex-col gap-3 animate-in fade-in duration-200">
-											<label
-												htmlFor={`input-${fieldKey}`}
-												className="text-[10px] font-bold text-brand-grey uppercase tracking-wide"
+						return (
+							<div
+								key={fieldKey}
+								className={`w-full p-4 flex flex-col transition-colors hover:bg-slate-50/30 text-left border-l-4 ${
+									errorMsg
+										? "border-l-rose-500 bg-rose-50/10"
+										: "border-l-transparent border-slate-100"
+								}`}
+							>
+								{isEditing ? (
+									// Inline Editing Mode Panel
+									<div className="w-full flex flex-col gap-3 animate-in fade-in duration-200">
+										<label
+											htmlFor={`input-${fieldKey}`}
+											className="text-[10px] font-bold text-brand-grey uppercase tracking-wide"
+										>
+											{t(`review.fields.${String(fieldKey).toLowerCase()}`, {
+												defaultValue: String(fieldKey).replace(/_/g, " "),
+											})}
+										</label>
+										{isBooleanField ? (
+											<select
+												id={`input-${fieldKey}`}
+												value={editBuffer}
+												onChange={(e) => setEditBuffer(e.target.value)}
+												className={`w-full h-12 border rounded-xl px-4 text-sm font-medium text-slate-800 bg-white focus:outline-none shadow-inner ${
+													errorMsg
+														? "border-rose-300 focus:border-rose-500"
+														: "border-slate-200 focus:border-slate-400"
+												}`}
+												aria-invalid={errorMsg ? "true" : "false"}
+												aria-describedby={
+													errorMsg ? `error-${fieldKey}` : undefined
+												}
+												autoFocus
 											>
-												{t(`review.fields.${String(fieldKey).toLowerCase()}`, {
-													defaultValue: String(fieldKey).replace(/_/g, " "),
-												})}
-											</label>
-											{isBooleanField ? (
-												<select
-													id={`input-${fieldKey}`}
-													value={editBuffer}
-													onChange={(e) => setEditBuffer(e.target.value)}
-													className={`w-full h-12 border rounded-xl px-4 text-sm font-medium text-slate-800 bg-white focus:outline-none shadow-inner ${
-														errorMsg
-															? "border-rose-300 focus:border-rose-500"
-															: "border-slate-200 focus:border-slate-400"
-													}`}
-													aria-invalid={errorMsg ? "true" : "false"}
-													aria-describedby={
-														errorMsg ? `error-${fieldKey}` : undefined
-													}
-													autoFocus
-												>
-													<option value="true">
-														{t("common.yes", { defaultValue: "Ja" })}
-													</option>
-													<option value="false">
-														{t("common.no", { defaultValue: "Nein" })}
-													</option>
-												</select>
-											) : (
-												<input
-													id={`input-${fieldKey}`}
-													type="text"
-													value={editBuffer}
-													onChange={(e) => setEditBuffer(e.target.value)}
-													className={`w-full h-12 border rounded-xl px-4 text-sm font-medium text-slate-800 bg-white focus:outline-none shadow-inner ${
-														errorMsg
-															? "border-rose-300 focus:border-rose-500"
-															: "border-slate-200 focus:border-slate-400"
-													}`}
-													aria-invalid={errorMsg ? "true" : "false"}
-													aria-describedby={
-														errorMsg ? `error-${fieldKey}` : undefined
-													}
-													autoFocus
-												/>
-											)}
-											{errorMsg && (
-												<div
-													id={`error-${fieldKey}`}
-													role="alert"
-													className="flex items-center gap-1.5 text-[11px] font-semibold text-rose-600 animate-in fade-in duration-200"
-												>
-													<AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-500" />
-													<span>{errorMsg}</span>
-												</div>
-											)}
-											<div className="flex items-center space-x-2 justify-end">
+												<option value="true">{t("common.yes")}</option>
+												<option value="false">{t("common.no")}</option>
+											</select>
+										) : (
+											<input
+												id={`input-${fieldKey}`}
+												type="text"
+												value={editBuffer}
+												onChange={(e) => setEditBuffer(e.target.value)}
+												className={`w-full h-12 border rounded-xl px-4 text-sm font-medium text-slate-800 bg-white focus:outline-none shadow-inner ${
+													errorMsg
+														? "border-rose-300 focus:border-rose-500"
+														: "border-slate-200 focus:border-slate-400"
+												}`}
+												aria-invalid={errorMsg ? "true" : "false"}
+												aria-describedby={
+													errorMsg ? `error-${fieldKey}` : undefined
+												}
+												autoFocus
+											/>
+										)}
+										{errorMsg && (
+											<div
+												id={`error-${fieldKey}`}
+												role="alert"
+												className="flex items-center gap-1.5 text-[11px] font-semibold text-rose-600 animate-in fade-in duration-200"
+											>
+												<AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+												<span>{errorMsg}</span>
+											</div>
+										)}
+										<div className="flex items-center space-x-2 justify-end">
+											<button
+												type="button"
+												onClick={() => setEditingField(null)}
+												className="h-9 px-4 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-600 active:scale-95 transition-all"
+											>
+												{t("common.cancel")}
+											</button>
+											<button
+												type="button"
+												onClick={() => saveInlineEdit(fieldKey)}
+												className="h-9 px-4 rounded-lg bg-slate-900 text-white text-xs font-bold active:scale-95 transition-all"
+											>
+												{t("common.save")}
+											</button>
+										</div>
+									</div>
+								) : (
+									// Standard Row Content Mode
+									<>
+										<div className="w-full flex items-center justify-between group">
+											<div
+												onClick={() => startEditing(fieldKey, currentValue)}
+												className="flex flex-col gap-0.5 overflow-hidden flex-1 pr-4 cursor-pointer rounded-lg hover:bg-slate-100/50 p-1 -m-1 transition-all"
+											>
+												<span className="text-[10px] font-bold text-brand-grey uppercase tracking-wide">
+													{t(
+														`review.fields.${String(fieldKey).toLowerCase()}`,
+														{
+															defaultValue: String(fieldKey).replace(/_/g, " "),
+														},
+													)}
+												</span>
+												<span className="text-sm font-bold text-slate-800 truncate">
+													{renderFieldValue(fieldKey, currentValue, t)}
+												</span>
+											</div>
+
+											<div className="flex items-center space-x-2 shrink-0">
+												{/* Status Check Circle Overlay */}
 												<button
 													type="button"
-													onClick={() => setEditingField(null)}
-													className="h-9 px-4 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-600 active:scale-95 transition-all"
+													aria-label={t("common.verify_field", {
+														field: t(
+															`review.fields.${String(fieldKey).toLowerCase()}`,
+															{ defaultValue: fieldKey },
+														),
+													})}
+													aria-pressed={isChecked}
+													onClick={() => toggleVerified(fieldKey)}
+													className={`size-7 rounded-full flex items-center justify-center border transition-all ${
+														isChecked
+															? "bg-green-50 border-green-200 text-green-600 shadow-sm"
+															: "bg-white border-slate-200 text-slate-300 hover:border-slate-300"
+													}`}
 												>
-													{t("common.cancel", "Abbrechen")}
+													<Check className="w-4 h-4 stroke-[3px]" />
 												</button>
+
+												{/* Accessible 44px Tap Target Inline Trigger Button */}
 												<button
 													type="button"
-													onClick={() => saveInlineEdit(fieldKey)}
-													className="h-9 px-4 rounded-lg bg-slate-900 text-white text-xs font-bold active:scale-95 transition-all"
+													aria-label={t("common.edit_field", {
+														field: t(
+															`review.fields.${String(fieldKey).toLowerCase()}`,
+															{ defaultValue: fieldKey },
+														),
+													})}
+													onClick={() => startEditing(fieldKey, currentValue)}
+													className="size-11 min-w-[44px] min-h-[44px] bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-100 cursor-pointer focus-visible:outline-2 focus-visible:outline-brand-primary transition-all shadow-sm shrink-0"
 												>
-													{t("common.save", "Speichern")}
+													<Edit3 className="size-4" />
 												</button>
 											</div>
 										</div>
-									) : (
-										// Standard Row Content Mode
-										<>
-											<div className="w-full flex items-center justify-between group">
-												<div
-													onClick={() => startEditing(fieldKey, currentValue)}
-													className="flex flex-col gap-0.5 overflow-hidden flex-1 pr-4 cursor-pointer rounded-lg hover:bg-slate-100/50 p-1 -m-1 transition-all"
-												>
-													<span className="text-[10px] font-bold text-brand-grey uppercase tracking-wide">
-														{t(
-															`review.fields.${String(fieldKey).toLowerCase()}`,
-															{
-																defaultValue: String(fieldKey).replace(
-																	/_/g,
-																	" ",
-																),
-															},
-														)}
-													</span>
-													<span className="text-sm font-bold text-slate-800 truncate">
-														{renderFieldValue(fieldKey, currentValue, t)}
-													</span>
-												</div>
-
-												<div className="flex items-center space-x-2 shrink-0">
-													{/* Status Check Circle Overlay */}
-													<button
-														type="button"
-														aria-label={`${t(`review.fields.${String(fieldKey).toLowerCase()}`, { defaultValue: fieldKey })} verifizieren`}
-														aria-pressed={isChecked}
-														onClick={() => toggleVerified(fieldKey)}
-														className={`size-7 rounded-full flex items-center justify-center border transition-all ${
-															isChecked
-																? "bg-green-50 border-green-200 text-green-600 shadow-sm"
-																: "bg-white border-slate-200 text-slate-300 hover:border-slate-300"
-														}`}
-													>
-														<Check className="w-4 h-4 stroke-[3px]" />
-													</button>
-
-													{/* Accessible 44px Tap Target Inline Trigger Button */}
-													<button
-														type="button"
-														aria-label={`Edit ${t(`review.fields.${String(fieldKey).toLowerCase()}`, { defaultValue: fieldKey })}`}
-														onClick={() => startEditing(fieldKey, currentValue)}
-														className="size-11 min-w-[44px] min-h-[44px] bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-100 cursor-pointer focus-visible:outline-2 focus-visible:outline-brand-primary transition-all shadow-sm shrink-0"
-													>
-														<Edit3 className="size-4" />
-													</button>
-												</div>
+										{errorMsg && (
+											<div
+												id={`error-${fieldKey}`}
+												role="alert"
+												className="flex items-center gap-1.5 mt-1.5 text-[11px] font-semibold text-rose-600 animate-in fade-in duration-200"
+											>
+												<AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+												<span>{errorMsg}</span>
 											</div>
-											{errorMsg && (
-												<div
-													id={`error-${fieldKey}`}
-													role="alert"
-													className="flex items-center gap-1.5 mt-1.5 text-[11px] font-semibold text-rose-600 animate-in fade-in duration-200"
-												>
-													<AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-500" />
-													<span>{errorMsg}</span>
-												</div>
-											)}
-										</>
-									)}
-								</div>
-							);
-						})}
+										)}
+									</>
+								)}
+							</div>
+						);
+					})}
 				</div>
 
 				{/* Primary Execution Trigger Action Button */}
@@ -938,7 +952,7 @@ export const DocumentReviewView: React.FC = () => {
 						onClick={handleDeleteDocument}
 						className="w-full sm:flex-1 h-14 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 font-bold text-base rounded-2xl shadow-sm active:scale-98 transition-all flex items-center justify-center"
 					>
-						{t("review.delete_document", "Dokument löschen")}
+						{t("review.delete_document")}
 					</button>
 					<button
 						type="button"
@@ -947,22 +961,17 @@ export const DocumentReviewView: React.FC = () => {
 						disabled={isSubmitting}
 						className={`w-full sm:flex-1 h-14 bg-slate-900 hover:bg-slate-800 text-white font-bold text-base rounded-2xl shadow-lg active:scale-98 transition-all flex items-center justify-center ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
 					>
-						{isSubmitting
-							? t("common.saving", "Speichere...")
-							: t("review.confirm_all", "Bestätigen")}
+						{isSubmitting ? t("common.saving") : t("review.confirm_all")}
 					</button>
 				</div>
 			</div>
 
 			<ConfirmationModal
 				isOpen={showDeleteModal}
-				title={t("review.delete_title", "Dokument löschen?")}
-				message={t(
-					"review.delete_confirm",
-					"Möchtest Du dieses Dokument wirklich löschen?",
-				)}
-				confirmLabel={t("common.delete", "Löschen")}
-				cancelLabel={t("common.cancel", "Abbrechen")}
+				title={t("review.delete_title")}
+				message={t("review.delete_confirm")}
+				confirmLabel={t("common.delete")}
+				cancelLabel={t("common.cancel")}
 				onConfirm={handleConfirmDelete}
 				onCancel={() => setShowDeleteModal(false)}
 			/>

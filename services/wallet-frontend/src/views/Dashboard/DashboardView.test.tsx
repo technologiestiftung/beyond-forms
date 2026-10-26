@@ -18,9 +18,7 @@ const { mockProfileReturn } = vi.hoisted(() => ({
 
 vi.mock("react-i18next", () => ({
 	useTranslation: () => ({
-		/** Returns i18n keys except when `t` is called with a string default (e.g. ApplicationCard). */
-		t: (key: string, options?: string | Record<string, unknown>) =>
-			typeof options === "string" ? options : key,
+		t: (key: string) => key,
 		i18n: { language: "en", changeLanguage: vi.fn() },
 	}),
 }));
@@ -103,22 +101,33 @@ describe("DashboardView", () => {
 		).toBeInTheDocument();
 		expect(
 			screen.getByText(
-				"Starte mit Deinem Antrag. Klaro zeigt Dir Schritt-für-Schritt, was wichtig ist.",
+				"sections.applications.basic_security.description.in_progress",
 			),
 		).toBeInTheDocument();
-		expect(screen.getByTestId("lets-go-button")).toHaveTextContent(
-			"Antrag generieren",
+		expect(screen.getByTestId("application-overview-button")).toHaveTextContent(
+			"sections.applications.basic_security.actions.complete",
+		);
+		expect(screen.getByTestId("application-generate-button")).toHaveTextContent(
+			"sections.applications.generate_button",
 		);
 		expect(screen.getByTestId("language-switcher")).toBeInTheDocument();
 
 		expect(
-			screen.getByRole("heading", { level: 2, name: "Bewohnerparkausweis" }),
+			screen.getByRole("heading", {
+				level: 2,
+				name: "sections.applications.parking_permit.title",
+			}),
 		).toBeInTheDocument();
 		expect(
-			screen.getByRole("heading", { level: 2, name: "Wohngeld" }),
+			screen.getByRole("heading", {
+				level: 2,
+				name: "sections.applications.housing_allowance.title",
+			}),
 		).toBeInTheDocument();
 		expect(
-			screen.getAllByRole("button", { name: "Antrag generieren" }),
+			screen.getAllByRole("button", {
+				name: "sections.applications.generate_button",
+			}),
 		).toHaveLength(5);
 	});
 

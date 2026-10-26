@@ -22,7 +22,6 @@ export const DocumentCategoryNavigation: React.FC<
 		<nav
 			aria-label={t("docs.categories_nav_label", {
 				ns: "application",
-				defaultValue: "Dokumentkategorien",
 			})}
 			data-testid="document-category-nav"
 			className="self-start max-h-full overflow-y-auto bg-white rounded-2xl border border-brand-border-subtle shadow-cards p-3"
@@ -60,14 +59,12 @@ export const DocumentCategoryNavigation: React.FC<
 									>
 										{t(category.titleKey, {
 											ns: "application",
-											defaultValue: category.defaultTitle,
 										})}
 									</span>
 									<span className="text-sm text-brand-grey">
 										{t("docs.category_document_count", {
 											ns: "application",
 											count: documentCount,
-											defaultValue: `${documentCount} Dokumente`,
 										})}
 									</span>
 								</span>

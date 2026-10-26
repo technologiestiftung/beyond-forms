@@ -6,8 +6,8 @@ import type { UseFormRegisterReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { useProfile } from "../../hooks/useProfile";
-import type { Profile } from "../../schemas/profile.schema";
+import { useProfile } from "../../../hooks/useProfile";
+import type { Profile } from "../../../schemas/profile.schema";
 import {
 	AlertCircle,
 	CheckCircle2,
@@ -15,22 +15,11 @@ import {
 	Pencil,
 	Calendar,
 } from "lucide-react";
-import { AppRoutes } from "../../constants/routes";
-import { PageContainer } from "../../components/Layout/PageContainer";
-import { PrimaryButton } from "../../components/ui/PrimaryButton";
-import { ProgressBar } from "../../components/ui/ProgressBar";
-import { useScrollToTop, scrollToTop } from "../../utils/scroll";
-import { OptionCard as SharedOptionCard } from "../../components/ui/OptionCard";
-
-const OptionCard: React.FC<{
-	id: string;
-	title: string;
-	hinweis?: string;
-	selected: boolean;
-	onClick: () => void;
-}> = (props) => (
-	<SharedOptionCard {...props} dataTestId={`housing-option-${props.id}`} />
-);
+import { AppRoutes } from "../../../constants/routes";
+import { PageContainer } from "../../../components/Layout/PageContainer";
+import { PrimaryButton } from "../../../components/ui/PrimaryButton";
+import { useScrollToTop, scrollToTop } from "../../../utils/scroll";
+import { OptionCard } from "../../../components/ui/OptionCard";
 
 interface FieldProps {
 	id: string;
@@ -51,8 +40,9 @@ const FormField: React.FC<FieldProps> = ({
 	onBlur,
 	error,
 }) => {
+	const { t } = useTranslation("profile");
 	return (
-		<div className="flex flex-col gap-1 text-left relative pb-3 border-b border-slate-100 last:border-b-0 focus-within:border-primary-green-300 transition-all">
+		<div className="flex flex-col gap-1 text-left relative pb-3 border-b border-slate-100 last:border-b-0 focus-within:border-primary-blue-300 transition-all">
 			<label
 				htmlFor={id}
 				className="text-xs font-bold text-slate-600 uppercase tracking-wide"
@@ -80,7 +70,7 @@ const FormField: React.FC<FieldProps> = ({
 				/>
 				<button
 					type="button"
-					aria-label={`${label} bearbeiten`}
+					aria-label={t("common.edit_field", { field: label })}
 					onClick={() => document.getElementById(id)?.focus()}
 					className="absolute right-0 min-w-[44px] min-h-[44px] size-11 bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center text-slate-600 hover:text-slate-900 hover:border-slate-300 cursor-pointer transition-all active:scale-95 shadow-sm shrink-0 focus-visible:outline-2 focus-visible:outline-brand-primary"
 				>
@@ -323,9 +313,6 @@ export const ApplicationHousingQuestions: React.FC = () => {
 		return 0; // Exit to overview
 	};
 
-	const totalPages = 8;
-	const calculatedProgress = currentPage > 1.5 ? Math.floor(currentPage) : 1;
-
 	const handleSaveField = async (
 		section: "address" | "housing",
 		key: string,
@@ -489,13 +476,10 @@ export const ApplicationHousingQuestions: React.FC = () => {
 		switch (currentPage) {
 			case 1:
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-								{t(
-									"housing.questions.address_title",
-									"Wie lautet Deine aktuelle Wohnadresse?",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
+								{t("housing.questions.address_title")}
 							</h1>
 						</div>
 
@@ -513,16 +497,13 @@ export const ApplicationHousingQuestions: React.FC = () => {
 											e.target.checked ? "ohne feste Adresse" : "",
 										);
 									}}
-									className="size-5 rounded border-slate-300 text-primary-green-600 focus:ring-primary-green-500"
+									className="size-5 rounded border-slate-300 text-primary-blue-500 focus:ring-primary-blue-500"
 								/>
 								<label
 									htmlFor="noFixedAddress"
 									className="text-sm font-bold text-slate-700"
 								>
-									{t(
-										"housing.labels.no_fixed_address",
-										"Ich habe aktuell keine feste Adresse",
-									)}
+									{t("housing.labels.no_fixed_address")}
 								</label>
 							</div>
 
@@ -530,7 +511,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								<>
 									<FormField
 										id="street"
-										label={t("housing.labels.street", "Straße")}
+										label={t("housing.labels.street")}
 										register={register("street")}
 										onBlur={() =>
 											handleSaveField(
@@ -542,7 +523,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 									/>
 									<FormField
 										id="houseNumber"
-										label={t("housing.labels.houseNumber", "Hausnummer")}
+										label={t("housing.labels.houseNumber")}
 										register={register("houseNumber")}
 										onBlur={() =>
 											handleSaveField(
@@ -554,7 +535,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 									/>
 									<FormField
 										id="zipCode"
-										label={t("housing.labels.zipCode", "Postleitzahl")}
+										label={t("housing.labels.zipCode")}
 										register={register("zipCode")}
 										onBlur={() =>
 											handleSaveField(
@@ -566,7 +547,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 									/>
 									<FormField
 										id="city"
-										label={t("housing.labels.city", "Stadt")}
+										label={t("housing.labels.city")}
 										register={register("city")}
 										onBlur={() =>
 											handleSaveField(
@@ -584,23 +565,17 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 			case 1.5:
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-								{t(
-									"housing.questions.last_fixed_address_title",
-									"Wo hast Du zuletzt fest gewohnt?",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight lg:text-[2rem] lg:leading-10">
+								{t("housing.questions.last_fixed_address_title")}
 							</h1>
 						</div>
 
 						<div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
 							<FormField
 								id="lastFixedAddress"
-								label={t(
-									"housing.labels.last_fixed_address",
-									"Letzter fester Wohnort",
-								)}
+								label={t("housing.labels.last_fixed_address")}
 								register={register("lastFixedAddress")}
 								onBlur={() =>
 									handleSaveField(
@@ -616,23 +591,18 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 			case 2:
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-								{t(
-									"housing.questions.accomodation_type_title",
-									"Wie wohnst Du zurzeit?",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
+								{t("housing.questions.accomodation_type_title")}
 							</h1>
 						</div>
 
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="Rental Apartment"
-								title={t(
-									"housing.options.accomodation_rental",
-									"Ich lebe in einer Mietwohnung",
-								)}
+								title={t("housing.options.accomodation_rental")}
 								selected={values.accomodationType === "Rental Apartment"}
 								onClick={() => {
 									setValue("accomodationType", "Rental Apartment");
@@ -644,11 +614,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="Own Home"
-								title={t(
-									"housing.options.accomodation_own",
-									"Ich lebe in meinem Eigenheim / Eigentumswohnung",
-								)}
+								title={t("housing.options.accomodation_own")}
 								selected={values.accomodationType === "Own Home"}
 								onClick={() => {
 									setValue("accomodationType", "Own Home");
@@ -660,11 +628,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="Shared Household"
-								title={t(
-									"housing.options.accomodation_care",
-									"Ich wohne in einer Pflegeeinrichtung",
-								)}
+								title={t("housing.options.accomodation_care")}
 								selected={values.accomodationType === "Shared Household"}
 								onClick={() => {
 									setValue("accomodationType", "Shared Household");
@@ -676,11 +642,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="Relative"
-								title={t(
-									"housing.options.accomodation_relative",
-									"Ich lebe bei Verwandten / Bekannten",
-								)}
+								title={t("housing.options.accomodation_relative")}
 								selected={values.accomodationType === "Relative"}
 								onClick={() => {
 									setValue("accomodationType", "Relative");
@@ -697,20 +661,18 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 			case 3:
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-								{t(
-									"housing.questions.tenancy_status_title",
-									"Bist Du Haupt- oder Untermieter?",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight lg:text-[2rem] lg:leading-10">
+								{t("housing.questions.tenancy_status_title")}
 							</h1>
 						</div>
 
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="Main Tenant"
-								title={t("housing.options.tenancy_main", "Ich bin Hauptmieter")}
+								title={t("housing.options.tenancy_main")}
 								selected={values.tenancyStatus === "Main Tenant"}
 								onClick={() => {
 									setValue("tenancyStatus", "Main Tenant");
@@ -722,8 +684,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="Subtenant"
-								title={t("housing.options.tenancy_sub", "Ich bin Untermieter")}
+								title={t("housing.options.tenancy_sub")}
 								selected={values.tenancyStatus === "Subtenant"}
 								onClick={() => {
 									setValue("tenancyStatus", "Subtenant");
@@ -731,11 +694,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="FreeLodging"
-								title={t(
-									"housing.options.tenancy_free",
-									"Ich habe freies Wohnrecht",
-								)}
+								title={t("housing.options.tenancy_free")}
 								selected={
 									values.tenancyStatus === null &&
 									!!values.freeHousingRightHolder
@@ -756,10 +717,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								<div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm mt-2 animate-fadeIn">
 									<FormField
 										id="landlordName"
-										label={t(
-											"housing.labels.landlord_name",
-											"Name des Vermieters",
-										)}
+										label={t("housing.labels.landlord_name")}
 										register={register("landlordName")}
 										onBlur={() =>
 											handleSaveField(
@@ -777,10 +735,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 									<div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm mt-2 animate-fadeIn">
 										<FormField
 											id="freeHousingRightHolder"
-											label={t(
-												"housing.labels.free_housing_right_holder",
-												"Freies Wohnrecht bei (Name der Person)",
-											)}
+											label={t("housing.labels.free_housing_right_holder")}
 											register={register("freeHousingRightHolder")}
 											onBlur={() =>
 												handleSaveField(
@@ -799,20 +754,18 @@ export const ApplicationHousingQuestions: React.FC = () => {
 			case 4: {
 				const isJaSublet = (values.subletRoomCount ?? 0) > 0;
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-								{t(
-									"housing.questions.sublet_title",
-									"Vermietest Du Zimmer unter?",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
+								{t("housing.questions.sublet_title")}
 							</h1>
 						</div>
 
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="sublet-no"
-								title={t("common.no", "Nein")}
+								title={t("common.no")}
 								selected={
 									values.subletRoomCount === null ||
 									values.subletRoomCount === 0
@@ -823,8 +776,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="sublet-yes"
-								title={t("common.yes", "Ja")}
+								title={t("common.yes")}
 								selected={isJaSublet}
 								onClick={() => {
 									setValue("subletRoomCount", 1);
@@ -836,10 +790,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								<div className="px-1 animate-fadeIn">
 									<FormField
 										id="subletRoomCount"
-										label={t(
-											"housing.labels.sublet_room_count",
-											"Wie viele Zimmer vermietest Du unter?",
-										)}
+										label={t("housing.labels.sublet_room_count")}
 										type="number"
 										register={register("subletRoomCount", {
 											valueAsNumber: true,
@@ -854,10 +805,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 									/>
 									<FormField
 										id="subletRentIncome"
-										label={t(
-											"housing.labels.sublet_rent_income",
-											"Miete (Warm) in EUR",
-										)}
+										label={t("housing.labels.sublet_rent_income")}
 										type="number"
 										register={register("subletRentIncome", {
 											valueAsNumber: true,
@@ -880,20 +828,18 @@ export const ApplicationHousingQuestions: React.FC = () => {
 			case 5: {
 				const isArrears = !!values.rentPaidUntil;
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-								{t(
-									"housing.questions.arrears_title",
-									"Hast Du Mietrückstände?",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight lg:text-[2rem] lg:leading-10">
+								{t("housing.questions.arrears_title")}
 							</h1>
 						</div>
 
 						<div className="flex flex-col gap-4">
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="arrears-no"
-								title={t("common.no", "Nein")}
+								title={t("common.no")}
 								selected={!isArrears}
 								onClick={() => {
 									setValue("rentPaidUntil", null);
@@ -901,8 +847,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								}}
 							/>
 							<OptionCard
+								testIdPrefix="housing-option"
 								id="arrears-yes"
-								title={t("common.yes", "Ja")}
+								title={t("common.yes")}
 								selected={isArrears}
 								onClick={() => {
 									const today = new Date().toISOString().split("T")[0];
@@ -919,10 +866,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 											className="text-sm font-semibold text-slate-700 text-left flex items-center gap-1.5"
 										>
 											<Calendar className="size-4 text-slate-500" />
-											{t(
-												"housing.labels.rent_paid_until",
-												"Miete gezahlt bis (Datum)",
-											)}
+											{t("housing.labels.rent_paid_until")}
 										</label>
 										<input
 											id="rentPaidUntil"
@@ -947,23 +891,17 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 			case 6:
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
-								{t(
-									"housing.questions.costs_title",
-									"Wie hoch sind Deine monatlichen Wohnkosten?",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
+								{t("housing.questions.costs_title")}
 							</h1>
 						</div>
 
 						<div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-4">
 							<FormField
 								id="rentTotal"
-								label={t(
-									"housing.labels.rent_total",
-									"Miete insgesamt (Warmmiete) in EUR",
-								)}
+								label={t("housing.labels.rent_total")}
 								type="number"
 								register={register("rentTotal", { valueAsNumber: true })}
 								onBlur={() =>
@@ -976,7 +914,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 							/>
 							<FormField
 								id="heatingCosts"
-								label={t("housing.labels.heating_costs", "Heizkosten (€)")}
+								label={t("housing.labels.heating_costs")}
 								type="number"
 								register={register("heatingCosts", { valueAsNumber: true })}
 								onBlur={() =>
@@ -989,10 +927,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 							/>
 							<FormField
 								id="hotWaterCosts"
-								label={t(
-									"housing.labels.hot_water_costs",
-									"Warmwasserkosten (€)",
-								)}
+								label={t("housing.labels.hot_water_costs")}
 								type="number"
 								register={register("hotWaterCosts", { valueAsNumber: true })}
 								onBlur={() =>
@@ -1005,7 +940,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 							/>
 							<FormField
 								id="cableTvCosts"
-								label={t("housing.labels.cable_tv_costs", "Kabelfernsehen (€)")}
+								label={t("housing.labels.cable_tv_costs")}
 								type="number"
 								register={register("cableTvCosts", { valueAsNumber: true })}
 								onBlur={() =>
@@ -1022,23 +957,17 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 			case 7:
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-								{t(
-									"housing.questions.size_title",
-									"Wie groß ist Deine Wohnung/Haus?",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight lg:text-[2rem] lg:leading-10">
+								{t("housing.questions.size_title")}
 							</h1>
 						</div>
 
 						<div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-4">
 							<FormField
 								id="livingArea"
-								label={t(
-									"housing.labels.living_area",
-									"Fläche in Quadratmetern",
-								)}
+								label={t("housing.labels.living_area")}
 								type="number"
 								register={register("livingArea", { valueAsNumber: true })}
 								onBlur={() =>
@@ -1051,10 +980,7 @@ export const ApplicationHousingQuestions: React.FC = () => {
 							/>
 							<FormField
 								id="numberOfRooms"
-								label={t(
-									"housing.labels.number_of_rooms",
-									"Anzahl der Räume (ohne Küche/Bad)",
-								)}
+								label={t("housing.labels.number_of_rooms")}
 								type="number"
 								register={register("numberOfRooms", { valueAsNumber: true })}
 								onBlur={() =>
@@ -1085,19 +1011,17 @@ export const ApplicationHousingQuestions: React.FC = () => {
 					Ofenheizung: "heating_ofenheizung",
 				};
 				return (
-					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn">
+					<div className="w-full max-w-md flex flex-col gap-5 animate-fadeIn lg:max-w-none">
 						<div className="text-left flex flex-col gap-2 px-1">
-							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-								{t(
-									"housing.questions.heating_type_title",
-									"Wie wird Deine Wohnung beheizt?",
-								)}
+							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight lg:text-[2rem] lg:leading-10">
+								{t("housing.questions.heating_type_title")}
 							</h1>
 						</div>
 
 						<div className="flex flex-col gap-4">
 							{heatingTypes.map((ht) => (
 								<OptionCard
+									testIdPrefix="housing-option"
 									key={ht}
 									id={`heating-${ht}`}
 									title={t(`housing.options.${heatingTypeKeys[ht]}`, ht)}
@@ -1131,70 +1055,58 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 	return (
 		<PageContainer
-			topBarProps={{ onBack: onPreviousPage, showLanguageSwitcher: true }}
+			topBarProps={{
+				onBack: onPreviousPage,
+				showLanguageSwitcher: true,
+				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
+			}}
+			contentClassName="lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pb-16"
 		>
 			{(isUpdating || saveSuccess) && (
 				<div
 					role="status"
-					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100"
+					className="fixed top-6 z-50 flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl border border-slate-100 lg:left-[calc(50%+var(--spacing)*36)] lg:-translate-x-1/2"
 				>
 					{isUpdating ? (
 						<>
 							<Loader2 className="w-4 h-4 animate-spin text-slate-800" />
 							<span className="text-xs font-bold text-slate-800">
-								{t("personal.actions.saving", "Speichern...")}
+								{t("personal.actions.saving")}
 							</span>
 						</>
 					) : (
 						<>
 							<CheckCircle2 className="w-4 h-4 text-green-600" />
 							<span className="text-xs font-bold text-slate-800">
-								{t("personal.actions.saved", "Gespeichert")}
+								{t("personal.actions.saved")}
 							</span>
 						</>
 					)}
 				</div>
 			)}
 
-			<ProgressBar
-				current={calculatedProgress}
-				total={totalPages}
-				colorVariant="green"
-				ariaLabel={t("common:step_page", {
-					current: calculatedProgress,
-					total: totalPages,
-					defaultValue: `${calculatedProgress} von ${totalPages} Seiten`,
-				})}
-			/>
-			<div className="w-full max-w-md flex flex-col gap-1.5 mb-6 -mt-4">
-				<div className="text-left text-[10px] font-bold text-slate-600 tracking-wider uppercase">
-					{t("common:step_page", {
-						current: calculatedProgress,
-						total: totalPages,
-						defaultValue: `${calculatedProgress} von ${totalPages} Seiten`,
-					})}
-				</div>
-			</div>
-
 			{saveError && (
-				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm">
+				<div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-900 font-medium w-full max-w-md mb-4 text-sm lg:max-w-180 lg:mx-auto">
 					<AlertCircle className="w-5 h-5 shrink-0 text-rose-500" />
 					<p>{saveError}</p>
 				</div>
 			)}
 
-			{renderPageContent()}
+			<div className="w-full max-w-md flex flex-col gap-6 lg:max-w-180 lg:mx-auto lg:bg-white lg:rounded-3xl lg:border lg:border-brand-border-subtle lg:shadow-cards lg:px-10 lg:py-8">
+				{renderPageContent()}
 
-			<div className="pt-6 w-full max-w-md">
-				<PrimaryButton
-					data-testid="next-button"
-					type="button"
-					onClick={onNextPage}
-				>
-					{currentPage >= 8
-						? t("common.done", "Geschafft!")
-						: t("common.save_and_continue", "Speichern und weiter")}
-				</PrimaryButton>
+				<div className="w-full">
+					<PrimaryButton
+						className="lg:flex lg:w-fit lg:min-w-44 lg:ml-auto"
+						data-testid="next-button"
+						type="button"
+						onClick={onNextPage}
+					>
+						{currentPage >= 8
+							? t("common.done")
+							: t("common.save_and_continue")}
+					</PrimaryButton>
+				</div>
 			</div>
 		</PageContainer>
 	);
