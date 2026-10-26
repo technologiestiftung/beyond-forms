@@ -697,7 +697,13 @@
 		"system_error": "A system error occurred",
 		"file_type_invalid": "This file format is not supported. Allowed formats are PDF, JPG, PNG and HEIC.",
 		"file_too_large": "This file is too large. The maximum size is 10 MB.",
-		"processing_failed": "Document processing failed."
+		"processing_failed": "Document processing failed.",
+		"codes": {
+			"DIS_INVOCATION_FAILED": "The document could not be read. Please try again.",
+			"GCS_BLOB_MISSING": "The file is no longer available. Please upload the document again.",
+			"PROCESSING_TIMEOUT": "Processing took too long. Please upload the document again.",
+			"PUBLISH_FAILED": "The document could not be sent for processing. Please try again."
+		}
 	},
 	"logout": "Logout",
 	"settings": {

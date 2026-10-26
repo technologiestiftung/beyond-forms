@@ -697,7 +697,13 @@
 		"system_error": "Ein Systemfehler ist aufgetreten",
 		"file_type_invalid": "Dieses Dateiformat wird nicht unterstützt. Erlaubt sind PDF, JPG, PNG oder HEIC.",
 		"file_too_large": "Die Datei ist zu groß. Erlaubt sind maximal 10 MB.",
-		"processing_failed": "Dokumentenverarbeitung fehlgeschlagen."
+		"processing_failed": "Dokumentenverarbeitung fehlgeschlagen.",
+		"codes": {
+			"DIS_INVOCATION_FAILED": "Das Dokument konnte nicht ausgelesen werden. Bitte versuche es noch einmal.",
+			"GCS_BLOB_MISSING": "Die Datei ist nicht mehr verfügbar. Bitte lade das Dokument noch einmal hoch.",
+			"PROCESSING_TIMEOUT": "Die Verarbeitung hat zu lange gedauert. Bitte lade das Dokument noch einmal hoch.",
+			"PUBLISH_FAILED": "Das Dokument konnte nicht zur Verarbeitung übermittelt werden. Bitte versuche es noch einmal."
+		}
 	},
 	"logout": "Abmelden",
 	"settings": {

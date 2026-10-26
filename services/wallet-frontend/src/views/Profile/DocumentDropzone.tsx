@@ -36,6 +36,7 @@ import {
 } from "../../utils/profile";
 import { env } from "../../config/env.config";
 import { authenticatedFetch } from "../../utils/apiClient";
+import { getDocumentFailureMessage } from "../../utils/documentMessages";
 import {
 	DOCUMENT_ACCEPT_ATTRIBUTE,
 	validateDocumentFile,
@@ -339,7 +340,7 @@ export const DocumentDropzone: React.FC = () => {
 				if (activeMatch.status === "FAILED") {
 					setStatus("ERROR");
 					setErrorMessage(
-						activeMatch.user_error_code || t("errors.processing_failed"),
+						getDocumentFailureMessage(t, activeMatch.user_error_code),
 					);
 					if (processingTimeoutRef.current) {
 						clearTimeout(processingTimeoutRef.current);
