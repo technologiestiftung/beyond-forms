@@ -1356,28 +1356,28 @@ value = ""
 ["p7_mz1.3-cb_freibschwerbenein"]
 type = "checkbox"
 description = "Nein"
-value = "{{ 
+value = """{{ 
   !(
     has_disability_id 
     || is_care_dependent 
     || care_level 
     || is_victim_of_national_socialist_persecution 
-    || (household_members && household_members.some && household_members.some(m => m && (m.has_disability_id || m.is_care_dependent || m.care_level != null)))
+    || household_has_disability
   ) ? true : '' 
-}}"
+}}"""
 
 ["p7_mz1.3-cb_freibschwerbeja"]
 type = "checkbox"
 description = "Ja "
-value = "{{ 
+value = """{{ 
   (
     has_disability_id 
     || is_care_dependent 
     || care_level 
     || is_victim_of_national_socialist_persecution 
-    || (household_members && household_members.some && household_members.some(m => m && (m.has_disability_id || m.is_care_dependent || m.care_level != null)))
+    || household_has_disability
   ) ? true : false 
-}}"
+}}"""
 
 ["p7_mz1.3-et_freibschwerbehhm1familienname"]
 type = "string"

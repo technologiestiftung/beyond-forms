@@ -121,6 +121,11 @@ def person_context(people: List[AssociatedPersons], money_entries: Iterable[Any]
         # pyjexl 0.3 has no length function.
         "household_members_count": len(household),
         "household_children_count": len(household_children),
+        # pyjexl has no `.some`/lambdas, so the "any household member" test happens here.
+        "household_has_disability": any(
+            person["has_disability_id"] or person["is_care_dependent"] or person["care_level"] is not None
+            for person in household
+        ),
         "associated_persons_count": len(people),
         "partner": partners[0] if partners else None,
     }

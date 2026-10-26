@@ -483,7 +483,7 @@ options = [
   "1"
 ]
 option_labels = { "0" = "Ja", "1" = "Nein" }
-value = "{{ (
+value = """{{ (
   (previous_benefits_kind == 'Bürgergeld' && previous_benefits_period_within_last_three_years == true)
   || (previous_benefits_kind == 'Sozialhilfe' && previous_benefits_period_within_last_three_years == true)
 ) ? '0' : (
@@ -491,7 +491,7 @@ value = "{{ (
   || previous_benefits_kind == 'Wohngeld'
   || previous_benefits_period_within_last_three_years == false
     ? '1' : ''
-) }}"
+) }}"""
 
 ["p5_txtfleistungart"]
 optional = true
