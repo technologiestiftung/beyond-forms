@@ -7,7 +7,7 @@
 set -e
 
 DB_CONTAINER="postgres"
-DB_URL="postgresql://devuser:devpassword@localhost:5432/devdb"
+DB_URL="postgresql://devuser:devpassword@localhost:5432/devdb?sslmode=disable"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUT_DIR="$SCRIPT_DIR/../libs/db-schema"

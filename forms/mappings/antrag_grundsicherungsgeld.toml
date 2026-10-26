@@ -139,7 +139,7 @@ value = "{{ documents.health_insurance_proof && documents.health_insurance_proof
 optional = true
 type = "checkbox"
 description = "20 - Option 2 von 3 - Machen Sie Angaben zu Ihrer Rentenversicherungsnummer/Sozialversicherungsnummer. - Diese ist nicht vorhanden."
-value = ""
+value = "{{ social_security_type == 'None' && !pension_insurance_no && !(documents.health_insurance_proof && documents.health_insurance_proof.pension_insurance_number) && !(documents.pension_notice && documents.pension_notice.pension_insurance_number) ? true : '' }}"
 
 ["p2_chbxrvnrbeantragt"]
 optional = true
@@ -170,7 +170,7 @@ options = [
   "1"
 ]
 option_labels = { "0" = "Ja (bitte fügen Sie den Aufenthaltstitel bei)", "1" = "Nein" }
-value = ""
+value = "{{ is_german_citizen == false && residence_status ? '0' : '' }}"
 
 ["p2_rbtnasylblg"]
 type = "radio"
@@ -192,7 +192,7 @@ value = ""
 optional = true
 type = "string"
 description = "26 - Geben Sie Ihre Ausländerzentralregistriernummer an, falls vorhanden."
-value = ""
+value = "{{ azr_number ? azr_number : '' }}"
 
 ["p2_rbtnkostenuebernahme"]
 type = "radio"
@@ -447,7 +447,7 @@ options = [
   "1"
 ]
 option_labels = { "0" = "Ja (bitte füllen Sie auch die Anlage BB aus)", "1" = "Nein" }
-value = ""
+value = "{{ has_unavoidable_special_need == true ? '0' : (has_unavoidable_special_need == false ? '1' : '') }}"
 
 ["p4_rbtnstationaer"]
 type = "radio"
@@ -483,54 +483,62 @@ options = [
   "1"
 ]
 option_labels = { "0" = "Ja", "1" = "Nein" }
-value = "{{ has_received_previous_benefits == true ? '0' : (has_received_previous_benefits == false ? '1' : '') }}"
+value = """{{ (
+  (previous_benefits_kind == 'Bürgergeld' && previous_benefits_period_within_last_three_years == true)
+  || (previous_benefits_kind == 'Sozialhilfe' && previous_benefits_period_within_last_three_years == true)
+) ? '0' : (
+  has_received_previous_benefits == false
+  || previous_benefits_kind == 'Wohngeld'
+  || previous_benefits_period_within_last_three_years == false
+    ? '1' : ''
+) }}"""
 
 ["p5_txtfleistungart"]
 optional = true
 type = "string"
 description = "52 - Bitte geben Sie die Art der Leistung an."
-value = ""
+value = "{{ (previous_benefits_kind == 'Bürgergeld' || previous_benefits_kind == 'Sozialhilfe') ? previous_benefits_kind : '' }}"
 
 ["p5_dateleistungvon"]
 optional = true
 type = "string"
 description = "53 - Bitte geben Sie den Zeitraum an, in dem Sie Leistungen erhalten haben - Datum von (TT.MM.JJJJ)"
-value = ""
+value = "{{ (previous_benefits_kind == 'Bürgergeld' || previous_benefits_kind == 'Sozialhilfe') && previous_benefits_from ? previous_benefits_from : '' }}"
 
 ["p5_dateleistungbis"]
 optional = true
 type = "string"
 description = "53 - Bitte geben Sie den Zeitraum an, in dem Sie Leistungen erhalten haben - Datum bis (TT.MM.JJJJ)"
-value = ""
+value = "{{ (previous_benefits_kind == 'Bürgergeld' || previous_benefits_kind == 'Sozialhilfe') && previous_benefits_until ? previous_benefits_until : '' }}"
 
 ["p5_txtftraegername"]
 type = "string"
 description = "54 - Name des Leistungsträgers"
-value = "{{ previous_benefits_authority ? previous_benefits_authority : '' }}"
+value = "{{ (previous_benefits_kind == 'Bürgergeld' || previous_benefits_kind == 'Sozialhilfe') && previous_benefits_authority_name ? previous_benefits_authority_name : '' }}"
 
 ["p5_txtftraegerstr"]
 optional = true
 type = "string"
 description = "55 - Straße des Leistungsträgers"
-value = ""
+value = "{{ (previous_benefits_kind == 'Bürgergeld' || previous_benefits_kind == 'Sozialhilfe') && previous_benefits_authority_street ? previous_benefits_authority_street : '' }}"
 
 ["p5_txtftraegerhausnr"]
 optional = true
 type = "string"
 description = "56 - Hausnummer des Leistungsträgers"
-value = ""
+value = "{{ (previous_benefits_kind == 'Bürgergeld' || previous_benefits_kind == 'Sozialhilfe') && previous_benefits_authority_house_number ? previous_benefits_authority_house_number : '' }}"
 
 ["p5_txtftraegerplz"]
 optional = true
 type = "string"
 description = "57 - Postleitzahl des Leistungsträgers"
-value = ""
+value = "{{ (previous_benefits_kind == 'Bürgergeld' || previous_benefits_kind == 'Sozialhilfe') && previous_benefits_authority_zip_code ? previous_benefits_authority_zip_code : '' }}"
 
 ["p5_txtftraegerort"]
 optional = true
 type = "string"
 description = "58 - Ort des Leistungsträgers"
-value = ""
+value = "{{ (previous_benefits_kind == 'Bürgergeld' || previous_benefits_kind == 'Sozialhilfe') && previous_benefits_authority_city ? previous_benefits_authority_city : '' }}"
 
 ["p5_rbtnangestellt"]
 type = "radio"
@@ -613,7 +621,7 @@ options = [
   "1"
 ]
 option_labels = { "0" = "Ja", "1" = "Nein" }
-value = "{{ documents.income_declaration && documents.income_declaration.has_self_employment_income != null ? (documents.income_declaration.has_self_employment_income ? '0' : '1') : '' }}"
+value = "{{ documents.income_declaration && documents.income_declaration.has_self_employment_income != null ? (documents.income_declaration.has_self_employment_income ? '0' : (was_self_employed_last_5_years == true ? '0' : '1')) : (was_self_employed_last_5_years == true || income['Business'] || income['Agriculture and Forestry'] || income['Other Self-Employment'] ? '0' : (was_self_employed_last_5_years == false ? '1' : '')) }}"
 
 ["p5_rbtnentgeltersatz"]
 type = "radio"
@@ -623,7 +631,7 @@ options = [
   "1"
 ]
 option_labels = { "0" = "Ja", "1" = "Nein (weiter mit 71)" }
-value = ""
+value = "{{ received_wage_replacement_last_5_years == true || income['Health Insurance Benefits'] || income['Employment Agency Benefits'] || income['Parental Allowance'] ? '0' : (received_wage_replacement_last_5_years == false ? '1' : '') }}"
 
 ["p5_txtfentgeltersatz"]
 optional = true
@@ -651,7 +659,7 @@ options = [
   "1"
 ]
 option_labels = { "0" = "Ja", "1" = "Nein" }
-value = ""
+value = "{{ did_military_or_voluntary_service_last_5_years == true ? '0' : (did_military_or_voluntary_service_last_5_years == false ? '1' : '') }}"
 
 ["p6_rbtnpflege"]
 type = "radio"
@@ -661,7 +669,7 @@ options = [
   "1"
 ]
 option_labels = { "0" = "Ja", "1" = "Nein" }
-value = ""
+value = "{{ cared_for_relatives_last_5_years == true ? '0' : (cared_for_relatives_last_5_years == false ? '1' : '') }}"
 
 ["p6_txtarealebensunterhalt"]
 optional = true
@@ -762,7 +770,7 @@ options = [
   "1"
 ]
 option_labels = { "0" = "Ja (bitte füllen Sie auch die Anlage KDU aus)", "1" = "Nein" }
-value = ""
+value = "{{ (rent_total && rent_total > 0) || (heating_costs && heating_costs > 0) ? '0' : (rent_total == 0 && heating_costs == 0 ? '1' : '') }}"
 
 ["p8_dateunterschriftperson"]
 type = "string"

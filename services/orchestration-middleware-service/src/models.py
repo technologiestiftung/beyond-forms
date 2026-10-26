@@ -460,6 +460,7 @@ class Users(Base):
     birth_name: Mapped[Optional[str]] = mapped_column(String(255))
     residence_status: Mapped[Optional[str]] = mapped_column(String(255))
     identification_numbers: Mapped[Optional[str]] = mapped_column(String(255))
+    azr_number: Mapped[Optional[str]] = mapped_column(String(12))
     tax_id: Mapped[Optional[str]] = mapped_column(String(255))
     license_plate: Mapped[Optional[str]] = mapped_column(String(20))
     vehicle_make: Mapped[Optional[str]] = mapped_column(String(255))
@@ -528,6 +529,11 @@ class Users(Base):
     wohngeld_payment_to_applicant: Mapped[Optional[bool]] = mapped_column(Boolean)
     consents_to_bank_statement_retention: Mapped[Optional[bool]] = mapped_column(Boolean)
     consents_to_registry_verification: Mapped[Optional[bool]] = mapped_column(Boolean)
+    has_unavoidable_special_need: Mapped[Optional[bool]] = mapped_column(Boolean)
+    was_self_employed_last_5_years: Mapped[Optional[bool]] = mapped_column(Boolean)
+    received_wage_replacement_last_5_years: Mapped[Optional[bool]] = mapped_column(Boolean)
+    did_military_or_voluntary_service_last_5_years: Mapped[Optional[bool]] = mapped_column(Boolean)
+    cared_for_relatives_last_5_years: Mapped[Optional[bool]] = mapped_column(Boolean)
     demo_seed_fixture_hash: Mapped[Optional[str]] = mapped_column(String(64))
 
     conversations: Mapped[list["Conversations"]] = relationship(

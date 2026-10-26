@@ -10,6 +10,7 @@
   "profile": {
     "first_name": "Sabine",
     "last_name": "Reinhardt",
+    "email": "sabine.reinhardt@example.org",
     "date_of_birth": "1968-04-22",
     "place_of_birth": "Potsdam",
     "legal_gender": "Female",
@@ -24,6 +25,8 @@
     "displaced_status": null,
     "residence_status": null,
     "license_plate": "B-SR 224",
+    "vehicle_make": "Toyota Yaris",
+    "vehicle_year": "2011",
 
     "street": "Invalidenstraße",
     "house_number": "84",
@@ -41,6 +44,7 @@
     "pension_insurance_no": "22220468R071",
 
     "is_currently_employed": false,
+    "can_work_at_least_3h_daily": false,
     "ability_to_work": "Permanently disabled",
     "has_permanent_reduction_in_earning_capacity": true,
     "reduced_work_capacity_start_date": "2019-10-01",
@@ -62,14 +66,17 @@
     "sublet_rent_income": null,
     "rent_paid_until": "2026-07-31",
     "landlord_name": "Wohnungsbaugesellschaft Mitte mbH",
-    "heating_type": "Gaszentralheizung",
+    "heating_type": "Sammelheizung",
     "free_housing_right_holder": null,
 
     "monthly_income": 245.00,
     "income_entries": [
       { "income_type": "Pension", "monthly_amount": 245.0 }
     ],
-    "has_assets": false,
+    "has_assets": true,
+    "asset_entries": [
+      { "asset_type": "Motor Vehicle", "amount": 2800.0, "description": "Toyota Yaris, Baujahr 2011, geschätzter Wert ca. 2.800 EUR" }
+    ],
     "assets_description": null,
 
     "bank_name": "Berliner Volksbank",
@@ -126,7 +133,12 @@
     "expects_rent_change": false,
     "wohngeld_payment_to_applicant": true,
     "consents_to_bank_statement_retention": true,
-    "consents_to_registry_verification": true
+    "consents_to_registry_verification": true,
+    "has_unavoidable_special_need": false,
+    "was_self_employed_last_5_years": false,
+    "received_wage_replacement_last_5_years": false,
+    "did_military_or_voluntary_service_last_5_years": false,
+    "cared_for_relatives_last_5_years": false
   },
 
   "applications": [
