@@ -1,7 +1,19 @@
 import type { IChatService, SendMessageOptions } from "./IChatService";
 import { env } from "../../config/env.config";
 import { useAuthStore } from "../../store/useAuthStore";
-import { ChatStreamChunkSchema } from "../../schemas/chat.schema";
+import {
+	ChatStreamChunkSchema,
+	type EligibilityAnswerEvent,
+} from "../../schemas/chat.schema";
+import type { A2uiMessage } from "../../a2ui/messages";
+
+interface StreamHandler {
+	onToken: (content: string) => void;
+	onA2ui: (message: A2uiMessage) => void;
+	onEligibilityAnswer: (answer: EligibilityAnswerEvent) => void;
+	onDone: () => void;
+	onError: (message: string) => void;
+}
 
 function chatRequestHeaders(
 	accept = "application/x-ndjson",
@@ -29,14 +41,7 @@ function parseNdjsonLine(line: string): unknown | null {
 	}
 }
 
-function handleChunk(
-	parsed: unknown,
-	handler: {
-		onToken: (content: string) => void;
-		onDone: () => void;
-		onError: (message: string) => void;
-	},
-): boolean {
+function handleChunk(parsed: unknown, handler: StreamHandler): boolean {
 	const result = ChatStreamChunkSchema.safeParse(parsed);
 	if (!result.success) {
 		return false;
@@ -44,6 +49,14 @@ function handleChunk(
 	const chunk = result.data;
 	if (chunk.type === "token" && chunk.content) {
 		handler.onToken(chunk.content);
+		return false;
+	}
+	if (chunk.type === "a2ui" && chunk.message) {
+		handler.onA2ui(chunk.message as A2uiMessage);
+		return false;
+	}
+	if (chunk.type === "eligibility_answer" && chunk.field && chunk.value) {
+		handler.onEligibilityAnswer({ field: chunk.field, value: chunk.value });
 		return false;
 	}
 	if (chunk.type === "done") {
@@ -60,11 +73,7 @@ function handleChunk(
 export class HttpChatService implements IChatService {
 	private processLine(
 		line: string,
-		handler: {
-			onToken: (content: string) => void;
-			onDone: () => void;
-			onError: (message: string) => void;
-		},
+		handler: StreamHandler,
 		reader: ReadableStreamDefaultReader<Uint8Array>,
 	): boolean {
 		const parsed = parseNdjsonLine(line);
@@ -81,11 +90,7 @@ export class HttpChatService implements IChatService {
 	private async handleStreamRead(options: {
 		reader: ReadableStreamDefaultReader<Uint8Array>;
 		decoder: TextDecoder;
-		handler: {
-			onToken: (content: string) => void;
-			onDone: () => void;
-			onError: (message: string) => void;
-		};
+		handler: StreamHandler;
 		buffer: string;
 	}): Promise<{ done: boolean; buffer: string }> {
 		const { reader, decoder, handler } = options;
@@ -111,19 +116,31 @@ export class HttpChatService implements IChatService {
 	private async handleStream(options: {
 		reader: ReadableStreamDefaultReader<Uint8Array>;
 		onResponse: (msg: string) => void;
+		onA2ui?: (message: A2uiMessage) => void;
+		onEligibilityAnswer?: (answer: EligibilityAnswerEvent) => void;
 		onDone: () => void;
 		onError: (err: string) => void;
 		signal?: AbortSignal;
 	}) {
-		const { reader, onResponse, onDone, onError, signal } = options;
+		const {
+			reader,
+			onResponse,
+			onA2ui,
+			onEligibilityAnswer,
+			onDone,
+			onError,
+			signal,
+		} = options;
 		const decoder = new TextDecoder();
 		let accumulated = "";
 		let hasFinished = false;
-		const handler = {
+		const handler: StreamHandler = {
 			onToken: (tokenContent: string) => {
 				accumulated += tokenContent;
 				onResponse(accumulated);
 			},
+			onA2ui: (message) => onA2ui?.(message),
+			onEligibilityAnswer: (answer) => onEligibilityAnswer?.(answer),
 			onDone: () => {
 				hasFinished = true;
 				onDone();
@@ -167,14 +184,30 @@ export class HttpChatService implements IChatService {
 	}
 
 	async sendMessage(options: SendMessageOptions): Promise<void> {
-		const { content, onResponse, onDone, onError, signal } = options;
+		const {
+			content,
+			locale,
+			guidedCheck,
+			onResponse,
+			onA2ui,
+			onEligibilityAnswer,
+			onDone,
+			onError,
+			signal,
+		} = options;
 		let response: Response;
 		try {
 			response = await fetch(`${env.VITE_API_URL}/chat/stream`, {
 				method: "POST",
 				headers: chatRequestHeaders("application/x-ndjson"),
 				credentials: "include",
-				body: JSON.stringify({ content }),
+				body: JSON.stringify({
+					content,
+					locale,
+					guided_check: guidedCheck && {
+						current_field: guidedCheck.currentField,
+					},
+				}),
 				signal,
 			});
 		} catch (e) {
@@ -214,7 +247,15 @@ export class HttpChatService implements IChatService {
 			return;
 		}
 
-		await this.handleStream({ reader, onResponse, onDone, onError, signal });
+		await this.handleStream({
+			reader,
+			onResponse,
+			onA2ui,
+			onEligibilityAnswer,
+			onDone,
+			onError,
+			signal,
+		});
 	}
 
 	async newChat(): Promise<void> {
