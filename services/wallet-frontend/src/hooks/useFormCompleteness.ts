@@ -1,7 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { env } from "../config/env.config";
 import { authenticatedFetch } from "../utils/apiClient";
-import { MAX_MILESTONE_LEVEL, type MilestoneLevel } from "../store/useProfileStore";
+import {
+	MAX_MILESTONE_LEVEL,
+	type MilestoneLevel,
+} from "../store/useProfileStore";
 
 interface FormCompletenessResponse {
 	filled_fields: number;
@@ -33,7 +36,7 @@ function levelFromRatio(filled: number, total: number): MilestoneLevel {
  */
 export function useFormCompleteness(formType: string) {
 	const { data, isLoading } = useQuery<MilestoneLevel>({
-		queryKey: ["form-completeness", formType],
+		queryKey: ["profile", "form-completeness", formType],
 		queryFn: async () => {
 			if (env.VITE_USE_MOCKS || env.VITE_USE_MOCK_AUTH) {
 				// Mock/dev profiles are seeded fully filled in; skip the network call.
