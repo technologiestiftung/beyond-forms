@@ -46,11 +46,17 @@ jobs:
         run: npm ci
         working-directory: services/wallet-frontend
 
+      # Playwright ships distro-specific browser builds, so the cache must be
+      # keyed on the Ubuntu release, not just runner.os.
+      - name: Detect OS release
+        id: os
+        run: echo "release=$(. /etc/os-release && echo "$ID$VERSION_ID")" >> "$GITHUB_OUTPUT"
+
       - name: Cache Playwright browsers
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ matrix.engine }}-${{ hashFiles('services/wallet-frontend/package-lock.json') }}
+          key: playwright-${{ steps.os.outputs.release }}-${{ matrix.engine }}-${{ hashFiles('services/wallet-frontend/package-lock.json') }}
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps ${{ matrix.engine }}
