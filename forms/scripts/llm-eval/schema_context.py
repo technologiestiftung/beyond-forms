@@ -321,6 +321,9 @@ _DERIVED_DESCRIPTIONS = {
     "sort_order - the list a form's Person 2..N / hhm1..hhmN slots are filled from. The APPLICANT IS NOT "
     "IN THIS LIST, so household_members[0] is the first *other* person.",
     "household_members_count": "How many people household_members holds (the applicant not counted).",
+    "previous_benefits_period_within_last_three_years": "True when the previous benefits period ended "
+    "within the last three years or is still running, false when it ended earlier, null when no end date "
+    "could be parsed.",
     "household_has_disability": "True when any household member (the applicant not counted) has a disability "
     "ID, is care dependent or has a care level.",
     "income": "The APPLICANT's monthly income per income line, keyed by income type - e.g. "

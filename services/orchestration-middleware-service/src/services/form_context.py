@@ -60,10 +60,23 @@ def previous_benefits_context(user_row: Dict[str, Any]) -> Dict[str, Any]:
         previous_kind = "Wohngeld"
     else:
         previous_kind = None
+    # The form asks about the last three years; a claim counts if it ended inside that window
+    # or is still running. No parseable end date leaves the answer open.
+    within_three_years = None
+    if dates:
+        try:
+            until = datetime.datetime.strptime(dates[-1], "%d.%m.%Y").date()
+        except ValueError:
+            until = None
+        if until is not None:
+            today = datetime.date.today()
+            cutoff = today.replace(year=today.year - 3, day=28 if (today.month, today.day) == (2, 29) else today.day)
+            within_three_years = until >= cutoff
     return {
         "previous_benefits_kind": previous_kind,
         "previous_benefits_from": dates[0] if len(dates) > 1 else None,
         "previous_benefits_until": dates[-1] if dates else None,
+        "previous_benefits_period_within_last_three_years": within_three_years,
         "previous_benefits_authority_name": ", ".join(parts) or None,
         "previous_benefits_authority_street": street,
         "previous_benefits_authority_house_number": house_number,
