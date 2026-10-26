@@ -8,15 +8,9 @@ export const ApplicationIncomeAssetsIntro: React.FC = () => {
 
 	return (
 		<SectionIntroLayout
-			title={t(
-				"questionnaire.sections.income_assets.title",
-				"Dein Einkommen, Ersparnisse und Wertsachen",
-			)}
+			title={t("questionnaire.sections.income_assets.title")}
 			description={t("financial.intro.intro_desc")}
-			recommendedDocsTitle={t(
-				"financial.intro.recommended_docs",
-				"Empfohlene Dokumente",
-			)}
+			recommendedDocsTitle={t("financial.intro.recommended_docs")}
 			documents={[
 				t("financial.intro.doc_list.statements"),
 				t("financial.intro.doc_list.pension"),

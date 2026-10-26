@@ -28,8 +28,7 @@ interface StatusBadgeProps {
 	started?: boolean;
 	totalQuestions?: number;
 	answeredQuestions?: number;
-	badgeKey?: string;
-	badge?: string;
+	badgeKey: string;
 	t: TFunction;
 }
 
@@ -45,7 +44,6 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
 	totalQuestions,
 	answeredQuestions,
 	badgeKey,
-	badge,
 	t,
 }) => {
 	if (locked) {
@@ -63,30 +61,22 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
 		return (
 			<div className={BADGE_POSITION}>
 				<StatusPill tone={tone} size="compact">
-					{t(
-						"questionnaire.questions_count",
-						"Fragen: {{answered}}/{{total}}",
-						{
-							answered: answeredQuestions,
-							total: totalQuestions,
-						},
-					)}
+					{t("questionnaire.questions_count", {
+						answered: answeredQuestions,
+						total: totalQuestions,
+					})}
 				</StatusPill>
 			</div>
 		);
 	}
 
-	if (badgeKey || badge) {
-		return (
-			<div className={BADGE_POSITION}>
-				<StatusPill tone={tone} size="compact">
-					{badgeKey ? t(badgeKey, badge ?? "") : badge}
-				</StatusPill>
-			</div>
-		);
-	}
-
-	return null;
+	return (
+		<div className={BADGE_POSITION}>
+			<StatusPill tone={tone} size="compact">
+				{t(badgeKey)}
+			</StatusPill>
+		</div>
+	);
 };
 
 interface StatusIconProps {
@@ -131,7 +121,7 @@ export const QuestionnaireStatusList: React.FC<
 	const { t } = useTranslation("application");
 	const { profileData } = useProfile();
 
-	const infoSections = getMappedInformationSections(profileData || {}, t).map(
+	const infoSections = getMappedInformationSections(profileData || {}).map(
 		(section, index, arr) => {
 			const completed = section.completed;
 			const skipped = getActiveSkippedCategories(profileData || {});
@@ -175,19 +165,13 @@ export const QuestionnaireStatusList: React.FC<
 										</div>
 										<div className="flex flex-col gap-1 pr-2 min-w-0 flex-1 lg:contents">
 											<span className="text-body-lg font-semibold text-brand-black wrap-break-word lg:row-start-1 lg:col-start-2">
-												{section.titleKey
-													? t(section.titleKey, section.title)
-													: section.title}
+												{t(section.titleKey)}
 											</span>
-											{section.subtitleKey || section.subtitle ? (
-												<p
-													className={`text-xs text-brand-black leading-relaxed lg:row-start-2 lg:col-start-2 lg:self-start lg:max-w-[60ch] lg:text-body ${section.locked ? "" : "lg:text-brand-grey"}`}
-												>
-													{section.subtitleKey
-														? t(section.subtitleKey, section.subtitle)
-														: section.subtitle}
-												</p>
-											) : null}
+											<p
+												className={`text-xs text-brand-black leading-relaxed lg:row-start-2 lg:col-start-2 lg:self-start lg:max-w-[60ch] lg:text-body ${section.locked ? "" : "lg:text-brand-grey"}`}
+											>
+												{t(section.subtitleKey)}
+											</p>
 											<StatusBadge
 												locked={!!section.locked}
 												completed={section.completed}
@@ -195,7 +179,6 @@ export const QuestionnaireStatusList: React.FC<
 												totalQuestions={section.totalQuestions}
 												answeredQuestions={section.answeredQuestions}
 												badgeKey={section.badgeKey}
-												badge={section.badge}
 												t={t}
 											/>
 										</div>
@@ -209,7 +192,7 @@ export const QuestionnaireStatusList: React.FC<
 						})
 					) : (
 						<p className="text-center text-xs text-slate-500 font-medium py-8 px-4 bg-white rounded-3xl border border-brand-border-subtle shadow-cards">
-							{t("questionnaire.empty", "Keine Informationen vorhanden")}
+							{t("questionnaire.empty")}
 						</p>
 					)}
 				</div>

@@ -12,27 +12,6 @@ const { mockProfileState } = vi.hoisted(() => ({
 	},
 }));
 
-const MOCK_TRANSLATIONS: Record<string, string> = {
-	"overview.warning_modal_title": "Antrag vorzeitig generieren?",
-	"overview.generate_notice_ready_title":
-		"Dein Antrag ist fertig! Du kannst ihn jetzt runterladen.",
-};
-
-const interpolate = (text: unknown, values?: Record<string, unknown>) =>
-	typeof text === "string"
-		? text.replace(/\{\{(\w+)\}\}/g, (_, name: string) =>
-				String(values?.[name]),
-			)
-		: text;
-
-vi.mock("react-i18next", () => ({
-	useTranslation: () => ({
-		t: (key: string, defaultText: string, values?: Record<string, unknown>) =>
-			interpolate(MOCK_TRANSLATIONS[key] || defaultText, values),
-		i18n: { language: "de", changeLanguage: vi.fn() },
-	}),
-}));
-
 const mockUseDocumentProcessingSocket = vi.fn();
 vi.mock("../../hooks/useDocumentProcessingSocket", () => ({
 	useDocumentProcessingSocket: () => mockUseDocumentProcessingSocket(),
@@ -134,7 +113,7 @@ describe("ApplicationOverview", () => {
 		expect(button).toBeInTheDocument();
 	});
 
-	it("renders the Herunterladen button and triggers download", async () => {
+	it("renders the download button and triggers download", async () => {
 		mockProfileState.milestoneLevel = 3;
 		useProfileStore.setState({ milestoneLevel: 3 });
 		renderComponent();
@@ -142,7 +121,7 @@ describe("ApplicationOverview", () => {
 		fireEvent.click(button);
 
 		expect(
-			await screen.findByText("Antragsentwurf Vorschau"),
+			await screen.findByText("overview.preview_title"),
 		).toBeInTheDocument();
 
 		const downloadButton = screen.getByTestId("download-pdf-button");
@@ -174,7 +153,7 @@ describe("ApplicationOverview", () => {
 		fireEvent.click(button);
 
 		expect(
-			await screen.findByText("Antrag vorzeitig generieren?"),
+			await screen.findByText("overview.warning_modal_title"),
 		).toBeInTheDocument();
 	});
 
@@ -186,9 +165,9 @@ describe("ApplicationOverview", () => {
 		fireEvent.click(button);
 
 		expect(
-			await screen.findByText("Antragsentwurf Vorschau"),
+			await screen.findByText("overview.preview_title"),
 		).toBeInTheDocument();
-		expect(screen.getByTitle("PDF Vorschau")).toBeInTheDocument();
+		expect(screen.getByTitle("overview.pdf_preview_title")).toBeInTheDocument();
 	});
 
 	it("opens PDF Preview Modal after confirming warning dialog", async () => {
@@ -202,7 +181,7 @@ describe("ApplicationOverview", () => {
 		fireEvent.click(confirmButton);
 
 		expect(
-			await screen.findByText("Antragsentwurf Vorschau"),
+			await screen.findByText("overview.preview_title"),
 		).toBeInTheDocument();
 	});
 
@@ -214,10 +193,10 @@ describe("ApplicationOverview", () => {
 		fireEvent.click(button);
 
 		await waitFor(() => {
-			expect(screen.getByText("Antragsentwurf Vorschau")).toBeInTheDocument();
+			expect(screen.getByText("overview.preview_title")).toBeInTheDocument();
 		});
 
-		const downloadButton = screen.getByText("Herunterladen");
+		const downloadButton = screen.getByText("overview.download_button");
 		expect(downloadButton).toBeInTheDocument();
 
 		fireEvent.click(downloadButton);
@@ -229,10 +208,10 @@ describe("ApplicationOverview", () => {
 		useProfileStore.setState({ milestoneLevel: 2 });
 		renderComponent();
 		expect(
-			screen.getByText("Dein Antrag ist fast fertig!"),
+			screen.getByText("overview.cta_band.almost_ready_title"),
 		).toBeInTheDocument();
 		expect(
-			screen.queryByText("Dein Antrag ist fertig!"),
+			screen.queryByText("overview.cta_band.ready_title"),
 		).not.toBeInTheDocument();
 	});
 
@@ -240,14 +219,14 @@ describe("ApplicationOverview", () => {
 		mockProfileState.milestoneLevel = 3;
 		useProfileStore.setState({ milestoneLevel: 3 });
 		renderComponent();
-		expect(screen.getByText("Dein Antrag ist fertig!")).toBeInTheDocument();
 		expect(
-			screen.getByText(
-				"Dein Antrag ist fertig! Du kannst ihn jetzt runterladen.",
-			),
+			screen.getByText("overview.cta_band.ready_title"),
 		).toBeInTheDocument();
 		expect(
-			screen.queryByText(/Dein Antrag ist fast fertig!/),
+			screen.getByText("overview.generate_notice_ready_title"),
+		).toBeInTheDocument();
+		expect(
+			screen.queryByText("overview.cta_band.almost_ready_title"),
 		).not.toBeInTheDocument();
 	});
 });

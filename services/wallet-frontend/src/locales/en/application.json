@@ -28,6 +28,7 @@
 		},
 		"generate_button": "Generate application",
 		"preview_title": "Application draft preview",
+		"pdf_preview_title": "PDF preview",
 		"download_button": "Download",
 		"download_filename": "basic_income_application.pdf",
 		"download_success_title": "Success",
@@ -58,7 +59,10 @@
 		"warning_modal_title": "Application incomplete",
 		"warning_modal_description": "You have not filled out all recommended fields. An incomplete application may delay processing by the office. Do you still want to generate the application now?",
 		"warning_modal_cancel": "Back to application",
-		"warning_modal_confirm": "Generate anyway"
+		"warning_modal_confirm": "Generate anyway",
+		"errors": {
+			"generation_failed": "Could not generate the application. Please try again later."
+		}
 	},
 	"questionnaire": {
 		"overview_header_title": "Questions",
@@ -174,7 +178,12 @@
 			"heating": "Heating cost bill (gas/heating bill)",
 			"housing": "Annex Housing / Cost of accommodation",
 			"cooperation_agreement": "Obligation to cooperate + privacy policy",
-			"household": "Household members / benefit community declaration"
+			"household": "Household members / benefit community declaration",
+			"care_level_notice": "Care level assessment notice",
+			"care_home_contract": "Care home contract",
+			"care_facility_costs": "Care home cost statement / Cost coverage declaration",
+			"care_service_invoice": "Outpatient care service invoices",
+			"disability_id": "Severe disability ID card"
 		},
 		"badges": {
 			"doc": "Document",
@@ -324,6 +333,10 @@
 			"german": "I am a German citizen.",
 			"eu_5": "I am a citizen of an EU country and have lived in Germany for at least 5 years.",
 			"permit": "My residence permit for Germany is valid."
+		},
+		"actions": {
+			"saving": "Saving...",
+			"saved": "Saved"
 		}
 	},
 	"household": {
@@ -459,7 +472,10 @@
 			"bank_holder_req": "Account holder is required.",
 			"bank_name_req": "Bank name is required.",
 			"bank_iban_req": "IBAN is required.",
-			"bank_iban_invalid": "Invalid IBAN"
+			"bank_iban_invalid": "Invalid IBAN",
+			"pension_amount_invalid": "Invalid pension amount",
+			"employment_amount_invalid": "Invalid earnings amount",
+			"other_income_amount_invalid": "Invalid income amount"
 		}
 	},
 	"health": {

@@ -107,7 +107,7 @@ export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
 		return (
 			<div className="mt-4 flex flex-col gap-2 w-full text-left">
 				<h4 className="text-brand-black font-semibold text-body-lg mb-2">
-					{t("docs.unsorted_title", "Kürzlich hochgeladene Dokumente")}
+					{t("docs.unsorted_title")}
 				</h4>
 				<div className="flex flex-col bg-white rounded-xl border border-brand-border-subtle shadow-cards overflow-hidden">
 					{unassignedFiles.map((file) => (
@@ -124,7 +124,7 @@ export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
 									>
 										{file.name
 											? sanitizeFileName(file.name)
-											: t("docs.untitled", "Unbenanntes Dokument")}
+											: t("docs.untitled")}
 									</span>
 								</div>
 								<span className="text-xs text-brand-grey font-medium">
@@ -138,7 +138,7 @@ export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
 								{file.status === ProcessingStatusEnum.enum.PROCESSING ||
 								file.status === ProcessingStatusEnum.enum.PENDING ? (
 									<span className="h-8 px-3 flex items-center justify-center bg-secondary-orange-20 border border-secondary-orange-500/30 text-secondary-orange-800 font-bold rounded-full text-[10px] tracking-wider uppercase select-none animate-pulse shrink-0">
-										{t("docs.processing", "Verarbeitung...")}
+										{t("docs.processing")}
 									</span>
 								) : (
 									<button
@@ -153,7 +153,7 @@ export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
 										}
 										className="h-8 px-3.5 bg-primary-blue-500 text-white font-bold rounded-full text-xs shadow-sm hover:opacity-90 active:scale-95 transition-all"
 									>
-										{t("docs.review", "Prüfen")}
+										{t("docs.review")}
 									</button>
 								)}
 
@@ -162,7 +162,7 @@ export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
 									onClick={() => setDeleteDocId(file.id)}
 									data-testid={`delete-btn-${file.id}`}
 									className="p-2 hover:bg-status-error-bg text-brand-grey hover:text-status-error rounded-lg transition-colors shrink-0"
-									aria-label={t("docs.delete_aria", "Dokument löschen")}
+									aria-label={t("docs.delete_aria")}
 								>
 									<Trash2 className="size-4.5" />
 								</button>
@@ -172,13 +172,10 @@ export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
 				</div>
 				<ConfirmationModal
 					isOpen={deleteDocId !== null}
-					title={t("docs.delete_title", "Dokument löschen?")}
-					message={t(
-						"docs.delete_confirm",
-						"Möchtest Du dieses Dokument wirklich löschen?",
-					)}
-					confirmLabel={t("common.delete", "Löschen")}
-					cancelLabel={t("common.cancel", "Abbrechen")}
+					title={t("docs.delete_title")}
+					message={t("docs.delete_confirm")}
+					confirmLabel={t("common.delete")}
+					cancelLabel={t("common.cancel")}
 					onConfirm={handleConfirmDelete}
 					onCancel={() => setDeleteDocId(null)}
 				/>
@@ -255,7 +252,7 @@ export const DocumentStatusList: React.FC<DocumentStatusListProps> = ({
 							className="flex flex-col gap-3 w-full text-left"
 						>
 							<h4 className="text-brand-black font-semibold text-body-lg mb-2">
-								{t(group.titleKey, group.defaultTitle)}
+								{t(group.titleKey)}
 							</h4>
 
 							<div className="flex flex-col gap-4">

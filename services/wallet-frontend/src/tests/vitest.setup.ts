@@ -43,17 +43,34 @@ window.scrollTo = vi.fn();
 
 installMatchMediaMock();
 
-// Global mock for react-i18next
-vi.mock("react-i18next", () => ({
-	useTranslation: () => ({
-		t: (key: string) => key,
-		i18n: {
-			language: "de",
-			changeLanguage: vi.fn(),
+// Global mock for react-i18next: returns the key, plus any interpolation values.
+vi.mock("react-i18next", () => {
+	const i18nextOptions = new Set([
+		"ns",
+		"defaultValue",
+		"returnObjects",
+		"lng",
+	]);
+	return {
+		useTranslation: () => ({
+			t: (key: string, options?: Record<string, unknown>) => {
+				const values = Object.fromEntries(
+					Object.entries(options ?? {}).filter(
+						([name]) => !i18nextOptions.has(name),
+					),
+				);
+				return Object.keys(values).length > 0
+					? `${key} ${JSON.stringify(values)}`
+					: key;
+			},
+			i18n: {
+				language: "de",
+				changeLanguage: vi.fn(),
+			},
+		}),
+		initReactI18next: {
+			type: "3rdParty",
+			init: vi.fn(),
 		},
-	}),
-	initReactI18next: {
-		type: "3rdParty",
-		init: vi.fn(),
-	},
-}));
+	};
+});

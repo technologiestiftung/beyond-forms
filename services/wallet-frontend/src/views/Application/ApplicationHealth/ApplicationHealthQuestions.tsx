@@ -358,14 +358,14 @@ export const ApplicationHealthQuestions: React.FC = () => {
 						<>
 							<Loader2 className="w-4 h-4 animate-spin text-slate-800" />
 							<span className="text-xs font-bold text-slate-800">
-								{t("personal.actions.saving", "Speichern...")}
+								{t("personal.actions.saving")}
 							</span>
 						</>
 					) : (
 						<>
 							<CheckCircle2 className="w-4 h-4 text-green-600" />
 							<span className="text-xs font-bold text-slate-800">
-								{t("personal.actions.saved", "Gespeichert")}
+								{t("personal.actions.saved")}
 							</span>
 						</>
 					)}
@@ -385,29 +385,26 @@ export const ApplicationHealthQuestions: React.FC = () => {
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
 							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
-								{t("health.care_dependency.title", "Bist Du pflegebedürftig?")}
+								{t("health.care_dependency.title")}
 							</h1>
 						</div>
 						<div className="bg-brand-bg p-4 rounded-2xl border border-brand-border/40 text-left flex flex-col gap-1.5">
 							<p className="text-xs text-brand-grey leading-relaxed font-medium">
-								{t(
-									"health.care_dependency.desc",
-									"Diese Information wird benötigt, um eventuelle Pflegezuschüsse oder stationäre Leistungen zu bestimmen.",
-								)}
+								{t("health.care_dependency.desc")}
 							</p>
 						</div>
 						<div className="flex flex-col gap-4">
 							<OptionCard
 								testIdPrefix="health-option"
 								id="care-yes"
-								title={t("common.yes", "Ja")}
+								title={t("common.yes")}
 								selected={isCareDependent === true}
 								onClick={() => setIsCareDependent(true)}
 							/>
 							<OptionCard
 								testIdPrefix="health-option"
 								id="care-no"
-								title={t("common.no", "Nein")}
+								title={t("common.no")}
 								selected={isCareDependent === false}
 								onClick={() => setIsCareDependent(false)}
 							/>
@@ -420,32 +417,26 @@ export const ApplicationHealthQuestions: React.FC = () => {
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
 							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
-								{t(
-									"health.inpatient.title",
-									"Wohnst Du in einer vollstationären Pflegeeinrichtung?",
-								)}
+								{t("health.inpatient.title")}
 							</h1>
 						</div>
 						<div className="bg-brand-bg p-4 rounded-2xl border border-brand-border/40 text-left flex flex-col gap-1.5">
 							<p className="text-xs text-brand-grey leading-relaxed font-medium">
-								{t(
-									"health.inpatient.desc",
-									"Wenn Du in einem Pflegeheim oder einer stationären Einrichtung lebst, gelten andere Miet- und Betreuungspauschalen.",
-								)}
+								{t("health.inpatient.desc")}
 							</p>
 						</div>
 						<div className="flex flex-col gap-4">
 							<OptionCard
 								testIdPrefix="health-option"
 								id="inpatient-yes"
-								title={t("common.yes", "Ja")}
+								title={t("common.yes")}
 								selected={hasInpatientFacilityAccommodation === true}
 								onClick={() => setHasInpatientFacilityAccommodation(true)}
 							/>
 							<OptionCard
 								testIdPrefix="health-option"
 								id="inpatient-no"
-								title={t("common.no", "Nein")}
+								title={t("common.no")}
 								selected={hasInpatientFacilityAccommodation === false}
 								onClick={() => setHasInpatientFacilityAccommodation(false)}
 							/>
@@ -458,16 +449,13 @@ export const ApplicationHealthQuestions: React.FC = () => {
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
 							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
-								{t(
-									"health.inpatient_details.title",
-									"Details zur stationären Einrichtung",
-								)}
+								{t("health.inpatient_details.title")}
 							</h1>
 						</div>
 						<div className="flex flex-col gap-4 text-left">
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t("health.inpatient_details.move_in_date", "Einzugsdatum")}
+									{t("health.inpatient_details.move_in_date")}
 								</label>
 								<input
 									type="date"
@@ -480,16 +468,12 @@ export const ApplicationHealthQuestions: React.FC = () => {
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t(
-										"health.inpatient_details.last_residence",
-										"Letzter Wohnort vor der Heimaufnahme",
-									)}
+									{t("health.inpatient_details.last_residence")}
 								</label>
 								<input
 									type="text"
 									placeholder={t(
 										"health.inpatient_details.last_residence_placeholder",
-										"Adresse der letzten Wohnung",
 									)}
 									value={inpatientFacilityLastResidence}
 									onChange={(e) =>
@@ -507,40 +491,28 @@ export const ApplicationHealthQuestions: React.FC = () => {
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
 							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
-								{t(
-									"health.earning_capacity.title",
-									"Wie schätzt Du Deine Erwerbsfähigkeit ein?",
-								)}
+								{t("health.earning_capacity.title")}
 							</h1>
 						</div>
 						<div className="flex flex-col gap-4">
 							<OptionCard
 								testIdPrefix="health-option"
 								id="work-fully"
-								title={t(
-									"health.earning_capacity.fully_able",
-									"Ich kann voll arbeiten (mind. 3 Std./Tag)",
-								)}
+								title={t("health.earning_capacity.fully_able")}
 								selected={abilityToWork === "Fully able"}
 								onClick={() => setAbilityToWork("Fully able")}
 							/>
 							<OptionCard
 								testIdPrefix="health-option"
 								id="work-temporary"
-								title={t(
-									"health.earning_capacity.temporary",
-									"Ich bin vorübergehend weniger als 3 Std. arbeitsfähig",
-								)}
+								title={t("health.earning_capacity.temporary")}
 								selected={abilityToWork === "Temporarily disabled"}
 								onClick={() => setAbilityToWork("Temporarily disabled")}
 							/>
 							<OptionCard
 								testIdPrefix="health-option"
 								id="work-permanent"
-								title={t(
-									"health.earning_capacity.permanent",
-									"Ich bin dauerhaft voll erwerbsgemindert",
-								)}
+								title={t("health.earning_capacity.permanent")}
 								selected={abilityToWork === "Permanently disabled"}
 								onClick={() => setAbilityToWork("Permanently disabled")}
 							/>
@@ -553,16 +525,13 @@ export const ApplicationHealthQuestions: React.FC = () => {
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
 							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
-								{t(
-									"health.earning_temp.title",
-									"Details zur vorübergehenden Erwerbsminderung",
-								)}
+								{t("health.earning_temp.title")}
 							</h1>
 						</div>
 						<div className="flex flex-col gap-4 text-left">
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t("health.earning_temp.start_date", "Beginn")}
+									{t("health.earning_temp.start_date")}
 								</label>
 								<input
 									type="date"
@@ -575,7 +544,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t("health.earning_temp.end_date", "Voraussichtliches Ende")}
+									{t("health.earning_temp.end_date")}
 								</label>
 								<input
 									type="date"
@@ -588,17 +557,11 @@ export const ApplicationHealthQuestions: React.FC = () => {
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t(
-										"health.earning_temp.reason",
-										"Grund (z.B. Krankheit, ärztliches Attest)",
-									)}
+									{t("health.earning_temp.reason")}
 								</label>
 								<input
 									type="text"
-									placeholder={t(
-										"health.earning_temp.reason_placeholder",
-										"Z.B. Längere Erkrankung",
-									)}
+									placeholder={t("health.earning_temp.reason_placeholder")}
 									value={reducedWorkCapacityReason}
 									onChange={(e) => setReducedWorkCapacityReason(e.target.value)}
 									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
@@ -613,16 +576,13 @@ export const ApplicationHealthQuestions: React.FC = () => {
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
 							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
-								{t(
-									"health.earning_perm.title",
-									"Details zur dauerhaften Erwerbsminderung",
-								)}
+								{t("health.earning_perm.title")}
 							</h1>
 						</div>
 						<div className="flex flex-col gap-4 text-left">
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t("health.earning_perm.start_date", "Beginn")}
+									{t("health.earning_perm.start_date")}
 								</label>
 								<input
 									type="date"
@@ -635,17 +595,11 @@ export const ApplicationHealthQuestions: React.FC = () => {
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t(
-										"health.earning_perm.reason",
-										"Grund (z.B. Rentenbescheid)",
-									)}
+									{t("health.earning_perm.reason")}
 								</label>
 								<input
 									type="text"
-									placeholder={t(
-										"health.earning_perm.reason_placeholder",
-										"Z.B. Bescheid über Erwerbsminderungsrente",
-									)}
+									placeholder={t("health.earning_perm.reason_placeholder")}
 									value={reducedWorkCapacityReason}
 									onChange={(e) => setReducedWorkCapacityReason(e.target.value)}
 									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all"
@@ -653,22 +607,19 @@ export const ApplicationHealthQuestions: React.FC = () => {
 							</div>
 							<div className="flex flex-col gap-4 mt-2">
 								<label className="text-sm font-bold text-slate-700">
-									{t(
-										"health.earning_perm.disability_question",
-										"Besitzt Du einen offiziellen Behindertenausweis?",
-									)}
+									{t("health.earning_perm.disability_question")}
 								</label>
 								<OptionCard
 									testIdPrefix="health-option"
 									id="disability-yes"
-									title={t("common.yes", "Ja")}
+									title={t("common.yes")}
 									selected={hasDisabilityId === true}
 									onClick={() => setHasDisabilityId(true)}
 								/>
 								<OptionCard
 									testIdPrefix="health-option"
 									id="disability-no"
-									title={t("common.no", "Nein")}
+									title={t("common.no")}
 									selected={hasDisabilityId === false}
 									onClick={() => setHasDisabilityId(false)}
 								/>
@@ -682,13 +633,13 @@ export const ApplicationHealthQuestions: React.FC = () => {
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
 							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
-								{t("health.disability.title", "Angaben zum Behindertenausweis")}
+								{t("health.disability.title")}
 							</h1>
 						</div>
 						<div className="flex flex-col gap-4 text-left">
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t("health.disability.valid_until", "Gültig bis")}
+									{t("health.disability.valid_until")}
 								</label>
 								<input
 									type="date"
@@ -699,10 +650,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className="text-sm font-bold text-slate-700">
-									{t(
-										"health.disability.merkzeichen",
-										"Eingetragenes Merkzeichen (falls zutreffend)",
-									)}
+									{t("health.disability.merkzeichen")}
 								</label>
 								<select
 									value={merkzeichen || ""}
@@ -715,10 +663,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 									className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary-blue-300 focus:ring-1 focus:ring-primary-blue-300 outline-none text-slate-800 font-medium transition-all bg-white"
 								>
 									<option value="">
-										{t(
-											"health.disability.no_merkzeichen",
-											"-- Kein Merkzeichen --",
-										)}
+										{t("health.disability.no_merkzeichen")}
 									</option>
 									<option value="G">{t("health.marks.G")}</option>
 									<option value="aG">{t("health.marks.aG")}</option>
@@ -743,36 +688,27 @@ export const ApplicationHealthQuestions: React.FC = () => {
 					<>
 						<div className="text-left flex flex-col gap-3 mb-2 px-1">
 							<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight lg:text-[2rem] lg:leading-10">
-								{t(
-									"health.nutrition.title",
-									"Benötigst Du aus medizinischen Gründen eine kostenaufwändige Ernährung?",
-								)}
+								{t("health.nutrition.title")}
 							</h1>
 						</div>
 						<div className="bg-brand-bg p-4 rounded-2xl border border-brand-border/40 text-left flex flex-col gap-1.5">
 							<p className="text-xs text-brand-grey leading-relaxed font-medium">
-								{t(
-									"health.nutrition.desc",
-									"Bei bestimmten Krankheiten (z.B. Zöliakie, Niereninsuffizienz) kannst Du einen finanziellen Mehrbedarf erhalten.",
-								)}
+								{t("health.nutrition.desc")}
 							</p>
 						</div>
 						<div className="flex flex-col gap-4">
 							<OptionCard
 								testIdPrefix="health-option"
 								id="nutrition-yes"
-								title={t("common.yes", "Ja")}
-								hinweis={t(
-									"health.nutrition.yes_hinweis",
-									"Du erhältst dafür später ein Formular für Deinen Arzt zur Bescheinigung.",
-								)}
+								title={t("common.yes")}
+								hinweis={t("health.nutrition.yes_hinweis")}
 								selected={hasCostlyMedicalNutrition === true}
 								onClick={() => setHasCostlyMedicalNutrition(true)}
 							/>
 							<OptionCard
 								testIdPrefix="health-option"
 								id="nutrition-no"
-								title={t("common.no", "Nein")}
+								title={t("common.no")}
 								selected={hasCostlyMedicalNutrition === false}
 								onClick={() => setHasCostlyMedicalNutrition(false)}
 							/>
@@ -788,9 +724,7 @@ export const ApplicationHealthQuestions: React.FC = () => {
 						onClick={handleNext}
 						disabled={isNextDisabled()}
 					>
-						{currentPage === 8
-							? t("common.done", "Geschafft!")
-							: t("common.continue", "Weiter")}
+						{currentPage === 8 ? t("common.done") : t("common.continue")}
 					</PrimaryButton>
 				</div>
 			</div>

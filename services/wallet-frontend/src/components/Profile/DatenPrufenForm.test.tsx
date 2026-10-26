@@ -8,17 +8,6 @@ vi.mock("../../utils/apiClient", () => ({
 	authenticatedFetch: vi.fn(),
 }));
 
-vi.mock("react-i18next", () => ({
-	useTranslation: () => ({
-		t: (key: string, options?: { defaultValue?: string } | string) =>
-			typeof options === "string"
-				? options
-				: options?.defaultValue ||
-					key.split(".").pop()?.replace(/_/g, " ") ||
-					key,
-	}),
-}));
-
 describe("DatenPrufenForm", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -55,9 +44,8 @@ describe("DatenPrufenForm", () => {
 		});
 		expect(screen.getByText("Doe")).toBeInTheDocument();
 
-		// Check for keys (capitalized or replaced underscores)
-		expect(screen.getByText(/first name/i)).toBeInTheDocument();
-		expect(screen.getByText(/last name/i)).toBeInTheDocument();
+		expect(screen.getByText("review.fields.first_name")).toBeInTheDocument();
+		expect(screen.getByText("review.fields.last_name")).toBeInTheDocument();
 	});
 
 	it("displays a warning banner if user_error_code is present", async () => {
@@ -72,10 +60,10 @@ describe("DatenPrufenForm", () => {
 		render(<DatenPrufenForm documentId="doc-2" />);
 
 		await waitFor(() => {
-			expect(screen.getByText(/Überprüfung empfohlen/i)).toBeInTheDocument();
+			expect(screen.getByText("review.warning_title")).toBeInTheDocument();
 		});
 		expect(
-			screen.getByText(/Seiten dieses Dokuments fehlen/i),
+			screen.getByText("review.warnings.PAGINATION_MISSING_PAGES"),
 		).toBeInTheDocument();
 	});
 
@@ -93,7 +81,9 @@ describe("DatenPrufenForm", () => {
 			expect(screen.getByText("Alice")).toBeInTheDocument();
 		});
 
-		const editBtn = screen.getByRole("button", { name: /Edit|bearbeiten/i });
+		const editBtn = screen.getByRole("button", {
+			name: 'common.edit_field {"field":"review.fields.name"}',
+		});
 		expect(editBtn).toBeInTheDocument();
 		fireEvent.click(editBtn);
 
@@ -103,7 +93,7 @@ describe("DatenPrufenForm", () => {
 
 		fireEvent.change(input, { target: { value: "Alicia" } });
 
-		const saveButton = screen.getByRole("button", { name: /Save/i });
+		const saveButton = screen.getByRole("button", { name: "common.save" });
 		fireEvent.click(saveButton);
 
 		// After saving, input should be gone and new text should be there

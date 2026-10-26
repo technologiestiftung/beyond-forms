@@ -8,26 +8,14 @@ export const ApplicationHealthIntro: React.FC = () => {
 
 	return (
 		<SectionIntroLayout
-			title={t("health.intro.title", "Gesundheit und Pflege")}
-			description={t(
-				"health.intro.desc",
-				"Lade Nachweise hoch, um Unterstützung bei Pflege oder Mehrbedarf bei Behinderung zu erhalten. Der Assistent übernimmt viele Angaben automatisch.",
-			)}
-			recommendedDocsTitle={t(
-				"health.intro.recommended_docs",
-				"Empfohlene Dokumente",
-			)}
+			title={t("health.intro.title")}
+			description={t("health.intro.desc")}
+			recommendedDocsTitle={t("health.intro.recommended_docs")}
 			documents={[
-				t("health.intro.doc_list.care_pills", "Pflegegradbescheid"),
-				t("health.intro.doc_list.disability_card", "Schwerbehindertenausweis"),
-				t(
-					"health.intro.doc_list.nursing_home_contract",
-					"Heimvertrag oder Heimkostenaufstellung",
-				),
-				t(
-					"health.intro.doc_list.care_service_invoice",
-					"Rechnungen des Pflegedienstes",
-				),
+				t("health.intro.doc_list.care_pills"),
+				t("health.intro.doc_list.disability_card"),
+				t("health.intro.doc_list.nursing_home_contract"),
+				t("health.intro.doc_list.care_service_invoice"),
 			]}
 			uploadCategory="health"
 			questionsRoute={AppRoutes.ApplicationHealthQuestions}

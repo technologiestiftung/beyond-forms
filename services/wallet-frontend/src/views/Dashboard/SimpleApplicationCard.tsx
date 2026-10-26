@@ -69,7 +69,7 @@ export const SimpleApplicationCard: React.FC<SimpleApplicationCardProps> = ({
 				{isGenerating && (
 					<Loader2 className="size-5 animate-spin mr-2 shrink-0" />
 				)}
-				{t("sections.applications.generate_button", "Antrag generieren")}
+				{t("sections.applications.generate_button")}
 			</PrimaryButton>
 
 			{modal}

@@ -27,7 +27,7 @@ export const ProfileHub: React.FC = () => {
 	const personalData: Partial<PersonalData> = profileData?.personalData || {};
 
 	const firstName = personalData.firstName || "User";
-	const openLabel = t("common.open", "Öffnen");
+	const openLabel = t("common.open");
 
 	const getDocumentsStatus = (): SectionStatus => {
 		if (documents.some((doc) => doc.status === "PROCESSING")) {
@@ -75,22 +75,15 @@ export const ProfileHub: React.FC = () => {
 					headingTestId="profile-name"
 					title={t("welcome", {
 						name: firstName,
-						defaultValue: `Hallo ${firstName}!`,
 					})}
-					subtitle={t(
-						"subtitle",
-						"Hier verwaltest Du Deine Angaben, Dokumente und Einstellungen. Klaro übernimmt sie für alle Anträge.",
-					)}
+					subtitle={t("subtitle")}
 				/>
 			</div>
 
 			<div className="flex flex-col gap-4 w-full max-w-md mx-auto lg:max-w-none lg:mx-0 lg:grid lg:grid-cols-[repeat(auto-fit,minmax(288px,1fr))] lg:gap-5 lg:items-stretch">
 				<ProfileSectionCard
-					title={t("sections.personal.title", "Persönliche Angaben")}
-					description={t(
-						"sections.personal.desc",
-						"Name, Geburtsdatum und weitere persönliche Angaben",
-					)}
+					title={t("sections.personal.title")}
+					description={t("sections.personal.desc")}
 					status={getPersonalStatus()}
 					statusLabel={t(...STATUS_LABEL[getPersonalStatus()])}
 					actionLabel={openLabel}
@@ -99,11 +92,8 @@ export const ProfileHub: React.FC = () => {
 					data-testid="section-personal"
 				/>
 				<ProfileSectionCard
-					title={t("sections.documents.title", "Meine Dokumente")}
-					description={t(
-						"sections.documents.desc",
-						"Dokumente für Anträge und andere Services",
-					)}
+					title={t("sections.documents.title")}
+					description={t("sections.documents.desc")}
 					status={getDocumentsStatus()}
 					statusLabel={t(...STATUS_LABEL[getDocumentsStatus()])}
 					actionLabel={openLabel}
@@ -113,11 +103,8 @@ export const ProfileHub: React.FC = () => {
 				/>
 
 				<ProfileSectionCard
-					title={t("sections.settings.title", "Einstellungen")}
-					description={t(
-						"sections.settings.desc",
-						"Sprache, Benachrichtigungen und Wallet",
-					)}
+					title={t("sections.settings.title")}
+					description={t("sections.settings.desc")}
 					actionLabel={openLabel}
 					icon={<Settings className="size-6" />}
 					onClick={() => navigate(AppRoutes.ProfileSettings)}

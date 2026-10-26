@@ -647,9 +647,7 @@ const Page6Citizenship: React.FC<Page6CitizenshipProps> = ({
 			<OptionCard
 				testIdPrefix="about-me-option"
 				id="german"
-				title={t("personal.options.german", {
-					defaultValue: "Ich habe die deutsche Staatsangehörigkeit.",
-				})}
+				title={t("personal.options.german")}
 				selected={statusOption === "german"}
 				onClick={() => {
 					setStatusOption("german");
@@ -660,10 +658,7 @@ const Page6Citizenship: React.FC<Page6CitizenshipProps> = ({
 			<OptionCard
 				testIdPrefix="about-me-option"
 				id="eu_5"
-				title={t("personal.options.eu_5", {
-					defaultValue:
-						"Ich habe eine Staatsangehörigkeit von einem EU-Land. Seit mindestens 5 Jahren lebe ich in Deutschland.",
-				})}
+				title={t("personal.options.eu_5")}
 				selected={statusOption === "eu_5"}
 				onClick={() => {
 					setStatusOption("eu_5");
@@ -697,9 +692,7 @@ const Page6Citizenship: React.FC<Page6CitizenshipProps> = ({
 			<OptionCard
 				testIdPrefix="about-me-option"
 				id="permit"
-				title={t("personal.options.permit", {
-					defaultValue: "Mein Aufenthaltstitel für Deutschland ist gültig.",
-				})}
+				title={t("personal.options.permit")}
 				selected={statusOption === "permit"}
 				onClick={() => {
 					setStatusOption("permit");
@@ -1507,14 +1500,14 @@ export const ApplicationAboutMeQuestions: React.FC = () => {
 						<>
 							<Loader2 className="w-4 h-4 animate-spin text-slate-800" />
 							<span className="text-xs font-bold text-slate-800">
-								{t("personal.actions.saving", "Speichern...")}
+								{t("personal.actions.saving")}
 							</span>
 						</>
 					) : (
 						<>
 							<CheckCircle2 className="w-4 h-4 text-green-600" />
 							<span className="text-xs font-bold text-slate-800">
-								{t("personal.actions.saved", "Gespeichert")}
+								{t("personal.actions.saved")}
 							</span>
 						</>
 					)}

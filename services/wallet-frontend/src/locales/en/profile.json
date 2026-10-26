@@ -73,21 +73,34 @@
 			"go_to_page_2": "Go to question 2 of 2"
 		},
 		"care_dependency": {
-			"title": "Do you require care?"
+			"title": "Do you require care?",
+			"desc": "This information is needed to determine any care allowances or inpatient benefits."
 		},
 		"inpatient_details": {
-			"move_in_date": "Move-in date"
+			"move_in_date": "Move-in date",
+			"title": "Residential facility details",
+			"last_residence": "Last place of residence before moving into the care home",
+			"last_residence_placeholder": "Address of your last home"
 		},
 		"earning_temp": {
 			"start_date": "Start date",
-			"end_date": "Expected end date"
+			"end_date": "Expected end date",
+			"title": "Details on temporary reduced earning capacity",
+			"reason": "Reason (e.g. illness, medical certificate)",
+			"reason_placeholder": "E.g. prolonged illness"
 		},
 		"earning_perm": {
-			"start_date": "Start date"
+			"start_date": "Start date",
+			"title": "Details on permanent reduced earning capacity",
+			"reason": "Reason (e.g. pension notice)",
+			"reason_placeholder": "E.g. notice of reduced earning capacity pension",
+			"disability_question": "Do you have an official disability ID card?"
 		},
 		"disability": {
 			"title": "Disability ID details",
-			"valid_until": "Valid until"
+			"valid_until": "Valid until",
+			"merkzeichen": "Registered marker (Merkzeichen, if applicable)",
+			"no_merkzeichen": "-- No marker --"
 		},
 		"marks": {
 			"G": "G (Significant mobility impairment)",
@@ -102,6 +115,21 @@
 			"EB": "EB (Entitled to compensation)",
 			"VB": "VB (Entitled to war pension/care)",
 			"T": "T (Entitled to travel)"
+		},
+		"inpatient": {
+			"title": "Do you live in a full-time residential care facility?",
+			"desc": "If you live in a care home or residential facility, different rent and care allowances apply."
+		},
+		"earning_capacity": {
+			"title": "How would you rate your ability to work?",
+			"fully_able": "I can work fully (at least 3 hrs/day)",
+			"temporary": "I can temporarily work less than 3 hrs/day",
+			"permanent": "I am permanently fully unable to work"
+		},
+		"nutrition": {
+			"title": "Do you need a costly diet for medical reasons?",
+			"desc": "For certain illnesses (e.g. coeliac disease, kidney failure) you can receive an additional needs allowance.",
+			"yes_hinweis": "You will later receive a form for your doctor to certify this."
 		}
 	},
 	"welcome": "Hello {{name}}!",
@@ -203,7 +231,82 @@
 			"houseNumber": "House Number",
 			"city": "City",
 			"state": "State",
-			"zipCode": "Postal Code"
+			"zipCode": "Postal Code",
+			"email": "Email address",
+			"phoneNumber": "Phone number",
+			"monthlyIncome": "Monthly income (€)",
+			"incomeSources": "Income types",
+			"hasAssets": "I own savings, property or valuables",
+			"assetsDescription": "Description of assets",
+			"professionalExpenses": "Work-related expenses (€)",
+			"hasChildcareExpenses": "I have childcare costs",
+			"gaveAwayAssetsLast10Years": "I have given away assets in the last 10 years",
+			"grossNegligenceLast10Years": "I have reduced my assets through gross negligence in the last 10 years",
+			"hasAppliedForBenefitsAwaitingDecision": "I am waiting for a decision on another application",
+			"benefitsAwaitingDecisionType": "Type of benefit applied for",
+			"benefitsAwaitingDecisionApplicationDate": "Application date",
+			"benefitsAwaitingDecisionOffice": "Responsible authority",
+			"benefitsAwaitingDecisionReference": "Reference number",
+			"areOneTimePaymentsExpected": "I am expecting a one-time payment",
+			"oneTimePaymentsExpectedType": "Type of one-time payment",
+			"oneTimePaymentsExpectedAmount": "Amount of one-time payment (€)",
+			"oneTimePaymentsExpectedDate": "Date of one-time payment",
+			"bankName": "Bank",
+			"accountHolder": "Account holder",
+			"iban": "IBAN",
+			"bic": "BIC",
+			"abilityToWork": "Ability to work",
+			"reducedWorkCapacityStartDate": "Start of reduced earning capacity",
+			"reducedWorkCapacityEndDate": "Expected end of reduced earning capacity",
+			"reducedWorkCapacityReason": "Reason for reduced earning capacity",
+			"hasPermanentReductionInEarningCapacity": "I have a permanent reduction in earning capacity",
+			"hasDisabilityId": "I have a severe disability ID card",
+			"merkzeichen": "Marker (Merkzeichen)",
+			"disabilityApplicationPending": "My application for a severe disability ID card is still pending",
+			"hasCostlyMedicalNutrition": "I need a costly diet",
+			"hasInpatientFacilityAccommodation": "I live in a residential facility",
+			"inpatientFacilityLastResidence": "Last place of residence before moving in",
+			"personsInHouseholdCount": "People in the household",
+			"marriedSince": "Married since",
+			"accomodationType": "Type of accommodation",
+			"hotWaterCosts": "Hot water costs (€)",
+			"cableTvCosts": "Cable/TV costs (€)",
+			"landlordName": "Landlord",
+			"heatingType": "Heating type",
+			"rentPaidUntil": "Rent paid until",
+			"subletRoomCount": "Sublet rooms",
+			"subletRentIncome": "Income from subletting (€)",
+			"freeHousingRightHolder": "Holder of the rent-free right of residence",
+			"isSubsidizedHousing": "I live in publicly subsidised housing",
+			"hasOtherResidence": "I have another accommodation",
+			"hasSecondaryResidence": "I have a secondary residence",
+			"hasGarageCosts": "I pay for a garage/parking space",
+			"garageCosts": "Garage costs (€)",
+			"hasHouseholdEnergyCosts": "I pay household energy costs",
+			"householdEnergyCosts": "Household energy costs (€)",
+			"isLivingAreaUsedCommercially": "Part of the living space is used commercially",
+			"commerciallyUsedAreaSqm": "Commercially used area (m²)",
+			"isGermanCitizen": "I am a German citizen",
+			"isResidentInGermany": "My habitual residence is in Germany",
+			"isVictimOfNationalSocialistPersecution": "I am a victim of National Socialist persecution",
+			"socialSecurityType": "Social insurance",
+			"healthInsuranceStatus": "Type of health insurance",
+			"healthInsuranceProvider": "Health insurance provider",
+			"pensionInsuranceProvider": "Pension insurance provider",
+			"pensionInsuranceNo": "Pension insurance number",
+			"isCurrentlyEmployed": "I am currently employed",
+			"isStudentOrTrainee": "I am a pupil, student or trainee",
+			"hasAppliedForAsylumBenefits": "I have applied for benefits under the Asylum Seekers' Benefits Act",
+			"hasReceivedPreviousBenefits": "I have received social benefits before",
+			"previousBenefitsAuthority": "Granting authority",
+			"previousBenefitsPeriod": "Approval period",
+			"previousBenefitsRefNo": "Reference number",
+			"displacedStatus": "Displaced person status",
+			"hasGuardian": "I have a legal guardian",
+			"hasCustodian": "I have a legal assistant (Beistand)",
+			"licensePlate": "Licence plate",
+			"licensePlate_placeholder": "e.g. B-XY 1234",
+			"licensePlate_hint": "Required for the resident parking permit."
 		},
 		"step_title": {
 			"1": "Personal Data",
@@ -247,7 +350,8 @@
 			"page": "Page",
 			"add_page": "Add Page",
 			"confirm": "Process Document",
-			"confirm_camera": "Use & Process Photo"
+			"confirm_camera": "Use & Process Photo",
+			"camera_hint": "Please place the document flat in good lighting."
 		},
 		"countries": {
 			"DE": "Germany",
@@ -349,6 +453,7 @@
 		"remove_file": "Remove",
 		"download": "Download",
 		"edit_field": "Edit {{field}}",
+		"verify_field": "Verify {{field}}",
 		"open": "Open"
 	},
 	"success": {
@@ -359,7 +464,8 @@
 			"saved": "Document saved",
 			"updated": "Application updated"
 		},
-		"back_action": "Continue"
+		"back_action": "Continue",
+		"subtext": "Your details were successfully analysed, validated and added to your file."
 	},
 	"review": {
 		"title": "Review data",
@@ -590,7 +696,8 @@
 		"upload_failed": "Upload failed",
 		"system_error": "A system error occurred",
 		"file_type_invalid": "This file format is not supported. Allowed formats are PDF, JPG, PNG and HEIC.",
-		"file_too_large": "This file is too large. The maximum size is 10 MB."
+		"file_too_large": "This file is too large. The maximum size is 10 MB.",
+		"processing_failed": "Document processing failed."
 	},
 	"logout": "Logout",
 	"settings": {
@@ -600,7 +707,8 @@
 				"title": "Permanently delete account?",
 				"desc": "Are you sure you want to delete your account? All your personal data and documents will be immediately and permanently removed from the device.",
 				"confirm": "Delete Account",
-				"cancel": "Cancel"
+				"cancel": "Cancel",
+				"error": "Error deleting the account. Please try again later."
 			}
 		},
 		"account": {
@@ -778,5 +886,10 @@
 			"loadFailed": "An error occurred while loading the document preview.",
 			"loading_document": "Loading document..."
 		}
+	},
+	"docs": {
+		"back_to_overview_aria": "Back to my documents",
+		"close_aria": "Close",
+		"add_document": "Add document"
 	}
 }

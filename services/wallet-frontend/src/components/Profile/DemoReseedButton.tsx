@@ -24,16 +24,11 @@ const ReseedButton: React.FC<{ persona: DemoPersona }> = ({ persona }) => {
 				data-testid="demo-reseed-button"
 				className="lg:w-auto lg:self-start"
 			>
-				{isPending
-					? t("demo_reseed.pending", "Wird zurückgesetzt…")
-					: t("demo_reseed.button", "Demo-Profil zurücksetzen")}
+				{isPending ? t("demo_reseed.pending") : t("demo_reseed.button")}
 			</SecondaryButton>
 			{isError && (
 				<p role="alert" className="text-sm text-rose-600 font-medium">
-					{t(
-						"demo_reseed.error",
-						"Das Demo-Profil konnte nicht zurückgesetzt werden.",
-					)}
+					{t("demo_reseed.error")}
 				</p>
 			)}
 		</div>

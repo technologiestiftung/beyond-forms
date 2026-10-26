@@ -523,14 +523,14 @@ export const ApplicationHouseholdQuestions: React.FC = () => {
 						<>
 							<Loader2 className="w-4 h-4 animate-spin text-slate-800" />
 							<span className="text-xs font-bold text-slate-800">
-								{t("personal.actions.saving", "Speichern...")}
+								{t("personal.actions.saving")}
 							</span>
 						</>
 					) : (
 						<>
 							<CheckCircle2 className="w-4 h-4 text-green-600" />
 							<span className="text-xs font-bold text-slate-800">
-								{t("personal.actions.saved", "Gespeichert")}
+								{t("personal.actions.saved")}
 							</span>
 						</>
 					)}

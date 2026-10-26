@@ -21,13 +21,10 @@ export const DocumentUploadCard = () => {
 				</div>
 				<div className="flex flex-col gap-2 flex-1 min-w-0">
 					<span className="text-brand-black font-bold text-body-lg">
-						{t("docs.actions.upload_title", "Dokument hochladen")}
+						{t("docs.actions.upload_title")}
 					</span>
 					<span className="text-brand-black font-medium leading-relaxed">
-						{t(
-							"docs.actions.upload_desc",
-							"Lade ein Foto oder PDF Deines Dokuments hoch.",
-						)}
+						{t("docs.actions.upload_desc")}
 					</span>
 				</div>
 			</button>
@@ -46,13 +43,10 @@ export const DocumentUploadCard = () => {
 				</div>
 				<div className="flex flex-col gap-2 flex-1 min-w-0">
 					<span className="text-brand-black font-bold text-body-lg">
-						{t("docs.actions.camera_title", "Mit Kamera scannen")}
+						{t("docs.actions.camera_title")}
 					</span>
 					<span className="text-brand-black font-medium leading-relaxed">
-						{t(
-							"docs.actions.camera_desc",
-							"Lade ein Foto Deines Dokuments hoch.",
-						)}
+						{t("docs.actions.camera_desc")}
 					</span>
 				</div>
 			</button>

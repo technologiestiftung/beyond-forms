@@ -58,6 +58,14 @@
 			"housing_allowance": {
 				"title": "Housing allowance",
 				"description": "Apply for housing allowance (Wohngeld) directly with your saved details."
+			},
+			"basic_income": {
+				"title": "Basic income support",
+				"description": "Apply for basic income support directly with your saved details."
+			},
+			"child_allowance": {
+				"title": "Child supplement",
+				"description": "Apply for the child supplement directly with your saved details."
 			}
 		}
 	},

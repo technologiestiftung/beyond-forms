@@ -66,11 +66,26 @@ const EMPLOYMENT_SOURCES: Record<string, string> = {
 	none: "employment_none",
 };
 
+/** Reverse of `EMPLOYMENT_SOURCES`: stored source key → employment type. */
+export const EMPLOYMENT_TYPE_BY_SOURCE: Record<string, string> =
+	Object.fromEntries(
+		Object.entries(EMPLOYMENT_SOURCES).map(([type, source]) => [source, type]),
+	);
+
 const OTHER_INCOME_SOURCES: Record<string, string> = {
 	sick_pay: "other_sick",
 	alimony: "other_alimony",
 	other: "other_rent",
 };
+
+/** Reverse of `OTHER_INCOME_SOURCES`: stored source key → income type. */
+export const OTHER_INCOME_TYPE_BY_SOURCE: Record<string, string> =
+	Object.fromEntries(
+		Object.entries(OTHER_INCOME_SOURCES).map(([type, source]) => [
+			source,
+			type,
+		]),
+	);
 
 export const PENSION_SOURCE_KEYS = [
 	"pension",

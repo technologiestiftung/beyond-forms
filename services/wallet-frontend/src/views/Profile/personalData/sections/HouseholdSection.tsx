@@ -11,14 +11,11 @@ export const HouseholdSection: React.FC<SectionProps> = ({
 	return (
 		<div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-5 w-full">
 			<h2 className="text-sm font-extrabold text-slate-950 tracking-wide uppercase mb-1">
-				{t("personal.groups.household", "Haushalt")}
+				{t("personal.groups.household")}
 			</h2>
 			<FormField
 				id="personsInHouseholdCount"
-				label={t(
-					"personal.fields.personsInHouseholdCount",
-					"Personen im Haushalt",
-				)}
+				label={t("personal.fields.personsInHouseholdCount")}
 				type="number"
 				register={register("personsInHouseholdCount", {
 					setValueAs: emptyStringToUndefinedNumber,
@@ -27,7 +24,7 @@ export const HouseholdSection: React.FC<SectionProps> = ({
 			/>
 			<FormField
 				id="marriedSince"
-				label={t("personal.fields.marriedSince", "Verheiratet seit")}
+				label={t("personal.fields.marriedSince")}
 				type="date"
 				register={register("marriedSince")}
 				onBlur={() => handleFieldBlur("marriedSince")}

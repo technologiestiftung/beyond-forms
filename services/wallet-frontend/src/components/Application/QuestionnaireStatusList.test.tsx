@@ -4,22 +4,6 @@ import { QuestionnaireStatusList } from "./QuestionnaireStatusList";
 import { useProfile } from "../../hooks/useProfile";
 import type { Profile } from "../../schemas/profile.schema";
 
-// Mock react-i18next
-const interpolate = (text: unknown, values?: Record<string, unknown>) =>
-	typeof text === "string"
-		? text.replace(/\{\{(\w+)\}\}/g, (_, name: string) =>
-				String(values?.[name]),
-			)
-		: text;
-
-vi.mock("react-i18next", () => ({
-	useTranslation: () => ({
-		t: (_key: string, defaultText: string, values?: Record<string, unknown>) =>
-			interpolate(defaultText, values),
-		i18n: { language: "de", changeLanguage: vi.fn() },
-	}),
-}));
-
 // Mock the useProfile hook
 vi.mock("../../hooks/useProfile", () => ({
 	useProfile: vi.fn(),
@@ -29,7 +13,9 @@ vi.mock("../../hooks/useProfile", () => ({
 const mockSections = [
 	{
 		id: "about_me",
-		title: "Über Dich",
+		titleKey: "questionnaire.sections.about_me.title",
+		subtitleKey: "questionnaire.sections.about_me.subtitle",
+		badgeKey: "questionnaire.badges.personal",
 		completed: true,
 		route: "/about-me",
 		questionsRoute: "/about-me/questions",
@@ -39,7 +25,9 @@ const mockSections = [
 	},
 	{
 		id: "income_assets",
-		title: "Dein Einkommen, Ersparnisse und Wertsachen",
+		titleKey: "questionnaire.sections.income_assets.title",
+		subtitleKey: "questionnaire.sections.income_assets.subtitle",
+		badgeKey: "questionnaire.badges.personal",
 		completed: false,
 		route: "/income-assets",
 		icon: () => <div data-testid="mock-icon-income_assets" />,
@@ -48,7 +36,9 @@ const mockSections = [
 	},
 	{
 		id: "household",
-		title: "Familie und Haushalt",
+		titleKey: "questionnaire.sections.household.title",
+		subtitleKey: "questionnaire.sections.household.subtitle",
+		badgeKey: "questionnaire.badges.personal",
 		completed: false,
 		route: "/household",
 		icon: () => <div data-testid="mock-icon-household" />,
@@ -57,7 +47,9 @@ const mockSections = [
 	},
 	{
 		id: "health",
-		title: "Gesundheit und zusätzlicher Bedarf",
+		titleKey: "questionnaire.sections.health.title",
+		subtitleKey: "questionnaire.sections.health.subtitle",
+		badgeKey: "questionnaire.badges.personal",
 		completed: false,
 		route: "/health",
 		icon: () => <div data-testid="mock-icon-health" />,
@@ -96,13 +88,17 @@ describe("QuestionnaireStatusList", () => {
 
 	it("renders all questionnaire categories in the list with correct titles", () => {
 		render(<QuestionnaireStatusList />);
-		expect(screen.getByText("Über Dich")).toBeInTheDocument();
-		expect(screen.getByText("Familie und Haushalt")).toBeInTheDocument();
 		expect(
-			screen.getByText("Dein Einkommen, Ersparnisse und Wertsachen"),
+			screen.getByText("questionnaire.sections.about_me.title"),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText("Gesundheit und zusätzlicher Bedarf"),
+			screen.getByText("questionnaire.sections.household.title"),
+		).toBeInTheDocument();
+		expect(
+			screen.getByText("questionnaire.sections.income_assets.title"),
+		).toBeInTheDocument();
+		expect(
+			screen.getByText("questionnaire.sections.health.title"),
 		).toBeInTheDocument();
 	});
 
@@ -110,16 +106,22 @@ describe("QuestionnaireStatusList", () => {
 		render(<QuestionnaireStatusList />);
 
 		// 1. Completed state (Über Dich): Filled circle with checkmark
-		const completeCard = screen.getByText("Über Dich").closest("button");
+		const completeCard = screen
+			.getByText("questionnaire.sections.about_me.title")
+			.closest("button");
 		expect(completeCard).toBeInTheDocument();
-		expect(screen.getByText("Fragen: 5/5")).toBeInTheDocument();
+		expect(
+			screen.getByText(
+				'questionnaire.questions_count {"answered":5,"total":5}',
+			),
+		).toBeInTheDocument();
 		expect(
 			completeCard?.querySelector(".bg-primary-blue-500"),
 		).toBeInTheDocument(); // Filled background circle
 
 		// 2. Unlocked but Incomplete/Started state (Dein Einkommen, Ersparnisse und Wertsachen)
 		const incomeCard = screen
-			.getByText("Dein Einkommen, Ersparnisse und Wertsachen")
+			.getByText("questionnaire.sections.income_assets.title")
 			.closest("button");
 		expect(incomeCard).toBeInTheDocument();
 		expect(incomeCard?.closest(".opacity-50")).not.toBeInTheDocument(); // Not disabled
@@ -127,7 +129,7 @@ describe("QuestionnaireStatusList", () => {
 
 		// 3. Locked state (Familie und Haushalt): Locked and disabled because preceding active Income section is incomplete
 		const householdCard = screen
-			.getByText("Familie und Haushalt")
+			.getByText("questionnaire.sections.household.title")
 			.closest("button");
 		expect(householdCard).toBeInTheDocument();
 		expect(householdCard?.closest(".opacity-70")).toBeInTheDocument(); // Opacity disabled style
@@ -135,7 +137,7 @@ describe("QuestionnaireStatusList", () => {
 
 		// 4. Locked state (Gesundheit und zusätzlicher Bedarf): Locked and disabled because preceding active Income section is incomplete
 		const lockedCard = screen
-			.getByText("Gesundheit und zusätzlicher Bedarf")
+			.getByText("questionnaire.sections.health.title")
 			.closest("button");
 		expect(lockedCard).toBeInTheDocument();
 		expect(lockedCard?.closest(".opacity-70")).toBeInTheDocument(); // Opacity disabled style

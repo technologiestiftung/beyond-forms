@@ -8,24 +8,12 @@ export const ApplicationHouseholdIntro: React.FC = () => {
 
 	return (
 		<SectionIntroLayout
-			title={t(
-				"questionnaire.sections.household.title",
-				"Familie und Haushalt",
-			)}
-			description={t(
-				"questionnaire.sections.household.intro_desc",
-				"Lade Nachweise hoch, um Angaben zu Deiner Familie und Deinem Haushalt zu machen. Der Assistent übernimmt viele Angaben automatisch.",
-			)}
+			title={t("questionnaire.sections.household.title")}
+			description={t("questionnaire.sections.household.intro_desc")}
 			recommendedDocsTitle={t(
 				"questionnaire.sections.household.recommended_docs",
-				"Empfohlene Dokumente",
 			)}
-			documents={[
-				t(
-					"questionnaire.sections.household.docs_list.declaration",
-					"Haushaltsangehörige / Bedarfsgemeinschaftserklärung",
-				),
-			]}
+			documents={[t("questionnaire.sections.household.docs_list.declaration")]}
 			uploadCategory="household"
 			questionsRoute={AppRoutes.ApplicationHouseholdQuestions}
 		/>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import {
 	Loader2,
@@ -101,11 +102,7 @@ const GenerationErrorBanner: React.FC<{ error: string | null }> = ({
 };
 
 interface AutoVerifiedDocumentBannerProps {
-	t: (
-		key: string,
-		defaultText?: string,
-		options?: Record<string, unknown>,
-	) => string;
+	t: TFunction;
 	documentName: string | null;
 	onDismiss: () => void;
 }
@@ -123,13 +120,7 @@ const AutoVerifiedDocumentBanner: React.FC<AutoVerifiedDocumentBannerProps> = ({
 			<div className="p-4 bg-green-50 border border-green-200 rounded-2xl flex items-center justify-between gap-3 text-green-950 font-medium text-sm text-left shadow-sm">
 				<div className="flex items-center gap-3">
 					<CheckCircle2 className="w-5 h-5 shrink-0 text-green-600" />
-					<p>
-						{t(
-							"overview.document_auto_verified_banner",
-							`Dein Antrag wurde basierend auf deinem Dokument "${documentName}" aktualisiert.`,
-							{ documentName },
-						)}
-					</p>
+					<p>{t("overview.document_auto_verified_banner", { documentName })}</p>
 				</div>
 				<button
 					onClick={onDismiss}
@@ -144,11 +135,7 @@ const AutoVerifiedDocumentBanner: React.FC<AutoVerifiedDocumentBannerProps> = ({
 };
 
 interface ConfirmModalProps {
-	t: (
-		key: string,
-		defaultText?: string,
-		options?: Record<string, unknown>,
-	) => string;
+	t: TFunction;
 	isOpen: boolean;
 	onClose: () => void;
 	onConfirm: () => void;
@@ -180,7 +167,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 					<button
 						onClick={onClose}
 						className="p-2 -mr-2 text-brand-grey hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
-						aria-label={t("overview.close_modal_button", "Schließen")}
+						aria-label={t("overview.close_modal_button")}
 					>
 						<X className="w-5 h-5" />
 					</button>
@@ -191,13 +178,10 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 						id="confirm-modal-title"
 						className="text-xl font-extrabold text-slate-900 tracking-tight"
 					>
-						{t("overview.warning_modal_title", "Antrag unvollständig")}
+						{t("overview.warning_modal_title")}
 					</h3>
 					<p className="text-slate-600 leading-relaxed">
-						{t(
-							"overview.warning_modal_description",
-							"Du hast noch nicht alle empfohlenen Felder ausgefüllt. Ein unvollständiger Antrag kann die Bearbeitung durch das Amt verzögern. Möchtest du den Antrag trotzdem jetzt schon generieren?",
-						)}
+						{t("overview.warning_modal_description")}
 					</p>
 				</div>
 
@@ -207,7 +191,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 						onClick={onClose}
 						className="px-5 py-3 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition-colors cursor-pointer w-full"
 					>
-						{t("overview.warning_modal_cancel", "Zurück zum Antrag")}
+						{t("overview.warning_modal_cancel")}
 					</button>
 					<PrimaryButton
 						data-testid="confirm-modal-submit"
@@ -218,7 +202,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 						{isGenerating && (
 							<Loader2 className="size-5 animate-spin mr-2 shrink-0" />
 						)}
-						{t("overview.warning_modal_confirm", "Trotzdem generieren")}
+						{t("overview.warning_modal_confirm")}
 					</PrimaryButton>
 				</div>
 			</div>
@@ -293,34 +277,16 @@ export const ApplicationOverview: React.FC = () => {
 	const isComplete = milestoneLevel >= MAX_MILESTONE_LEVEL;
 	const isAlmostReady = milestoneLevel >= 2 && !isComplete;
 
-	let ctaBandTitle = t("overview.cta_band.title", "Antrag als PDF");
-	let ctaBandDescription = t(
-		"overview.cta_band.description",
-		"Du kannst den Antrag jederzeit generieren. Unvollständige Anträge dauern in der Bearbeitung länger.",
-	);
-	let generateNotice = t(
-		"overview.generate_notice_title",
-		"Dein Antrag ist fast fertig! Du kannst ihn jederzeit runterladen.",
-	);
+	let ctaBandTitle = t("overview.cta_band.title");
+	let ctaBandDescription = t("overview.cta_band.description");
+	let generateNotice = t("overview.generate_notice_title");
 	if (isComplete) {
 		generateNotice = t("overview.generate_notice_ready_title");
-		ctaBandTitle = t(
-			"overview.cta_band.ready_title",
-			"Dein Antrag ist fertig!",
-		);
-		ctaBandDescription = t(
-			"overview.cta_band.ready_description",
-			"Du kannst ihn jetzt als PDF runterladen und einreichen.",
-		);
+		ctaBandTitle = t("overview.cta_band.ready_title");
+		ctaBandDescription = t("overview.cta_band.ready_description");
 	} else if (isAlmostReady) {
-		ctaBandTitle = t(
-			"overview.cta_band.almost_ready_title",
-			"Dein Antrag ist fast fertig!",
-		);
-		ctaBandDescription = t(
-			"overview.cta_band.almost_ready_description",
-			"Du kannst ihn jederzeit als PDF runterladen.",
-		);
+		ctaBandTitle = t("overview.cta_band.almost_ready_title");
+		ctaBandDescription = t("overview.cta_band.almost_ready_description");
 	}
 
 	const handleCategoryClick = (id: string) => {
@@ -342,12 +308,7 @@ export const ApplicationOverview: React.FC = () => {
 			setShowPreviewModal(true);
 		} catch (err) {
 			console.error("PDF generation failed:", err);
-			setGenerationError(
-				t(
-					"overview.errors.generation_failed",
-					"Konnte den Antrag nicht generieren. Bitte versuche es später noch einmal.",
-				),
-			);
+			setGenerationError(t("overview.errors.generation_failed"));
 		} finally {
 			setIsGenerating(false);
 		}
@@ -394,7 +355,7 @@ export const ApplicationOverview: React.FC = () => {
 					<GenerationErrorBanner error={generationError} />
 					<div className="flex flex-col gap-3 px-1 mt-1 text-left lg:gap-4 lg:px-0">
 						<h1 className="text-[32px] font-extrabold text-brand-black tracking-tight leading-[38px] max-w-xs lg:max-w-none lg:text-[2.5rem] lg:leading-12">
-							{t("overview.main_title", "Antrag auf Grundsicherung")}
+							{t("overview.main_title")}
 						</h1>
 					</div>
 
@@ -403,10 +364,7 @@ export const ApplicationOverview: React.FC = () => {
 							type="button"
 							onClick={scrollToGenerateButton}
 							className="bg-secondary-orange-200 flex flex-row gap-2 p-3.5 rounded-xl shadow-sm text-left w-full cursor-pointer hover:bg-secondary-orange-300/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue-500 focus-visible:ring-offset-2 mb-4 lg:hidden"
-							aria-label={t(
-								"overview.generate_notice_scroll_label",
-								"Zum Antrag generieren scrollen",
-							)}
+							aria-label={t("overview.generate_notice_scroll_label")}
 						>
 							<p className="text-body-lg font-semibold text-brand-black">
 								{generateNotice}
@@ -445,7 +403,7 @@ export const ApplicationOverview: React.FC = () => {
 					>
 						<GenerateButtonLabel
 							isGenerating={isGenerating}
-							label={t("overview.generate_button", "Antrag generieren")}
+							label={t("overview.generate_button")}
 						/>
 					</PrimaryButton>
 				</div>

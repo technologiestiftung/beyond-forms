@@ -28,6 +28,7 @@
 		},
 		"generate_button": "Antrag generieren",
 		"preview_title": "Antragsentwurf Vorschau",
+		"pdf_preview_title": "PDF-Vorschau",
 		"download_button": "Herunterladen",
 		"download_filename": "antrag_grundsicherung_im_alter.pdf",
 		"download_success_title": "Erfolgreich",
@@ -58,7 +59,10 @@
 		"warning_modal_title": "Antrag unvollständig",
 		"warning_modal_description": "Du hast noch nicht alle empfohlenen Felder ausgefüllt. Ein unvollständiger Antrag kann die Bearbeitung durch das Amt verzögern. Möchtest du den Antrag trotzdem jetzt schon generieren?",
 		"warning_modal_cancel": "Zurück zum Antrag",
-		"warning_modal_confirm": "Trotzdem generieren"
+		"warning_modal_confirm": "Trotzdem generieren",
+		"errors": {
+			"generation_failed": "Konnte den Antrag nicht generieren. Bitte versuche es später noch einmal."
+		}
 	},
 	"questionnaire": {
 		"overview_header_title": "Fragen",
@@ -174,7 +178,12 @@
 			"heating": "Heizkostennachweis (Gas-/Wärmerechnung)",
 			"housing": "Anlage Unterkunft / Kosten der Unterkunft",
 			"cooperation_agreement": "Mitwirkungsverpflichtung + Datenschutzerklärung",
-			"household": "Haushaltsangehörige/Bedarfsgemeinschaftserklärung"
+			"household": "Haushaltsangehörige/Bedarfsgemeinschaftserklärung",
+			"care_level_notice": "Pflegegradbescheid",
+			"care_home_contract": "Heimvertrag",
+			"care_facility_costs": "Heimkostenaufstellung / Übernahmeerklärung",
+			"care_service_invoice": "Rechnungen des ambulanten Pflegedienstes",
+			"disability_id": "Schwerbehindertenausweis"
 		},
 		"badges": {
 			"doc": "Dokument",
@@ -324,6 +333,10 @@
 			"german": "Ich habe die deutsche Staatsangehörigkeit.",
 			"eu_5": "Ich habe eine Staatsangehörigkeit von einem EU-Land. Seit mindestens 5 Jahren lebe ich in Deutschland.",
 			"permit": "Mein Aufenthaltstitel für Deutschland ist gültig."
+		},
+		"actions": {
+			"saving": "Speichern...",
+			"saved": "Gespeichert"
 		}
 	},
 	"household": {
@@ -459,7 +472,10 @@
 			"bank_holder_req": "Kontoinhaber ist erforderlich.",
 			"bank_name_req": "Name der Bank ist erforderlich.",
 			"bank_iban_req": "IBAN ist erforderlich.",
-			"bank_iban_invalid": "Ungültige IBAN"
+			"bank_iban_invalid": "Ungültige IBAN",
+			"pension_amount_invalid": "Ungültiger Rentenbetrag",
+			"employment_amount_invalid": "Ungültiger Verdienstbetrag",
+			"other_income_amount_invalid": "Ungültiger Einnahmenbetrag"
 		}
 	},
 	"health": {

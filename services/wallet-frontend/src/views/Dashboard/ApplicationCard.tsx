@@ -30,8 +30,6 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 	const currentLevel = level !== undefined ? level : hookLevel;
 
 	let descKey = "sections.applications.basic_security.description.in_progress";
-	let fallbackDesc =
-		"Starte mit Deinem Antrag. Klaro zeigt Dir Schritt-für-Schritt, was wichtig ist.";
 	let activeLevel: 0 | 1 | 2 | 3;
 	if (status === "not_started") {
 		activeLevel = 0;
@@ -46,16 +44,10 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 
 	if (status === "not_started") {
 		descKey = "sections.applications.basic_security.description.new";
-		fallbackDesc =
-			"Starte mit Deinem Antrag. Klaro zeigt Dir Schritt-für-Schritt, was wichtig ist.";
 	} else if (status === "completed") {
 		descKey = "sections.applications.basic_security.description.completed";
-		fallbackDesc =
-			"Dein Antrag ist fertig – Du kannst das Formular jetzt einreichen!";
 	} else if (currentLevel === 2) {
 		descKey = "sections.applications.basic_security.description.almost";
-		fallbackDesc =
-			"Fast fertig! Füge noch die fehlenden Angaben und Dokumente hinzu.";
 	}
 
 	const generateLabel = (
@@ -63,7 +55,7 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 			{isGenerating && (
 				<Loader2 className="size-5 animate-spin mr-2 shrink-0" />
 			)}
-			{t("sections.applications.generate_button", "Antrag generieren")}
+			{t("sections.applications.generate_button")}
 		</>
 	);
 	const openOverview = () => navigate(AppRoutes.ApplicationOverview);
@@ -71,17 +63,12 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 
 	let overviewLabel = t(
 		"sections.applications.basic_security.actions.complete",
-		"Antrag vervollständigen",
 	);
 	if (status === "not_started") {
-		overviewLabel = t(
-			"sections.applications.basic_security.actions.start",
-			"Los geht's",
-		);
+		overviewLabel = t("sections.applications.basic_security.actions.start");
 	} else if (status === "completed") {
 		overviewLabel = t(
 			"sections.applications.basic_security.actions.view_details",
-			"Angaben ansehen",
 		);
 	}
 	const isGeneratePrimary = activeLevel >= 2;
@@ -99,7 +86,7 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 
 					<div className="flex flex-row justify-between gap-2 min-w-0 items-start">
 						<p className="text-brand-black text-body-lg leading-relaxed mt-1 min-w-0 wrap-break-word">
-							{t(descKey, fallbackDesc)}
+							{t(descKey)}
 						</p>
 
 						<img

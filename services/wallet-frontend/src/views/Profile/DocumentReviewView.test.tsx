@@ -135,7 +135,9 @@ describe("DocumentReviewView - Validation & Smart Error Handling", () => {
 		expect(screen.getByText("15.10.2020")).toBeInTheDocument();
 
 		// Universal Affordance: explicit edit buttons should be fully accessible
-		const editBtn = screen.getByLabelText(/Edit.*date_of_birth/i);
+		const editBtn = screen.getByLabelText(
+			'common.edit_field {"field":"review.fields.date_of_birth"}',
+		);
 		expect(editBtn).toBeInTheDocument();
 
 		// Click directly on the date value text to trigger edit mode

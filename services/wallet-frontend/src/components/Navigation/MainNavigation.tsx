@@ -49,7 +49,7 @@ export const MainNavigation: React.FC = () => {
       lg:flex-col lg:justify-start lg:bg-primary-blue-500 lg:px-6 lg:pt-8
       lg:border-r lg:border-white/5 lg:border-t-0 lg:pb-0
     "
-			aria-label={t("nav.mainNavigation", "Main navigation")}
+			aria-label={t("nav.mainNavigation")}
 		>
 			<div
 				className="relative mx-auto w-full max-w-md lg:hidden"
@@ -139,7 +139,7 @@ export const MainNavigation: React.FC = () => {
 								</span>
 							)}
 							<span className="truncate text-sm text-white/60">
-								{t("common:nav.logged_in", "Angemeldet")}
+								{t("common:nav.logged_in")}
 							</span>
 						</div>
 					</div>
@@ -147,7 +147,7 @@ export const MainNavigation: React.FC = () => {
 					<SidebarNavItem
 						onClick={() => void handleLogout()}
 						icon={<Icons.LogoutIcon className="size-full" />}
-						label={t("common:nav.logout", "Abmelden")}
+						label={t("common:nav.logout")}
 						testId="sidebar-logout"
 					/>
 				</div>

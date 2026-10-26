@@ -24,31 +24,22 @@ export const DocumentReviewSuccessView: React.FC = () => {
 
 				{/* Core Headlines */}
 				<h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-					{t("success.headline", "Daten übernommen")}
+					{t("success.headline")}
 				</h1>
 
 				<p className="text-sm text-brand-grey max-w-xs mb-8 leading-relaxed">
-					{t(
-						"success.subtext",
-						"Deine Angaben wurden erfolgreich analysiert, validiert und in Deine Akte übertragen.",
-					)}
+					{t("success.subtext")}
 				</p>
 
 				{/* Milestone Overview Item Card Deck */}
 				<div className="w-full bg-white border border-slate-100 rounded-2xl p-5 shadow-sm text-left flex flex-col gap-4 mb-10">
 					<h4 className="text-[10px] font-bold text-brand-grey uppercase tracking-wider mb-1 px-0.5">
-						{t("success.summary_title", "Was wurde gespeichert?")}
+						{t("success.summary_title")}
 					</h4>
 
-					<MilestoneRow
-						text={t("success.milestone.imported", "Daten übernommen")}
-					/>
-					<MilestoneRow
-						text={t("success.milestone.saved", "Dokument gespeichert")}
-					/>
-					<MilestoneRow
-						text={t("success.milestone.updated", "Antrag aktualisiert")}
-					/>
+					<MilestoneRow text={t("success.milestone.imported")} />
+					<MilestoneRow text={t("success.milestone.saved")} />
+					<MilestoneRow text={t("success.milestone.updated")} />
 				</div>
 
 				{/* Return Target Action Trigger Button */}
@@ -59,7 +50,7 @@ export const DocumentReviewSuccessView: React.FC = () => {
 						});
 					}}
 				>
-					{t("success.back_action", "Weiter")}
+					{t("success.back_action")}
 				</PrimaryButton>
 			</div>
 		</PageContainer>

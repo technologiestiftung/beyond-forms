@@ -139,14 +139,8 @@ export const DashboardView: React.FC = () => {
 			card: (
 				<SimpleApplicationCard
 					key="antrag_bewohnerparkausweis"
-					title={t(
-						"sections.applications.parking_permit.title",
-						"Bewohnerparkausweis",
-					)}
-					description={t(
-						"sections.applications.parking_permit.description",
-						"Beantrage Deinen Bewohnerparkausweis direkt mit Deinen hinterlegten Angaben.",
-					)}
+					title={t("sections.applications.parking_permit.title")}
+					description={t("sections.applications.parking_permit.description")}
 					formType="antrag_bewohnerparkausweis"
 				/>
 			),
@@ -156,11 +150,8 @@ export const DashboardView: React.FC = () => {
 			card: (
 				<SimpleApplicationCard
 					key="antrag_wohngeld"
-					title={t("sections.applications.housing_allowance.title", "Wohngeld")}
-					description={t(
-						"sections.applications.housing_allowance.description",
-						"Beantrage Wohngeld für Deine Miete direkt mit Deinen hinterlegten Angaben.",
-					)}
+					title={t("sections.applications.housing_allowance.title")}
+					description={t("sections.applications.housing_allowance.description")}
 					formType="antrag_wohngeld"
 				/>
 			),
@@ -170,14 +161,8 @@ export const DashboardView: React.FC = () => {
 			card: (
 				<SimpleApplicationCard
 					key="antrag_grundsicherungsgeld"
-					title={t(
-						"sections.applications.basic_income.title",
-						"Grundsicherungsgeld",
-					)}
-					description={t(
-						"sections.applications.basic_income.description",
-						"Beantrage Grundsicherungsgeld direkt mit Deinen hinterlegten Angaben.",
-					)}
+					title={t("sections.applications.basic_income.title")}
+					description={t("sections.applications.basic_income.description")}
 					formType="antrag_grundsicherungsgeld"
 				/>
 			),
@@ -187,14 +172,8 @@ export const DashboardView: React.FC = () => {
 			card: (
 				<SimpleApplicationCard
 					key="antrag_kinderzuschlag"
-					title={t(
-						"sections.applications.child_allowance.title",
-						"Kinderzuschlag",
-					)}
-					description={t(
-						"sections.applications.child_allowance.description",
-						"Beantrage Kinderzuschlag direkt mit Deinen hinterlegten Angaben.",
-					)}
+					title={t("sections.applications.child_allowance.title")}
+					description={t("sections.applications.child_allowance.description")}
 					formType="antrag_kinderzuschlag"
 				/>
 			),

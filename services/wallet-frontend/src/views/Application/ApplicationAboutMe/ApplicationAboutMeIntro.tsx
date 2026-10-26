@@ -8,29 +8,16 @@ export const ApplicationAboutMeIntro: React.FC = () => {
 
 	return (
 		<SectionIntroLayout
-			title={t("questionnaire.sections.about_me.title", "Über Dich")}
-			description={t(
-				"questionnaire.sections.about_me.intro_desc",
-				"Lade Dokumente hoch.\nDer Assistent übernimmt viele Angaben automatisch. Du kannst sie später prüfen.",
-			)}
+			title={t("questionnaire.sections.about_me.title")}
+			description={t("questionnaire.sections.about_me.intro_desc")}
 			recommendedDocsTitle={t(
 				"questionnaire.sections.about_me.recommended_docs",
-				"Empfohlene Dokumente",
 			)}
 			documents={[
-				t(
-					"questionnaire.sections.about_me.docs_list.id_card",
-					"Personalausweis",
-				),
-				t("questionnaire.sections.about_me.docs_list.passport", "Reisepass"),
-				t(
-					"questionnaire.sections.about_me.docs_list.residence_permit",
-					"Aufenthaltstitel",
-				),
-				t(
-					"questionnaire.sections.about_me.docs_list.tolerated_stay",
-					"Aufenthaltsgestattung/Duldung",
-				),
+				t("questionnaire.sections.about_me.docs_list.id_card"),
+				t("questionnaire.sections.about_me.docs_list.passport"),
+				t("questionnaire.sections.about_me.docs_list.residence_permit"),
+				t("questionnaire.sections.about_me.docs_list.tolerated_stay"),
 			]}
 			uploadCategory="about_me"
 			questionsRoute={AppRoutes.ApplicationAboutMeQuestions}

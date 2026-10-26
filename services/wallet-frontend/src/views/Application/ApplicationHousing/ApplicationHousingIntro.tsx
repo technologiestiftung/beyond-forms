@@ -8,28 +8,15 @@ export const ApplicationHousingIntro: React.FC = () => {
 
 	return (
 		<SectionIntroLayout
-			title={t("questionnaire.sections.housing.title", "Dein Wohnen")}
-			description={t(
-				"questionnaire.sections.housing.intro_desc",
-				"Lade Dokumente hoch.\nDer Assistent übernimmt viele Angaben automatisch. Du kannst sie später prüfen.",
-			)}
+			title={t("questionnaire.sections.housing.title")}
+			description={t("questionnaire.sections.housing.intro_desc")}
 			recommendedDocsTitle={t(
 				"questionnaire.sections.housing.recommended_docs",
-				"Empfohlene Dokumente",
 			)}
 			documents={[
-				t(
-					"questionnaire.sections.housing.docs_list.rental_contract",
-					"Mietvertrag / Untermietvertrag",
-				),
-				t(
-					"questionnaire.sections.housing.docs_list.heating_proof",
-					"Heizkostennachweis / Gasrechnung",
-				),
-				t(
-					"questionnaire.sections.housing.docs_list.utility_statement",
-					"Nebenkostenabrechnung",
-				),
+				t("questionnaire.sections.housing.docs_list.rental_contract"),
+				t("questionnaire.sections.housing.docs_list.heating_proof"),
+				t("questionnaire.sections.housing.docs_list.utility_statement"),
 			]}
 			uploadCategory="housing"
 			questionsRoute={AppRoutes.ApplicationHousingQuestions}

@@ -62,37 +62,22 @@ export const ApplicationUploadOptions: React.FC = () => {
 
 	return (
 		<ApplicationStepLayout
-			title={t(
-				"questionnaire.intro.upload_options_title",
-				"Wie möchtest Du Dokumente einreichen?",
-			)}
-			description={t(
-				"questionnaire.intro.upload_options_desc",
-				"Wähle eine Option, um Deine Dokumente hochzuladen.",
-			)}
+			title={t("questionnaire.intro.upload_options_title")}
+			description={t("questionnaire.intro.upload_options_desc")}
 			onBack={handleBack}
-			backAriaLabel={t(
-				"questionnaire.intro.back_to_intro",
-				"Zurück zur Einführung",
-			)}
+			backAriaLabel={t("questionnaire.intro.back_to_intro")}
 		>
 			<PathOptionGroup>
 				<PathOption
 					icon={Upload}
-					title={t("financial.intro.upload_doc", "Dokument hochladen")}
-					description={t(
-						"financial.intro.upload_desc",
-						"Wähle ein Dokument aus.",
-					)}
+					title={t("financial.intro.upload_doc")}
+					description={t("financial.intro.upload_desc")}
 					onClick={() => openUpload("upload")}
 				/>
 				<PathOption
 					icon={Camera}
-					title={t("financial.intro.take_photo", "Mit Kamera aufnehmen")}
-					description={t(
-						"financial.intro.take_photo_desc",
-						"Nimm ein Foto deines Dokuments auf.",
-					)}
+					title={t("financial.intro.take_photo")}
+					description={t("financial.intro.take_photo_desc")}
 					onClick={() => openUpload("camera")}
 				/>
 			</PathOptionGroup>

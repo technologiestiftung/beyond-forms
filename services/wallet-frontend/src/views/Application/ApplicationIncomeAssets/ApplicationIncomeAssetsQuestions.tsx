@@ -11,8 +11,10 @@ import type {
 import { PageContainer } from "../../../components/Layout/PageContainer";
 import { useScrollToTop, scrollToTop } from "../../../utils/scroll";
 import {
+	EMPLOYMENT_TYPE_BY_SOURCE,
 	END_PAGE,
 	LEGACY_OTHER_INCOME_SOURCE_KEYS,
+	OTHER_INCOME_TYPE_BY_SOURCE,
 	PENSION_SOURCE_KEYS,
 	calculateTotalIncome,
 	countIncomeCategories,
@@ -181,20 +183,23 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 			const cachedEmployment = sessionStorage.getItem(
 				"income_assets_employment_amount",
 			);
-			if (sources.includes("employment_employed")) {
-				setEmploymentType("employed");
-			} else if (sources.includes("employment_self")) {
-				setEmploymentType("self_employed");
-			} else if (sources.includes("employment_student")) {
-				setEmploymentType("training");
-			} else if (sources.includes("employment_unemployed")) {
-				setEmploymentType("unemployed");
-			} else if (sources.includes("employment_none")) {
-				setEmploymentType("none");
-			} else if (personal.isCurrentlyEmployed === true) {
-				setEmploymentType("employed");
-			} else if (personal.isCurrentlyEmployed === false) {
-				setEmploymentType("unemployed");
+			// Entry order preserves the previous priority if several
+			// employment sources are present.
+			const typeFromSource = Object.entries(EMPLOYMENT_TYPE_BY_SOURCE).find(
+				([source]) => sources.includes(source),
+			)?.[1];
+			let resolvedEmploymentType = typeFromSource;
+			if (
+				!resolvedEmploymentType &&
+				personal.isCurrentlyEmployed !== null &&
+				personal.isCurrentlyEmployed !== undefined
+			) {
+				resolvedEmploymentType = personal.isCurrentlyEmployed
+					? "employed"
+					: "unemployed";
+			}
+			if (resolvedEmploymentType) {
+				setEmploymentType(resolvedEmploymentType);
 			}
 
 			setJobTitle(personal.workScopeAndType || "");
@@ -212,16 +217,9 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 	const initOther = React.useCallback(
 		(storedIncome: string, sources: string[]) => {
 			const cachedOther = sessionStorage.getItem("income_assets_other_amount");
-			const otherTypes: string[] = [];
-			if (sources.includes("other_sick")) {
-				otherTypes.push("sick_pay");
-			}
-			if (sources.includes("other_alimony")) {
-				otherTypes.push("alimony");
-			}
-			if (sources.includes("other_rent")) {
-				otherTypes.push("other");
-			}
+			const otherTypes = sources
+				.map((source) => OTHER_INCOME_TYPE_BY_SOURCE[source])
+				.filter((type): type is string => Boolean(type));
 
 			if (otherTypes.length > 0) {
 				setOtherIncomeTypes(otherTypes);
@@ -457,9 +455,7 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 	const savePension = async () => {
 		clearErrors();
 		if (isInvalidAmount(pensionAmount)) {
-			setSaveError(
-				t("financial.errors.pension_amount_invalid", "Ungültiger Rentenbetrag"),
-			);
+			setSaveError(t("financial.errors.pension_amount_invalid"));
 			return;
 		}
 		sessionStorage.setItem("income_assets_pension_amount", pensionAmount);
@@ -474,12 +470,7 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 	const saveEmployment = async () => {
 		clearErrors();
 		if (isInvalidAmount(employmentAmount)) {
-			setSaveError(
-				t(
-					"financial.errors.employment_amount_invalid",
-					"Ungültiger Verdienstbetrag",
-				),
-			);
+			setSaveError(t("financial.errors.employment_amount_invalid"));
 			return;
 		}
 		sessionStorage.setItem("income_assets_employment_amount", employmentAmount);
@@ -522,12 +513,7 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 	const saveOtherIncome = async () => {
 		clearErrors();
 		if (isInvalidAmount(otherIncomeAmount)) {
-			setSaveError(
-				t(
-					"financial.errors.other_income_amount_invalid",
-					"Ungültiger Einnahmenbetrag",
-				),
-			);
+			setSaveError(t("financial.errors.other_income_amount_invalid"));
 			return;
 		}
 		sessionStorage.setItem("income_assets_other_amount", otherIncomeAmount);
@@ -576,9 +562,9 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 			!/^[A-Z]{2}[0-9]{2}[A-Z0-9]{12,30}$/i.test(normalizedIban)
 		) {
 			setFieldErrors({
-				iban: t("financial.errors.bank_iban_invalid", "Ungültige IBAN"),
+				iban: t("financial.errors.bank_iban_invalid"),
 			});
-			setSaveError(t("financial.errors.bank_iban_invalid", "Ungültige IBAN"));
+			setSaveError(t("financial.errors.bank_iban_invalid"));
 			return;
 		}
 
@@ -656,14 +642,14 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 						<>
 							<Loader2 className="w-4 h-4 animate-spin text-slate-800" />
 							<span className="text-xs font-bold text-slate-800">
-								{t("profile:personal.actions.saving", "Speichern...")}
+								{t("profile:personal.actions.saving")}
 							</span>
 						</>
 					) : (
 						<>
 							<CheckCircle2 className="w-4 h-4 text-green-600" />
 							<span className="text-xs font-bold text-slate-800">
-								{t("profile:personal.actions.saved", "Gespeichert")}
+								{t("profile:personal.actions.saved")}
 							</span>
 						</>
 					)}

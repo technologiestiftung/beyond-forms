@@ -27,11 +27,9 @@ export const CategoryDocumentsView: React.FC = () => {
 		? {
 				title: t(group.titleKey, {
 					ns: "application",
-					defaultValue: group.defaultTitle,
 				}),
 				description: t(group.descriptionKey, {
 					ns: "application",
-					defaultValue: group.defaultDescription,
 				}),
 				slotIds: group.slotIds,
 			}
@@ -47,7 +45,7 @@ export const CategoryDocumentsView: React.FC = () => {
 					<div className="flex flex-col items-center gap-4">
 						<div className="w-10 h-10 border-4 border-primary-blue-500 border-t-transparent rounded-full animate-spin" />
 						<p className="text-brand-grey text-xs font-bold tracking-wider uppercase">
-							{t("common.loading", "Lade...")}
+							{t("common.loading")}
 						</p>
 					</div>
 				</div>
@@ -60,11 +58,9 @@ export const CategoryDocumentsView: React.FC = () => {
 			<PageContainer>
 				<div className="w-full max-w-md flex flex-col items-center px-2 gap-6 pt-32 text-center">
 					<h2 className="text-xl font-extrabold text-slate-900">
-						{t("common.error_title", "Fehler")}
+						{t("common.error_title")}
 					</h2>
-					<p className="text-brand-grey text-sm">
-						{t("common.error_desc", "Fehler beim Laden der Dokumente.")}
-					</p>
+					<p className="text-brand-grey text-sm">{t("common.error_desc")}</p>
 					<button
 						type="button"
 						onClick={() => {
@@ -76,9 +72,7 @@ export const CategoryDocumentsView: React.FC = () => {
 						}}
 						className="h-12 px-8 bg-white border border-slate-200 text-slate-800 font-bold rounded-2xl shadow-sm active:scale-98 transition-all"
 					>
-						{activeCategory
-							? t("common.retry", "Erneut versuchen")
-							: t("common.back", "Zurück")}
+						{activeCategory ? t("common.retry") : t("common.back")}
 					</button>
 				</div>
 			</PageContainer>
@@ -93,7 +87,6 @@ export const CategoryDocumentsView: React.FC = () => {
 				className: "lg:max-w-[1152px] lg:px-8 xl:px-16 lg:pt-4",
 				backAriaLabel: t("docs.back_to_overview_aria", {
 					ns: "application",
-					defaultValue: "Zurück zu meine Dokumente",
 				}),
 				rightElement: (
 					<button
@@ -102,7 +95,6 @@ export const CategoryDocumentsView: React.FC = () => {
 						className="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-all"
 						aria-label={t("docs.close_aria", {
 							ns: "application",
-							defaultValue: "Schließen",
 						})}
 					>
 						<X className="w-5 h-5 text-slate-700" />
@@ -116,13 +108,10 @@ export const CategoryDocumentsView: React.FC = () => {
 				<>
 					<div className="flex w-full flex-col gap-3 shrink-0 mb-6">
 						<h1 className="text-[32px] leading-10 font-bold text-brand-black">
-							{t("sections.documents.title", "Meine Dokumente")}
+							{t("sections.documents.title")}
 						</h1>
 						<p className="text-body-lg text-brand-grey">
-							{t(
-								"sections.documents.subtitle",
-								"Lade Deine Dokumente einmal hoch. Klaro verwendet sie dann für alle passenden Anträge.",
-							)}
+							{t("sections.documents.subtitle")}
 						</p>
 					</div>
 
@@ -161,7 +150,6 @@ export const CategoryDocumentsView: React.FC = () => {
 						<span className="text-primary-blue-500">
 							{t("docs.add_document", {
 								ns: "application",
-								defaultValue: "Dokument hinzufügen",
 							})}
 						</span>
 					</PrimaryButton>
@@ -179,7 +167,7 @@ export const CategoryDocumentsView: React.FC = () => {
 						onClick={() => navigate(AppRoutes.ProfileDocuments)}
 						className="w-full h-14 bg-white border border-slate-200 text-slate-800 font-bold rounded-2xl shadow-sm mt-8 active:scale-98 transition-all"
 					>
-						{t("common.back_to_overview", "Zurück zur Übersicht")}
+						{t("common.back_to_overview")}
 					</button>
 				</div>
 			)}

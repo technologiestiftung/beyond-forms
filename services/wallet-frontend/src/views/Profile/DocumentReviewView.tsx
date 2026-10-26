@@ -109,9 +109,7 @@ const renderFieldValue = (
 	}
 	const boolValue = normalizeBooleanForUi(value);
 	if (boolValue !== undefined) {
-		return boolValue
-			? t("common.yes", { defaultValue: "Ja" })
-			: t("common.no", { defaultValue: "Nein" });
+		return boolValue ? t("common.yes") : t("common.no");
 	}
 	const enumMap = ENUM_TRANSLATION_KEYS[fieldKey];
 	if (enumMap && typeof value === "string" && enumMap[value]) {
@@ -620,10 +618,7 @@ export const DocumentReviewView: React.FC = () => {
 					{ replace: true },
 				);
 			} else {
-				const fallbackMsg = t(
-					"review.errors.verification_failed",
-					"Fehler beim Bestätigen der Daten.",
-				);
+				const fallbackMsg = t("review.errors.verification_failed");
 				const errorMsg = await parseSubmitError({
 					response,
 					fallbackMsg,
@@ -637,10 +632,7 @@ export const DocumentReviewView: React.FC = () => {
 			}
 		} catch (err: unknown) {
 			console.error("Verification request failed:", err);
-			let errorMessage = t(
-				"review.errors.system_error",
-				"Ein unerwarteter Systemfehler ist aufgetreten.",
-			);
+			let errorMessage = t("review.errors.system_error");
 			if (err instanceof Error) {
 				errorMessage = err.message;
 			}
@@ -690,7 +682,7 @@ export const DocumentReviewView: React.FC = () => {
 					}),
 				middleElement: (
 					<span className="text-sm font-extrabold text-slate-800 tracking-wide uppercase truncate">
-						{t("review.title", "Daten prüfen")}
+						{t("review.title")}
 					</span>
 				),
 				rightElement: (
@@ -711,10 +703,7 @@ export const DocumentReviewView: React.FC = () => {
 		>
 			<div className="w-full max-w-md flex flex-col items-center px-4">
 				<p className="text-xs text-brand-grey text-center mb-6 px-4 leading-relaxed">
-					{t(
-						"review.subtitle",
-						"Prüfe die ausgelesenen Daten und bestätige sie.",
-					)}
+					{t("review.subtitle")}
 				</p>
 
 				{saveError && (
@@ -733,7 +722,7 @@ export const DocumentReviewView: React.FC = () => {
 						htmlFor="document-type-select"
 						className="block text-[10px] font-bold text-brand-grey uppercase tracking-wide mb-1.5"
 					>
-						{t("review.detected_type", "Es wurde ein Dokument erkannt")}
+						{t("review.detected_type")}
 					</label>
 					<div className="relative">
 						<select
@@ -744,7 +733,7 @@ export const DocumentReviewView: React.FC = () => {
 						>
 							{REQUIRED_DOCUMENT_SLOTS.map((slot) => (
 								<option key={slot.id} value={slot.id}>
-									{tApplication(slot.titleKey, slot.defaultTitle)}
+									{tApplication(slot.titleKey)}
 								</option>
 							))}
 							<option value="OTHER">{t("review.doc_type_other")}</option>
@@ -755,7 +744,7 @@ export const DocumentReviewView: React.FC = () => {
 				{/* Fields Headline */}
 				<div className="w-full text-left mb-3 px-1">
 					<h4 className="text-[11px] font-bold text-brand-grey uppercase tracking-wider">
-						{t("review.detected_data", "Es wurden folgende Daten erkannt")}
+						{t("review.detected_data")}
 					</h4>
 				</div>
 
@@ -811,12 +800,8 @@ export const DocumentReviewView: React.FC = () => {
 													}
 													autoFocus
 												>
-													<option value="true">
-														{t("common.yes", { defaultValue: "Ja" })}
-													</option>
-													<option value="false">
-														{t("common.no", { defaultValue: "Nein" })}
-													</option>
+													<option value="true">{t("common.yes")}</option>
+													<option value="false">{t("common.no")}</option>
 												</select>
 											) : (
 												<input
@@ -852,14 +837,14 @@ export const DocumentReviewView: React.FC = () => {
 													onClick={() => setEditingField(null)}
 													className="h-9 px-4 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-600 active:scale-95 transition-all"
 												>
-													{t("common.cancel", "Abbrechen")}
+													{t("common.cancel")}
 												</button>
 												<button
 													type="button"
 													onClick={() => saveInlineEdit(fieldKey)}
 													className="h-9 px-4 rounded-lg bg-slate-900 text-white text-xs font-bold active:scale-95 transition-all"
 												>
-													{t("common.save", "Speichern")}
+													{t("common.save")}
 												</button>
 											</div>
 										</div>
@@ -891,7 +876,12 @@ export const DocumentReviewView: React.FC = () => {
 													{/* Status Check Circle Overlay */}
 													<button
 														type="button"
-														aria-label={`${t(`review.fields.${String(fieldKey).toLowerCase()}`, { defaultValue: fieldKey })} verifizieren`}
+														aria-label={t("common.verify_field", {
+															field: t(
+																`review.fields.${String(fieldKey).toLowerCase()}`,
+																{ defaultValue: fieldKey },
+															),
+														})}
 														aria-pressed={isChecked}
 														onClick={() => toggleVerified(fieldKey)}
 														className={`size-7 rounded-full flex items-center justify-center border transition-all ${
@@ -906,7 +896,12 @@ export const DocumentReviewView: React.FC = () => {
 													{/* Accessible 44px Tap Target Inline Trigger Button */}
 													<button
 														type="button"
-														aria-label={`Edit ${t(`review.fields.${String(fieldKey).toLowerCase()}`, { defaultValue: fieldKey })}`}
+														aria-label={t("common.edit_field", {
+															field: t(
+																`review.fields.${String(fieldKey).toLowerCase()}`,
+																{ defaultValue: fieldKey },
+															),
+														})}
 														onClick={() => startEditing(fieldKey, currentValue)}
 														className="size-11 min-w-[44px] min-h-[44px] bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-100 cursor-pointer focus-visible:outline-2 focus-visible:outline-brand-primary transition-all shadow-sm shrink-0"
 													>
@@ -938,7 +933,7 @@ export const DocumentReviewView: React.FC = () => {
 						onClick={handleDeleteDocument}
 						className="w-full sm:flex-1 h-14 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 font-bold text-base rounded-2xl shadow-sm active:scale-98 transition-all flex items-center justify-center"
 					>
-						{t("review.delete_document", "Dokument löschen")}
+						{t("review.delete_document")}
 					</button>
 					<button
 						type="button"
@@ -947,22 +942,17 @@ export const DocumentReviewView: React.FC = () => {
 						disabled={isSubmitting}
 						className={`w-full sm:flex-1 h-14 bg-slate-900 hover:bg-slate-800 text-white font-bold text-base rounded-2xl shadow-lg active:scale-98 transition-all flex items-center justify-center ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
 					>
-						{isSubmitting
-							? t("common.saving", "Speichere...")
-							: t("review.confirm_all", "Bestätigen")}
+						{isSubmitting ? t("common.saving") : t("review.confirm_all")}
 					</button>
 				</div>
 			</div>
 
 			<ConfirmationModal
 				isOpen={showDeleteModal}
-				title={t("review.delete_title", "Dokument löschen?")}
-				message={t(
-					"review.delete_confirm",
-					"Möchtest Du dieses Dokument wirklich löschen?",
-				)}
-				confirmLabel={t("common.delete", "Löschen")}
-				cancelLabel={t("common.cancel", "Abbrechen")}
+				title={t("review.delete_title")}
+				message={t("review.delete_confirm")}
+				confirmLabel={t("common.delete")}
+				cancelLabel={t("common.cancel")}
 				onConfirm={handleConfirmDelete}
 				onCancel={() => setShowDeleteModal(false)}
 			/>

@@ -13,35 +13,19 @@ const getWarningMessage = (
 	t: (key: string, options?: Record<string, unknown>) => string,
 ): string => {
 	if (!code) {
-		return t("review.warnings.default", {
-			defaultValue: "Bitte überprüfe die ausgelesenen Daten sorgfältig.",
-		});
+		return t("review.warnings.default");
 	}
 	switch (code) {
 		case "PAGINATION_MISSING_PAGES":
-			return t("review.warnings.PAGINATION_MISSING_PAGES", {
-				defaultValue:
-					"Es sieht so aus, als ob einige Seiten dieses Dokuments fehlen könnten. Bitte überprüfe, ob alles vollständig ist.",
-			});
+			return t("review.warnings.PAGINATION_MISSING_PAGES");
 		case "LEGIBILITY_ISSUES":
-			return t("review.warnings.LEGIBILITY_ISSUES", {
-				defaultValue:
-					"Das Dokument ist an einigen Stellen schwer lesbar (z. B. durch Unschärfe oder Spiegelung). Bitte kontrolliere die Daten genau.",
-			});
+			return t("review.warnings.LEGIBILITY_ISSUES");
 		case "DATA_CONFLICTS":
-			return t("review.warnings.DATA_CONFLICTS", {
-				defaultValue:
-					"Einige ausgelesene Daten stimmen nicht mit Deinen bisherigen Angaben überein. Bitte bestätige die korrekten Details.",
-			});
+			return t("review.warnings.DATA_CONFLICTS");
 		case "OLD_STATEMENT_WARNING":
-			return t("review.warnings.OLD_STATEMENT_WARNING", {
-				defaultValue:
-					"Dieser Nachweis scheint älter als 3 Monate zu sein. Du kannst fortfahren, aber die Sachbearbeiter bitten eventuell um eine Aktualisierung.",
-			});
+			return t("review.warnings.OLD_STATEMENT_WARNING");
 		default:
-			return t("review.warnings.default", {
-				defaultValue: "Bitte überprüfe die ausgelesenen Daten sorgfältig.",
-			});
+			return t("review.warnings.default");
 	}
 };
 
@@ -147,9 +131,7 @@ export const DatenPrufenForm: React.FC<DatenPrufenFormProps> = ({
 					<AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" />
 					<div>
 						<h3 className="text-sm font-medium text-yellow-800">
-							{t("review.warning_title", {
-								defaultValue: "Überprüfung empfohlen",
-							})}
+							{t("review.warning_title")}
 						</h3>
 						<p className="mt-1 text-sm text-yellow-700">
 							{getWarningMessage(warningCode, t)}
@@ -239,10 +221,7 @@ export const DatenPrufenForm: React.FC<DatenPrufenFormProps> = ({
 
 				{extractedFields.length === 0 && (
 					<div className="p-8 text-center text-brand-black">
-						{t(
-							"review.no_data",
-							"Aus diesem Dokument wurden keine Daten ausgelesen.",
-						)}
+						{t("review.no_data")}
 					</div>
 				)}
 			</div>

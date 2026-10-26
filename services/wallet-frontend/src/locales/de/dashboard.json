@@ -58,6 +58,14 @@
 			"housing_allowance": {
 				"title": "Wohngeld",
 				"description": "Beantrage Wohngeld für Deine Miete direkt mit Deinen hinterlegten Angaben."
+			},
+			"basic_income": {
+				"title": "Grundsicherungsgeld",
+				"description": "Beantrage Grundsicherungsgeld direkt mit Deinen hinterlegten Angaben."
+			},
+			"child_allowance": {
+				"title": "Kinderzuschlag",
+				"description": "Beantrage Kinderzuschlag direkt mit Deinen hinterlegten Angaben."
 			}
 		}
 	},
