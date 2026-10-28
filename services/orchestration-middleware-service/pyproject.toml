@@ -26,6 +26,7 @@ dependencies = [
     "pyopenssl",
     "Pillow",
     "pillow-heif",
+    "ag-ui-protocol>=1.0.0",
 ]
 
 [tool.uv.sources]

@@ -235,9 +235,7 @@ def fill_pdf_form(pdf_bytes: bytes, field_values: Dict[str, Any], ignore_read_on
     }
     if appearance_targets:
         try:
-            pdf_out = _render_text_appearances(
-                pdf_out, appearance_targets, choice_opt_indices, choice_pdf_values
-            )
+            pdf_out = _render_text_appearances(pdf_out, appearance_targets, choice_opt_indices, choice_pdf_values)
             pdf_out = _reconcile_acroform_fields(pdf_out)
         except Exception:
             logger.warning(

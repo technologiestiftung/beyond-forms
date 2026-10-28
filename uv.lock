@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.13"
 resolution-markers = [
     "python_full_version >= '3.15'",
@@ -18,6 +18,18 @@ members = [
     "orchestration-middleware-service",
     "rules-engine",
     "schema-utils",
+]
+
+[[package]]
+name = "ag-ui-protocol"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/57/92/d88fdc7f4648dc38d3d54c595066bb3e63a4c091884ffb2f98272c33eef8/ag_ui_protocol-1.0.0.tar.gz", hash = "sha256:cfebecef2e7bc942cc8a52d908a4ea86a98f631d2ffdc6ec5812bb843eac74fb", size = 30759, upload-time = "2026-09-17T18:31:19.448Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/82/b0/850be4576e6443dc575daa54188d8136ae2b2eca3f19e098e7a088fc9ebc/ag_ui_protocol-1.0.0-py3-none-any.whl", hash = "sha256:0058eaf0522201089d444e430fc35180bc8ad0222cae39e8568b313e8105d9e6", size = 36842, upload-time = "2026-09-17T18:31:18.471Z" },
 ]
 
 [[package]]
@@ -2338,6 +2350,7 @@ name = "orchestration-middleware-service"
 version = "0.1.0"
 source = { editable = "services/orchestration-middleware-service" }
 dependencies = [
+    { name = "ag-ui-protocol" },
     { name = "aiofiles" },
     { name = "beyondforms-auth" },
     { name = "beyondforms-document-schemas" },
@@ -2370,6 +2383,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "ag-ui-protocol", specifier = ">=1.0.0" },
     { name = "aiofiles" },
     { name = "beyondforms-auth", editable = "libs/auth" },
     { name = "beyondforms-document-schemas", editable = "libs/document-schemas" },

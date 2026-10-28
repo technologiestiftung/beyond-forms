@@ -620,7 +620,11 @@ class AssociatedPersons(Base):
     has_guardian: Mapped[Optional[bool]] = mapped_column(Boolean)
     has_custodian: Mapped[Optional[bool]] = mapped_column(Boolean)
     displaced_status: Mapped[Optional[DisplacedStatusType]] = mapped_column(
-        Enum(DisplacedStatusType, values_callable=lambda cls: [member.value for member in cls], name="displaced_status_type")
+        Enum(
+            DisplacedStatusType,
+            values_callable=lambda cls: [member.value for member in cls],
+            name="displaced_status_type",
+        )
     )
     displaced_issued_on: Mapped[Optional[datetime.date]] = mapped_column(Date)
     displaced_issued_by: Mapped[Optional[str]] = mapped_column(String(255))
@@ -631,15 +635,27 @@ class AssociatedPersons(Base):
     has_disability_id: Mapped[Optional[bool]] = mapped_column(Boolean)
     disability_valid_until: Mapped[Optional[datetime.date]] = mapped_column(Date)
     merkzeichen: Mapped[Optional[DisabilityMerkzeichenType]] = mapped_column(
-        Enum(DisabilityMerkzeichenType, values_callable=lambda cls: [member.value for member in cls], name="disability_merkzeichen_type")
+        Enum(
+            DisabilityMerkzeichenType,
+            values_callable=lambda cls: [member.value for member in cls],
+            name="disability_merkzeichen_type",
+        )
     )
     disability_application_pending: Mapped[Optional[bool]] = mapped_column(Boolean)
     social_security_type: Mapped[Optional[SocialSecurityTypeType]] = mapped_column(
-        Enum(SocialSecurityTypeType, values_callable=lambda cls: [member.value for member in cls], name="social_security_type_type")
+        Enum(
+            SocialSecurityTypeType,
+            values_callable=lambda cls: [member.value for member in cls],
+            name="social_security_type_type",
+        )
     )
     health_insurance_provider: Mapped[Optional[str]] = mapped_column(String(255))
     health_insurance_status: Mapped[Optional[HealthInsuranceStatusType]] = mapped_column(
-        Enum(HealthInsuranceStatusType, values_callable=lambda cls: [member.value for member in cls], name="health_insurance_status_type")
+        Enum(
+            HealthInsuranceStatusType,
+            values_callable=lambda cls: [member.value for member in cls],
+            name="health_insurance_status_type",
+        )
     )
     pension_insurance_provider: Mapped[Optional[str]] = mapped_column(String(255))
     pension_insurance_no: Mapped[Optional[str]] = mapped_column(String(255))
@@ -904,9 +920,7 @@ class IncomeEntries(_MoneyEntry):
     reference_no: Mapped[Optional[str]] = mapped_column(String(255))
 
     user: Mapped["Users"] = relationship("Users", back_populates="income_entries")
-    person: Mapped[Optional["AssociatedPersons"]] = relationship(
-        "AssociatedPersons", back_populates="income_entries"
-    )
+    person: Mapped[Optional["AssociatedPersons"]] = relationship("AssociatedPersons", back_populates="income_entries")
 
 
 class ExpenseEntries(_MoneyEntry):
@@ -944,9 +958,7 @@ class ExpenseEntries(_MoneyEntry):
     note: Mapped[Optional[str]] = mapped_column(String(255))
 
     user: Mapped["Users"] = relationship("Users", back_populates="expense_entries")
-    person: Mapped[Optional["AssociatedPersons"]] = relationship(
-        "AssociatedPersons", back_populates="expense_entries"
-    )
+    person: Mapped[Optional["AssociatedPersons"]] = relationship("AssociatedPersons", back_populates="expense_entries")
 
 
 class AssetEntries(_MoneyEntry):
@@ -1021,4 +1033,3 @@ class BenefitClaimEntries(_MoneyEntry):
     person: Mapped[Optional["AssociatedPersons"]] = relationship(
         "AssociatedPersons", back_populates="benefit_claim_entries"
     )
-

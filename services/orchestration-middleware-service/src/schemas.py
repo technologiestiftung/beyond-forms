@@ -34,8 +34,7 @@ class _MoneyEntrySchema(BaseModel):
     person_sort_order: Optional[int] = Field(
         None,
         description=(
-            "The sort_order of the associated person this row belongs to, or null for the "
-            "applicant's own row."
+            "The sort_order of the associated person this row belongs to, or null for the applicant's own row."
         ),
     )
 
@@ -467,16 +466,19 @@ class UserInformationUpdateSchema(BaseModel):
         None, description="Whether the user consents to verification against the residents' registry"
     )
     has_unavoidable_special_need: Optional[bool] = Field(
-        None, description="Whether the user has an unavoidable special need they cannot cover otherwise, e.g. costs of exercising access rights to a child (SGB II § 21 Abs. 6)"
+        None,
+        description="Whether the user has an unavoidable special need they cannot cover otherwise, e.g. costs of exercising access rights to a child (SGB II § 21 Abs. 6)",
     )
     was_self_employed_last_5_years: Optional[bool] = Field(
         None, description="Whether the user was self-employed or freelancing within the last five years"
     )
     received_wage_replacement_last_5_years: Optional[bool] = Field(
-        None, description="Whether the user received wage replacement benefits (e.g. Krankengeld, Arbeitslosengeld, Elterngeld) within the last five years"
+        None,
+        description="Whether the user received wage replacement benefits (e.g. Krankengeld, Arbeitslosengeld, Elterngeld) within the last five years",
     )
     did_military_or_voluntary_service_last_5_years: Optional[bool] = Field(
-        None, description="Whether the user did military service or a voluntary service (FSJ, BFD) within the last five years"
+        None,
+        description="Whether the user did military service or a voluntary service (FSJ, BFD) within the last five years",
     )
     cared_for_relatives_last_5_years: Optional[bool] = Field(
         None, description="Whether the user cared for relatives (care under SGB XI) within the last five years"

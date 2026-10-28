@@ -221,17 +221,13 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
     entries = getattr(db_user, "income_entries", None)
     if entries is not None and not isinstance(entries, Mock):
         income_rows = [
-            row
-            for row in entries
-            if hasattr(row, "income_type") and getattr(row, "person_id", None) is None
+            row for row in entries if hasattr(row, "income_type") and getattr(row, "person_id", None) is None
         ]
 
     has_permanent_reduction = getattr(db_user, "has_permanent_reduction_in_earning_capacity", None)
     if isinstance(has_permanent_reduction, Mock):
         has_permanent_reduction = None
-    has_pension_row = any(
-        getattr(row.income_type, "value", row.income_type) == "Pension" for row in income_rows
-    )
+    has_pension_row = any(getattr(row.income_type, "value", row.income_type) == "Pension" for row in income_rows)
     if income_rows:
         has_old_age_pension = has_pension_row and not has_permanent_reduction
         has_reduced_earnings_pension = has_pension_row and bool(has_permanent_reduction)
@@ -269,9 +265,7 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
 
     _category_rows = {name: _rows_for(lines) for name, lines in _INCOME_CATEGORY_LINES.items()}
     _category_totals = {name: _explicit_total(rows) for name, rows in _category_rows.items()}
-    _amountless_categories = {
-        name for name, rows in _category_rows.items() if rows and not _category_totals[name]
-    }
+    _amountless_categories = {name for name, rows in _category_rows.items() if rows and not _category_totals[name]}
 
     def _line_total(name: str) -> float:
         """The summed monthly amounts of the named income lines. A line recorded without

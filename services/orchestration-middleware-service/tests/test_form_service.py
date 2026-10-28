@@ -776,7 +776,9 @@ async def test_get_completeness_ignores_documents_namespace(form_service, mock_u
         ({"first_name": "Max", "is_care_dependent": True, "care_level": "Level 2"}, (2, 2)),
     ],
 )
-async def test_get_completeness_counts_follow_up_fields_only_when_gate_is_yes(form_service, mock_user, context, expected):
+async def test_get_completeness_counts_follow_up_fields_only_when_gate_is_yes(
+    form_service, mock_user, context, expected
+):
     mock_mapping = {
         "p1_check": "{{ first_name != null ? first_name : '' }}",
         "p1_care": "{{ care_level ? care_level : '' }}",
@@ -882,9 +884,7 @@ def _money_rows(person_id=None):
             reference_no="12 345678 K 001",
         ),
         IncomeEntries(person_id=person_id, income_type="Child Benefit", monthly_amount=decimal.Decimal("250.00")),
-        ExpenseEntries(
-            person_id=person_id, expense_type="Health Insurance", monthly_amount=decimal.Decimal("120.50")
-        ),
+        ExpenseEntries(person_id=person_id, expense_type="Health Insurance", monthly_amount=decimal.Decimal("120.50")),
         AssetEntries(
             person_id=person_id, asset_type="Securities", amount=decimal.Decimal("3000"), description="Fondsanteile"
         ),
@@ -931,9 +931,7 @@ def test_money_context_separates_the_applicant_from_each_person():
     applicant's rows would print the wrong person's income."""
     partner_id = uuid.uuid4()
     rows = _money_rows() + _money_rows(person_id=partner_id)
-    rows.append(
-        IncomeEntries(person_id=partner_id, income_type="Alimony", monthly_amount=decimal.Decimal("300.00"))
-    )
+    rows.append(IncomeEntries(person_id=partner_id, income_type="Alimony", monthly_amount=decimal.Decimal("300.00")))
 
     assert money_context(rows, None)["income"].get("Alimony") is None
     assert money_context(rows, partner_id)["income"]["Alimony"] == decimal.Decimal("300.00")
@@ -1044,8 +1042,7 @@ def test_count_unmapped_required_fields_skips_optional_filled_and_container_entr
 async def test_get_completeness_counts_unmapped_required_fields_as_unfilled(form_service, mock_user, tmp_path):
     form_service.mapping_path = str(tmp_path)
     (tmp_path / "test_form.toml").write_text(
-        '["p1_mapped"]\ntype = "string"\nvalue = "{{ first_name }}"\n\n'
-        '["p1_unmapped"]\ntype = "radio"\nvalue = ""\n',
+        '["p1_mapped"]\ntype = "string"\nvalue = "{{ first_name }}"\n\n["p1_unmapped"]\ntype = "radio"\nvalue = ""\n',
         encoding="utf-8",
     )
     mock_mapping = {"p1_mapped": "{{ first_name }}", "p1_unmapped": ""}

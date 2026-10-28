@@ -99,8 +99,9 @@ curl -s $API/api/v1/documents/$DOC/file -H "$AUTH" -o document.pdf
 
 curl -s $API/export/antrag_grundsicherung_im_alter -H "$AUTH" | jq   # filled PDF, signed URL
 
-curl -s -X POST $API/chat -H "$AUTH" -H 'Content-Type: application/json' \
-  -d '{"content":"Wie hoch ist meine Miete laut meinem Profil?"}' | jq -r .content
+curl -sN -X POST $API/chat/stream -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"threadId":"demo","runId":"demo-1","messages":[{"id":"1","role":"user","content":"Wie hoch ist meine Miete laut meinem Profil?"}]}' \
+  | sed -n 's/^data: //p' | jq -rj 'select(.type=="TEXT_MESSAGE_CHUNK") | .delta'; echo   # AG-UI events over SSE
 ```
 
 Full interactive reference: <http://localhost:8080/docs>. There is no HTTP seed API —

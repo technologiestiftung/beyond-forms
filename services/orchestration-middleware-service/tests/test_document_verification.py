@@ -527,9 +527,7 @@ def test_verify_document_pension_notice_persists_verified_amount(mock_post, mock
     assert bound_values["monthly_amount"] == decimal.Decimal("650.00")
 
     income_query_mock = query_mocks[IncomeEntries]
-    income_query_mock.filter.return_value.update.assert_called_once_with(
-        {"monthly_amount": decimal.Decimal("650.00")}
-    )
+    income_query_mock.filter.return_value.update.assert_called_once_with({"monthly_amount": decimal.Decimal("650.00")})
 
 
 @patch("requests.post")

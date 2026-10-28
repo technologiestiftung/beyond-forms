@@ -414,44 +414,6 @@ def test_upload_file_success(mock_storage_client, mock_publish_event, mock_user_
     mock_db.commit.assert_called_once()
 
 
-@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_stateless_chat_success(mock_completion):
-    """
-    Verify the stateless chat endpoint parses payloads and returns responses.
-    """
-    import json
-
-    class MockMessage:
-        def __init__(self, content):
-            self.content = content
-
-    class MockChoice:
-        def __init__(self, content):
-            self.message = MockMessage(content)
-
-    class MockResponse:
-        def __init__(self, content):
-            self.choices = [MockChoice(content)]
-
-    mock_json = json.dumps(
-        {"extracted_data": {"permit_type": "Car"}, "next_question": "What date do you want the permit to start?"}
-    )
-    mock_completion.return_value = MockResponse(mock_json)
-
-    payload = {
-        "staged_data": {"first_name": "Jane"},
-        "recent_history": [{"role": "user", "content": "I want to register my car."}],
-        "target_schema": [{"id": "permit_type", "type": "string", "text": "Permit Type"}],
-    }
-
-    response = client.post("/api/v1/stateless/chat", json=payload)
-
-    assert response.status_code == 200
-    json_response = response.json()
-    assert json_response["extracted_data"]["permit_type"] == "Car"
-    assert json_response["next_question"] == "What date do you want the permit to start?"
-
-
 @patch("httpx.AsyncClient")
 @patch("google.cloud.storage.Client")
 def test_delete_profile_success(mock_storage_client, mock_async_client, mock_db):

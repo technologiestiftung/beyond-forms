@@ -129,9 +129,7 @@ RELATION_WRITERS = {
     "income_entries": _money_grid_writer(IncomeEntries, IncomeEntrySchema, "income_entries", "income_type"),
     "expense_entries": _money_grid_writer(ExpenseEntries, ExpenseEntrySchema, "expense_entries", "expense_type"),
     "asset_entries": _money_grid_writer(AssetEntries, AssetEntrySchema, "asset_entries", "asset_type"),
-    "benefit_claim_entries": _money_grid_writer(
-        BenefitClaimEntries, BenefitClaimEntrySchema, "benefit_claim_entries"
-    ),
+    "benefit_claim_entries": _money_grid_writer(BenefitClaimEntries, BenefitClaimEntrySchema, "benefit_claim_entries"),
 }
 RELATION_KEYS = frozenset(RELATION_WRITERS)
 RELATION_WRITE_ORDER = tuple(RELATION_WRITERS)

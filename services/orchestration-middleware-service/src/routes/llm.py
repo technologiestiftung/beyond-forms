@@ -30,7 +30,9 @@ from src.services.rag_service import search_knowledge_base
 from beyondforms.auth import User as AuthUser, get_current_user, require_authenticated_user
 from src.schemas import AssociatedPersonSchema, UserInformationUpdateSchema
 from src.tools import AVAILABLE_TOOLS
-from src.utils import ndjson_done, ndjson_error, ndjson_token
+from ag_ui.core import RunStartedEvent, RunFinishedEvent, RunErrorEvent, TextMessageChunkEvent
+from ag_ui.encoder import EventEncoder
+from ag_ui.core.types import RunAgentInput
 
 
 _USER_FIELD_NAMES: frozenset[str] = frozenset(UserInformationUpdateSchema.model_fields)
@@ -76,6 +78,7 @@ def _mock_llm_kwargs() -> dict:
     if os.getenv("MOCK_LLM_RESPONSES") == "true":
         return {"mock_response": "Hallo! Wie kann ich dir heute helfen?"}
     return {}
+
 
 _USER_TABLE_NAMES = frozenset(
     {
@@ -238,23 +241,6 @@ async def berlin_social_services_knowledge_base(question: str) -> str:
         return f"Error: The knowledge base is temporarily unavailable. Details: {str(e)}"
 
 
-class ChatRequest(BaseModel):
-    content: str
-
-    @field_validator("content")
-    @classmethod
-    def content_must_not_be_empty(cls, v: str) -> str:
-        if not v.strip():
-            raise ValueError("content must not be empty")
-        return v
-
-
-class ChatResponse(BaseModel):
-    response: Optional[str] = None
-    tool_calls: list[dict] = []
-    conversation_id: uuid.UUID
-
-
 def _prepare_chat_messages(context_messages: list[dict]) -> list[dict]:
     """
     Constructs the final, immutable messages payload for LiteLLM inference,
@@ -267,175 +253,26 @@ def _prepare_chat_messages(context_messages: list[dict]) -> list[dict]:
     return messages
 
 
-@router.post("/chat", response_model=ChatResponse)
-async def handle_chat(
-    chat_request: ChatRequest = Body(...),
-    db: Session = Depends(get_db),
-    current_user: AuthUser = Depends(require_authenticated_user),
-    conv_service: ConversationService = Depends(get_conversation_service),
-    user_service: UserService = Depends(get_user_service),
-):
-    """
-    Endpoint for handling chat interactions with the LLM.
-    """
-    conversation = conv_service.get_or_create_in_progress_conversation()
-    conversation_id = conversation.id
-
-    conv_service.add_message(
-        conversation_id=conversation_id, role=ChatMessageRoleType.USER, content=chat_request.content
-    )
-    db.commit()
-
-    context_messages = conv_service.get_conversation_context(conversation_id, limit=CHAT_CONTEXT_WINDOW_SIZE)
-
-    available_tools = AVAILABLE_TOOLS
-
-    tool_name_to_function_dict = {
-        "get_user_table_schema": get_user_table_schema,
-        "update_user_data": partial(update_user_data, current_user=current_user, db=db, user_service=user_service),
-        "get_user_data": partial(get_user_data, current_user=current_user, db=db, user_service=user_service),
-        "check_progress_status": partial(check_progress_status, current_user=current_user),
-        "berlin_social_services_knowledge_base": berlin_social_services_knowledge_base,
-    }
-
-    messages = _prepare_chat_messages(context_messages)
-
-    tool_call_log: list[dict] = []
-    round_count = 0
-
-    while round_count < MAX_TOOL_CALL_ROUNDS:
-        round_count += 1
-        response = await acompletion(
-            model="vertex_ai/" + os.getenv("GEMINI_MODEL_NAME"),
-            reasoning_effort="low",
-            messages=messages,
-            tools=available_tools,
-            tool_choice="auto",
-            vertex_location="global",
-            vertex_project=os.getenv("GCLOUD_PROJECT"),
-            stream=False,
-        )
-        assistant_message = response.choices[0].message
-
-        metadata = {}
-        assistant_message_dict: dict = {"role": "assistant", "content": assistant_message.content}
-        if hasattr(response, "usage") and response.usage:
-            metadata["token_usage"] = {
-                "prompt_tokens": getattr(response.usage, "prompt_tokens", None),
-                "completion_tokens": getattr(response.usage, "completion_tokens", None),
-                "total_tokens": getattr(response.usage, "total_tokens", None),
-            }
-
-        if assistant_message.tool_calls:
-            metadata["tool_calls"] = [tc.model_dump() for tc in assistant_message.tool_calls]
-            assistant_message_dict["tool_calls"] = metadata["tool_calls"]
-
-        conv_service.add_message(
-            conversation_id=conversation_id,
-            role=ChatMessageRoleType.ASSISTANT,
-            content=assistant_message.content,
-            metadata=metadata,
-        )
-        db.commit()
-
-        messages.append(assistant_message_dict)
-
-        if not assistant_message.tool_calls:
-            return ChatResponse(
-                response=assistant_message.content,
-                tool_calls=tool_call_log,
-                conversation_id=conversation_id,
-            )
-
-        for tool_call in assistant_message.tool_calls:
-            function_name = tool_call.function.name
-            function_args = json.loads(tool_call.function.arguments)
-            fn = tool_name_to_function_dict.get(function_name)
-
-            if fn is None:
-                result = {"error": f"Unknown function: {function_name}"}
-            else:
-                try:
-                    result = await fn(**function_args)
-                except Exception as fn_err:
-                    logger.exception(f"Error executing tool {function_name}")
-                    result = {"error": f"Error executing tool {function_name}: {fn_err}"}
-
-            tool_call_log.append(
-                {
-                    "name": function_name,
-                    "args": function_args,
-                    "result": str(result),
-                }
-            )
-            tool_content = str(result)
-            conv_service.add_message(
-                conversation_id=conversation_id,
-                role=ChatMessageRoleType.TOOL,
-                content=tool_content,
-                metadata={
-                    "tool_call_id": tool_call.id,
-                    "name": function_name,
-                },
-            )
-            db.commit()
-
-            messages.append(
-                {
-                    "role": "tool",
-                    "tool_call_id": tool_call.id,
-                    "name": function_name,
-                    "content": tool_content,
-                }
-            )
-
-    response = await acompletion(
-        model="vertex_ai/" + os.getenv("GEMINI_MODEL_NAME"),
-        reasoning_effort="low",
-        messages=messages,
-        vertex_location="global",
-        vertex_project=os.getenv("GCLOUD_PROJECT"),
-    )
-
-    final_message = response.choices[0].message
-    metadata = {}
-    if hasattr(response, "usage") and response.usage:
-        metadata["token_usage"] = {
-            "prompt_tokens": getattr(response.usage, "prompt_tokens", None),
-            "completion_tokens": getattr(response.usage, "completion_tokens", None),
-            "total_tokens": getattr(response.usage, "total_tokens", None),
-        }
-
-    conv_service.add_message(
-        conversation_id=conversation_id,
-        role=ChatMessageRoleType.ASSISTANT,
-        content=final_message.content,
-        metadata=metadata,
-    )
-    db.commit()
-
-    return ChatResponse(
-        response=final_message.content or "",
-        tool_calls=tool_call_log,
-        conversation_id=conversation_id,
-    )
-
-
 @router.post("/chat/stream")
 async def handle_chat_stream(
-    chat_request: ChatRequest = Body(...),
+    input_data: RunAgentInput = Body(...),
     db: Session = Depends(get_db),
     current_user: AuthUser = Depends(require_authenticated_user),
     conv_service: ConversationService = Depends(get_conversation_service),
     user_service: UserService = Depends(get_user_service),
 ):
+    last = input_data.messages[-1] if input_data.messages else None
+    if not (last and last.role == "user" and isinstance(last.content, str) and last.content.strip()):
+        raise HTTPException(status_code=422, detail="content must not be empty")
+    content = last.content
+
     conversation = conv_service.get_or_create_in_progress_conversation()
     conversation_id = conversation.id
 
     conv_service.add_message(
         conversation_id=conversation_id,
         role=ChatMessageRoleType.USER,
-        content=chat_request.content,
+        content=content,
     )
     db.commit()
 
@@ -453,45 +290,59 @@ async def handle_chat_stream(
 
     messages = _prepare_chat_messages(context_messages)
 
-    async def generate():
+    async def event_generator():
         nonlocal messages
 
-        for _round_num in range(1, MAX_TOOL_CALL_ROUNDS + 1):
-            stream_response = await acompletion(
-                model="vertex_ai/" + os.getenv("GEMINI_MODEL_NAME"),
-                reasoning_effort="low",
-                messages=messages,
-                tools=available_tools,
-                tool_choice="auto",
-                vertex_location="global",
-                vertex_project=os.getenv("GCLOUD_PROJECT"),
-                stream=True,
-                **_mock_llm_kwargs(),
-            )
+        encoder = EventEncoder()
 
+        thread_id = str(conversation_id)
+        run_id = str(input_data.run_id)
+
+        yield encoder.encode(RunStartedEvent(thread_id=thread_id, run_id=run_id))
+
+        for round_num in range(1, MAX_TOOL_CALL_ROUNDS + 1):
+            message_id = str(uuid.uuid4())
             accumulated_content = ""
             tool_calls_by_index: dict[int, dict] = {}
 
             try:
+                stream_response = await acompletion(
+                    model="vertex_ai/" + os.getenv("GEMINI_MODEL_NAME"),
+                    reasoning_effort="low",
+                    messages=messages,
+                    tools=available_tools,
+                    # last round forces a text answer
+                    tool_choice="auto" if round_num < MAX_TOOL_CALL_ROUNDS else "none",
+                    vertex_location="global",
+                    vertex_project=os.getenv("GCLOUD_PROJECT"),
+                    stream=True,
+                    **_mock_llm_kwargs(),
+                )
                 async for chunk in stream_response:
-                    delta = chunk.choices[0].delta
+                    if hasattr(chunk.choices[0].delta, "content") and chunk.choices[0].delta.content:
+                        content = chunk.choices[0].delta.content
+                        accumulated_content += content
+                        yield encoder.encode(
+                            TextMessageChunkEvent(
+                                message_id=message_id,
+                                delta=content,
+                            )
+                        )
 
-                    if delta.content:
-                        accumulated_content += delta.content
-                        yield ndjson_token(delta.content)
-
-                    if delta.tool_calls:
-                        for tc_delta in delta.tool_calls:
-                            idx = tc_delta.index
+                    if hasattr(chunk.choices[0].delta, "tool_calls") and chunk.choices[0].delta.tool_calls:
+                        tool_calls = chunk.choices[0].delta.tool_calls
+                        for tool_call in tool_calls:
+                            idx = tool_call.index
                             if idx not in tool_calls_by_index:
                                 tool_calls_by_index[idx] = {
-                                    "id": tc_delta.id or "",
-                                    "function": {"name": tc_delta.function.name or "", "arguments": ""},
+                                    "id": tool_call.id or "",
+                                    "function": {"name": tool_call.function.name or "", "arguments": ""},
                                 }
-                            if tc_delta.function and tc_delta.function.arguments:
-                                tool_calls_by_index[idx]["function"]["arguments"] += tc_delta.function.arguments
-            except Exception:
-                yield ndjson_error("Streaming error")
+                            if tool_call.function and tool_call.function.arguments:
+                                tool_calls_by_index[idx]["function"]["arguments"] += tool_call.function.arguments
+            except Exception as e:
+                logger.exception(e)
+                yield encoder.encode(RunErrorEvent(thread_id=thread_id, run_id=run_id, message="Streaming Error"))
                 return
 
             if tool_calls_by_index:
@@ -508,9 +359,11 @@ async def handle_chat_stream(
                 db.commit()
                 messages.append(assistant_dict)
 
-                for tc in tool_calls_list:
-                    function_name = tc["function"]["name"]
-                    function_args = json.loads(tc["function"]["arguments"]) if tc["function"]["arguments"] else {}
+                for tool_call in tool_calls_list:
+                    function_name = tool_call["function"]["name"]
+                    function_args = (
+                        json.loads(tool_call["function"]["arguments"]) if tool_call["function"]["arguments"] else {}
+                    )
                     fn = tool_name_to_function_dict.get(function_name)
                     if fn is None:
                         result = {"error": f"Unknown function: {function_name}"}
@@ -521,16 +374,21 @@ async def handle_chat_stream(
                             logger.exception(f"Error executing tool {function_name}")
                             result = {"error": f"Error executing tool {function_name}: {fn_err}"}
 
-                    tool_content = str(result)
+                    tool_content = json.dumps(result, default=str)
                     conv_service.add_message(
                         conversation_id=conversation_id,
                         role=ChatMessageRoleType.TOOL,
                         content=tool_content,
-                        metadata={"tool_call_id": tc["id"], "name": function_name},
+                        metadata={"tool_call_id": tool_call["id"], "name": function_name},
                     )
                     db.commit()
                     messages.append(
-                        {"role": "tool", "tool_call_id": tc["id"], "name": function_name, "content": tool_content},
+                        {
+                            "role": "tool",
+                            "tool_call_id": tool_call["id"],
+                            "name": function_name,
+                            "content": tool_content,
+                        },
                     )
                 continue
 
@@ -542,41 +400,11 @@ async def handle_chat_stream(
                     metadata={},
                 )
                 db.commit()
-                yield ndjson_done(conversation_id=conversation_id)
-                return
+            break
 
-        stream_response = await acompletion(
-            model="vertex_ai/" + os.getenv("GEMINI_MODEL_NAME"),
-            reasoning_effort="low",
-            messages=messages,
-            vertex_location="global",
-            vertex_project=os.getenv("GCLOUD_PROJECT"),
-            stream=True,
-            **_mock_llm_kwargs(),
-        )
+        yield encoder.encode(RunFinishedEvent(thread_id=thread_id, run_id=run_id))
 
-        accumulated = ""
-        try:
-            async for chunk in stream_response:
-                delta = chunk.choices[0].delta
-                content = delta.content or ""
-                accumulated += content
-                if content:
-                    yield ndjson_token(content)
-        except Exception:
-            yield ndjson_error("Streaming error")
-            return
-
-        conv_service.add_message(
-            conversation_id=conversation_id,
-            role=ChatMessageRoleType.ASSISTANT,
-            content=accumulated or "",
-            metadata={},
-        )
-        db.commit()
-        yield ndjson_done(conversation_id=conversation_id)
-
-    return StreamingResponse(generate(), media_type="application/x-ndjson")
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
 @router.post("/chat/new")
@@ -591,71 +419,6 @@ async def handle_new_chat(
     conv_service.close_all_in_progress_conversations()
     db.commit()
     return {"status": "success", "message": "Started new chat session"}
-
-
-class StatelessChatRequest(BaseModel):
-    staged_data: dict
-    recent_history: list[dict]
-    target_schema: list[dict]
-
-
-class StatelessChatResponse(BaseModel):
-    extracted_data: dict
-    next_question: Optional[str] = None
-
-
-@router.post("/api/v1/stateless/chat", response_model=StatelessChatResponse)
-async def stateless_chat(
-    request: StatelessChatRequest,
-    model_name: str = os.getenv("GEMINI_MODEL_NAME", "gemini-3.7-flash"),
-):
-    system_prompt = """
-You are assisting a user in filling out a form.
-Based on the current `staged_data` (what we already know) and the `recent_history` of the conversation,
-extract any new information that maps to the `target_schema` and provide the `next_question` to fill the remaining gaps.
-
-Current Staged Data:
-{staged_data}
-
-Target Schema (Fields to fill):
-{target_schema}
-
-Output Format:
-You MUST return a JSON object with the following structure:
-{{
-  "extracted_data": {{
-    "field_id": "value or null",
-    ...
-  }},
-  "next_question": "Natural language text asking for the next missing field"
-}}
-""".format(staged_data=json.dumps(request.staged_data), target_schema=json.dumps(request.target_schema))
-
-    messages = [{"role": "system", "content": system_prompt}]
-    messages.extend(request.recent_history)
-
-    try:
-        response = await acompletion(
-            model="vertex_ai/" + model_name,
-            messages=messages,
-            temperature=0,
-            response_format={
-                "type": "json_object",
-                "response_schema": StatelessChatResponse,
-            },
-            vertex_project=os.getenv("GCLOUD_PROJECT"),
-            vertex_location="global",
-        )
-
-        raw_json = response.choices[0].message.content
-        result_dict = json.loads(raw_json)
-
-        return StatelessChatResponse(
-            extracted_data=result_dict.get("extracted_data", {}), next_question=result_dict.get("next_question")
-        )
-
-    except Exception:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @router.get("/conversations")

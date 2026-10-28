@@ -200,330 +200,243 @@ def test_llm_health_check():
     assert response.json() == {"status": "LLM healthy"}
 
 
-def _chat_request_body(user_text: str) -> dict:
-    return {"content": user_text}
+def _run_input(user_text: str) -> dict:
+    return {
+        "threadId": "client-thread",
+        "runId": "run-1",
+        "state": {},
+        "messages": [{"id": "msg-1", "role": "user", "content": user_text}],
+        "tools": [],
+        "context": [],
+        "forwardedProps": {},
+    }
+
+
+def _stream(*deltas):
+    async def gen():
+        for delta in deltas:
+            yield SimpleNamespace(choices=[SimpleNamespace(delta=delta)])
+
+    return gen()
+
+
+def _text_stream(*parts: str):
+    return _stream(*(SimpleNamespace(content=part, tool_calls=None) for part in parts))
+
+
+def _tool_call_stream(name: str, args: str = "{}", call_id: str = "call_1"):
+    # arguments arrive split across chunks, as Gemini streams them
+    half = len(args) // 2
+    return _stream(
+        SimpleNamespace(
+            content=None,
+            tool_calls=[
+                SimpleNamespace(index=0, id=call_id, function=SimpleNamespace(name=name, arguments=args[:half]))
+            ],
+        ),
+        SimpleNamespace(
+            content=None,
+            tool_calls=[SimpleNamespace(index=0, id=None, function=SimpleNamespace(name=None, arguments=args[half:]))],
+        ),
+    )
+
+
+def _events(response) -> list[dict]:
+    return [json.loads(line[len("data: ") :]) for line in response.text.splitlines() if line.startswith("data: ")]
+
+
+def _streamed_text(events: list[dict]) -> str:
+    return "".join(e["delta"] for e in events if e["type"] == "TEXT_MESSAGE_CHUNK")
+
+
+@pytest.fixture
+def mock_conv(mock_conv_service):
+    conv = MagicMock()
+    conv.id = uuid.uuid4()
+    mock_conv_service.get_or_create_in_progress_conversation.return_value = conv
+    mock_conv_service.get_conversation_context.return_value = []
+    return conv
 
 
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_no_tool_call(mock_completion, mock_conv_service):
-    mock_message = MagicMock()
-    mock_message.content = "Hello! How can I help you?"
-    mock_message.tool_calls = None
+def test_chat_stream_no_tool_call(mock_completion, mock_conv_service, mock_conv):
+    mock_completion.return_value = _text_stream("Hello! ", "How can I help you?")
 
-    mock_choice = MagicMock()
-    mock_choice.message = mock_message
-
-    mock_completion.return_value = MagicMock(choices=[mock_choice], usage=None)
-
-    mock_conv = MagicMock()
-    mock_conv.id = uuid.uuid4()
-    mock_conv_service.get_or_create_in_progress_conversation.return_value = mock_conv
-    mock_conv_service.get_conversation_context.return_value = []
-
-    response = client.post("/chat", json=_chat_request_body("Hello"))
+    response = client.post("/chat/stream", json=_run_input("Hello"))
 
     assert response.status_code == 200
-    data = response.json()
-    assert data["response"] == "Hello! How can I help you?"
-    assert data["tool_calls"] == []
-    assert data["conversation_id"] == str(mock_conv.id)
+    assert response.headers["content-type"].startswith("text/event-stream")
+    events = _events(response)
+    assert events[0] == {"type": "RUN_STARTED", "threadId": str(mock_conv.id), "runId": "run-1"}
+    assert events[-1]["type"] == "RUN_FINISHED"
+    assert events[-1]["runId"] == "run-1"
+    assert _streamed_text(events) == "Hello! How can I help you?"
     assert mock_completion.call_count == 1
-    mock_conv_service.add_message.assert_called()
+
+    saved = [c.kwargs for c in mock_conv_service.add_message.call_args_list]
+    assert saved[0]["content"] == "Hello"
+    assert saved[-1]["content"] == "Hello! How can I help you?"
 
 
 @patch("src.routes.llm.check_progress_status", new_callable=AsyncMock)
-@patch("src.routes.llm.update_user_data", new_callable=AsyncMock)
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_with_tool_call(mock_completion, mock_update_user_data, mock_check_progress, mock_conv_service):
-    mock_check_progress.return_value = {
-        "progress_percentage": 50,
-        "missing_fields": ["name", "email"],
-    }
-
-    tool_call_id = "call_123"
-
-    first_message = MagicMock()
-    first_message.content = None
-    mock_function = MagicMock()
-    mock_function.name = "check_progress_status"
-    mock_function.arguments = "{}"
-    mock_tool_call = MagicMock()
-    mock_tool_call.id = tool_call_id
-    mock_tool_call.function = mock_function
-    mock_tool_call.model_dump.return_value = {
-        "id": tool_call_id,
-        "type": "function",
-        "function": {"name": "check_progress_status", "arguments": "{}"},
-    }
-    first_message.tool_calls = [mock_tool_call]
-
-    first_choice = MagicMock()
-    first_choice.message = first_message
-
-    second_message = MagicMock()
-    second_message.content = "You are 50% done."
-    second_message.tool_calls = None
-
-    second_choice = MagicMock()
-    second_choice.message = second_message
-
+def test_chat_stream_with_tool_call(mock_completion, mock_check_progress, mock_conv_service, mock_conv):
+    mock_check_progress.return_value = {"progress_percentage": 50, "missing_fields": ["name", "email"]}
     mock_completion.side_effect = [
-        MagicMock(choices=[first_choice], usage=None),
-        MagicMock(choices=[second_choice], usage=None),
+        _tool_call_stream("check_progress_status", call_id="call_123"),
+        _text_stream("You are 50% done."),
     ]
 
-    mock_conv = MagicMock()
-    mock_conv.id = uuid.uuid4()
-    mock_conv_service.get_or_create_in_progress_conversation.return_value = mock_conv
-    mock_conv_service.get_conversation_context.return_value = []
-
-    response = client.post("/chat", json=_chat_request_body("What's my progress?"))
+    response = client.post("/chat/stream", json=_run_input("What's my progress?"))
 
     assert response.status_code == 200
-    data = response.json()
-    assert data["response"] == "You are 50% done."
-    assert len(data["tool_calls"]) == 1
-    assert data["tool_calls"][0]["name"] == "check_progress_status"
+    events = _events(response)
+    assert _streamed_text(events) == "You are 50% done."
+    assert events[-1]["type"] == "RUN_FINISHED"
     mock_check_progress.assert_awaited_once()
     assert mock_completion.call_count == 2
-    mock_conv_service.add_message.assert_called()
+
+    tool_message = mock_completion.call_args_list[1].kwargs["messages"][-1]
+    assert tool_message["role"] == "tool"
+    assert tool_message["tool_call_id"] == "call_123"
+    assert json.loads(tool_message["content"]) == mock_check_progress.return_value
 
 
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_with_update_user_data_tool_call(mock_completion, mock_conv_service, mock_db):
-    tool_call_id = "call_456"
-
-    first_message = MagicMock()
-    first_message.content = None
-    mock_function = MagicMock()
-    mock_function.name = "update_user_data"
-    mock_function.arguments = json.dumps({"updates": {"rent_total": 550.0}})
-    mock_tool_call = MagicMock()
-    mock_tool_call.id = tool_call_id
-    mock_tool_call.function = mock_function
-    mock_tool_call.model_dump.return_value = {
-        "id": tool_call_id,
-        "type": "function",
-        "function": {"name": "update_user_data", "arguments": json.dumps({"updates": {"rent_total": 550.0}})},
-    }
-    first_message.tool_calls = [mock_tool_call]
-
-    first_choice = MagicMock()
-    first_choice.message = first_message
-
-    second_message = MagicMock()
-    second_message.content = "I've updated your rent information."
-    second_message.tool_calls = None
-
-    second_choice = MagicMock()
-    second_choice.message = second_message
-
+def test_chat_stream_with_update_user_data_tool_call(mock_completion, mock_conv_service, mock_conv, mock_db):
+    args = json.dumps({"updates": {"rent_total": 550.0}})
     mock_completion.side_effect = [
-        MagicMock(choices=[first_choice], usage=None),
-        MagicMock(choices=[second_choice], usage=None),
+        _tool_call_stream("update_user_data", args, call_id="call_456"),
+        _text_stream("I've updated your rent information."),
     ]
-
-    mock_conv = MagicMock()
-    mock_conv.id = uuid.uuid4()
-    mock_conv_service.get_or_create_in_progress_conversation.return_value = mock_conv
-    mock_conv_service.get_conversation_context.return_value = []
-
-    mock_user_service = MagicMock()
-    app.dependency_overrides[get_user_service] = lambda: mock_user_service
+    app.dependency_overrides[get_user_service] = lambda: MagicMock()
 
     with patch("src.routes.llm.update_user_data", new_callable=AsyncMock) as mock_update_user_data:
         mock_update_user_data.return_value = {"status": "success", "message": "User data updated successfully"}
-        response = client.post("/chat", json=_chat_request_body("My rent is 550"))
+        response = client.post("/chat/stream", json=_run_input("My rent is 550"))
 
-        assert response.status_code == 200
-        data = response.json()
-        assert data["response"] == "I've updated your rent information."
-        assert len(data["tool_calls"]) == 1
-        assert data["tool_calls"][0]["name"] == "update_user_data"
-        assert data["tool_calls"][0]["args"] == {"updates": {"rent_total": 550.0}}
-        mock_update_user_data.assert_called_once()
+    assert response.status_code == 200
+    assert _streamed_text(_events(response)) == "I've updated your rent information."
+    mock_update_user_data.assert_awaited_once()
+    assert mock_update_user_data.call_args.kwargs["updates"] == {"rent_total": 550.0}
 
 
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_with_get_user_data_tool_call(mock_completion, mock_conv_service, mock_db):
-    tool_call_id = "call_get_data"
-
-    first_message = MagicMock()
-    first_message.content = None
-    mock_function = MagicMock()
-    mock_function.name = "get_user_data"
-    mock_function.arguments = "{}"
-    mock_tool_call = MagicMock()
-    mock_tool_call.id = tool_call_id
-    mock_tool_call.function = mock_function
-    mock_tool_call.model_dump.return_value = {
-        "id": tool_call_id,
-        "type": "function",
-        "function": {"name": "get_user_data", "arguments": "{}"},
-    }
-    first_message.tool_calls = [mock_tool_call]
-
-    first_choice = MagicMock()
-    first_choice.message = first_message
-
-    second_message = MagicMock()
-    second_message.content = "You have Anna as your first name on file."
-    second_message.tool_calls = None
-
-    second_choice = MagicMock()
-    second_choice.message = second_message
-
+def test_chat_stream_with_get_user_data_tool_call(mock_completion, mock_conv_service, mock_conv, mock_db):
     mock_completion.side_effect = [
-        MagicMock(choices=[first_choice], usage=None),
-        MagicMock(choices=[second_choice], usage=None),
+        _tool_call_stream("get_user_data", call_id="call_get_data"),
+        _text_stream("You have Anna as your first name on file."),
     ]
+    app.dependency_overrides[get_user_service] = lambda: MagicMock()
 
-    mock_conv = MagicMock()
-    mock_conv.id = uuid.uuid4()
-    mock_conv_service.get_or_create_in_progress_conversation.return_value = mock_conv
-    mock_conv_service.get_conversation_context.return_value = []
-
-    mock_user_service = MagicMock()
-    app.dependency_overrides[get_user_service] = lambda: mock_user_service
-
-    stored_data = {"first_name": "Anna"}
     with patch("src.routes.llm.get_user_data", new_callable=AsyncMock) as mock_get_user_data:
-        mock_get_user_data.return_value = stored_data
-        response = client.post("/chat", json=_chat_request_body("What do you already know about me?"))
+        mock_get_user_data.return_value = {"first_name": "Anna"}
+        response = client.post("/chat/stream", json=_run_input("What do you already know about me?"))
 
-        assert response.status_code == 200
-        data = response.json()
-        assert data["response"] == "You have Anna as your first name on file."
-        assert len(data["tool_calls"]) == 1
-        assert data["tool_calls"][0]["name"] == "get_user_data"
-        assert data["tool_calls"][0]["args"] == {}
-        mock_get_user_data.assert_called_once()
+    assert response.status_code == 200
+    assert _streamed_text(_events(response)) == "You have Anna as your first name on file."
+    mock_get_user_data.assert_awaited_once()
+
+    tool_message = mock_completion.call_args_list[1].kwargs["messages"][-1]
+    assert json.loads(tool_message["content"]) == {"first_name": "Anna"}
 
 
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_multi_round_tool_calls(
-    mock_completion,
-    mock_conv_service,
-    mock_db,
-):
-    # Round 1: LLM calls get_user_table_schema
-    first_function = MagicMock()
-    first_function.name = "get_user_table_schema"
-    first_function.arguments = "{}"
-    first_tool_call = MagicMock()
-    first_tool_call.id = "call_001"
-    first_tool_call.function = first_function
-    first_tool_call.model_dump.return_value = {
-        "id": "call_001",
-        "type": "function",
-        "function": {"name": "get_user_table_schema", "arguments": "{}"},
-    }
-
-    first_message = MagicMock()
-    first_message.content = None
-    first_message.tool_calls = [first_tool_call]
-
-    # Round 2: LLM calls update_user_data with schema knowledge
-    second_function = MagicMock()
-    second_function.name = "update_user_data"
-    second_function.arguments = json.dumps({"updates": {"rent_total": 550.0}})
-    second_tool_call = MagicMock()
-    second_tool_call.id = "call_002"
-    second_tool_call.function = second_function
-    second_tool_call.model_dump.return_value = {
-        "id": "call_002",
-        "type": "function",
-        "function": {"name": "update_user_data", "arguments": json.dumps({"updates": {"rent_total": 550.0}})},
-    }
-
-    second_message = MagicMock()
-    second_message.content = None
-    second_message.tool_calls = [second_tool_call]
-
-    # Round 3: LLM returns final text
-    third_message = MagicMock()
-    third_message.content = "I've updated your rent to 550."
-    third_message.tool_calls = None
-
+def test_chat_stream_multi_round_tool_calls(mock_completion, mock_conv_service, mock_conv, mock_db):
     mock_completion.side_effect = [
-        MagicMock(choices=[MagicMock(message=first_message)], usage=None),
-        MagicMock(choices=[MagicMock(message=second_message)], usage=None),
-        MagicMock(choices=[MagicMock(message=third_message)], usage=None),
+        _tool_call_stream("get_user_table_schema", call_id="call_001"),
+        _tool_call_stream("update_user_data", json.dumps({"updates": {"rent_total": 550.0}}), call_id="call_002"),
+        _text_stream("I've updated your rent to 550."),
     ]
-
-    mock_conv = MagicMock()
-    mock_conv.id = uuid.uuid4()
-    mock_conv_service.get_or_create_in_progress_conversation.return_value = mock_conv
-    mock_conv_service.get_conversation_context.return_value = []
-
-    mock_user_service = MagicMock()
-    app.dependency_overrides[get_user_service] = lambda: mock_user_service
+    app.dependency_overrides[get_user_service] = lambda: MagicMock()
 
     with patch("src.routes.llm.update_user_data", new_callable=AsyncMock) as mock_update_user_data:
         mock_update_user_data.return_value = {"status": "success", "message": "User data updated successfully"}
-        response = client.post("/chat", json=_chat_request_body("My rent is 550"))
+        response = client.post("/chat/stream", json=_run_input("My rent is 550"))
 
-        assert response.status_code == 200
-        data = response.json()
-        assert data["response"] == "I've updated your rent to 550."
-        assert len(data["tool_calls"]) == 2
-        assert data["tool_calls"][0]["name"] == "get_user_table_schema"
-        assert data["tool_calls"][1]["name"] == "update_user_data"
-        assert mock_completion.call_count == 3
-        mock_update_user_data.assert_called_once()
+    assert response.status_code == 200
+    assert _streamed_text(_events(response)) == "I've updated your rent to 550."
+    assert mock_completion.call_count == 3
+    mock_update_user_data.assert_awaited_once()
+
+    stored_tool_calls = [
+        c.kwargs["metadata"]["tool_calls"][0]["function"]["name"]
+        for c in mock_conv_service.add_message.call_args_list
+        if c.kwargs.get("metadata", {}).get("tool_calls")
+    ]
+    assert stored_tool_calls == ["get_user_table_schema", "update_user_data"]
 
 
-def test_chat_unauthenticated():
+def test_chat_stream_unauthenticated():
     async def raise_401():
         raise HTTPException(status_code=401, detail="Missing authentication token")
 
     app.dependency_overrides[require_authenticated_user] = raise_401
 
-    response = client.post("/chat", json=_chat_request_body("Hello"))
+    response = client.post("/chat/stream", json=_run_input("Hello"))
     assert response.status_code == 401
 
 
+def test_chat_stream_rejects_empty_user_message(mock_conv_service, mock_conv):
+    response = client.post("/chat/stream", json=_run_input("   "))
+    assert response.status_code == 422
+
+
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_max_tool_call_rounds(mock_completion, mock_conv_service):
-    def make_tool_call_response(name, args, call_id):
-        mock_function = MagicMock()
-        mock_function.name = name
-        mock_function.arguments = args
-        mock_tool_call = MagicMock()
-        mock_tool_call.id = call_id
-        mock_tool_call.function = mock_function
-        mock_tool_call.model_dump.return_value = {
-            "id": call_id,
-            "type": "function",
-            "function": {"name": name, "arguments": args},
-        }
-        message = MagicMock()
-        message.content = None
-        message.tool_calls = [mock_tool_call]
-        return MagicMock(choices=[MagicMock(message=message)], usage=None)
-
-    final_message = MagicMock()
-    final_message.content = "Done after max rounds."
-    final_message.tool_calls = None
-
-    side_effects = [make_tool_call_response("check_progress_status", "{}", f"call_{i}") for i in range(6)] + [
-        MagicMock(choices=[MagicMock(message=final_message)], usage=None)
-    ]
-    mock_completion.side_effect = side_effects
-
-    mock_conv = MagicMock()
-    mock_conv.id = uuid.uuid4()
-    mock_conv_service.get_or_create_in_progress_conversation.return_value = mock_conv
-    mock_conv_service.get_conversation_context.return_value = []
+def test_chat_stream_last_round_forces_text(mock_completion, mock_conv_service, mock_conv):
+    max_rounds = 5
+    mock_completion.side_effect = [
+        _tool_call_stream("check_progress_status", call_id=f"call_{i}") for i in range(max_rounds - 1)
+    ] + [_text_stream("Done after max rounds.")]
 
     with patch("src.routes.llm.check_progress_status", new_callable=AsyncMock) as mock_check:
         mock_check.return_value = {"progress_percentage": 50, "missing_fields": []}
-        response = client.post("/chat", json=_chat_request_body("Keep checking"))
+        response = client.post("/chat/stream", json=_run_input("Keep checking"))
 
     assert response.status_code == 200
-    data = response.json()
-    assert len(data["tool_calls"]) == 5
-    assert mock_completion.call_count == 6
+    assert _streamed_text(_events(response)) == "Done after max rounds."
+    assert mock_completion.call_count == max_rounds
+    tool_choices = [c.kwargs["tool_choice"] for c in mock_completion.call_args_list]
+    assert tool_choices == ["auto"] * (max_rounds - 1) + ["none"]
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_finishes_when_model_ignores_tool_choice_none(mock_completion, mock_conv_service, mock_conv):
+    mock_completion.side_effect = [_tool_call_stream("check_progress_status", call_id=f"call_{i}") for i in range(5)]
+
+    with patch("src.routes.llm.check_progress_status", new_callable=AsyncMock) as mock_check:
+        mock_check.return_value = {"progress_percentage": 50, "missing_fields": []}
+        response = client.post("/chat/stream", json=_run_input("Keep checking"))
+
+    assert mock_completion.call_count == 5
+    assert _events(response)[-1]["type"] == "RUN_FINISHED"
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_error_hides_exception_details(mock_completion, mock_conv_service, mock_conv):
+    async def broken():
+        yield SimpleNamespace(choices=[SimpleNamespace(delta=SimpleNamespace(content="Hal", tool_calls=None))])
+        raise RuntimeError("vertex credentials expired")
+
+    mock_completion.return_value = broken()
+
+    response = client.post("/chat/stream", json=_run_input("Hello"))
+
+    events = _events(response)
+    assert events[-1]["type"] == "RUN_ERROR"
+    assert "vertex" not in events[-1]["message"]
+    assert not any(e["type"] == "RUN_FINISHED" for e in events)
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_reports_failed_llm_call(mock_completion, mock_conv_service, mock_conv):
+    mock_completion.side_effect = RuntimeError("Refresh token has expired")
+
+    response = client.post("/chat/stream", json=_run_input("Hello"))
+
+    events = _events(response)
+    assert [e["type"] for e in events] == ["RUN_STARTED", "RUN_ERROR"]
+    assert "token" not in events[-1]["message"]
 
 
 @pytest.mark.asyncio

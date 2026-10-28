@@ -114,19 +114,14 @@ def person_context(people: List[AssociatedPersons], money_entries: Iterable[Any]
         # `monthly_pension_income` predates the per-person money grid; without this a pension
         # recorded only there reaches Wohngeld (which reads the column) but not the forms
         # that read `income`.
-        if (
-            person.get("monthly_pension_income") is not None
-            and "Pension" not in person["income"]
-        ):
+        if person.get("monthly_pension_income") is not None and "Pension" not in person["income"]:
             person["income"] = {**person["income"], "Pension": person["monthly_pension_income"]}
             person["has_any_income"] = True
         people.append(person)
-   
+
     partners = [person for person in people if person["association_type"] in PARTNER_TYPES]
     household = [person for person in people if person["lives_in_household"]]
-    household_children = [
-        person for person in household if person["association_type"] == AssociationType.CHILD
-    ]
+    household_children = [person for person in household if person["association_type"] == AssociationType.CHILD]
     return {
         "associated_persons": people,
         "household_members": household,
