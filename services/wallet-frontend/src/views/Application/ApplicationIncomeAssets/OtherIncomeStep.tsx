@@ -1,25 +1,35 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { toggleOption } from "./incomeAssetsHelpers";
+import { toggleOption, type IncomeAmounts } from "./incomeAssetsHelpers";
+import { IncomeAmountField } from "./IncomeAmountField";
 import { OptionCard } from "../../../components/ui/OptionCard";
 import { PrimaryButton } from "../../../components/ui/PrimaryButton";
+
+const OTHER_INCOME_OPTIONS = [
+	{ value: "sick_pay", cardId: "sick_pay", label: "other_sick" },
+	{ value: "alimony", cardId: "alimony", label: "other_alimony" },
+	{ value: "other", cardId: "other_income", label: "other_rent" },
+];
 
 interface OtherIncomeStepProps {
 	otherIncomeTypes: string[];
 	setOtherIncomeTypes: (val: string[]) => void;
-	otherIncomeAmount: string;
-	setOtherIncomeAmount: (val: string) => void;
+	otherIncomeAmounts: IncomeAmounts;
+	setOtherIncomeAmount: (incomeType: string, amount: string) => void;
 	onContinue: () => void;
 }
 
 export const OtherIncomeStep: React.FC<OtherIncomeStepProps> = ({
 	otherIncomeTypes,
 	setOtherIncomeTypes,
-	otherIncomeAmount,
+	otherIncomeAmounts,
 	setOtherIncomeAmount,
 	onContinue,
 }) => {
 	const { t } = useTranslation("application");
+	const chosen = OTHER_INCOME_OPTIONS.filter((o) =>
+		otherIncomeTypes.includes(o.value),
+	);
 
 	return (
 		<div className="flex flex-col gap-5">
@@ -27,33 +37,18 @@ export const OtherIncomeStep: React.FC<OtherIncomeStepProps> = ({
 				{t("financial.questions.other_income_title")}
 			</h1>
 			<div className="flex flex-col gap-3">
-				<OptionCard
-					id="sick_pay"
-					title={t("financial.options.other_sick")}
-					type="checkbox"
-					selected={otherIncomeTypes.includes("sick_pay")}
-					onClick={() =>
-						setOtherIncomeTypes(toggleOption(otherIncomeTypes, "sick_pay"))
-					}
-				/>
-				<OptionCard
-					id="alimony"
-					title={t("financial.options.other_alimony")}
-					type="checkbox"
-					selected={otherIncomeTypes.includes("alimony")}
-					onClick={() =>
-						setOtherIncomeTypes(toggleOption(otherIncomeTypes, "alimony"))
-					}
-				/>
-				<OptionCard
-					id="other_income"
-					title={t("financial.options.other_rent")}
-					type="checkbox"
-					selected={otherIncomeTypes.includes("other")}
-					onClick={() =>
-						setOtherIncomeTypes(toggleOption(otherIncomeTypes, "other"))
-					}
-				/>
+				{OTHER_INCOME_OPTIONS.map((option) => (
+					<OptionCard
+						key={option.value}
+						id={option.cardId}
+						title={t(`financial.options.${option.label}`)}
+						type="checkbox"
+						selected={otherIncomeTypes.includes(option.value)}
+						onClick={() =>
+							setOtherIncomeTypes(toggleOption(otherIncomeTypes, option.value))
+						}
+					/>
+				))}
 				<OptionCard
 					id="no_other_income"
 					title={t("financial.options.other_none")}
@@ -65,29 +60,20 @@ export const OtherIncomeStep: React.FC<OtherIncomeStepProps> = ({
 				/>
 			</div>
 
-			{otherIncomeTypes.length > 0 && !otherIncomeTypes.includes("none") && (
-				<div className="flex flex-col gap-1.5 mt-2 animate-fadeIn">
-					<label
-						htmlFor="other-income-amount-input"
-						className="text-xs font-extrabold text-slate-800"
-					>
-						{t("financial.questions.other_income_amount_label")}
-					</label>
-					<div className="relative">
-						<span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-brand-grey">
-							€
-						</span>
-						<input
-							id="other-income-amount-input"
-							type="text"
-							value={otherIncomeAmount}
-							onChange={(e) => setOtherIncomeAmount(e.target.value)}
+			{chosen.length > 0 && (
+				<div className="flex flex-col gap-4 mt-2">
+					{chosen.map((option) => (
+						<IncomeAmountField
+							key={option.value}
+							id={`other-income-amount-${option.value}`}
+							label={t(`financial.options.${option.label}`)}
+							value={otherIncomeAmounts[option.value] ?? ""}
+							onChange={(amount) => setOtherIncomeAmount(option.value, amount)}
 							placeholder={t(
 								"financial.questions.other_income_amount_placeholder",
 							)}
-							className="w-full pl-8 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-primary-blue-500 focus:outline-none"
 						/>
-					</div>
+					))}
 				</div>
 			)}
 			<PrimaryButton

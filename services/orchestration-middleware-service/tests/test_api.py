@@ -1,4 +1,5 @@
 import io
+import re
 import uuid
 import json
 import decimal
@@ -12,11 +13,12 @@ from sqlalchemy.orm import Session
 
 from beyondforms.auth import User as AuthUser, get_current_user, require_authenticated_user
 from src.routes.llm import update_user_data, get_user_data, get_conversation_service
-from src.services.user_service import get_user_service
+from src.services.user_service import get_user_service, write_profile_payload
 from src.services.conversation_service import ConversationService
 from src.models import Users as DbUser, GenderType
 from src.db import get_db
 from src.main import app
+from src.tools import AVAILABLE_TOOLS
 
 client = TestClient(app)
 
@@ -437,6 +439,311 @@ def test_chat_stream_reports_failed_llm_call(mock_completion, mock_conv_service,
     events = _events(response)
     assert [e["type"] for e in events] == ["RUN_STARTED", "RUN_ERROR"]
     assert "token" not in events[-1]["message"]
+
+
+@pytest.fixture(autouse=True)
+def rules_engine():
+    """The rules engine's next step; unreachable unless a test says otherwise."""
+    with patch("src.routes.llm.evaluate", return_value=None) as evaluate:
+        yield evaluate
+
+
+@pytest.fixture
+def profile_row(rules_engine):
+    row = DbUser()
+    rules_engine.return_value = {"next_step": "step_applicant_name"}
+    with patch("src.routes.llm._load_user_row", return_value=row):
+        yield row
+
+
+def _card_args(card_id: str = "step_applicant_name", **overrides) -> dict:
+    args = {
+        "card_id": card_id,
+        "question": "Wie heißen Sie?",
+        "labels": {"first_name": "Vorname", "last_name": "Nachname", "birth_name": "Geburtsname"},
+    }
+    return {**args, **overrides}
+
+
+def _card_stream(args: dict, call_id: str = "call_card", lead_in: str = "Fangen wir an:"):
+    return _stream(
+        SimpleNamespace(content=lead_in, tool_calls=None),
+        SimpleNamespace(
+            content=None,
+            tool_calls=[
+                SimpleNamespace(
+                    index=0, id=call_id, function=SimpleNamespace(name="show_card", arguments=json.dumps(args))
+                )
+            ],
+        ),
+    )
+
+
+def _stored(mock_conv_service, role: str) -> list[dict]:
+    return [c.kwargs for c in mock_conv_service.add_message.call_args_list if c.kwargs["role"].value == role]
+
+
+def _offered_card(mock_completion, call: int = 0):
+    """The card the system prompt names as next."""
+    system_prompt = mock_completion.call_args_list[call].kwargs["messages"][0]["content"]
+    match = re.search(r'Next card: card_id "([^"]+)"', system_prompt)
+    return match and match.group(1)
+
+
+def test_show_card_is_one_of_the_available_tools():
+    assert "show_card" in {tool["function"]["name"] for tool in AVAILABLE_TOOLS}
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_show_card_sends_the_built_card_and_pauses(
+    mock_completion, mock_conv_service, mock_conv, profile_row
+):
+    mock_completion.return_value = _card_stream(_card_args(), call_id="call_card_1")
+
+    response = client.post("/chat/stream", json=_run_input("Ich möchte meinen Grundsicherungsantrag ausfüllen"))
+
+    assert _offered_card(mock_completion) == "step_applicant_name"
+    events = _events(response)
+    assert [e["type"] for e in events] == ["RUN_STARTED", "TEXT_MESSAGE_CHUNK", "TOOL_CALL_CHUNK", "RUN_FINISHED"]
+    card = events[2]
+    assert card["toolCallId"] == "call_card_1"
+    assert card["toolCallName"] == "show_card"
+    assert card["parentMessageId"] == events[1]["messageId"]
+    assert json.loads(card["delta"]) == {
+        "card_id": "step_applicant_name",
+        "question": "Wie heißen Sie?",
+        "inputs": [
+            {"field": "first_name", "kind": "text", "label": "Vorname"},
+            {"field": "last_name", "kind": "text", "label": "Nachname"},
+            {"field": "birth_name", "kind": "text", "label": "Geburtsname", "optional": True},
+        ],
+    }
+    assert mock_completion.call_count == 1
+
+    assistant = _stored(mock_conv_service, "assistant")[-1]
+    assert assistant["content"] == "Fangen wir an:"
+    assert assistant["metadata"]["tool_calls"][0]["id"] == "call_card_1"
+    assert _stored(mock_conv_service, "tool") == []
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_offers_no_card_without_a_profile(mock_completion, mock_conv_service, mock_conv):
+    mock_completion.return_value = _text_stream("Hallo!")
+
+    with patch("src.routes.llm._load_user_row", return_value=None):
+        client.post("/chat/stream", json=_run_input("Hallo"))
+
+    assert _offered_card(mock_completion) is None
+
+
+@pytest.mark.parametrize(
+    "evaluation",
+    [None, {"next_step": "END"}, {"next_step": "step_eligibility_nationality"}],
+    ids=["down", "done", "no columns"],
+)
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_offers_no_card_when_the_rules_have_none(
+    mock_completion, evaluation, mock_conv_service, mock_conv, profile_row, rules_engine
+):
+    rules_engine.return_value = evaluation
+    mock_completion.return_value = _text_stream("Hallo!")
+
+    client.post("/chat/stream", json=_run_input("Hallo"))
+
+    assert _offered_card(mock_completion) is None
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_tells_the_model_when_the_application_is_complete(
+    mock_completion, mock_conv_service, mock_conv, profile_row, rules_engine
+):
+    rules_engine.return_value = {"next_step": "END"}
+    mock_completion.return_value = _text_stream("Alles ist ausgefüllt.")
+
+    client.post("/chat/stream", json=_run_input("Weiter"))
+
+    system_prompt = mock_completion.call_args.kwargs["messages"][0]["content"]
+    assert "Every card of the user's Grundsicherungsantrag is answered" in system_prompt
+    assert _offered_card(mock_completion) is None
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_runs_server_tools_next_to_a_card(
+    mock_completion, mock_conv_service, mock_conv, mock_db, profile_row
+):
+    mock_completion.return_value = _stream(
+        SimpleNamespace(
+            content=None,
+            tool_calls=[
+                SimpleNamespace(
+                    index=0, id="call_data", function=SimpleNamespace(name="get_user_data", arguments="{}")
+                ),
+                SimpleNamespace(
+                    index=1,
+                    id="call_card",
+                    function=SimpleNamespace(name="show_card", arguments=json.dumps(_card_args())),
+                ),
+            ],
+        )
+    )
+
+    with patch("src.routes.llm.get_user_data", new_callable=AsyncMock) as mock_get_user_data:
+        mock_get_user_data.return_value = {"first_name": None}
+        response = client.post("/chat/stream", json=_run_input("Weiter"))
+
+    assert [e["type"] for e in _events(response)][-2:] == ["TOOL_CALL_CHUNK", "RUN_FINISHED"]
+    assert [t["metadata"]["tool_call_id"] for t in _stored(mock_conv_service, "tool")] == ["call_data"]
+    assert mock_completion.call_count == 1
+
+
+@pytest.mark.parametrize(
+    "card_id", ["step_unknown", "step_applicant_accommodation_costs"], ids=["unknown", "not the next card"]
+)
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_rejects_cards_that_are_not_offered(
+    mock_completion, card_id, mock_conv_service, mock_conv, profile_row
+):
+    mock_completion.side_effect = [_card_stream(_card_args(card_id)), _text_stream("Erzählen Sie mir davon.")]
+
+    response = client.post("/chat/stream", json=_run_input("Hallo"))
+
+    events = _events(response)
+    assert not any(e["type"] == "TOOL_CALL_CHUNK" for e in events)
+    assert events[-1]["type"] == "RUN_FINISHED"
+    assert mock_completion.call_count == 2
+    tool_result = json.loads(_stored(mock_conv_service, "tool")[0]["content"])
+    assert tool_result == {"error": f"Unknown card_id: {card_id}"}
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_lets_the_model_fix_missing_card_texts(mock_completion, mock_conv_service, mock_conv, profile_row):
+    incomplete = _card_args(labels={"first_name": "Vorname"})
+    mock_completion.side_effect = [
+        _card_stream(incomplete, call_id="call_1"),
+        _card_stream(_card_args(), call_id="call_2"),
+    ]
+
+    response = client.post("/chat/stream", json=_run_input("Los geht's"))
+
+    error = json.loads(_stored(mock_conv_service, "tool")[0]["content"])["error"]
+    assert error.startswith("Fix the card texts and call show_card again")
+    assert "labels.last_name" in error
+    card_events = [e for e in _events(response) if e["type"] == "TOOL_CALL_CHUNK"]
+    assert [e["toolCallId"] for e in card_events] == ["call_2"]
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_closes_a_card_the_user_did_not_click(mock_completion, mock_conv_service, mock_conv):
+    mock_conv_service.get_conversation_context.return_value = [
+        {"role": "user", "content": "Wohnkosten"},
+        {
+            "role": "assistant",
+            "content": "Kurz zu Ihrer Wohnung:",
+            "tool_calls": [{"id": "call_open", "function": {"name": "show_card", "arguments": "{}"}}],
+        },
+    ]
+    mock_completion.return_value = _text_stream("Alles klar.")
+
+    client.post("/chat/stream", json=_run_input("Die Miete ist 500 Euro"))
+
+    stored = [c.kwargs for c in mock_conv_service.add_message.call_args_list]
+    assert stored[0]["role"].value == "tool"
+    assert stored[0]["metadata"] == {"tool_call_id": "call_open", "name": "show_card"}
+    assert json.loads(stored[0]["content"]) == {"answered_in_text": True}
+    assert stored[1]["role"].value == "user"
+
+
+def _card_answer_input(tool_call_id: str, values: object) -> dict:
+    body = _run_input("unused")
+    body["messages"] = [
+        {"id": "msg-2", "role": "tool", "toolCallId": tool_call_id, "content": json.dumps({"values": values})}
+    ]
+    return body
+
+
+_OPEN_CARD_CONTEXT = [
+    {"role": "user", "content": "Antrag"},
+    {
+        "role": "assistant",
+        "content": "Fangen wir an:",
+        "tool_calls": [{"id": "call_open", "function": {"name": "show_card", "arguments": json.dumps(_card_args())}}],
+    },
+]
+
+
+@patch("src.routes.llm.write_profile_payload", wraps=write_profile_payload)
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_saves_a_card_answer_and_continues(
+    mock_completion, mock_write, mock_conv_service, mock_conv, profile_row, rules_engine
+):
+    mock_conv_service.get_conversation_context.return_value = _OPEN_CARD_CONTEXT
+    rules_engine.return_value = {"next_step": "step_applicant_dob"}
+    mock_completion.return_value = _text_stream("Danke, Anna.")
+
+    response = client.post(
+        "/chat/stream", json=_card_answer_input("call_open", {"first_name": "Anna", "last_name": "Klar"})
+    )
+
+    assert response.status_code == 200
+    assert (profile_row.first_name, profile_row.last_name) == ("Anna", "Klar")
+    mock_write.assert_called_once()
+    assert _streamed_text(_events(response)) == "Danke, Anna."
+    stored = [c.kwargs for c in mock_conv_service.add_message.call_args_list]
+    assert stored[0]["role"].value == "tool"
+    assert json.loads(stored[0]["content"]) == {
+        "card_id": "step_applicant_name",
+        "saved": {"first_name": "Anna", "last_name": "Klar"},
+    }
+    assert stored[0]["metadata"] == {"tool_call_id": "call_open", "name": "show_card"}
+    assert not any(s["role"].value == "user" for s in stored)
+    assert _offered_card(mock_completion) == "step_applicant_dob"
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_does_not_offer_a_card_answered_in_this_chat(
+    mock_completion, mock_conv_service, mock_conv, profile_row
+):
+    mock_conv_service.get_conversation_context.return_value = [
+        {"role": "tool", "name": "show_card", "content": json.dumps({"card_id": "step_applicant_name", "saved": {}})}
+    ]
+    mock_completion.return_value = _text_stream("Weiter geht's.")
+
+    client.post("/chat/stream", json=_run_input("Weiter"))
+
+    assert _offered_card(mock_completion) is None
+
+
+@pytest.mark.parametrize(
+    "values",
+    [{"first_name": "Anna"}, {"iban": "DE00"}, {"first_name": 5, "last_name": "Klar"}, "Anna"],
+    ids=["missing field", "foreign field", "wrong type", "no object"],
+)
+def test_chat_stream_rejects_an_invalid_card_answer(values, mock_conv_service, mock_conv, profile_row):
+    mock_conv_service.get_conversation_context.return_value = _OPEN_CARD_CONTEXT
+
+    response = client.post("/chat/stream", json=_card_answer_input("call_open", values))
+
+    assert response.status_code == 422
+    mock_conv_service.add_message.assert_not_called()
+    assert profile_row.first_name is None
+
+
+@pytest.mark.parametrize(
+    "context",
+    [
+        _OPEN_CARD_CONTEXT,
+        _OPEN_CARD_CONTEXT + [{"role": "tool", "tool_call_id": "call_open", "content": "{}"}],
+    ],
+    ids=["other card", "already answered"],
+)
+def test_chat_stream_rejects_an_answer_without_its_open_card(context, mock_conv_service, mock_conv):
+    mock_conv_service.get_conversation_context.return_value = context
+    tool_call_id = "call_other" if len(context) == 2 else "call_open"
+
+    response = client.post("/chat/stream", json=_card_answer_input(tool_call_id, {"first_name": "Anna"}))
+
+    assert response.status_code == 409
+    mock_conv_service.add_message.assert_not_called()
 
 
 @pytest.mark.asyncio

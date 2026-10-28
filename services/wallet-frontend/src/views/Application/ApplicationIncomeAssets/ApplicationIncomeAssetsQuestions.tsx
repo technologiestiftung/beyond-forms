@@ -6,25 +6,27 @@ import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { AppRoutes } from "../../../constants/routes";
 import type {
 	FinancialData,
+	IncomeEntry,
 	PersonalData,
 } from "../../../schemas/profile.schema";
 import { PageContainer } from "../../../components/Layout/PageContainer";
 import { useScrollToTop, scrollToTop } from "../../../utils/scroll";
 import {
-	EMPLOYMENT_TYPE_BY_SOURCE,
 	END_PAGE,
-	LEGACY_OTHER_INCOME_SOURCE_KEYS,
-	OTHER_INCOME_TYPE_BY_SOURCE,
-	PENSION_SOURCE_KEYS,
-	calculateTotalIncome,
-	countIncomeCategories,
+	OTHER_INCOME_TYPES,
+	PENSION_INCOME_TYPES,
+	employmentRows,
 	getNextPage,
+	hasInvalidAmount,
+	incomeRows,
 	isInvalidAmount,
 	isWithoutEmployment,
 	parseAmount,
-	withEmploymentSource,
-	withOtherIncomeSources,
-	withPensionSources,
+	storedEmploymentIncome,
+	storedIncomeAmounts,
+	storedIncomeOptions,
+	totalIncome,
+	type IncomeAmounts,
 	type WizardSaveResult,
 } from "./incomeAssetsHelpers";
 import { AwaitingBenefitsStep } from "./AwaitingBenefitsStep";
@@ -81,9 +83,8 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 		useState<string>("");
 
 	// Q3: Pension
-	const [selectedSources, setSelectedSources] = useState<string[]>([]);
 	const [pensionTypes, setPensionTypes] = useState<string[]>([]);
-	const [pensionAmount, setPensionAmount] = useState<string>("");
+	const [pensionAmounts, setPensionAmounts] = useState<IncomeAmounts>({});
 
 	// Q4: Employment
 	const [employmentType, setEmploymentType] = useState<string>("");
@@ -93,7 +94,9 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 
 	// Q5: Other income
 	const [otherIncomeTypes, setOtherIncomeTypes] = useState<string[]>([]);
-	const [otherIncomeAmount, setOtherIncomeAmount] = useState<string>("");
+	const [otherIncomeAmounts, setOtherIncomeAmounts] = useState<IncomeAmounts>(
+		{},
+	);
 
 	// Q6: One-time payments
 	const [areOneTimePaymentsExpected, setAreOneTimePaymentsExpected] = useState<
@@ -115,142 +118,53 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 	useScrollToTop(currentPage);
 
 	const initPension = React.useCallback(
-		// eslint-disable-next-line complexity
-		(storedIncome: string, sources: string[]) => {
-			const cachedPension = sessionStorage.getItem(
-				"income_assets_pension_amount",
-			);
-
-			const types = sources
-				.filter((s) => s.startsWith("pension_"))
-				.map((s) => s.replace("pension_", ""));
-			if (sources.includes("Altersrente") && !types.includes("retirement")) {
-				types.push("retirement");
-			}
-			if (
-				sources.includes("Erwerbsminderungsrente") &&
-				!types.includes("reduced")
-			) {
-				types.push("reduced");
-			}
-			if (types.length > 0) {
-				setPensionTypes(types);
-			} else if (
-				sources.includes("pension") ||
-				(extracted &&
-					(extracted.monthly_income ||
-						extracted.monthly_amount ||
-						extracted.amount_pension))
-			) {
+		(entries: IncomeEntry[]) => {
+			const stored = storedIncomeOptions(PENSION_INCOME_TYPES, entries);
+			const extractedAmount =
+				extracted?.monthly_income ||
+				extracted?.monthly_amount ||
+				extracted?.amount_pension;
+			// a pension notice the user just uploaded fills an unanswered page
+			if (stored.length === 0 && extractedAmount) {
 				setPensionTypes(["retirement"]);
-			} else if (sources.includes("none_pension")) {
-				setPensionTypes(["none"]);
+				setPensionAmounts({ retirement: String(extractedAmount) });
+				return;
 			}
-
-			if (cachedPension !== null) {
-				setPensionAmount(cachedPension);
-			} else if (
-				extracted &&
-				(extracted.monthly_income ||
-					extracted.monthly_amount ||
-					extracted.amount_pension)
-			) {
-				setPensionAmount(
-					String(
-						extracted.monthly_income ||
-							extracted.monthly_amount ||
-							extracted.amount_pension ||
-							"",
-					),
-				);
-				if (!sources.includes("pension")) {
-					sources.push("pension");
-					setSelectedSources([...sources]);
-				}
-			} else if (sources.some((s) => PENSION_SOURCE_KEYS.includes(s))) {
-				setPensionAmount(storedIncome);
-			}
+			setPensionTypes(stored);
+			setPensionAmounts(storedIncomeAmounts(PENSION_INCOME_TYPES, entries));
 		},
 		[extracted],
 	);
 
 	const initEmployment = React.useCallback(
-		(
-			storedIncome: string,
-			personal: Partial<PersonalData>,
-			sources: string[],
-		) => {
-			const cachedEmployment = sessionStorage.getItem(
-				"income_assets_employment_amount",
-			);
-			// Entry order preserves the previous priority if several
-			// employment sources are present.
-			const typeFromSource = Object.entries(EMPLOYMENT_TYPE_BY_SOURCE).find(
-				([source]) => sources.includes(source),
-			)?.[1];
-			let resolvedEmploymentType = typeFromSource;
-			if (
-				!resolvedEmploymentType &&
+		(entries: IncomeEntry[], personal: Partial<PersonalData>) => {
+			const { isSelfEmployed, amount } = storedEmploymentIncome(entries);
+			if (isSelfEmployed) {
+				setEmploymentType("self_employed");
+			} else if (
 				personal.isCurrentlyEmployed !== null &&
 				personal.isCurrentlyEmployed !== undefined
 			) {
-				resolvedEmploymentType = personal.isCurrentlyEmployed
-					? "employed"
-					: "unemployed";
+				setEmploymentType(
+					personal.isCurrentlyEmployed ? "employed" : "unemployed",
+				);
 			}
-			if (resolvedEmploymentType) {
-				setEmploymentType(resolvedEmploymentType);
-			}
-
 			setJobTitle(personal.workScopeAndType || "");
 			setEmployerName(personal.employerName || "");
-
-			if (cachedEmployment !== null) {
-				setEmploymentAmount(cachedEmployment);
-			} else if (personal.isCurrentlyEmployed === true) {
-				setEmploymentAmount(storedIncome);
-			}
+			setEmploymentAmount(amount);
 		},
 		[],
 	);
 
-	const initOther = React.useCallback(
-		(storedIncome: string, sources: string[]) => {
-			const cachedOther = sessionStorage.getItem("income_assets_other_amount");
-			const otherTypes = sources
-				.map((source) => OTHER_INCOME_TYPE_BY_SOURCE[source])
-				.filter((type): type is string => Boolean(type));
-
-			if (otherTypes.length > 0) {
-				setOtherIncomeTypes(otherTypes);
-			} else if (
-				sources.some((s) => LEGACY_OTHER_INCOME_SOURCE_KEYS.includes(s))
-			) {
-				setOtherIncomeTypes(["other"]);
-			} else if (sources.includes("none_other")) {
-				setOtherIncomeTypes(["none"]);
-			}
-
-			if (cachedOther !== null) {
-				setOtherIncomeAmount(cachedOther);
-			} else if (otherTypes.length > 0) {
-				setOtherIncomeAmount(storedIncome);
-			}
-		},
-		[],
-	);
+	const initOther = React.useCallback((entries: IncomeEntry[]) => {
+		setOtherIncomeTypes(storedIncomeOptions(OTHER_INCOME_TYPES, entries));
+		setOtherIncomeAmounts(storedIncomeAmounts(OTHER_INCOME_TYPES, entries));
+	}, []);
 
 	const initIncomeAssets = React.useCallback(() => {
 		const financial: Partial<FinancialData> = profileData?.financial ?? {};
 		const personal: Partial<PersonalData> = profileData?.personalData ?? {};
-		const sources = [...(financial.incomeSources || [])];
-		const incomeCategoryCount = countIncomeCategories(
-			sources,
-			personal.isCurrentlyEmployed,
-		);
-		const storedIncome =
-			incomeCategoryCount === 1 ? String(financial.monthlyIncome || "") : "";
-		setSelectedSources(sources);
+		const incomeEntries = financial.incomeEntries ?? [];
 
 		const setAwaiting = () => {
 			setHasAppliedForBenefitsAwaitingDecision(
@@ -333,9 +247,9 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 
 		setAwaiting();
 		setPrevious();
-		initPension(storedIncome, sources);
-		initEmployment(storedIncome, personal, sources);
-		initOther(storedIncome, sources);
+		initPension(incomeEntries);
+		initEmployment(incomeEntries, personal);
+		initOther(incomeEntries);
 		setOneTime();
 		setBank();
 
@@ -452,19 +366,23 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 		);
 	};
 
-	const savePension = async () => {
+	const savePension = () => {
 		clearErrors();
-		if (isInvalidAmount(pensionAmount)) {
+		if (hasInvalidAmount(pensionTypes, pensionAmounts)) {
 			setSaveError(t("financial.errors.pension_amount_invalid"));
 			return;
 		}
-		sessionStorage.setItem("income_assets_pension_amount", pensionAmount);
-		const updatedSources = withPensionSources(selectedSources, pensionTypes);
-		if (
-			await saveAndContinue("financial", { incomeSources: updatedSources }, 4)
-		) {
-			setSelectedSources(updatedSources);
-		}
+		void saveAndContinue(
+			"financial",
+			{
+				incomeEntries: incomeRows(
+					PENSION_INCOME_TYPES,
+					pensionTypes,
+					pensionAmounts,
+				),
+			},
+			4,
+		);
 	};
 
 	const saveEmployment = async () => {
@@ -473,11 +391,6 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 			setSaveError(t("financial.errors.employment_amount_invalid"));
 			return;
 		}
-		sessionStorage.setItem("income_assets_employment_amount", employmentAmount);
-		const updatedSources = withEmploymentSource(
-			selectedSources,
-			employmentType,
-		);
 
 		const isEmployed = employmentType
 			? !isWithoutEmployment(employmentType)
@@ -503,29 +416,30 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 			return;
 		}
 
-		if (
-			await saveAndContinue("financial", { incomeSources: updatedSources }, 5)
-		) {
-			setSelectedSources(updatedSources);
-		}
+		await saveAndContinue(
+			"financial",
+			{ incomeEntries: employmentRows(employmentType, employmentAmount) },
+			5,
+		);
 	};
 
-	const saveOtherIncome = async () => {
+	const saveOtherIncome = () => {
 		clearErrors();
-		if (isInvalidAmount(otherIncomeAmount)) {
+		if (hasInvalidAmount(otherIncomeTypes, otherIncomeAmounts)) {
 			setSaveError(t("financial.errors.other_income_amount_invalid"));
 			return;
 		}
-		sessionStorage.setItem("income_assets_other_amount", otherIncomeAmount);
-		const updatedSources = withOtherIncomeSources(
-			selectedSources,
-			otherIncomeTypes,
+		void saveAndContinue(
+			"financial",
+			{
+				incomeEntries: incomeRows(
+					OTHER_INCOME_TYPES,
+					otherIncomeTypes,
+					otherIncomeAmounts,
+				),
+			},
+			6,
 		);
-		if (
-			await saveAndContinue("financial", { incomeSources: updatedSources }, 6)
-		) {
-			setSelectedSources(updatedSources);
-		}
 	};
 
 	const saveOneTimePayments = () => {
@@ -568,14 +482,11 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 			return;
 		}
 
-		const totalIncome = calculateTotalIncome({
-			pensionTypes,
-			pensionAmount,
-			employmentType,
-			employmentAmount,
-			otherIncomeTypes,
-			otherIncomeAmount,
-		});
+		const monthlyIncome = totalIncome([
+			...incomeRows(PENSION_INCOME_TYPES, pensionTypes, pensionAmounts),
+			...employmentRows(employmentType, employmentAmount),
+			...incomeRows(OTHER_INCOME_TYPES, otherIncomeTypes, otherIncomeAmounts),
+		]);
 
 		try {
 			const result = await updateSection({
@@ -587,14 +498,11 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 						iban: normalizedIban || null,
 						bic: bic.replace(/\s+/g, "").toUpperCase() || null,
 					},
-					...(totalIncome !== null && { monthlyIncome: totalIncome }),
+					...(monthlyIncome !== null && { monthlyIncome }),
 					validateEntireForm: false,
 				},
 			});
 			if (result.success) {
-				sessionStorage.removeItem("income_assets_pension_amount");
-				sessionStorage.removeItem("income_assets_employment_amount");
-				sessionStorage.removeItem("income_assets_other_amount");
 				navigate(AppRoutes.ApplicationOverview);
 			} else {
 				handleValidationErrors(result.validationErrors);
@@ -715,8 +623,10 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 					<PensionStep
 						pensionTypes={pensionTypes}
 						setPensionTypes={setPensionTypes}
-						pensionAmount={pensionAmount}
-						setPensionAmount={setPensionAmount}
+						pensionAmounts={pensionAmounts}
+						setPensionAmount={(pensionType, amount) =>
+							setPensionAmounts({ ...pensionAmounts, [pensionType]: amount })
+						}
 						onContinue={savePension}
 					/>
 				)}
@@ -741,8 +651,13 @@ export const ApplicationIncomeAssetsQuestions: React.FC = () => {
 					<OtherIncomeStep
 						otherIncomeTypes={otherIncomeTypes}
 						setOtherIncomeTypes={setOtherIncomeTypes}
-						otherIncomeAmount={otherIncomeAmount}
-						setOtherIncomeAmount={setOtherIncomeAmount}
+						otherIncomeAmounts={otherIncomeAmounts}
+						setOtherIncomeAmount={(incomeType, amount) =>
+							setOtherIncomeAmounts({
+								...otherIncomeAmounts,
+								[incomeType]: amount,
+							})
+						}
 						onContinue={saveOtherIncome}
 					/>
 				)}

@@ -133,7 +133,11 @@ describe("HttpChatService", () => {
 	it("buffers SSE events split across reads", async () => {
 		const events = RUN_STARTED + chunk("m1", "hi") + RUN_FINISHED;
 		vi.mocked(fetch).mockResolvedValue(
-			streamResponse([events.slice(0, 30), events.slice(30, 90), events.slice(90)]),
+			streamResponse([
+				events.slice(0, 30),
+				events.slice(30, 90),
+				events.slice(90),
+			]),
 		);
 
 		const { done, responses, onDone } = send(service);
@@ -177,7 +181,9 @@ describe("HttpChatService", () => {
 	it("joins validation error details", async () => {
 		vi.mocked(fetch).mockResolvedValue(
 			new Response(
-				JSON.stringify({ detail: [{ msg: "field required" }, { msg: "too long" }] }),
+				JSON.stringify({
+					detail: [{ msg: "field required" }, { msg: "too long" }],
+				}),
 				{ status: 422, headers: { "Content-Type": "application/json" } },
 			),
 		);
@@ -215,8 +221,7 @@ describe("HttpChatService", () => {
 		vi.mocked(fetch).mockImplementation(
 			(_url, init) =>
 				new Promise((_resolve, reject) => {
-					const abort = () =>
-						reject(new DOMException("Aborted", "AbortError"));
+					const abort = () => reject(new DOMException("Aborted", "AbortError"));
 					if (init?.signal?.aborted) {
 						abort();
 					}
@@ -230,5 +235,64 @@ describe("HttpChatService", () => {
 
 		expect(onError).not.toHaveBeenCalled();
 		expect(onDone).not.toHaveBeenCalled();
+	});
+
+	it("reports a show_card call after the lead-in text", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			streamResponse([
+				RUN_STARTED,
+				chunk("m1", "Kurz zu Ihrer Wohnung:"),
+				sse({
+					type: "TOOL_CALL_CHUNK",
+					toolCallId: "call_card",
+					toolCallName: "show_card",
+					parentMessageId: "m1",
+					delta: '{"card_id": "housing.costs"}',
+				}),
+				RUN_FINISHED,
+			]),
+		);
+		const onToolCall = vi.fn();
+		const onDone = vi.fn();
+
+		await service.sendMessage({
+			content: "Wohnkosten",
+			onResponse: () => {},
+			onToolCall,
+			onDone,
+			onError: () => {},
+		});
+
+		expect(onToolCall).toHaveBeenCalledWith({
+			toolCallId: "call_card",
+			name: "show_card",
+			args: { card_id: "housing.costs" },
+		});
+		expect(onDone).toHaveBeenCalledTimes(1);
+	});
+
+	it("sends a card answer as the tool message", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			streamResponse([RUN_STARTED, chunk("m1", "Danke."), RUN_FINISHED]),
+		);
+		const responses: string[] = [];
+
+		await service.sendToolResult({
+			toolCallId: "call_card",
+			content: '{"card_id":"housing.costs"}',
+			onResponse: (r) => responses.push(r),
+			onDone: () => {},
+			onError: () => {},
+		});
+
+		const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]?.body as string);
+		expect(body.messages).toEqual([
+			expect.objectContaining({
+				role: "tool",
+				toolCallId: "call_card",
+				content: '{"card_id":"housing.costs"}',
+			}),
+		]);
+		expect(responses).toEqual(["Danke."]);
 	});
 });

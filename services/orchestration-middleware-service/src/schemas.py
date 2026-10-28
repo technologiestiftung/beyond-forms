@@ -204,6 +204,8 @@ class UserProfileValidationSchema(BaseModel):
     social_security_type: Optional[str] = None
     health_insurance_provider: Optional[str] = None
     health_insurance_status: Optional[str] = None
+    pension_insurance_provider: Optional[str] = Field(None, max_length=255)
+    pension_insurance_no: Optional[str] = Field(None, max_length=255)
     has_applied_for_asylum_benefits: Optional[bool] = None
 
     # Housing fields
@@ -237,6 +239,9 @@ class UserProfileValidationSchema(BaseModel):
     monthly_income: Optional[decimal.Decimal] = Field(None, ge=0)
     is_currently_employed: Optional[bool] = None
     has_received_previous_benefits: Optional[bool] = None
+    previous_benefits_authority: Optional[str] = Field(None, max_length=255)
+    previous_benefits_period: Optional[str] = Field(None, max_length=255)
+    previous_benefits_ref_no: Optional[str] = Field(None, max_length=255)
     has_assets: Optional[bool] = None
     assets_description: Optional[str] = Field(None, max_length=1000)
     associated_persons: Optional[list[AssociatedPersonSchema]] = None
@@ -298,6 +303,7 @@ class UserProfileValidationSchema(BaseModel):
     merkzeichen: Optional[str] = None
     has_costly_medical_nutrition: Optional[bool] = None
     is_care_dependent: Optional[bool] = None
+    has_inpatient_facility_accommodation: Optional[bool] = None
     inpatient_facility_move_in_date: Optional[date] = None
     inpatient_facility_last_residence: Optional[str] = None
     reduced_work_capacity_start_date: Optional[date] = None

@@ -1,25 +1,37 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { toggleOption } from "./incomeAssetsHelpers";
+import { toggleOption, type IncomeAmounts } from "./incomeAssetsHelpers";
+import { IncomeAmountField } from "./IncomeAmountField";
 import { OptionCard } from "../../../components/ui/OptionCard";
 import { PrimaryButton } from "../../../components/ui/PrimaryButton";
+
+const PENSION_OPTIONS = [
+	{ value: "retirement", cardId: "retirement", label: "pension_retirement" },
+	{
+		value: "reduced",
+		cardId: "reduced_earning_capacity",
+		label: "pension_reduced",
+	},
+	{ value: "survivor", cardId: "survivor", label: "pension_survivor" },
+];
 
 interface PensionStepProps {
 	pensionTypes: string[];
 	setPensionTypes: (val: string[]) => void;
-	pensionAmount: string;
-	setPensionAmount: (val: string) => void;
+	pensionAmounts: IncomeAmounts;
+	setPensionAmount: (pensionType: string, amount: string) => void;
 	onContinue: () => void;
 }
 
 export const PensionStep: React.FC<PensionStepProps> = ({
 	pensionTypes,
 	setPensionTypes,
-	pensionAmount,
+	pensionAmounts,
 	setPensionAmount,
 	onContinue,
 }) => {
 	const { t } = useTranslation("application");
+	const chosen = PENSION_OPTIONS.filter((o) => pensionTypes.includes(o.value));
 
 	return (
 		<div className="flex flex-col gap-5">
@@ -27,31 +39,18 @@ export const PensionStep: React.FC<PensionStepProps> = ({
 				{t("financial.questions.pension_title")}
 			</h1>
 			<div className="flex flex-col gap-3">
-				<OptionCard
-					id="retirement"
-					title={t("financial.options.pension_retirement")}
-					type="checkbox"
-					selected={pensionTypes.includes("retirement")}
-					onClick={() =>
-						setPensionTypes(toggleOption(pensionTypes, "retirement"))
-					}
-				/>
-				<OptionCard
-					id="reduced_earning_capacity"
-					title={t("financial.options.pension_reduced")}
-					type="checkbox"
-					selected={pensionTypes.includes("reduced")}
-					onClick={() => setPensionTypes(toggleOption(pensionTypes, "reduced"))}
-				/>
-				<OptionCard
-					id="survivor"
-					title={t("financial.options.pension_survivor")}
-					type="checkbox"
-					selected={pensionTypes.includes("survivor")}
-					onClick={() =>
-						setPensionTypes(toggleOption(pensionTypes, "survivor"))
-					}
-				/>
+				{PENSION_OPTIONS.map((option) => (
+					<OptionCard
+						key={option.value}
+						id={option.cardId}
+						title={t(`financial.options.${option.label}`)}
+						type="checkbox"
+						selected={pensionTypes.includes(option.value)}
+						onClick={() =>
+							setPensionTypes(toggleOption(pensionTypes, option.value))
+						}
+					/>
+				))}
 				<OptionCard
 					id="no_pension"
 					title={t("financial.options.none_of_these")}
@@ -61,37 +60,18 @@ export const PensionStep: React.FC<PensionStepProps> = ({
 				/>
 			</div>
 
-			{!pensionTypes.includes("none") && pensionTypes.length > 0 && (
+			{chosen.length > 0 && (
 				<div className="flex flex-col gap-4 mt-2 p-5 bg-slate-50 rounded-2xl border border-slate-100 animate-fadeIn">
-					<div className="flex flex-col gap-1.5">
-						<label
-							htmlFor="pension-amount"
-							className="text-xs font-extrabold text-slate-800"
-						>
-							{t("financial.questions.pension_amount_label")}
-						</label>
-						<div className="relative">
-							<input
-								id="pension-amount"
-								type="text"
-								value={pensionAmount}
-								onChange={(e) => {
-									const val = e.target.value.replace(/[^0-9,.]/g, "");
-									setPensionAmount(val);
-								}}
-								placeholder={t(
-									"financial.questions.pension_amount_placeholder",
-								)}
-								className="w-full p-3.5 pr-10 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary-blue-500 focus:outline-none text-right"
-							/>
-							<span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-medium text-sm">
-								€
-							</span>
-						</div>
-						<p className="text-[11px] font-semibold text-slate-500 mt-1">
-							{t("financial.questions.amount_net_hint")}
-						</p>
-					</div>
+					{chosen.map((option) => (
+						<IncomeAmountField
+							key={option.value}
+							id={`pension-amount-${option.value}`}
+							label={t(`financial.options.${option.label}`)}
+							value={pensionAmounts[option.value] ?? ""}
+							onChange={(amount) => setPensionAmount(option.value, amount)}
+							placeholder={t("financial.questions.pension_amount_placeholder")}
+						/>
+					))}
 				</div>
 			)}
 			<PrimaryButton

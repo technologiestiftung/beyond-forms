@@ -31,6 +31,10 @@ interface FieldProps {
 	error?: string;
 }
 
+// Only the wizard knows this option; it is stored as no tenancy status plus the
+// name of the person who grants the free right of residence.
+const FREE_LODGING = "FreeLodging";
+
 const FormField: React.FC<FieldProps> = ({
 	id,
 	label,
@@ -203,7 +207,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 				accomodationType:
 					profileData.housing?.accomodationType ?? "Rental Apartment",
-				tenancyStatus: profileData.housing?.tenancyStatus ?? "Main Tenant",
+				tenancyStatus: profileData.housing?.freeHousingRightHolder
+					? FREE_LODGING
+					: (profileData.housing?.tenancyStatus ?? "Main Tenant"),
 				landlordName: profileData.housing?.landlordName ?? "",
 				freeHousingRightHolder:
 					profileData.housing?.freeHousingRightHolder ?? "",
@@ -386,24 +392,16 @@ export const ApplicationHousingQuestions: React.FC = () => {
 			housingData.accomodationType =
 				currentValues.accomodationType as Profile["housing"]["accomodationType"];
 		} else if (page === 3) {
-			housingData.tenancyStatus =
-				currentValues.tenancyStatus as Profile["housing"]["tenancyStatus"];
-			if (
-				currentValues.tenancyStatus === "Main Tenant" ||
-				currentValues.tenancyStatus === "Subtenant"
-			) {
-				housingData.landlordName = currentValues.landlordName || "";
-				housingData.freeHousingRightHolder = "";
-			} else if (
-				currentValues.tenancyStatus === null &&
-				currentValues.freeHousingRightHolder === "Ja"
-			) {
-				housingData.landlordName = "";
-				housingData.freeHousingRightHolder = "Ja";
-			} else {
-				housingData.landlordName = "";
-				housingData.freeHousingRightHolder = "";
-			}
+			const isFreeLodging = currentValues.tenancyStatus === FREE_LODGING;
+			housingData.tenancyStatus = isFreeLodging
+				? null
+				: (currentValues.tenancyStatus as Profile["housing"]["tenancyStatus"]);
+			housingData.landlordName = isFreeLodging
+				? ""
+				: currentValues.landlordName || "";
+			housingData.freeHousingRightHolder = isFreeLodging
+				? currentValues.freeHousingRightHolder || ""
+				: "";
 		} else if (page === 4) {
 			housingData.subletRoomCount = currentValues.subletRoomCount;
 			housingData.subletRentIncome = currentValues.subletRentIncome;
@@ -697,20 +695,8 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								testIdPrefix="housing-option"
 								id="FreeLodging"
 								title={t("housing.options.tenancy_free")}
-								selected={
-									values.tenancyStatus === null &&
-									!!values.freeHousingRightHolder
-								}
-								onClick={() => {
-									setValue("tenancyStatus", null);
-									setValue("freeHousingRightHolder", "Ja");
-									void handleSaveField("housing", "tenancyStatus", null);
-									void handleSaveField(
-										"housing",
-										"freeHousingRightHolder",
-										"Ja",
-									);
-								}}
+								selected={values.tenancyStatus === FREE_LODGING}
+								onClick={() => setValue("tenancyStatus", FREE_LODGING)}
 							/>
 
 							{values.tenancyStatus === "Subtenant" && (
@@ -730,23 +716,22 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								</div>
 							)}
 
-							{values.tenancyStatus === null &&
-								!!values.freeHousingRightHolder && (
-									<div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm mt-2 animate-fadeIn">
-										<FormField
-											id="freeHousingRightHolder"
-											label={t("housing.labels.free_housing_right_holder")}
-											register={register("freeHousingRightHolder")}
-											onBlur={() =>
-												handleSaveField(
-													"housing",
-													"freeHousingRightHolder",
-													getValues("freeHousingRightHolder"),
-												)
-											}
-										/>
-									</div>
-								)}
+							{values.tenancyStatus === FREE_LODGING && (
+								<div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm mt-2 animate-fadeIn">
+									<FormField
+										id="freeHousingRightHolder"
+										label={t("housing.labels.free_housing_right_holder")}
+										register={register("freeHousingRightHolder")}
+										onBlur={() =>
+											handleSaveField(
+												"housing",
+												"freeHousingRightHolder",
+												getValues("freeHousingRightHolder"),
+											)
+										}
+									/>
+								</div>
+							)}
 						</div>
 					</div>
 				);

@@ -1,5 +1,10 @@
-import { HttpAgent } from "@ag-ui/client";
-import type { IChatService, SendMessageOptions } from "./IChatService";
+import { HttpAgent, type Message } from "@ag-ui/client";
+import type {
+	ChatStreamCallbacks,
+	IChatService,
+	SendMessageOptions,
+	SendToolResultOptions,
+} from "./IChatService";
 import { env } from "../../config/env.config";
 import { useAuthStore } from "../../store/useAuthStore";
 
@@ -19,9 +24,7 @@ function errorMessage(error: unknown): string {
 	}
 	if (Array.isArray(detail)) {
 		return detail
-			.map(
-				(item: Record<string, unknown>) => item?.msg || JSON.stringify(item),
-			)
+			.map((item: Record<string, unknown>) => item?.msg || JSON.stringify(item))
 			.join(", ");
 	}
 	return error.message;
@@ -29,7 +32,29 @@ function errorMessage(error: unknown): string {
 
 export class HttpChatService implements IChatService {
 	async sendMessage(options: SendMessageOptions): Promise<void> {
-		const { content, onResponse, onDone, onError, signal } = options;
+		await this.run(
+			{ id: crypto.randomUUID(), role: "user", content: options.content },
+			options,
+		);
+	}
+
+	async sendToolResult(options: SendToolResultOptions): Promise<void> {
+		await this.run(
+			{
+				id: crypto.randomUUID(),
+				role: "tool",
+				toolCallId: options.toolCallId,
+				content: options.content,
+			},
+			options,
+		);
+	}
+
+	private async run(
+		message: Message,
+		callbacks: ChatStreamCallbacks,
+	): Promise<void> {
+		const { onResponse, onToolCall, onDone, onError, signal } = callbacks;
 		if (signal?.aborted) {
 			return;
 		}
@@ -39,7 +64,7 @@ export class HttpChatService implements IChatService {
 			headers: authHeader(),
 			fetch: (url, init) => fetch(url, { ...init, credentials: "include" }),
 		});
-		agent.addMessage({ id: crypto.randomUUID(), role: "user", content });
+		agent.addMessage(message);
 
 		const abortController = new AbortController();
 		signal?.addEventListener("abort", () => abortController.abort(), {
@@ -48,12 +73,12 @@ export class HttpChatService implements IChatService {
 
 		let text = "";
 		let settled = false;
-		const fail = (message: string) => {
+		const fail = (reason: string) => {
 			if (settled || signal?.aborted) {
 				return;
 			}
 			settled = true;
-			onError(message);
+			onError(reason);
 		};
 
 		try {
@@ -69,6 +94,13 @@ export class HttpChatService implements IChatService {
 					onTextMessageContentEvent: ({ event }) => {
 						text += event.delta;
 						onResponse(text);
+					},
+					onToolCallEndEvent: ({ event, toolCallName, toolCallArgs }) => {
+						onToolCall?.({
+							toolCallId: event.toolCallId,
+							name: toolCallName,
+							args: toolCallArgs,
+						});
 					},
 					onRunFinishedEvent: () => {
 						if (!settled) {

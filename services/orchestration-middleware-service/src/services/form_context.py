@@ -1,11 +1,12 @@
 import datetime
 import re
-from typing import Any, Dict, Iterable, List
+from typing import Any, Callable, Dict, Iterable, List
 
 from src.models import (
     INCOME_TYPE_DE,
     MARITAL_STATUS_DE,
     NATIONALITY_DE,
+    PENSION_INCOME_TYPES,
     AssociatedPersons,
     AssociationType,
     BenefitClaimKindType,
@@ -162,6 +163,21 @@ def _claim_rows(claims: Iterable[Any], kind: BenefitClaimKindType) -> List[Dict[
     return [row_to_dict(row) for row in sorted(rows, key=lambda claim: claim.sort_order)]
 
 
+_PENSION_KEYS = frozenset(pension_type.value for pension_type in PENSION_INCOME_TYPES)
+
+
+def _with_pension_line(by_type: Dict[str, Any], combine: Callable[[List[Any]], Any]) -> Dict[str, Any]:
+    """Folds every pension kind into `Pension`, the form's single "Renten/Pensionen" line."""
+    values = [value for key, value in by_type.items() if key in _PENSION_KEYS and value not in (None, "")]
+    if not values:
+        return by_type
+    return {**by_type, "Pension": combine(values)}
+
+
+def _join_distinct(values: List[Any]) -> str:
+    return ", ".join(dict.fromkeys(str(value) for value in values))
+
+
 def money_context(entries: Iterable[Any], person_id: Any) -> Dict[str, Any]:
     """The money grids for exactly one person. `person_id=None` selects the applicant's
     own rows, matching the `person_id IS NULL` convention in the entry tables."""
@@ -176,9 +192,13 @@ def money_context(entries: Iterable[Any], person_id: Any) -> Dict[str, Any]:
         key=lambda row: (row.person_id is not None, str(row.person_id), str(row.id)),
     )
     return {
-        "income": _entries_by_type(income, "income_type", "monthly_amount"),
-        "income_office": _entries_by_type(all_income, "income_type", "awarding_office"),
-        "income_reference": _entries_by_type(all_income, "income_type", "reference_no"),
+        "income": _with_pension_line(_entries_by_type(income, "income_type", "monthly_amount"), sum),
+        "income_office": _with_pension_line(
+            _entries_by_type(all_income, "income_type", "awarding_office"), _join_distinct
+        ),
+        "income_reference": _with_pension_line(
+            _entries_by_type(all_income, "income_type", "reference_no"), _join_distinct
+        ),
         "expenses": _entries_by_type(expenses, "expense_type", "monthly_amount"),
         "expense_notes": _entries_by_type(expenses, "expense_type", "note"),
         "assets": _entries_by_type(assets, "asset_type", "amount"),
@@ -196,6 +216,16 @@ def money_context(entries: Iterable[Any], person_id: Any) -> Dict[str, Any]:
         ],
         "pending_benefit_claims": _claim_rows(claims, BenefitClaimKindType.PENDING_APPLICATION),
         "expected_one_time_payments": _claim_rows(claims, BenefitClaimKindType.EXPECTED_ONE_TIME_PAYMENT),
+    }
+
+
+def free_housing_right_context(holder: Any) -> Dict[str, Any]:
+    """The form asks for the holder's first name and surname separately; the profile keeps
+    one name, read as first names followed by the surname."""
+    *first_names, last_name = (holder or "").split() or [""]
+    return {
+        "free_housing_right_holder_first_name": " ".join(first_names),
+        "free_housing_right_holder_last_name": last_name,
     }
 
 
@@ -228,6 +258,7 @@ def derived_context(
         "blz": _blz_from_iban(user_row.get("iban")),
         **age_context(user_row.get("date_of_birth")),
         **previous_benefits_context(user_row),
+        **free_housing_right_context(user_row.get("free_housing_right_holder")),
         **label_context(user_row),
         **money_context(money_entries, None),
         **person_context(people, money_entries),

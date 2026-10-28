@@ -10,7 +10,7 @@ import uuid
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from litellm import acompletion
 import logging
@@ -24,13 +24,16 @@ from src.services.user_service import (
     apply_profile_key,
     get_user_service,
     ordered_profile_items,
+    write_profile_payload,
 )
 from src.services.conversation_service import ConversationService, get_conversation_service
 from src.services.rag_service import search_knowledge_base
 from beyondforms.auth import User as AuthUser, get_current_user, require_authenticated_user
 from src.schemas import AssociatedPersonSchema, UserInformationUpdateSchema
-from src.tools import AVAILABLE_TOOLS
-from ag_ui.core import RunStartedEvent, RunFinishedEvent, RunErrorEvent, TextMessageChunkEvent
+from src.tools import AVAILABLE_TOOLS, SHOW_CARD_TOOL_NAME
+from src.chat_cards import APPLICATION_DONE_PROMPT, build_card_view, card_prompt, validate_card_answer
+from src.services.wizard_rules import evaluate, rules_steps
+from ag_ui.core import RunStartedEvent, RunFinishedEvent, RunErrorEvent, TextMessageChunkEvent, ToolCallChunkEvent
 from ag_ui.encoder import EventEncoder
 from ag_ui.core.types import RunAgentInput
 
@@ -64,6 +67,7 @@ _ENUM_ALLOWED_VALUES: dict[str, str] = {
 
 MAX_TOOL_CALL_ROUNDS = 5
 CHAT_CONTEXT_WINDOW_SIZE = int(os.getenv("CHAT_CONTEXT_WINDOW_SIZE", "20"))
+MAX_CARD_ANSWER_LENGTH = 4000
 
 router = APIRouter(tags=["llm"])
 logger = logging.getLogger(__name__)
@@ -241,16 +245,125 @@ async def berlin_social_services_knowledge_base(question: str) -> str:
         return f"Error: The knowledge base is temporarily unavailable. Details: {str(e)}"
 
 
-def _prepare_chat_messages(context_messages: list[dict]) -> list[dict]:
+def _prepare_chat_messages(context_messages: list[dict], card_instructions: str = "") -> list[dict]:
     """
     Constructs the final, immutable messages payload for LiteLLM inference,
     prepending the unified System Prompt and pre-cached dynamic tool instructions
     without modifying execution state.
     """
     final_system_prompt = SYSTEM_PROMPT + generate_tool_usage_prompt()
+    if card_instructions:
+        final_system_prompt += "\n\n" + card_instructions
     messages = [{"role": "system", "content": final_system_prompt}]
     messages.extend(context_messages)
     return messages
+
+
+def _unanswered_tool_calls(context_messages: list[dict]) -> list[dict]:
+    """Tool calls of the latest assistant message that have no result yet, e.g. a card the user didn't click."""
+    for i in range(len(context_messages) - 1, -1, -1):
+        message = context_messages[i]
+        if message["role"] == "user":
+            return []
+        if message["role"] == "assistant" and message.get("tool_calls"):
+            answered = {m.get("tool_call_id") for m in context_messages[i + 1 :] if m["role"] == "tool"}
+            return [tc for tc in message["tool_calls"] if tc["id"] not in answered]
+    return []
+
+
+def _tool_args(tool_call: dict) -> dict:
+    try:
+        args = json.loads(tool_call["function"]["arguments"] or "{}")
+    except json.JSONDecodeError:
+        return {}
+    return args if isinstance(args, dict) else {}
+
+
+def _answered_card_ids(context_messages: list[dict]) -> set[str]:
+    answered = set()
+    for message in context_messages:
+        if message["role"] != "tool" or message.get("name") != SHOW_CARD_TOOL_NAME:
+            continue
+        try:
+            result = json.loads(message.get("content") or "{}")
+        except json.JSONDecodeError:
+            continue
+        if isinstance(result, dict) and "saved" in result:
+            answered.add(result.get("card_id"))
+    return answered
+
+
+def _load_user_row(db: Session, user_service: UserService, current_user: AuthUser) -> Optional[DbUser]:
+    try:
+        return db.get(DbUser, user_service.get_internal_user_id(current_user.user_name))
+    except HTTPException:
+        return None
+
+
+async def _next_card(user_row: Optional[DbUser], answered_card_ids: set[str]) -> tuple[Optional[str], str]:
+    """The step the rules engine stops at, if it is a card not yet answered in this chat, and
+    what the model is told about it."""
+    if user_row is None:
+        return None, ""
+    evaluation = await asyncio.to_thread(evaluate, user_row)
+    step_id = (evaluation or {}).get("next_step")
+    if step_id == "END":
+        return None, APPLICATION_DONE_PROMPT
+    step = rules_steps().get(step_id, {})
+    if step_id in answered_card_ids or not step.get("columns"):
+        return None, ""
+    return step_id, card_prompt(step_id, step)
+
+
+def _card_view(
+    tool_call: dict, offered_card: Optional[str], already_shown: bool
+) -> tuple[Optional[dict], Optional[str]]:
+    if already_shown:
+        return None, "Only one card can be shown per answer."
+    args = _tool_args(tool_call)
+    if offered_card is None or args.get("card_id") != offered_card:
+        return None, f"Unknown card_id: {args.get('card_id')}"
+    view, errors = build_card_view(offered_card, rules_steps()[offered_card], args)
+    if errors:
+        return None, "Fix the card texts and call show_card again: " + "; ".join(errors)
+    return view, None
+
+
+async def _run_server_tool(tool_name_to_function_dict: dict, tool_call: dict):
+    function_name = tool_call["function"]["name"]
+    fn = tool_name_to_function_dict.get(function_name)
+    if fn is None:
+        return {"error": f"Unknown function: {function_name}"}
+    try:
+        function_args = json.loads(tool_call["function"]["arguments"]) if tool_call["function"]["arguments"] else {}
+        return await fn(**function_args)
+    except Exception as fn_err:
+        logger.exception(f"Error executing tool {function_name}")
+        return {"error": f"Error executing tool {function_name}: {fn_err}"}
+
+
+def _save_card_answer(
+    db: Session, user_service: UserService, current_user: AuthUser, card_call: dict, content: str
+) -> str:
+    """Validates and saves the values a card submitted; returns the tool result for the model."""
+    card_id = _tool_args(card_call).get("card_id")
+    step = rules_steps().get(card_id)
+    try:
+        values = json.loads(content).get("values")
+    except (json.JSONDecodeError, AttributeError):
+        values = None
+    user_row = _load_user_row(db, user_service, current_user)
+    if not step or user_row is None:
+        raise HTTPException(status_code=422, detail="This card can't be saved")
+    payload, errors = validate_card_answer(step, values)
+    if errors:
+        raise HTTPException(status_code=422, detail="; ".join(errors))
+    try:
+        write_profile_payload(db, user_row, payload)
+    except ProfileWriteError as exc:
+        db.rollback()
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return json.dumps({"card_id": card_id, "saved": values}, default=str)
 
 
 @router.post("/chat/stream")
@@ -262,22 +375,59 @@ async def handle_chat_stream(
     user_service: UserService = Depends(get_user_service),
 ):
     last = input_data.messages[-1] if input_data.messages else None
-    if not (last and last.role == "user" and isinstance(last.content, str) and last.content.strip()):
+    # a click on a card arrives as the result of its show_card call instead of a user message
+    is_card_answer = bool(last and last.role == "tool")
+    if not (last and last.role in ("user", "tool") and isinstance(last.content, str) and last.content.strip()):
         raise HTTPException(status_code=422, detail="content must not be empty")
+    if is_card_answer and len(last.content) > MAX_CARD_ANSWER_LENGTH:
+        raise HTTPException(status_code=422, detail="card answer is too long")
     content = last.content
 
     conversation = conv_service.get_or_create_in_progress_conversation()
     conversation_id = conversation.id
 
-    conv_service.add_message(
-        conversation_id=conversation_id,
-        role=ChatMessageRoleType.USER,
-        content=content,
-    )
+    previous_context = conv_service.get_conversation_context(conversation_id, limit=CHAT_CONTEXT_WINDOW_SIZE)
+    open_calls = _unanswered_tool_calls(previous_context)
+    answered_card = None
+    if is_card_answer:
+        answered_card = next(
+            (c for c in open_calls if c["id"] == last.tool_call_id and c["function"]["name"] == SHOW_CARD_TOOL_NAME),
+            None,
+        )
+        if answered_card is None:
+            raise HTTPException(status_code=409, detail="This card has already been answered")
+        content = _save_card_answer(db, user_service, current_user, answered_card, content)
+
+    # The user typed instead of answering a card; Gemini rejects a tool call without a result
+    for open_call in open_calls:
+        if open_call is answered_card:
+            continue
+        conv_service.add_message(
+            conversation_id=conversation_id,
+            role=ChatMessageRoleType.TOOL,
+            content=json.dumps({"answered_in_text": True}),
+            metadata={"tool_call_id": open_call["id"], "name": open_call["function"]["name"]},
+        )
+
+    if answered_card is not None:
+        conv_service.add_message(
+            conversation_id=conversation_id,
+            role=ChatMessageRoleType.TOOL,
+            content=content,
+            metadata={"tool_call_id": answered_card["id"], "name": SHOW_CARD_TOOL_NAME},
+        )
+    else:
+        conv_service.add_message(
+            conversation_id=conversation_id,
+            role=ChatMessageRoleType.USER,
+            content=content,
+        )
     db.commit()
 
     context_messages = conv_service.get_conversation_context(conversation_id, limit=CHAT_CONTEXT_WINDOW_SIZE)
 
+    user_row = _load_user_row(db, user_service, current_user)
+    offered_card, card_instructions = await _next_card(user_row, _answered_card_ids(context_messages))
     available_tools = AVAILABLE_TOOLS
 
     tool_name_to_function_dict = {
@@ -288,7 +438,7 @@ async def handle_chat_stream(
         "berlin_social_services_knowledge_base": berlin_social_services_knowledge_base,
     }
 
-    messages = _prepare_chat_messages(context_messages)
+    messages = _prepare_chat_messages(context_messages, card_instructions)
 
     async def event_generator():
         nonlocal messages
@@ -342,7 +492,7 @@ async def handle_chat_stream(
                                 tool_calls_by_index[idx]["function"]["arguments"] += tool_call.function.arguments
             except Exception as e:
                 logger.exception(e)
-                yield encoder.encode(RunErrorEvent(thread_id=thread_id, run_id=run_id, message="Streaming Error"))
+                yield encoder.encode(RunErrorEvent(message="Streaming Error"))
                 return
 
             if tool_calls_by_index:
@@ -359,20 +509,19 @@ async def handle_chat_stream(
                 db.commit()
                 messages.append(assistant_dict)
 
+                card_call = None
+                card_view = None
                 for tool_call in tool_calls_list:
                     function_name = tool_call["function"]["name"]
-                    function_args = (
-                        json.loads(tool_call["function"]["arguments"]) if tool_call["function"]["arguments"] else {}
-                    )
-                    fn = tool_name_to_function_dict.get(function_name)
-                    if fn is None:
-                        result = {"error": f"Unknown function: {function_name}"}
+                    if function_name == SHOW_CARD_TOOL_NAME:
+                        view, card_error = _card_view(tool_call, offered_card, already_shown=card_call is not None)
+                        if view is not None:
+                            # answered by the user's click, so it gets no result here
+                            card_call, card_view = tool_call, view
+                            continue
+                        result = {"error": card_error}
                     else:
-                        try:
-                            result = await fn(**function_args)
-                        except Exception as fn_err:
-                            logger.exception(f"Error executing tool {function_name}")
-                            result = {"error": f"Error executing tool {function_name}: {fn_err}"}
+                        result = await _run_server_tool(tool_name_to_function_dict, tool_call)
 
                     tool_content = json.dumps(result, default=str)
                     conv_service.add_message(
@@ -390,6 +539,17 @@ async def handle_chat_stream(
                             "content": tool_content,
                         },
                     )
+
+                if card_call is not None:
+                    yield encoder.encode(
+                        ToolCallChunkEvent(
+                            tool_call_id=card_call["id"],
+                            tool_call_name=SHOW_CARD_TOOL_NAME,
+                            parent_message_id=message_id,
+                            delta=json.dumps(card_view, default=str),
+                        )
+                    )
+                    break
                 continue
 
             if accumulated_content:

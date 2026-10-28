@@ -31,7 +31,9 @@ describe("DocumentPreviewModal", () => {
 		);
 
 		expect(screen.getByTestId("preview-loading-spinner")).toBeInTheDocument();
-		expect(screen.getByText("documents.errors.loading_document")).toBeInTheDocument();
+		expect(
+			screen.getByText("documents.errors.loading_document"),
+		).toBeInTheDocument();
 	});
 
 	it("renders iframe for application/pdf", async () => {

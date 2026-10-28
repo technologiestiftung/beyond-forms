@@ -47,19 +47,17 @@ export function useGeneratedPdfModal(
 	};
 
 	const modal =
-		showPreviewModal && application
-			? (
-					<PdfPreviewModal
-						key={application.downloadUrl}
-						onClose={closePreview}
-						pdfUrl={application.openUrl}
-						downloadUrl={application.downloadUrl}
-						downloadFilename={application.filename}
-						onDownloadSuccess={closePreview}
-						downloadButtonTestId={downloadButtonTestId}
-					/>
-				)
-			: null;
+		showPreviewModal && application ? (
+			<PdfPreviewModal
+				key={application.downloadUrl}
+				onClose={closePreview}
+				pdfUrl={application.openUrl}
+				downloadUrl={application.downloadUrl}
+				downloadFilename={application.filename}
+				onDownloadSuccess={closePreview}
+				downloadButtonTestId={downloadButtonTestId}
+			/>
+		) : null;
 
 	return { handleGenerate, isGenerating, error, modal };
 }

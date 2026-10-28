@@ -13,7 +13,14 @@ from src.services.form_service import (
     _extract_required_context_fields,
     _is_context_value_filled,
 )
-from src.services.form_context import age_context, derived_context, money_context, person_context, row_to_dict
+from src.services.form_context import (
+    age_context,
+    derived_context,
+    free_housing_right_context,
+    money_context,
+    person_context,
+    row_to_dict,
+)
 from src.models import (
     AssetEntries,
     AssociatedPersons,
@@ -825,6 +832,17 @@ def test_person_context_labels_fall_back_without_inventing():
     assert ctx["household_members"][0]["marital_status_de"] == ""
 
 
+@pytest.mark.parametrize(
+    "holder, first_name, last_name",
+    [("Erika Maria Klar", "Erika Maria", "Klar"), ("Klar", "", "Klar"), (None, "", ""), ("  ", "", "")],
+)
+def test_free_housing_right_holder_is_split_into_first_names_and_surname(holder, first_name, last_name):
+    assert free_housing_right_context(holder) == {
+        "free_housing_right_holder_first_name": first_name,
+        "free_housing_right_holder_last_name": last_name,
+    }
+
+
 def test_age_context_exposes_what_the_dropped_view_derived():
     today = datetime.date.today()
     minor = age_context(today.replace(year=today.year - 10))
@@ -897,6 +915,30 @@ def _money_rows(person_id=None):
             office_reference="Wohngeldstelle Mitte / WG-4711",
         ),
     ]
+
+
+def test_money_context_adds_every_pension_kind_into_the_pension_line():
+    """The form has one "Renten/Pensionen" line, while each pension keeps its own row."""
+    ctx = money_context(
+        [
+            IncomeEntries(
+                income_type="Old-Age Pension",
+                monthly_amount=decimal.Decimal("400.00"),
+                awarding_office="DRV Bund",
+            ),
+            IncomeEntries(
+                income_type="Survivor Pension",
+                monthly_amount=decimal.Decimal("200.00"),
+                awarding_office="DRV Berlin-Brandenburg",
+            ),
+            IncomeEntries(income_type="Reduced Earning Capacity Pension", monthly_amount=decimal.Decimal("0")),
+        ],
+        None,
+    )
+
+    assert ctx["income"]["Pension"] == decimal.Decimal("600.00")
+    assert ctx["income"]["Old-Age Pension"] == decimal.Decimal("400.00")
+    assert ctx["income_office"]["Pension"] == "DRV Bund, DRV Berlin-Brandenburg"
 
 
 def test_money_context_keys_grids_by_their_form_row():

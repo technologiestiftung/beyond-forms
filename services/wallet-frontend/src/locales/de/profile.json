@@ -235,7 +235,7 @@
 			"email": "E-Mail-Adresse",
 			"phoneNumber": "Telefonnummer",
 			"monthlyIncome": "Monatliches Einkommen (€)",
-			"incomeSources": "Einkommensarten",
+			"incomeEntries": "Monatliche Einnahmen (netto in Euro)",
 			"hasAssets": "Ich besitze Ersparnisse, Immobilien oder Wertgegenstände",
 			"assetsDescription": "Beschreibung des Vermögens",
 			"professionalExpenses": "Werbungskosten (€)",
@@ -276,7 +276,7 @@
 			"rentPaidUntil": "Miete bezahlt bis",
 			"subletRoomCount": "Untervermietete Zimmer",
 			"subletRentIncome": "Einnahmen aus Untervermietung (€)",
-			"freeHousingRightHolder": "Inhaber(in) des freien Wohnrechts",
+			"freeHousingRightHolder": "Freies Wohnrecht bei (Vor- und Nachname)",
 			"isSubsidizedHousing": "Ich wohne in einer öffentlich geförderten Wohnung",
 			"hasOtherResidence": "Ich habe eine weitere Unterkunft",
 			"hasSecondaryResidence": "Ich habe einen Zweitwohnsitz",
@@ -404,20 +404,15 @@
 			"Relative": "Bei Verwandten",
 			"Shared Household": "Wohngemeinschaft"
 		},
-		"incomeSources": {
-			"pension": "Rente",
-			"none_pension": "Keine Rente",
-			"employment_employed": "Angestellt",
-			"employment_self": "Selbstständig",
-			"employment_student": "Schüler(in)/Studierende(r)",
-			"employment_unemployed": "Arbeitslos",
-			"employment_none": "Keine Erwerbstätigkeit",
-			"other_benefits": "Sonstige Leistungen (z. B. Wohngeld, Unterhalt)",
-			"other_alimony": "Unterhalt",
-			"other_rent": "Mieteinnahmen",
-			"other_sick": "Krankengeld",
-			"other": "Sonstiges",
-			"none_other": "Keine sonstigen Einkünfte"
+		"incomeTypes": {
+			"Old-Age Pension": "Altersrente",
+			"Reduced Earning Capacity Pension": "Erwerbsminderungsrente",
+			"Survivor Pension": "Hinterbliebenenrente",
+			"Employment": "Einkommen aus nichtselbständiger Arbeit",
+			"Other Self-Employment": "Einkommen aus selbständiger Arbeit",
+			"Health Insurance Benefits": "Krankengeld",
+			"Alimony": "Unterhalt",
+			"Rental and Leasing": "Einnahmen aus Vermietung oder Verpachtung"
 		}
 	},
 	"address_placeholder": {
@@ -748,7 +743,7 @@
 			"city": "Stadt",
 			"no_fixed_address": "Ich habe aktuell keine feste Adresse",
 			"last_fixed_address": "Letzter fester Wohnort",
-			"free_housing_right_holder": "Freies Wohnrecht bei (Name der Person)",
+			"free_housing_right_holder": "Freies Wohnrecht bei (Vor- und Nachname)",
 			"landlord_name": "Name des Vermieters",
 			"arrears_amount": "Wie hoch sind Deine Mietschulden? (in Euro)",
 			"rent_paid_until": "Miete gezahlt bis (Datum)",

@@ -17,6 +17,7 @@ import {
 	getSavedProfileFields,
 	FIELD_SECTION,
 	BANK_FIELDS,
+	answeredIncomeEntries,
 } from "./personalData/formDefaults";
 import {
 	PROFILE_CATEGORIES,
@@ -84,7 +85,10 @@ export const PersonalDataEdit: React.FC = () => {
 			return;
 		}
 
-		const value = getValues(fieldName);
+		const value =
+			fieldName === "incomeEntries"
+				? answeredIncomeEntries(getValues("incomeEntries") ?? [])
+				: getValues(fieldName);
 		const section = FIELD_SECTION[fieldName] ?? "personalData";
 		const data = (
 			BANK_FIELDS.has(fieldName)

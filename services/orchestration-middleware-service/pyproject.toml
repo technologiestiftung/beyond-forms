@@ -27,6 +27,7 @@ dependencies = [
     "Pillow",
     "pillow-heif",
     "ag-ui-protocol>=1.0.0",
+    "json5>=0.15.0",
 ]
 
 [tool.uv.sources]

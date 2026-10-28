@@ -22,5 +22,9 @@
 		"quick_action1": "Can I receive basic security benefits?",
 		"quick_action2": "What documents do I need?",
 		"quick_action3": "How do I submit an application?"
+	},
+	"card": {
+		"submit": "Save",
+		"saved": "Saved"
 	}
 }

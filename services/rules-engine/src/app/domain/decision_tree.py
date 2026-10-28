@@ -59,6 +59,9 @@ def is_field_required(field_path: str, form_data: dict) -> bool:
             form_data, "applicant_infromation.applicant_residence_address"
         )
         return res_addr == "ohne feste Adresse"
+    if field_path.endswith((".applicant_tenancy_status", ".applicant_landlord_name")):
+        # someone living under a free right of residence has neither
+        return resolve_path(form_data, "applicant_accommodation.applicant_free_housing_right_holder") is None
     if field_path.endswith(".is_eu_citizen_5y") or field_path.endswith(".has_residence_permit"):
         citizenship = resolve_path(form_data, "applicant_information.applicant_personal_details.citizenship")
         return citizenship != "deutsch"
@@ -162,7 +165,8 @@ class DecisionTreeEvaluator:
         required_documents = set()
         missing_fields = set()
 
-        curr_step_id = initial_step
+        # an application continues where it starts, without walking the eligibility check again
+        curr_step_id = current_step_id if current_step_id in steps else initial_step
         blocked_step = None
 
         while curr_step_id and curr_step_id != "END":
@@ -232,7 +236,8 @@ class DecisionTreeEvaluator:
                             is_any_path_missing = True
                             break
 
-                    if is_any_path_missing:
+                    # $exists asks whether a path is missing, so a missing path answers it
+                    if is_any_path_missing and not cond.strip().startswith("$exists("):
                         blocked_on_transition = True
                         break
 

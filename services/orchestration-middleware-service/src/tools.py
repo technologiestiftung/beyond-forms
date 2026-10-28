@@ -1,3 +1,5 @@
+SHOW_CARD_TOOL_NAME = "show_card"
+
 AVAILABLE_TOOLS = [
     {
         "type": "function",
@@ -56,6 +58,28 @@ AVAILABLE_TOOLS = [
                     "question": {"type": "string"},
                 },
                 "required": ["question"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": SHOW_CARD_TOOL_NAME,
+            "description": "Shows the user the next card of their Grundsicherung application inside the chat, instead of "
+            "asking in text. Only for the card the system prompt names as next; it lists the input keys to label.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "card_id": {"type": "string", "description": "The card_id the system prompt names"},
+                    "question": {"type": "string", "description": "The question, in the language of the conversation"},
+                    "hint": {"type": "string", "description": "Optional short explanation below the question"},
+                    "labels": {"type": "object", "description": "A short label for each input key"},
+                    "option_labels": {
+                        "type": "object",
+                        "description": "For each choice input key, an object with a label per option value",
+                    },
+                },
+                "required": ["card_id", "question", "labels"],
             },
         },
     },

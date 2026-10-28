@@ -10,18 +10,16 @@ import requests
 from sqlalchemy.orm import Session
 from src.db import get_db
 from src.models import Users as DbUser, UploadedFiles, UserDocuments
-from src.schemas import AssociatedPersonSchema, UserProfileValidationSchema
+from src.schemas import AssociatedPersonSchema, IncomeEntrySchema, UserProfileValidationSchema
 from src.services.user_service import (
     ProfileWriteError,
-    RELATION_KEYS,
     UserService,
-    apply_profile_key,
     get_user_service,
-    ordered_profile_items,
+    write_profile_payload,
 )
-from src.services.berlin_districts import sync_berlin_district
 from src.utils import get_google_id_token
 from src.mappers import map_flat_to_rules_engine_payload
+from src.services.wizard_rules import application_start_step, evaluation_payload
 from src.tasks.cleanup import run_background_gcs_cleanup
 from src.gcs import get_gcs_client
 
@@ -37,8 +35,6 @@ def _delete_gcs_files_sync(files: list[tuple[str, str]]):
         except Exception as e:
             logger.error(f"Failed to delete GCS blob {object_name} from {bucket_name}: {e}")
 
-
-DISTRICT_SYNC_FIELDS = frozenset({"street", "house_number", "zip_code", "city"})
 
 logger = logging.getLogger(__name__)
 
@@ -72,10 +68,11 @@ def get_profile(
     background_tasks.add_task(run_background_gcs_cleanup, db_user.id)
 
     user_data = {c.name: getattr(db_user, c.name) for c in db_user.__table__.columns}
-    if user_data.get("displaced_status") is None:
-        user_data["displaced_status"] = "none"
     user_data["associated_persons"] = [
         AssociatedPersonSchema.model_validate(person).model_dump(mode="json") for person in db_user.associated_persons
+    ]
+    user_data["income_entries"] = [
+        IncomeEntrySchema.model_validate(row).model_dump(mode="json") for row in db_user.income_entries
     ]
 
     return user_data
@@ -102,33 +99,10 @@ def update_user_profile(
 
     # Persist incoming fields to database first (decoupled draft)
     logger.info(f"[DEBUG] update_user_profile payload: {payload.model_dump(exclude_unset=True)}")
-    exclude_keys = {"validate_entire_form"}
-    address_changed = False
-    for key, value in ordered_profile_items(payload.model_dump(exclude_unset=True)):
-        if key not in exclude_keys:
-            if key in RELATION_KEYS:
-                # Already validated by the request schema, so hand over the model
-                # instances rather than round-tripping the dumped dicts.
-                value = getattr(payload, key)
-            try:
-                if apply_profile_key(db_user, key, value):
-                    continue
-            except ProfileWriteError as exc:
-                raise HTTPException(status_code=422, detail=str(exc)) from exc
-            if key == "displaced_status" and value == "none":
-                value = None
-            if key in DISTRICT_SYNC_FIELDS and getattr(db_user, key) != value:
-                address_changed = True
-            setattr(db_user, key, value)
-
-    if address_changed:
-        db_user.district = sync_berlin_district(
-            db=db,
-            street=db_user.street,
-            house_number=db_user.house_number,
-            zip_code=db_user.zip_code,
-            city=db_user.city,
-        )
+    try:
+        write_profile_payload(db, db_user, payload)
+    except ProfileWriteError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     logger.info(
         f"[DEBUG] db_user attributes updated: street={db_user.street}, house_number={db_user.house_number}, zip_code={db_user.zip_code}, city={db_user.city}, district={db_user.district}"
@@ -161,7 +135,7 @@ def update_user_profile(
             future_evaluate = executor.submit(
                 requests.post,
                 eval_url,
-                json={"form_content": rules_engine_payload["form_content"], "current_step_id": "step_applicant_name"},
+                json={"form_content": evaluation_payload(db_user), "current_step_id": application_start_step()},
                 headers=headers,
                 timeout=10,
             )

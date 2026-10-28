@@ -235,7 +235,7 @@
 			"email": "Email address",
 			"phoneNumber": "Phone number",
 			"monthlyIncome": "Monthly income (€)",
-			"incomeSources": "Income types",
+			"incomeEntries": "Monthly income (net in EUR)",
 			"hasAssets": "I own savings, property or valuables",
 			"assetsDescription": "Description of assets",
 			"professionalExpenses": "Work-related expenses (€)",
@@ -276,7 +276,7 @@
 			"rentPaidUntil": "Rent paid until",
 			"subletRoomCount": "Sublet rooms",
 			"subletRentIncome": "Income from subletting (€)",
-			"freeHousingRightHolder": "Holder of the rent-free right of residence",
+			"freeHousingRightHolder": "Free right of residence granted by (first and last name)",
 			"isSubsidizedHousing": "I live in publicly subsidised housing",
 			"hasOtherResidence": "I have another accommodation",
 			"hasSecondaryResidence": "I have a secondary residence",
@@ -404,20 +404,15 @@
 			"Relative": "Living with relatives",
 			"Shared Household": "Shared household"
 		},
-		"incomeSources": {
-			"pension": "Pension",
-			"none_pension": "No pension",
-			"employment_employed": "Employed",
-			"employment_self": "Self-employed",
-			"employment_student": "Pupil/student",
-			"employment_unemployed": "Unemployed",
-			"employment_none": "Not employed",
-			"other_benefits": "Other benefits (e.g. housing allowance, maintenance)",
-			"other_alimony": "Alimony",
-			"other_rent": "Rental income",
-			"other_sick": "Sick pay",
-			"other": "Other",
-			"none_other": "No other income"
+		"incomeTypes": {
+			"Old-Age Pension": "Old-age pension",
+			"Reduced Earning Capacity Pension": "Reduced earning capacity pension",
+			"Survivor Pension": "Survivor pension",
+			"Employment": "Income from employment",
+			"Other Self-Employment": "Income from self-employment",
+			"Health Insurance Benefits": "Sickness benefit",
+			"Alimony": "Alimony / maintenance",
+			"Rental and Leasing": "Income from renting or leasing"
 		}
 	},
 	"address_placeholder": {
@@ -748,7 +743,7 @@
 			"city": "City",
 			"no_fixed_address": "I currently do not have a fixed address",
 			"last_fixed_address": "Last permanent residence",
-			"free_housing_right_holder": "Free housing right at (Name of the person)",
+			"free_housing_right_holder": "Free right of residence granted by (first and last name)",
 			"landlord_name": "Name of the landlord",
 			"arrears_amount": "How high are your rent arrears? (in Euro)",
 			"rent_paid_until": "Rent paid until (date)",

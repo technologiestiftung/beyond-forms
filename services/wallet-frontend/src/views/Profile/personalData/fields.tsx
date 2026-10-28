@@ -1,8 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, Pencil } from "lucide-react";
-import type { UseFormRegisterReturn, UseFormRegister } from "react-hook-form";
-import type { CombinedWizardFormValues } from "./types";
+import type { UseFormRegisterReturn } from "react-hook-form";
 
 export interface FieldProps {
 	id: string;
@@ -197,47 +196,5 @@ export const CheckboxField: React.FC<{
 				{hint && <span className="text-[11px] text-slate-500">{hint}</span>}
 			</span>
 		</label>
-	);
-};
-
-/**
- * A checkbox group sharing a single registered field name, so react-hook-form
- * collects the checked values into a string array (used for e.g. incomeSources).
- */
-export const MultiCheckboxField: React.FC<{
-	legend: string;
-	name: keyof CombinedWizardFormValues & string;
-	options: { code: string; name: string }[];
-	register: UseFormRegister<CombinedWizardFormValues>;
-	onBlur?: () => void;
-}> = ({ legend, name, options, register, onBlur }) => {
-	return (
-		<fieldset className="flex flex-col gap-2 text-left w-full">
-			<legend className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
-				{legend}
-			</legend>
-			<div className="flex flex-wrap gap-2">
-				{options.map((o) => (
-					<label
-						key={o.code}
-						htmlFor={`${name}-${o.code}`}
-						className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50/50 px-3 py-1.5 text-xs font-semibold text-slate-700 cursor-pointer has-checked:border-primary-green-300 has-checked:bg-primary-green-50"
-					>
-						<input
-							id={`${name}-${o.code}`}
-							type="checkbox"
-							value={o.code}
-							{...register(name)}
-							onBlur={(e) => {
-								void register(name).onBlur(e);
-								onBlur?.();
-							}}
-							className="size-3.5 rounded border-slate-300 text-primary-green-500 focus:ring-primary-green-500/40"
-						/>
-						{o.name}
-					</label>
-				))}
-			</div>
-		</fieldset>
 	);
 };

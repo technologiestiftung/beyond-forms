@@ -105,6 +105,8 @@ class DisabilityMerkzeichenType(str, enum.Enum):
 
 
 class DisplacedStatusType(str, enum.Enum):
+    # an explicit "no status", so it isn't mistaken for an unanswered question
+    NONE = "none"
     EXPELLEE__RESETTLER_ = "Expellee (Resettler)"
     DISPLACED_PERSON__RESETTLER_ = "Displaced Person (Resettler)"
     LATE_RESETTLER = "Late Resettler"
@@ -167,6 +169,9 @@ class IncomeTypeType(str, enum.Enum):
     RENTAL_AND_LEASING = "Rental and Leasing"
     HOUSING_BENEFIT = "Housing Benefit"
     PENSION = "Pension"
+    OLD_AGE_PENSION = "Old-Age Pension"
+    REDUCED_EARNING_CAPACITY_PENSION = "Reduced Earning Capacity Pension"
+    SURVIVOR_PENSION = "Survivor Pension"
     SOCIAL_ASSISTANCE = "Social Assistance"
     BASIC_SECURITY_BENEFITS = "Basic Security Benefits"
     ASYLUM_SEEKER_BENEFITS = "Asylum Seeker Benefits"
@@ -185,6 +190,16 @@ class IncomeTypeType(str, enum.Enum):
     OTHER_INCOME = "Other Income"
 
 
+# The form has one "Renten/Pensionen" line; each kind keeps its own row, amount and office.
+PENSION_INCOME_TYPES = frozenset(
+    {
+        IncomeTypeType.PENSION,
+        IncomeTypeType.OLD_AGE_PENSION,
+        IncomeTypeType.REDUCED_EARNING_CAPACITY_PENSION,
+        IncomeTypeType.SURVIVOR_PENSION,
+    }
+)
+
 INCOME_TYPE_DE = {
     IncomeTypeType.EMPLOYMENT: "Nichtselbstständige Tätigkeit",
     IncomeTypeType.HEALTH_INSURANCE_BENEFITS: "Leistungen der Krankenkasse",
@@ -194,6 +209,9 @@ INCOME_TYPE_DE = {
     IncomeTypeType.RENTAL_AND_LEASING: "Vermietung und Verpachtung",
     IncomeTypeType.HOUSING_BENEFIT: "Wohngeld/Lastenzuschuss",
     IncomeTypeType.PENSION: "Rente/Pension",
+    IncomeTypeType.OLD_AGE_PENSION: "Altersrente",
+    IncomeTypeType.REDUCED_EARNING_CAPACITY_PENSION: "Rente wegen Erwerbsminderung",
+    IncomeTypeType.SURVIVOR_PENSION: "Hinterbliebendenrente",
     IncomeTypeType.SOCIAL_ASSISTANCE: "Sozialhilfeleistungen",
     IncomeTypeType.BASIC_SECURITY_BENEFITS: "Grundsicherungsleistungen",
     IncomeTypeType.ASYLUM_SEEKER_BENEFITS: "Asylbewerberleistungen",

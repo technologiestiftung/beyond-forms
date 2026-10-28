@@ -71,7 +71,9 @@ describe("PersonaPicker", () => {
 
 		const phoneNumber = useAuthStore.getState().phoneNumber as string;
 		expect(phoneNumber).not.toMatch(/^\+493023125/);
-		expect(localStorage.getItem(getMockProfileStorageKey(phoneNumber))).toBeNull();
+		expect(
+			localStorage.getItem(getMockProfileStorageKey(phoneNumber)),
+		).toBeNull();
 	});
 
 	it("reveals the phone-number flow via the fallback link", () => {
