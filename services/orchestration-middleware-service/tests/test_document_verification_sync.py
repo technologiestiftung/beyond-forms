@@ -571,3 +571,17 @@ def test_verify_registration_rejects_unknown_gender_field(mock_post, mock_db):
     detail = response.json()["detail"]
     assert detail["message"] == "Validation failed"
     assert "gender" in detail["errors"]
+
+
+@pytest.mark.parametrize(
+    "amount, receives_pension",
+    [(decimal.Decimal("650.00"), True), (None, True), (decimal.Decimal("0"), False)],
+)
+def test_pension_row_with_amount_zero_means_no_pension(amount, receives_pension):
+    db_user = MagicMock(spec=DbUser)
+    db_user.income_entries = [IncomeEntries(income_type=IncomeTypeType.PENSION, monthly_amount=amount)]
+    db_user.has_permanent_reduction_in_earning_capacity = False
+
+    applicant = map_flat_to_rules_engine_payload(db_user)["form_content"]["applicant_information"]
+
+    assert applicant["applicant_receives_old_age_pension"] is receives_pension

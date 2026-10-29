@@ -1,4 +1,5 @@
 import io
+import re
 import uuid
 import json
 import decimal
@@ -12,11 +13,12 @@ from sqlalchemy.orm import Session
 
 from beyondforms.auth import User as AuthUser, get_current_user, require_authenticated_user
 from src.routes.llm import update_user_data, get_user_data, get_conversation_service
-from src.services.user_service import get_user_service
+from src.services.user_service import get_user_service, write_profile_payload
 from src.services.conversation_service import ConversationService
 from src.models import Users as DbUser, GenderType
 from src.db import get_db
 from src.main import app
+from src.tools import AVAILABLE_TOOLS
 
 client = TestClient(app)
 
@@ -200,330 +202,548 @@ def test_llm_health_check():
     assert response.json() == {"status": "LLM healthy"}
 
 
-def _chat_request_body(user_text: str) -> dict:
-    return {"content": user_text}
+def _run_input(user_text: str) -> dict:
+    return {
+        "threadId": "client-thread",
+        "runId": "run-1",
+        "state": {},
+        "messages": [{"id": "msg-1", "role": "user", "content": user_text}],
+        "tools": [],
+        "context": [],
+        "forwardedProps": {},
+    }
+
+
+def _stream(*deltas):
+    async def gen():
+        for delta in deltas:
+            yield SimpleNamespace(choices=[SimpleNamespace(delta=delta)])
+
+    return gen()
+
+
+def _text_stream(*parts: str):
+    return _stream(*(SimpleNamespace(content=part, tool_calls=None) for part in parts))
+
+
+def _tool_call_stream(name: str, args: str = "{}", call_id: str = "call_1"):
+    # arguments arrive split across chunks, as Gemini streams them
+    half = len(args) // 2
+    return _stream(
+        SimpleNamespace(
+            content=None,
+            tool_calls=[
+                SimpleNamespace(index=0, id=call_id, function=SimpleNamespace(name=name, arguments=args[:half]))
+            ],
+        ),
+        SimpleNamespace(
+            content=None,
+            tool_calls=[SimpleNamespace(index=0, id=None, function=SimpleNamespace(name=None, arguments=args[half:]))],
+        ),
+    )
+
+
+def _events(response) -> list[dict]:
+    return [json.loads(line[len("data: ") :]) for line in response.text.splitlines() if line.startswith("data: ")]
+
+
+def _streamed_text(events: list[dict]) -> str:
+    return "".join(e["delta"] for e in events if e["type"] == "TEXT_MESSAGE_CHUNK")
+
+
+@pytest.fixture
+def mock_conv(mock_conv_service):
+    conv = MagicMock()
+    conv.id = uuid.uuid4()
+    mock_conv_service.get_or_create_in_progress_conversation.return_value = conv
+    mock_conv_service.get_conversation_context.return_value = []
+    return conv
 
 
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_no_tool_call(mock_completion, mock_conv_service):
-    mock_message = MagicMock()
-    mock_message.content = "Hello! How can I help you?"
-    mock_message.tool_calls = None
+def test_chat_stream_no_tool_call(mock_completion, mock_conv_service, mock_conv):
+    mock_completion.return_value = _text_stream("Hello! ", "How can I help you?")
 
-    mock_choice = MagicMock()
-    mock_choice.message = mock_message
-
-    mock_completion.return_value = MagicMock(choices=[mock_choice], usage=None)
-
-    mock_conv = MagicMock()
-    mock_conv.id = uuid.uuid4()
-    mock_conv_service.get_or_create_in_progress_conversation.return_value = mock_conv
-    mock_conv_service.get_conversation_context.return_value = []
-
-    response = client.post("/chat", json=_chat_request_body("Hello"))
+    response = client.post("/chat/stream", json=_run_input("Hello"))
 
     assert response.status_code == 200
-    data = response.json()
-    assert data["response"] == "Hello! How can I help you?"
-    assert data["tool_calls"] == []
-    assert data["conversation_id"] == str(mock_conv.id)
+    assert response.headers["content-type"].startswith("text/event-stream")
+    events = _events(response)
+    assert events[0] == {"type": "RUN_STARTED", "threadId": str(mock_conv.id), "runId": "run-1"}
+    assert events[-1]["type"] == "RUN_FINISHED"
+    assert events[-1]["runId"] == "run-1"
+    assert _streamed_text(events) == "Hello! How can I help you?"
     assert mock_completion.call_count == 1
-    mock_conv_service.add_message.assert_called()
+
+    saved = [c.kwargs for c in mock_conv_service.add_message.call_args_list]
+    assert saved[0]["content"] == "Hello"
+    assert saved[-1]["content"] == "Hello! How can I help you?"
 
 
 @patch("src.routes.llm.check_progress_status", new_callable=AsyncMock)
-@patch("src.routes.llm.update_user_data", new_callable=AsyncMock)
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_with_tool_call(mock_completion, mock_update_user_data, mock_check_progress, mock_conv_service):
-    mock_check_progress.return_value = {
-        "progress_percentage": 50,
-        "missing_fields": ["name", "email"],
-    }
-
-    tool_call_id = "call_123"
-
-    first_message = MagicMock()
-    first_message.content = None
-    mock_function = MagicMock()
-    mock_function.name = "check_progress_status"
-    mock_function.arguments = "{}"
-    mock_tool_call = MagicMock()
-    mock_tool_call.id = tool_call_id
-    mock_tool_call.function = mock_function
-    mock_tool_call.model_dump.return_value = {
-        "id": tool_call_id,
-        "type": "function",
-        "function": {"name": "check_progress_status", "arguments": "{}"},
-    }
-    first_message.tool_calls = [mock_tool_call]
-
-    first_choice = MagicMock()
-    first_choice.message = first_message
-
-    second_message = MagicMock()
-    second_message.content = "You are 50% done."
-    second_message.tool_calls = None
-
-    second_choice = MagicMock()
-    second_choice.message = second_message
-
+def test_chat_stream_with_tool_call(mock_completion, mock_check_progress, mock_conv_service, mock_conv):
+    mock_check_progress.return_value = {"progress_percentage": 50, "missing_fields": ["name", "email"]}
     mock_completion.side_effect = [
-        MagicMock(choices=[first_choice], usage=None),
-        MagicMock(choices=[second_choice], usage=None),
+        _tool_call_stream("check_progress_status", call_id="call_123"),
+        _text_stream("You are 50% done."),
     ]
 
-    mock_conv = MagicMock()
-    mock_conv.id = uuid.uuid4()
-    mock_conv_service.get_or_create_in_progress_conversation.return_value = mock_conv
-    mock_conv_service.get_conversation_context.return_value = []
-
-    response = client.post("/chat", json=_chat_request_body("What's my progress?"))
+    response = client.post("/chat/stream", json=_run_input("What's my progress?"))
 
     assert response.status_code == 200
-    data = response.json()
-    assert data["response"] == "You are 50% done."
-    assert len(data["tool_calls"]) == 1
-    assert data["tool_calls"][0]["name"] == "check_progress_status"
+    events = _events(response)
+    assert _streamed_text(events) == "You are 50% done."
+    assert events[-1]["type"] == "RUN_FINISHED"
     mock_check_progress.assert_awaited_once()
     assert mock_completion.call_count == 2
-    mock_conv_service.add_message.assert_called()
+
+    tool_message = mock_completion.call_args_list[1].kwargs["messages"][-1]
+    assert tool_message["role"] == "tool"
+    assert tool_message["tool_call_id"] == "call_123"
+    assert json.loads(tool_message["content"]) == mock_check_progress.return_value
 
 
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_with_update_user_data_tool_call(mock_completion, mock_conv_service, mock_db):
-    tool_call_id = "call_456"
-
-    first_message = MagicMock()
-    first_message.content = None
-    mock_function = MagicMock()
-    mock_function.name = "update_user_data"
-    mock_function.arguments = json.dumps({"updates": {"rent_total": 550.0}})
-    mock_tool_call = MagicMock()
-    mock_tool_call.id = tool_call_id
-    mock_tool_call.function = mock_function
-    mock_tool_call.model_dump.return_value = {
-        "id": tool_call_id,
-        "type": "function",
-        "function": {"name": "update_user_data", "arguments": json.dumps({"updates": {"rent_total": 550.0}})},
-    }
-    first_message.tool_calls = [mock_tool_call]
-
-    first_choice = MagicMock()
-    first_choice.message = first_message
-
-    second_message = MagicMock()
-    second_message.content = "I've updated your rent information."
-    second_message.tool_calls = None
-
-    second_choice = MagicMock()
-    second_choice.message = second_message
-
+def test_chat_stream_with_update_user_data_tool_call(mock_completion, mock_conv_service, mock_conv, mock_db):
+    args = json.dumps({"updates": {"rent_total": 550.0}})
     mock_completion.side_effect = [
-        MagicMock(choices=[first_choice], usage=None),
-        MagicMock(choices=[second_choice], usage=None),
+        _tool_call_stream("update_user_data", args, call_id="call_456"),
+        _text_stream("I've updated your rent information."),
     ]
-
-    mock_conv = MagicMock()
-    mock_conv.id = uuid.uuid4()
-    mock_conv_service.get_or_create_in_progress_conversation.return_value = mock_conv
-    mock_conv_service.get_conversation_context.return_value = []
-
-    mock_user_service = MagicMock()
-    app.dependency_overrides[get_user_service] = lambda: mock_user_service
+    app.dependency_overrides[get_user_service] = lambda: MagicMock()
 
     with patch("src.routes.llm.update_user_data", new_callable=AsyncMock) as mock_update_user_data:
         mock_update_user_data.return_value = {"status": "success", "message": "User data updated successfully"}
-        response = client.post("/chat", json=_chat_request_body("My rent is 550"))
+        response = client.post("/chat/stream", json=_run_input("My rent is 550"))
 
-        assert response.status_code == 200
-        data = response.json()
-        assert data["response"] == "I've updated your rent information."
-        assert len(data["tool_calls"]) == 1
-        assert data["tool_calls"][0]["name"] == "update_user_data"
-        assert data["tool_calls"][0]["args"] == {"updates": {"rent_total": 550.0}}
-        mock_update_user_data.assert_called_once()
+    assert response.status_code == 200
+    assert _streamed_text(_events(response)) == "I've updated your rent information."
+    mock_update_user_data.assert_awaited_once()
+    assert mock_update_user_data.call_args.kwargs["updates"] == {"rent_total": 550.0}
 
 
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_with_get_user_data_tool_call(mock_completion, mock_conv_service, mock_db):
-    tool_call_id = "call_get_data"
-
-    first_message = MagicMock()
-    first_message.content = None
-    mock_function = MagicMock()
-    mock_function.name = "get_user_data"
-    mock_function.arguments = "{}"
-    mock_tool_call = MagicMock()
-    mock_tool_call.id = tool_call_id
-    mock_tool_call.function = mock_function
-    mock_tool_call.model_dump.return_value = {
-        "id": tool_call_id,
-        "type": "function",
-        "function": {"name": "get_user_data", "arguments": "{}"},
-    }
-    first_message.tool_calls = [mock_tool_call]
-
-    first_choice = MagicMock()
-    first_choice.message = first_message
-
-    second_message = MagicMock()
-    second_message.content = "You have Anna as your first name on file."
-    second_message.tool_calls = None
-
-    second_choice = MagicMock()
-    second_choice.message = second_message
-
+def test_chat_stream_with_get_user_data_tool_call(mock_completion, mock_conv_service, mock_conv, mock_db):
     mock_completion.side_effect = [
-        MagicMock(choices=[first_choice], usage=None),
-        MagicMock(choices=[second_choice], usage=None),
+        _tool_call_stream("get_user_data", call_id="call_get_data"),
+        _text_stream("You have Anna as your first name on file."),
     ]
+    app.dependency_overrides[get_user_service] = lambda: MagicMock()
 
-    mock_conv = MagicMock()
-    mock_conv.id = uuid.uuid4()
-    mock_conv_service.get_or_create_in_progress_conversation.return_value = mock_conv
-    mock_conv_service.get_conversation_context.return_value = []
-
-    mock_user_service = MagicMock()
-    app.dependency_overrides[get_user_service] = lambda: mock_user_service
-
-    stored_data = {"first_name": "Anna"}
     with patch("src.routes.llm.get_user_data", new_callable=AsyncMock) as mock_get_user_data:
-        mock_get_user_data.return_value = stored_data
-        response = client.post("/chat", json=_chat_request_body("What do you already know about me?"))
+        mock_get_user_data.return_value = {"first_name": "Anna"}
+        response = client.post("/chat/stream", json=_run_input("What do you already know about me?"))
 
-        assert response.status_code == 200
-        data = response.json()
-        assert data["response"] == "You have Anna as your first name on file."
-        assert len(data["tool_calls"]) == 1
-        assert data["tool_calls"][0]["name"] == "get_user_data"
-        assert data["tool_calls"][0]["args"] == {}
-        mock_get_user_data.assert_called_once()
+    assert response.status_code == 200
+    assert _streamed_text(_events(response)) == "You have Anna as your first name on file."
+    mock_get_user_data.assert_awaited_once()
+
+    tool_message = mock_completion.call_args_list[1].kwargs["messages"][-1]
+    assert json.loads(tool_message["content"]) == {"first_name": "Anna"}
 
 
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_multi_round_tool_calls(
-    mock_completion,
-    mock_conv_service,
-    mock_db,
-):
-    # Round 1: LLM calls get_user_table_schema
-    first_function = MagicMock()
-    first_function.name = "get_user_table_schema"
-    first_function.arguments = "{}"
-    first_tool_call = MagicMock()
-    first_tool_call.id = "call_001"
-    first_tool_call.function = first_function
-    first_tool_call.model_dump.return_value = {
-        "id": "call_001",
-        "type": "function",
-        "function": {"name": "get_user_table_schema", "arguments": "{}"},
-    }
-
-    first_message = MagicMock()
-    first_message.content = None
-    first_message.tool_calls = [first_tool_call]
-
-    # Round 2: LLM calls update_user_data with schema knowledge
-    second_function = MagicMock()
-    second_function.name = "update_user_data"
-    second_function.arguments = json.dumps({"updates": {"rent_total": 550.0}})
-    second_tool_call = MagicMock()
-    second_tool_call.id = "call_002"
-    second_tool_call.function = second_function
-    second_tool_call.model_dump.return_value = {
-        "id": "call_002",
-        "type": "function",
-        "function": {"name": "update_user_data", "arguments": json.dumps({"updates": {"rent_total": 550.0}})},
-    }
-
-    second_message = MagicMock()
-    second_message.content = None
-    second_message.tool_calls = [second_tool_call]
-
-    # Round 3: LLM returns final text
-    third_message = MagicMock()
-    third_message.content = "I've updated your rent to 550."
-    third_message.tool_calls = None
-
+def test_chat_stream_multi_round_tool_calls(mock_completion, mock_conv_service, mock_conv, mock_db):
     mock_completion.side_effect = [
-        MagicMock(choices=[MagicMock(message=first_message)], usage=None),
-        MagicMock(choices=[MagicMock(message=second_message)], usage=None),
-        MagicMock(choices=[MagicMock(message=third_message)], usage=None),
+        _tool_call_stream("get_user_table_schema", call_id="call_001"),
+        _tool_call_stream("update_user_data", json.dumps({"updates": {"rent_total": 550.0}}), call_id="call_002"),
+        _text_stream("I've updated your rent to 550."),
     ]
-
-    mock_conv = MagicMock()
-    mock_conv.id = uuid.uuid4()
-    mock_conv_service.get_or_create_in_progress_conversation.return_value = mock_conv
-    mock_conv_service.get_conversation_context.return_value = []
-
-    mock_user_service = MagicMock()
-    app.dependency_overrides[get_user_service] = lambda: mock_user_service
+    app.dependency_overrides[get_user_service] = lambda: MagicMock()
 
     with patch("src.routes.llm.update_user_data", new_callable=AsyncMock) as mock_update_user_data:
         mock_update_user_data.return_value = {"status": "success", "message": "User data updated successfully"}
-        response = client.post("/chat", json=_chat_request_body("My rent is 550"))
+        response = client.post("/chat/stream", json=_run_input("My rent is 550"))
 
-        assert response.status_code == 200
-        data = response.json()
-        assert data["response"] == "I've updated your rent to 550."
-        assert len(data["tool_calls"]) == 2
-        assert data["tool_calls"][0]["name"] == "get_user_table_schema"
-        assert data["tool_calls"][1]["name"] == "update_user_data"
-        assert mock_completion.call_count == 3
-        mock_update_user_data.assert_called_once()
+    assert response.status_code == 200
+    assert _streamed_text(_events(response)) == "I've updated your rent to 550."
+    assert mock_completion.call_count == 3
+    mock_update_user_data.assert_awaited_once()
+
+    stored_tool_calls = [
+        c.kwargs["metadata"]["tool_calls"][0]["function"]["name"]
+        for c in mock_conv_service.add_message.call_args_list
+        if c.kwargs.get("metadata", {}).get("tool_calls")
+    ]
+    assert stored_tool_calls == ["get_user_table_schema", "update_user_data"]
 
 
-def test_chat_unauthenticated():
+def test_chat_stream_unauthenticated():
     async def raise_401():
         raise HTTPException(status_code=401, detail="Missing authentication token")
 
     app.dependency_overrides[require_authenticated_user] = raise_401
 
-    response = client.post("/chat", json=_chat_request_body("Hello"))
+    response = client.post("/chat/stream", json=_run_input("Hello"))
     assert response.status_code == 401
 
 
+def test_chat_stream_rejects_empty_user_message(mock_conv_service, mock_conv):
+    response = client.post("/chat/stream", json=_run_input("   "))
+    assert response.status_code == 422
+
+
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_max_tool_call_rounds(mock_completion, mock_conv_service):
-    def make_tool_call_response(name, args, call_id):
-        mock_function = MagicMock()
-        mock_function.name = name
-        mock_function.arguments = args
-        mock_tool_call = MagicMock()
-        mock_tool_call.id = call_id
-        mock_tool_call.function = mock_function
-        mock_tool_call.model_dump.return_value = {
-            "id": call_id,
-            "type": "function",
-            "function": {"name": name, "arguments": args},
-        }
-        message = MagicMock()
-        message.content = None
-        message.tool_calls = [mock_tool_call]
-        return MagicMock(choices=[MagicMock(message=message)], usage=None)
-
-    final_message = MagicMock()
-    final_message.content = "Done after max rounds."
-    final_message.tool_calls = None
-
-    side_effects = [make_tool_call_response("check_progress_status", "{}", f"call_{i}") for i in range(6)] + [
-        MagicMock(choices=[MagicMock(message=final_message)], usage=None)
-    ]
-    mock_completion.side_effect = side_effects
-
-    mock_conv = MagicMock()
-    mock_conv.id = uuid.uuid4()
-    mock_conv_service.get_or_create_in_progress_conversation.return_value = mock_conv
-    mock_conv_service.get_conversation_context.return_value = []
+def test_chat_stream_last_round_forces_text(mock_completion, mock_conv_service, mock_conv):
+    max_rounds = 5
+    mock_completion.side_effect = [
+        _tool_call_stream("check_progress_status", call_id=f"call_{i}") for i in range(max_rounds - 1)
+    ] + [_text_stream("Done after max rounds.")]
 
     with patch("src.routes.llm.check_progress_status", new_callable=AsyncMock) as mock_check:
         mock_check.return_value = {"progress_percentage": 50, "missing_fields": []}
-        response = client.post("/chat", json=_chat_request_body("Keep checking"))
+        response = client.post("/chat/stream", json=_run_input("Keep checking"))
 
     assert response.status_code == 200
-    data = response.json()
-    assert len(data["tool_calls"]) == 5
-    assert mock_completion.call_count == 6
+    assert _streamed_text(_events(response)) == "Done after max rounds."
+    assert mock_completion.call_count == max_rounds
+    tool_choices = [c.kwargs["tool_choice"] for c in mock_completion.call_args_list]
+    assert tool_choices == ["auto"] * (max_rounds - 1) + ["none"]
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_finishes_when_model_ignores_tool_choice_none(mock_completion, mock_conv_service, mock_conv):
+    mock_completion.side_effect = [_tool_call_stream("check_progress_status", call_id=f"call_{i}") for i in range(5)]
+
+    with patch("src.routes.llm.check_progress_status", new_callable=AsyncMock) as mock_check:
+        mock_check.return_value = {"progress_percentage": 50, "missing_fields": []}
+        response = client.post("/chat/stream", json=_run_input("Keep checking"))
+
+    assert mock_completion.call_count == 5
+    assert _events(response)[-1]["type"] == "RUN_FINISHED"
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_error_hides_exception_details(mock_completion, mock_conv_service, mock_conv):
+    async def broken():
+        yield SimpleNamespace(choices=[SimpleNamespace(delta=SimpleNamespace(content="Hal", tool_calls=None))])
+        raise RuntimeError("vertex credentials expired")
+
+    mock_completion.return_value = broken()
+
+    response = client.post("/chat/stream", json=_run_input("Hello"))
+
+    events = _events(response)
+    assert events[-1]["type"] == "RUN_ERROR"
+    assert "vertex" not in events[-1]["message"]
+    assert not any(e["type"] == "RUN_FINISHED" for e in events)
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_reports_failed_llm_call(mock_completion, mock_conv_service, mock_conv):
+    mock_completion.side_effect = RuntimeError("Refresh token has expired")
+
+    response = client.post("/chat/stream", json=_run_input("Hello"))
+
+    events = _events(response)
+    assert [e["type"] for e in events] == ["RUN_STARTED", "RUN_ERROR"]
+    assert "token" not in events[-1]["message"]
+
+
+@pytest.fixture(autouse=True)
+def rules_engine():
+    """The rules engine's next step; unreachable unless a test says otherwise."""
+    with patch("src.routes.llm.evaluate", return_value=None) as evaluate:
+        yield evaluate
+
+
+@pytest.fixture
+def profile_row(rules_engine):
+    row = DbUser()
+    rules_engine.return_value = {"next_step": "step_applicant_name"}
+    with patch("src.routes.llm._load_user_row", return_value=row):
+        yield row
+
+
+def _card_args(card_id: str = "step_applicant_name", **overrides) -> dict:
+    args = {
+        "card_id": card_id,
+        "question": "Wie heißen Sie?",
+        "labels": {"first_name": "Vorname", "last_name": "Nachname", "birth_name": "Geburtsname"},
+    }
+    return {**args, **overrides}
+
+
+def _card_stream(args: dict, call_id: str = "call_card", lead_in: str = "Fangen wir an:"):
+    return _stream(
+        SimpleNamespace(content=lead_in, tool_calls=None),
+        SimpleNamespace(
+            content=None,
+            tool_calls=[
+                SimpleNamespace(
+                    index=0, id=call_id, function=SimpleNamespace(name="show_card", arguments=json.dumps(args))
+                )
+            ],
+        ),
+    )
+
+
+def _stored(mock_conv_service, role: str) -> list[dict]:
+    return [c.kwargs for c in mock_conv_service.add_message.call_args_list if c.kwargs["role"].value == role]
+
+
+def _offered_card(mock_completion, call: int = 0):
+    """The card the system prompt names as next."""
+    system_prompt = mock_completion.call_args_list[call].kwargs["messages"][0]["content"]
+    match = re.search(r'Next card: card_id "([^"]+)"', system_prompt)
+    return match and match.group(1)
+
+
+def test_show_card_is_one_of_the_available_tools():
+    assert "show_card" in {tool["function"]["name"] for tool in AVAILABLE_TOOLS}
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_show_card_sends_the_built_card_and_pauses(
+    mock_completion, mock_conv_service, mock_conv, profile_row
+):
+    mock_completion.return_value = _card_stream(_card_args(), call_id="call_card_1")
+
+    response = client.post("/chat/stream", json=_run_input("Ich möchte meinen Grundsicherungsantrag ausfüllen"))
+
+    assert _offered_card(mock_completion) == "step_applicant_name"
+    events = _events(response)
+    assert [e["type"] for e in events] == ["RUN_STARTED", "TEXT_MESSAGE_CHUNK", "TOOL_CALL_CHUNK", "RUN_FINISHED"]
+    card = events[2]
+    assert card["toolCallId"] == "call_card_1"
+    assert card["toolCallName"] == "show_card"
+    assert card["parentMessageId"] == events[1]["messageId"]
+    assert json.loads(card["delta"]) == {
+        "card_id": "step_applicant_name",
+        "question": "Wie heißen Sie?",
+        "inputs": [
+            {"field": "first_name", "kind": "text", "label": "Vorname"},
+            {"field": "last_name", "kind": "text", "label": "Nachname"},
+            {"field": "birth_name", "kind": "text", "label": "Geburtsname", "optional": True},
+        ],
+    }
+    assert mock_completion.call_count == 1
+
+    assistant = _stored(mock_conv_service, "assistant")[-1]
+    assert assistant["content"] == "Fangen wir an:"
+    assert assistant["metadata"]["tool_calls"][0]["id"] == "call_card_1"
+    assert _stored(mock_conv_service, "tool") == []
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_offers_no_card_without_a_profile(mock_completion, mock_conv_service, mock_conv):
+    mock_completion.return_value = _text_stream("Hallo!")
+
+    with patch("src.routes.llm._load_user_row", return_value=None):
+        client.post("/chat/stream", json=_run_input("Hallo"))
+
+    assert _offered_card(mock_completion) is None
+
+
+@pytest.mark.parametrize(
+    "evaluation",
+    [None, {"next_step": "END"}, {"next_step": "step_eligibility_nationality"}],
+    ids=["down", "done", "no columns"],
+)
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_offers_no_card_when_the_rules_have_none(
+    mock_completion, evaluation, mock_conv_service, mock_conv, profile_row, rules_engine
+):
+    rules_engine.return_value = evaluation
+    mock_completion.return_value = _text_stream("Hallo!")
+
+    client.post("/chat/stream", json=_run_input("Hallo"))
+
+    assert _offered_card(mock_completion) is None
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_tells_the_model_when_the_application_is_complete(
+    mock_completion, mock_conv_service, mock_conv, profile_row, rules_engine
+):
+    rules_engine.return_value = {"next_step": "END"}
+    mock_completion.return_value = _text_stream("Alles ist ausgefüllt.")
+
+    client.post("/chat/stream", json=_run_input("Weiter"))
+
+    system_prompt = mock_completion.call_args.kwargs["messages"][0]["content"]
+    assert "Every card of the user's Grundsicherungsantrag is answered" in system_prompt
+    assert _offered_card(mock_completion) is None
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_runs_server_tools_next_to_a_card(
+    mock_completion, mock_conv_service, mock_conv, mock_db, profile_row
+):
+    mock_completion.return_value = _stream(
+        SimpleNamespace(
+            content=None,
+            tool_calls=[
+                SimpleNamespace(
+                    index=0, id="call_data", function=SimpleNamespace(name="get_user_data", arguments="{}")
+                ),
+                SimpleNamespace(
+                    index=1,
+                    id="call_card",
+                    function=SimpleNamespace(name="show_card", arguments=json.dumps(_card_args())),
+                ),
+            ],
+        )
+    )
+
+    with patch("src.routes.llm.get_user_data", new_callable=AsyncMock) as mock_get_user_data:
+        mock_get_user_data.return_value = {"first_name": None}
+        response = client.post("/chat/stream", json=_run_input("Weiter"))
+
+    assert [e["type"] for e in _events(response)][-2:] == ["TOOL_CALL_CHUNK", "RUN_FINISHED"]
+    assert [t["metadata"]["tool_call_id"] for t in _stored(mock_conv_service, "tool")] == ["call_data"]
+    assert mock_completion.call_count == 1
+
+
+@pytest.mark.parametrize(
+    "card_id", ["step_unknown", "step_applicant_accommodation_costs"], ids=["unknown", "not the next card"]
+)
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_rejects_cards_that_are_not_offered(
+    mock_completion, card_id, mock_conv_service, mock_conv, profile_row
+):
+    mock_completion.side_effect = [_card_stream(_card_args(card_id)), _text_stream("Erzählen Sie mir davon.")]
+
+    response = client.post("/chat/stream", json=_run_input("Hallo"))
+
+    events = _events(response)
+    assert not any(e["type"] == "TOOL_CALL_CHUNK" for e in events)
+    assert events[-1]["type"] == "RUN_FINISHED"
+    assert mock_completion.call_count == 2
+    tool_result = json.loads(_stored(mock_conv_service, "tool")[0]["content"])
+    assert tool_result == {"error": f"Unknown card_id: {card_id}"}
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_lets_the_model_fix_missing_card_texts(mock_completion, mock_conv_service, mock_conv, profile_row):
+    incomplete = _card_args(labels={"first_name": "Vorname"})
+    mock_completion.side_effect = [
+        _card_stream(incomplete, call_id="call_1"),
+        _card_stream(_card_args(), call_id="call_2"),
+    ]
+
+    response = client.post("/chat/stream", json=_run_input("Los geht's"))
+
+    error = json.loads(_stored(mock_conv_service, "tool")[0]["content"])["error"]
+    assert error.startswith("Fix the card texts and call show_card again")
+    assert "labels.last_name" in error
+    card_events = [e for e in _events(response) if e["type"] == "TOOL_CALL_CHUNK"]
+    assert [e["toolCallId"] for e in card_events] == ["call_2"]
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_closes_a_card_the_user_did_not_click(mock_completion, mock_conv_service, mock_conv):
+    mock_conv_service.get_conversation_context.return_value = [
+        {"role": "user", "content": "Wohnkosten"},
+        {
+            "role": "assistant",
+            "content": "Kurz zu Ihrer Wohnung:",
+            "tool_calls": [{"id": "call_open", "function": {"name": "show_card", "arguments": "{}"}}],
+        },
+    ]
+    mock_completion.return_value = _text_stream("Alles klar.")
+
+    client.post("/chat/stream", json=_run_input("Die Miete ist 500 Euro"))
+
+    stored = [c.kwargs for c in mock_conv_service.add_message.call_args_list]
+    assert stored[0]["role"].value == "tool"
+    assert stored[0]["metadata"] == {"tool_call_id": "call_open", "name": "show_card"}
+    assert json.loads(stored[0]["content"]) == {"answered_in_text": True}
+    assert stored[1]["role"].value == "user"
+
+
+def _card_answer_input(tool_call_id: str, values: object) -> dict:
+    body = _run_input("unused")
+    body["messages"] = [
+        {"id": "msg-2", "role": "tool", "toolCallId": tool_call_id, "content": json.dumps({"values": values})}
+    ]
+    return body
+
+
+_OPEN_CARD_CONTEXT = [
+    {"role": "user", "content": "Antrag"},
+    {
+        "role": "assistant",
+        "content": "Fangen wir an:",
+        "tool_calls": [{"id": "call_open", "function": {"name": "show_card", "arguments": json.dumps(_card_args())}}],
+    },
+]
+
+
+@patch("src.routes.llm.write_profile_payload", wraps=write_profile_payload)
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_saves_a_card_answer_and_continues(
+    mock_completion, mock_write, mock_conv_service, mock_conv, profile_row, rules_engine
+):
+    mock_conv_service.get_conversation_context.return_value = _OPEN_CARD_CONTEXT
+    rules_engine.return_value = {"next_step": "step_applicant_dob"}
+    mock_completion.return_value = _text_stream("Danke, Anna.")
+
+    response = client.post(
+        "/chat/stream", json=_card_answer_input("call_open", {"first_name": "Anna", "last_name": "Klar"})
+    )
+
+    assert response.status_code == 200
+    assert (profile_row.first_name, profile_row.last_name) == ("Anna", "Klar")
+    mock_write.assert_called_once()
+    assert _streamed_text(_events(response)) == "Danke, Anna."
+    stored = [c.kwargs for c in mock_conv_service.add_message.call_args_list]
+    assert stored[0]["role"].value == "tool"
+    assert json.loads(stored[0]["content"]) == {
+        "card_id": "step_applicant_name",
+        "saved": {"first_name": "Anna", "last_name": "Klar"},
+    }
+    assert stored[0]["metadata"] == {"tool_call_id": "call_open", "name": "show_card"}
+    assert not any(s["role"].value == "user" for s in stored)
+    assert _offered_card(mock_completion) == "step_applicant_dob"
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_does_not_offer_a_card_answered_in_this_chat(
+    mock_completion, mock_conv_service, mock_conv, profile_row
+):
+    mock_conv_service.get_conversation_context.return_value = [
+        {"role": "tool", "name": "show_card", "content": json.dumps({"card_id": "step_applicant_name", "saved": {}})}
+    ]
+    mock_completion.return_value = _text_stream("Weiter geht's.")
+
+    client.post("/chat/stream", json=_run_input("Weiter"))
+
+    assert _offered_card(mock_completion) is None
+
+
+@pytest.mark.parametrize(
+    "values",
+    [{"first_name": "Anna"}, {"iban": "DE00"}, {"first_name": 5, "last_name": "Klar"}, "Anna"],
+    ids=["missing field", "foreign field", "wrong type", "no object"],
+)
+def test_chat_stream_rejects_an_invalid_card_answer(values, mock_conv_service, mock_conv, profile_row):
+    mock_conv_service.get_conversation_context.return_value = _OPEN_CARD_CONTEXT
+
+    response = client.post("/chat/stream", json=_card_answer_input("call_open", values))
+
+    assert response.status_code == 422
+    mock_conv_service.add_message.assert_not_called()
+    assert profile_row.first_name is None
+
+
+@pytest.mark.parametrize(
+    "context",
+    [
+        _OPEN_CARD_CONTEXT,
+        _OPEN_CARD_CONTEXT + [{"role": "tool", "tool_call_id": "call_open", "content": "{}"}],
+    ],
+    ids=["other card", "already answered"],
+)
+def test_chat_stream_rejects_an_answer_without_its_open_card(context, mock_conv_service, mock_conv):
+    mock_conv_service.get_conversation_context.return_value = context
+    tool_call_id = "call_other" if len(context) == 2 else "call_open"
+
+    response = client.post("/chat/stream", json=_card_answer_input(tool_call_id, {"first_name": "Anna"}))
+
+    assert response.status_code == 409
+    mock_conv_service.add_message.assert_not_called()
 
 
 @pytest.mark.asyncio

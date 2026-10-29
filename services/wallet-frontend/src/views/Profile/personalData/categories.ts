@@ -100,13 +100,7 @@ export const PROFILE_CATEGORIES: ProfileCategory[] = [
 		id: "financial",
 		labelKey: "personal.groups.financial",
 		Section: FinancialSection,
-		completionFields: [
-			"monthlyIncome",
-			"incomeSources",
-			"bankName",
-			"accountHolder",
-			"iban",
-		],
+		completionFields: ["monthlyIncome", "bankName", "accountHolder", "iban"],
 	},
 	{
 		id: "health",

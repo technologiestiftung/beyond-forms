@@ -1,23 +1,10 @@
 import React from "react";
-import { FormField, CheckboxField, MultiCheckboxField } from "../fields";
-import { emptyStringToUndefinedNumber } from "../formDefaults";
+import { FormField, CheckboxField } from "../fields";
+import {
+	PROFILE_INCOME_TYPES,
+	emptyStringToUndefinedNumber,
+} from "../formDefaults";
 import type { SectionProps } from "../types";
-
-const INCOME_SOURCE_OPTIONS = [
-	"pension",
-	"none_pension",
-	"employment_employed",
-	"employment_self",
-	"employment_student",
-	"employment_unemployed",
-	"employment_none",
-	"other_benefits",
-	"other_alimony",
-	"other_rent",
-	"other_sick",
-	"other",
-	"none_other",
-] as const;
 
 export const FinancialSection: React.FC<SectionProps> = ({
 	register,
@@ -38,16 +25,23 @@ export const FinancialSection: React.FC<SectionProps> = ({
 				})}
 				onBlur={() => handleFieldBlur("monthlyIncome")}
 			/>
-			<MultiCheckboxField
-				legend={t("personal.fields.incomeSources")}
-				name="incomeSources"
-				register={register}
-				onBlur={() => handleFieldBlur("incomeSources")}
-				options={INCOME_SOURCE_OPTIONS.map((code) => ({
-					code,
-					name: t(`personal.incomeSources.${code}`, code),
-				}))}
-			/>
+			<fieldset className="flex flex-col gap-4 text-left w-full">
+				<legend className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
+					{t("personal.fields.incomeEntries")}
+				</legend>
+				{PROFILE_INCOME_TYPES.map((incomeType, index) => (
+					<FormField
+						key={incomeType}
+						id={`incomeEntries.${index}.monthlyAmount`}
+						label={t(`personal.incomeTypes.${incomeType}`)}
+						type="number"
+						register={register(`incomeEntries.${index}.monthlyAmount`, {
+							setValueAs: emptyStringToUndefinedNumber,
+						})}
+						onBlur={() => handleFieldBlur("incomeEntries")}
+					/>
+				))}
+			</fieldset>
 			<CheckboxField
 				id="hasAssets"
 				label={t("personal.fields.hasAssets")}

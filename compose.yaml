@@ -163,6 +163,7 @@ services:
       - ./libs/auth:/app/libs/auth
       - ./libs/document-schemas:/app/libs/document-schemas
       - ./forms:/app/forms:ro
+      - ./schemas/rules:/app/schemas/rules:ro
       - ./demo:/app/demo:ro
       # Second entry on the default DEMO_ASSETS_PATH.
       - ./services/wallet-frontend/tests/fixtures:/app/services/wallet-frontend/tests/fixtures:ro

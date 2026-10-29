@@ -5,6 +5,7 @@ import * as Icons from "../ui/Icons";
 import { ChatForm } from "./ChatForm";
 import { WelcomeCard } from "./WelcomeCard";
 import { ChatMessage } from "./ChatMessage";
+import { ChatCard } from "./ChatCard";
 import { ChatTypingIndicator } from "./ChatTypingIndicator";
 import { ChatErrorMessage } from "./ChatErrorMessage";
 import { ChatHistory } from "./ChatHistory";
@@ -29,6 +30,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
 	const isLoading = useChatStore((s) => s.isLoading);
 	const error = useChatStore((s) => s.error);
 	const sendMessage = useChatStore((s) => s.sendMessage);
+	const answerCard = useChatStore((s) => s.answerCard);
 	const newChat = useChatStore((s) => s.newChat);
 	// The desktop side panel starts open; the mobile sheet has no room for it.
 	const [showChatHistory, setShowChatHistory] = useState(isDesktop);
@@ -127,6 +129,18 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
 								/>
 
 								{messages.map((msg) => {
+									if (msg.role === "card") {
+										return (
+											<ChatCard
+												key={msg.id}
+												message={msg}
+												disabled={isLoading}
+												onSubmit={(values) =>
+													void answerCard(msg.toolCallId, values)
+												}
+											/>
+										);
+									}
 									if (
 										msg.role === "assistant" &&
 										msg.content === "" &&

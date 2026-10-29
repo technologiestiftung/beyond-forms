@@ -144,10 +144,10 @@ def run_llm_chunk(prompt_template: str, schema_context: dict, boilerplate_chunk:
     for fid, finfo in boilerplate_chunk.items():
         line = (
             f'- ID: "{fid}", Type: "{finfo["type"]}", Description: "{finfo["description"]}", '
-            f'Options: {finfo["options"]}'
+            f"Options: {finfo['options']}"
         )
         if finfo.get("option_labels"):
-            line += f', Option Labels: {finfo["option_labels"]}'
+            line += f", Option Labels: {finfo['option_labels']}"
         if finfo.get("nearby_label"):
             line += f', Nearby Label (heuristic, unverified): "{finfo["nearby_label"]}"'
         if finfo.get("read_only"):

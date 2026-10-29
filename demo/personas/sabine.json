@@ -22,8 +22,8 @@
     "second_nationality": null,
     "has_guardian": false,
     "has_custodian": false,
-    "displaced_status": null,
-    "residence_status": null,
+    "displaced_status": "none",
+    "residence_status": "Citizen",
     "license_plate": "B-SR 224",
     "vehicle_make": "Toyota Yaris",
     "vehicle_year": "2011",
@@ -62,8 +62,9 @@
     "cable_tv_costs": 0.00,
     "number_of_rooms": 2,
     "living_area": 52.00,
-    "sublet_room_count": null,
-    "sublet_rent_income": null,
+    "sublet_room_count": 0,
+    "sublet_rent_income": 0.0,
+    "rent_arrears_amount": 0.0,
     "rent_paid_until": "2026-07-31",
     "landlord_name": "Wohnungsbaugesellschaft Mitte mbH",
     "heating_type": "Sammelheizung",
@@ -71,7 +72,10 @@
 
     "monthly_income": 245.00,
     "income_entries": [
-      { "income_type": "Pension", "monthly_amount": 245.0 }
+      { "income_type": "Reduced Earning Capacity Pension", "monthly_amount": 245.0 },
+      { "income_type": "Health Insurance Benefits", "monthly_amount": 0.0 },
+      { "income_type": "Alimony", "monthly_amount": 0.0 },
+      { "income_type": "Rental and Leasing", "monthly_amount": 0.0 }
     ],
     "has_assets": true,
     "asset_entries": [

@@ -272,14 +272,23 @@ describe("ApplicationHousingQuestions - TDD & Clean UI Verification", () => {
 			).toBeInTheDocument();
 		});
 
+		const holder = screen.getByLabelText(
+			"Freies Wohnrecht bei (Name der Person)",
+		);
+		expect(holder).toHaveValue("");
+		fireEvent.change(holder, { target: { value: "Erika Klar" } });
+
 		// Click next to save and navigate
 		fireEvent.click(screen.getByTestId("next-button"));
 
-		// Assert that freeHousingRightHolder and tenancyStatus are updated
 		await waitFor(() => {
 			expect(mockUpdateSection).toHaveBeenCalledWith({
 				section: "housing",
-				data: expect.objectContaining({ freeHousingRightHolder: "Ja" }),
+				data: expect.objectContaining({
+					tenancyStatus: null,
+					landlordName: "",
+					freeHousingRightHolder: "Erika Klar",
+				}),
 			});
 		});
 
@@ -289,5 +298,31 @@ describe("ApplicationHousingQuestions - TDD & Clean UI Verification", () => {
 				AppRoutes.ApplicationHouseholdQuestions,
 			);
 		});
+	});
+
+	it("reopens a stored free right of residence with the holder's name", async () => {
+		(useProfile as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+			profileData: {
+				address: { street: "Platz der Luftbrücke", city: "Berlin" },
+				housing: {
+					accomodationType: "Rental Apartment",
+					tenancyStatus: null,
+					freeHousingRightHolder: "Erika Klar",
+				},
+			},
+			updateSection: mockUpdateSection.mockResolvedValue({ success: true }),
+			isUpdating: false,
+			refetch: vi.fn().mockResolvedValue({}),
+		});
+		renderWithRouter(<ApplicationHousingQuestions />);
+
+		fireEvent.click(screen.getByTestId("next-button"));
+		await screen.findByText("Wie wohnst Du zurzeit?");
+		fireEvent.click(screen.getByTestId("next-button"));
+		await screen.findByText("Bist Du Haupt- oder Untermieter?");
+
+		expect(
+			screen.getByLabelText("Freies Wohnrecht bei (Name der Person)"),
+		).toHaveValue("Erika Klar");
 	});
 });

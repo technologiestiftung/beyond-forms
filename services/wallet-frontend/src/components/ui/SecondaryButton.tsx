@@ -1,6 +1,7 @@
 import React from "react";
 
-export interface SecondaryButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface SecondaryButtonProps
+	extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 	children: React.ReactNode;
 }
 

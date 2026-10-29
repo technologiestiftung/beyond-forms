@@ -105,6 +105,8 @@ class DisabilityMerkzeichenType(str, enum.Enum):
 
 
 class DisplacedStatusType(str, enum.Enum):
+    # an explicit "no status", so it isn't mistaken for an unanswered question
+    NONE = "none"
     EXPELLEE__RESETTLER_ = "Expellee (Resettler)"
     DISPLACED_PERSON__RESETTLER_ = "Displaced Person (Resettler)"
     LATE_RESETTLER = "Late Resettler"
@@ -167,6 +169,9 @@ class IncomeTypeType(str, enum.Enum):
     RENTAL_AND_LEASING = "Rental and Leasing"
     HOUSING_BENEFIT = "Housing Benefit"
     PENSION = "Pension"
+    OLD_AGE_PENSION = "Old-Age Pension"
+    REDUCED_EARNING_CAPACITY_PENSION = "Reduced Earning Capacity Pension"
+    SURVIVOR_PENSION = "Survivor Pension"
     SOCIAL_ASSISTANCE = "Social Assistance"
     BASIC_SECURITY_BENEFITS = "Basic Security Benefits"
     ASYLUM_SEEKER_BENEFITS = "Asylum Seeker Benefits"
@@ -185,6 +190,16 @@ class IncomeTypeType(str, enum.Enum):
     OTHER_INCOME = "Other Income"
 
 
+# The form has one "Renten/Pensionen" line; each kind keeps its own row, amount and office.
+PENSION_INCOME_TYPES = frozenset(
+    {
+        IncomeTypeType.PENSION,
+        IncomeTypeType.OLD_AGE_PENSION,
+        IncomeTypeType.REDUCED_EARNING_CAPACITY_PENSION,
+        IncomeTypeType.SURVIVOR_PENSION,
+    }
+)
+
 INCOME_TYPE_DE = {
     IncomeTypeType.EMPLOYMENT: "Nichtselbstständige Tätigkeit",
     IncomeTypeType.HEALTH_INSURANCE_BENEFITS: "Leistungen der Krankenkasse",
@@ -194,6 +209,9 @@ INCOME_TYPE_DE = {
     IncomeTypeType.RENTAL_AND_LEASING: "Vermietung und Verpachtung",
     IncomeTypeType.HOUSING_BENEFIT: "Wohngeld/Lastenzuschuss",
     IncomeTypeType.PENSION: "Rente/Pension",
+    IncomeTypeType.OLD_AGE_PENSION: "Altersrente",
+    IncomeTypeType.REDUCED_EARNING_CAPACITY_PENSION: "Rente wegen Erwerbsminderung",
+    IncomeTypeType.SURVIVOR_PENSION: "Hinterbliebendenrente",
     IncomeTypeType.SOCIAL_ASSISTANCE: "Sozialhilfeleistungen",
     IncomeTypeType.BASIC_SECURITY_BENEFITS: "Grundsicherungsleistungen",
     IncomeTypeType.ASYLUM_SEEKER_BENEFITS: "Asylbewerberleistungen",
@@ -620,7 +638,11 @@ class AssociatedPersons(Base):
     has_guardian: Mapped[Optional[bool]] = mapped_column(Boolean)
     has_custodian: Mapped[Optional[bool]] = mapped_column(Boolean)
     displaced_status: Mapped[Optional[DisplacedStatusType]] = mapped_column(
-        Enum(DisplacedStatusType, values_callable=lambda cls: [member.value for member in cls], name="displaced_status_type")
+        Enum(
+            DisplacedStatusType,
+            values_callable=lambda cls: [member.value for member in cls],
+            name="displaced_status_type",
+        )
     )
     displaced_issued_on: Mapped[Optional[datetime.date]] = mapped_column(Date)
     displaced_issued_by: Mapped[Optional[str]] = mapped_column(String(255))
@@ -631,15 +653,27 @@ class AssociatedPersons(Base):
     has_disability_id: Mapped[Optional[bool]] = mapped_column(Boolean)
     disability_valid_until: Mapped[Optional[datetime.date]] = mapped_column(Date)
     merkzeichen: Mapped[Optional[DisabilityMerkzeichenType]] = mapped_column(
-        Enum(DisabilityMerkzeichenType, values_callable=lambda cls: [member.value for member in cls], name="disability_merkzeichen_type")
+        Enum(
+            DisabilityMerkzeichenType,
+            values_callable=lambda cls: [member.value for member in cls],
+            name="disability_merkzeichen_type",
+        )
     )
     disability_application_pending: Mapped[Optional[bool]] = mapped_column(Boolean)
     social_security_type: Mapped[Optional[SocialSecurityTypeType]] = mapped_column(
-        Enum(SocialSecurityTypeType, values_callable=lambda cls: [member.value for member in cls], name="social_security_type_type")
+        Enum(
+            SocialSecurityTypeType,
+            values_callable=lambda cls: [member.value for member in cls],
+            name="social_security_type_type",
+        )
     )
     health_insurance_provider: Mapped[Optional[str]] = mapped_column(String(255))
     health_insurance_status: Mapped[Optional[HealthInsuranceStatusType]] = mapped_column(
-        Enum(HealthInsuranceStatusType, values_callable=lambda cls: [member.value for member in cls], name="health_insurance_status_type")
+        Enum(
+            HealthInsuranceStatusType,
+            values_callable=lambda cls: [member.value for member in cls],
+            name="health_insurance_status_type",
+        )
     )
     pension_insurance_provider: Mapped[Optional[str]] = mapped_column(String(255))
     pension_insurance_no: Mapped[Optional[str]] = mapped_column(String(255))
@@ -904,9 +938,7 @@ class IncomeEntries(_MoneyEntry):
     reference_no: Mapped[Optional[str]] = mapped_column(String(255))
 
     user: Mapped["Users"] = relationship("Users", back_populates="income_entries")
-    person: Mapped[Optional["AssociatedPersons"]] = relationship(
-        "AssociatedPersons", back_populates="income_entries"
-    )
+    person: Mapped[Optional["AssociatedPersons"]] = relationship("AssociatedPersons", back_populates="income_entries")
 
 
 class ExpenseEntries(_MoneyEntry):
@@ -944,9 +976,7 @@ class ExpenseEntries(_MoneyEntry):
     note: Mapped[Optional[str]] = mapped_column(String(255))
 
     user: Mapped["Users"] = relationship("Users", back_populates="expense_entries")
-    person: Mapped[Optional["AssociatedPersons"]] = relationship(
-        "AssociatedPersons", back_populates="expense_entries"
-    )
+    person: Mapped[Optional["AssociatedPersons"]] = relationship("AssociatedPersons", back_populates="expense_entries")
 
 
 class AssetEntries(_MoneyEntry):
@@ -1021,4 +1051,3 @@ class BenefitClaimEntries(_MoneyEntry):
     person: Mapped[Optional["AssociatedPersons"]] = relationship(
         "AssociatedPersons", back_populates="benefit_claim_entries"
     )
-

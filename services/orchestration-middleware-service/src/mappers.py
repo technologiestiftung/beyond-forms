@@ -2,7 +2,7 @@ from typing import Any, Optional
 import datetime
 import logging
 import re
-from src.models import Users as DbUser
+from src.models import PENSION_INCOME_TYPES, Users as DbUser
 from unittest.mock import Mock
 
 logger = logging.getLogger(__name__)
@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 # whenever `has_received_benefits_before` is true. Without a value there, every
 # applicant who has received benefits before is rejected as un-submittable.
 # TODO: replace the free-text column with a real date column so this parse can go away.
+_PENSION_KEYS = frozenset(pension_type.value for pension_type in PENSION_INCOME_TYPES)
 _ISO_DATE_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
 _DE_DATE_RE = re.compile(r"(\d{1,2})\.(\d{1,2})\.(\d{4})")
 _YEAR_MONTH_RE = re.compile(r"(\d{4})-(\d{2})(?!\d)")
@@ -221,20 +222,25 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
     entries = getattr(db_user, "income_entries", None)
     if entries is not None and not isinstance(entries, Mock):
         income_rows = [
-            row
-            for row in entries
-            if hasattr(row, "income_type") and getattr(row, "person_id", None) is None
+            row for row in entries if hasattr(row, "income_type") and getattr(row, "person_id", None) is None
         ]
 
     has_permanent_reduction = getattr(db_user, "has_permanent_reduction_in_earning_capacity", None)
     if isinstance(has_permanent_reduction, Mock):
         has_permanent_reduction = None
-    has_pension_row = any(
-        getattr(row.income_type, "value", row.income_type) == "Pension" for row in income_rows
-    )
+    # a pension row with amount 0 records an explicit "no pension"
+    pension_kinds = {
+        getattr(row.income_type, "value", row.income_type)
+        for row in income_rows
+        if getattr(row.income_type, "value", row.income_type) in _PENSION_KEYS and row.monthly_amount != 0
+    }
+    # a generic or survivor's pension says nothing about its reason, so the earning capacity decides
+    unspecific_pension = bool(pension_kinds - {"Old-Age Pension", "Reduced Earning Capacity Pension"})
     if income_rows:
-        has_old_age_pension = has_pension_row and not has_permanent_reduction
-        has_reduced_earnings_pension = has_pension_row and bool(has_permanent_reduction)
+        has_old_age_pension = "Old-Age Pension" in pension_kinds or (unspecific_pension and not has_permanent_reduction)
+        has_reduced_earnings_pension = "Reduced Earning Capacity Pension" in pension_kinds or (
+            unspecific_pension and bool(has_permanent_reduction)
+        )
     else:
         has_old_age_pension = None
         has_reduced_earnings_pension = None
@@ -247,7 +253,7 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
             pass
 
     _INCOME_CATEGORY_LINES = {
-        "pension_income": {"Pension"},
+        "pension_income": _PENSION_KEYS,
         "non_self_employed_income": {"Employment"},
         "social_benefits_income": {
             "Social Assistance",
@@ -269,9 +275,7 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
 
     _category_rows = {name: _rows_for(lines) for name, lines in _INCOME_CATEGORY_LINES.items()}
     _category_totals = {name: _explicit_total(rows) for name, rows in _category_rows.items()}
-    _amountless_categories = {
-        name for name, rows in _category_rows.items() if rows and not _category_totals[name]
-    }
+    _amountless_categories = {name for name, rows in _category_rows.items() if rows and not _category_totals[name]}
 
     def _line_total(name: str) -> float:
         """The summed monthly amounts of the named income lines. A line recorded without

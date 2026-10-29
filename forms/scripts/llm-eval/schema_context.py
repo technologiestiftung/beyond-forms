@@ -215,9 +215,7 @@ def default_paths(project_root: str) -> Tuple[str, str, str]:
     return (
         os.path.join(project_root, "services/orchestration-middleware-service/src/schemas.py"),
         os.path.join(project_root, "services/orchestration-middleware-service/src/models.py"),
-        os.path.join(
-            project_root, "libs/document-schemas/src/beyondforms/document_schemas/document_types.py"
-        ),
+        os.path.join(project_root, "libs/document-schemas/src/beyondforms/document_schemas/document_types.py"),
     )
 
 
@@ -492,7 +490,9 @@ def _money_rows_for_person(models, person_id: Any, data: Dict[str, Any]) -> list
         if scalar:
             rows.append(
                 models.IncomeEntries(
-                    person_id=person_id, income_type=models.IncomeTypeType.PENSION, monthly_amount=_decimal_or_none(scalar)
+                    person_id=person_id,
+                    income_type=models.IncomeTypeType.PENSION,
+                    monthly_amount=_decimal_or_none(scalar),
                 )
             )
 

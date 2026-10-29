@@ -267,6 +267,24 @@ describe("ApplicationAboutMeQuestions", () => {
 		).toBeInTheDocument();
 	});
 
+	it("goes to the next page when the next step belongs to another section", async () => {
+		mockUpdateSection.mockResolvedValue({
+			success: true,
+			data: { wizard_evaluation: { next_step: "step_applicant_sublet" } },
+		});
+		render(
+			<MemoryRouter>
+				<ApplicationAboutMeQuestions />
+			</MemoryRouter>,
+		);
+
+		fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
+
+		expect(
+			await screen.findByText("Wann und wo bist Du geboren?"),
+		).toBeInTheDocument();
+	});
+
 	it("navigates through the entire flow and redirects to overview on Page 9 completion", async () => {
 		const { container } = render(
 			<MemoryRouter>

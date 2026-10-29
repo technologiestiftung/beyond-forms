@@ -26,8 +26,10 @@ from src.schemas import (
     BenefitClaimEntrySchema,
     ExpenseEntrySchema,
     IncomeEntrySchema,
+    UserProfileValidationSchema,
 )
 from src.db import get_db
+from src.services.berlin_districts import sync_berlin_district
 
 logger = logging.getLogger(__name__)
 
@@ -129,9 +131,7 @@ RELATION_WRITERS = {
     "income_entries": _money_grid_writer(IncomeEntries, IncomeEntrySchema, "income_entries", "income_type"),
     "expense_entries": _money_grid_writer(ExpenseEntries, ExpenseEntrySchema, "expense_entries", "expense_type"),
     "asset_entries": _money_grid_writer(AssetEntries, AssetEntrySchema, "asset_entries", "asset_type"),
-    "benefit_claim_entries": _money_grid_writer(
-        BenefitClaimEntries, BenefitClaimEntrySchema, "benefit_claim_entries"
-    ),
+    "benefit_claim_entries": _money_grid_writer(BenefitClaimEntries, BenefitClaimEntrySchema, "benefit_claim_entries"),
 }
 RELATION_KEYS = frozenset(RELATION_WRITERS)
 RELATION_WRITE_ORDER = tuple(RELATION_WRITERS)
@@ -182,6 +182,34 @@ def apply_profile_key(user_row: DbUser, key: str, value: object) -> bool:
         return False
     writer(user_row, _reconcile_money_grid_items(user_row, key, value))
     return True
+
+
+DISTRICT_SYNC_FIELDS = frozenset({"street", "house_number", "zip_code", "city"})
+
+
+def write_profile_payload(db: Session, user_row: DbUser, payload: UserProfileValidationSchema) -> None:
+    """Writes the fields a validated profile payload sets, the same way for POST /profile and
+    for chat cards. Raises ProfileWriteError on bad input; the caller commits."""
+    address_changed = False
+    for key, value in ordered_profile_items(payload.model_dump(exclude_unset=True, exclude={"validate_entire_form"})):
+        if key in RELATION_KEYS:
+            # Already validated by the request schema, so hand over the model
+            # instances rather than round-tripping the dumped dicts.
+            value = getattr(payload, key)
+        if apply_profile_key(user_row, key, value):
+            continue
+        if key in DISTRICT_SYNC_FIELDS and getattr(user_row, key) != value:
+            address_changed = True
+        setattr(user_row, key, value)
+
+    if address_changed:
+        user_row.district = sync_berlin_district(
+            db=db,
+            street=user_row.street,
+            house_number=user_row.house_number,
+            zip_code=user_row.zip_code,
+            city=user_row.city,
+        )
 
 
 class UserService:

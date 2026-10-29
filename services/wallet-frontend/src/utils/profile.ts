@@ -16,6 +16,11 @@ import {
 	MAX_MILESTONE_LEVEL,
 	type MilestoneLevel,
 } from "../store/useProfileStore";
+import {
+	OTHER_INCOME_TYPES,
+	PENSION_INCOME_TYPES,
+	storedIncomeOptions,
+} from "../views/Application/ApplicationIncomeAssets/incomeAssetsHelpers";
 
 export const getActiveSkippedCategories = (
 	profile: Partial<Profile>,
@@ -252,11 +257,8 @@ const getIncomeAssetsStats = (
 	) {
 		answered++;
 	}
-	if (
-		profile.financial?.incomeSources &&
-		(profile.financial.incomeSources.includes("pension") ||
-			profile.financial.incomeSources.includes("none_pension"))
-	) {
+	const incomeEntries = profile.financial?.incomeEntries ?? [];
+	if (storedIncomeOptions(PENSION_INCOME_TYPES, incomeEntries).length > 0) {
 		answered++;
 	}
 	if (
@@ -265,12 +267,7 @@ const getIncomeAssetsStats = (
 	) {
 		answered++;
 	}
-	if (
-		profile.financial?.incomeSources &&
-		(profile.financial.incomeSources.includes("other_benefits") ||
-			profile.financial.incomeSources.includes("other") ||
-			profile.financial.incomeSources.includes("none_other"))
-	) {
+	if (storedIncomeOptions(OTHER_INCOME_TYPES, incomeEntries).length > 0) {
 		answered++;
 	}
 	if (
@@ -1014,13 +1011,12 @@ export function performMockAutoVerification(
 				bic: "WELADED1BER",
 			},
 			monthlyIncome: 650,
-			incomeSources: Array.from(
-				new Set([
-					...(profile.financial?.incomeSources || []),
-					"pension",
-					"pension_retirement",
-				]),
-			),
+			incomeEntries: [
+				...(profile.financial?.incomeEntries ?? []).filter(
+					(row) => row.incomeType !== "Old-Age Pension",
+				),
+				{ incomeType: "Old-Age Pension", monthlyAmount: 650 },
+			],
 		};
 
 		updatedProfile.address = {

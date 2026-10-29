@@ -69,8 +69,32 @@
             "$ref": "#/definitions/transition"
           },
           "minItems": 1
+        },
+        "columns": {
+          "type": "array",
+          "description": "The inputs a chat card shows for this step, each stored in a `users` column or as an income row. An input tied to a `field` answers that field for the decision tree; without one, or with `optional`, it is asked but not required.",
+          "items": {
+            "$ref": "#/definitions/column"
+          }
         }
       }
+    },
+    "column": {
+      "type": "object",
+      "oneOf": [{ "required": ["column"] }, { "required": ["income_type"] }],
+      "properties": {
+        "column": { "type": "string", "description": "The `users` column the input is stored in." },
+        "income_type": {
+          "type": "string",
+          "description": "Instead of a column: the `income_entries` type the amount is stored as. Inputs sharing a field add up."
+        },
+        "field": { "type": "string", "description": "The field path in `fields` this input answers." },
+        "optional": { "type": "boolean", "description": "May be left empty." },
+        "input": { "type": "string", "enum": ["select"], "description": "Show the choices as a dropdown." },
+        "options": { "type": "array", "description": "The allowed values, for a text column the wizard asks as a fixed choice." },
+        "options_source": { "type": "string", "enum": ["countries"], "description": "A list the frontend fills in itself." }
+      },
+      "additionalProperties": false
     },
     "section": {
       "type": "object",

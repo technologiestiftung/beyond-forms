@@ -988,17 +988,17 @@ value = "{{ sublet_unrentable_reason ? sublet_unrentable_reason : '' }}"
 ["p4_freies_wohnrecht_bei_name"]
 type = "string"
 description = "freies Wohnrecht bei Name"
-value = "{{ free_housing_right_holder ? free_housing_right_holder : '' }}"
+value = "{{ free_housing_right_holder_last_name }}"
 
 ["p4_freies_wohnrecht_bei_vorname"]
 type = "string"
 description = "freies Wohnrecht bei Vorname"
-value = "{{ free_housing_right_holder ? free_housing_right_holder : '' }}"
+value = "{{ free_housing_right_holder_first_name }}"
 
 ["p4_freies_wohnrecht"]
 type = "checkbox"
 description = "freies Wohnrecht"
-value = false
+value = "{{ free_housing_right_holder ? true : false }}"
 
 ["p4_personenziffer_1_wohnanschrift/_aufenthalt_vor_aufnahme_in_die_einrichtung"]
 type = "string"

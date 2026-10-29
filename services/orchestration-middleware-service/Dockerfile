@@ -30,6 +30,8 @@ COPY --from=builder --chown=app:app /app/services/orchestration-middleware-servi
 COPY --from=builder --chown=app:app /app/libs/auth /app/libs/auth
 COPY --from=builder --chown=app:app /app/libs/document-schemas /app/libs/document-schemas
 COPY --from=builder --chown=app:app /app/forms /app/forms
+# Steps, transitions and columns the chat cards and the wizard evaluation read.
+COPY --from=builder --chown=app:app /app/schemas/rules /app/schemas/rules
 # Demo persona fixtures. Read by src/services/demo_seed_service.py on startup
 # when DEMO_SEED_ENABLED=true.
 COPY --from=builder --chown=app:app /app/demo /app/demo

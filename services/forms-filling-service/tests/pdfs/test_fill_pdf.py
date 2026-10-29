@@ -171,9 +171,7 @@ def test_fill_nested_field_sets_value_on_terminal_field_not_ancestor():
 
 
 def test_fill_bewohnerparkausweis_bezirk_sets_export_value_not_display_label():
-    pdf_path = os.path.join(
-        os.path.dirname(__file__), "../../../../forms/pdfs/antrag_bewohnerparkausweis.pdf"
-    )
+    pdf_path = os.path.join(os.path.dirname(__file__), "../../../../forms/pdfs/antrag_bewohnerparkausweis.pdf")
     if not os.path.exists(pdf_path):
         pytest.skip("antrag_bewohnerparkausweis.pdf not available")
 
