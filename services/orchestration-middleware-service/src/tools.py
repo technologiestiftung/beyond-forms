@@ -1,3 +1,5 @@
+from src.chat_cards import MAX_TEXT_LENGTH
+
 SHOW_CARD_TOOL_NAME = "show_card"
 
 AVAILABLE_TOOLS = [
@@ -71,12 +73,24 @@ AVAILABLE_TOOLS = [
                 "type": "object",
                 "properties": {
                     "card_id": {"type": "string", "description": "The card_id the system prompt names"},
-                    "question": {"type": "string", "description": "The question, in the language of the conversation"},
-                    "hint": {"type": "string", "description": "Optional short explanation below the question"},
-                    "labels": {"type": "object", "description": "A short label for each input key"},
+                    "question": {
+                        "type": "string",
+                        "maxLength": MAX_TEXT_LENGTH,
+                        "description": "The question, in the language of the conversation",
+                    },
+                    "hint": {
+                        "type": "string",
+                        "maxLength": MAX_TEXT_LENGTH,
+                        "description": "Optional short explanation below the question",
+                    },
+                    "labels": {
+                        "type": "object",
+                        "description": f"A short label for each input key, at most {MAX_TEXT_LENGTH} characters",
+                    },
                     "option_labels": {
                         "type": "object",
-                        "description": "For each choice input key, an object with a label per option value",
+                        "description": "For each choice input key, an object with a label per option value, "
+                        f"at most {MAX_TEXT_LENGTH} characters",
                     },
                 },
                 "required": ["card_id", "question", "labels"],

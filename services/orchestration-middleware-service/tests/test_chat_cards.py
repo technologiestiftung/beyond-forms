@@ -2,10 +2,12 @@ import datetime
 import decimal
 
 import pytest
+from unittest.mock import MagicMock
 
 from src.chat_cards import build_card_view, card_inputs, card_prompt, validate_card_answer
 from src.models import AccomodationType, IncomeEntries, IncomeTypeType, Users
 from src.schemas import UserProfileValidationSchema
+from src.services.user_service import write_profile_payload
 from src.services.wizard_rules import RULES_PATH, application_start_step, evaluation_payload, rules_steps
 
 pytestmark = pytest.mark.skipif(not RULES_PATH.exists(), reason="rules file is not part of this checkout")
@@ -118,8 +120,8 @@ def test_build_card_view_reports_missing_texts():
     view, errors = build_card_view("step_applicant_legal_support", rules_steps()["step_applicant_legal_support"], args)
 
     assert view is None
-    assert "labels.has_guardian must be a text of 1 to 300 characters" in errors
-    assert "option_labels.has_custodian.false must be a text of 1 to 300 characters" in errors
+    assert "labels.has_guardian must be a text of 1 to 255 characters" in errors
+    assert "option_labels.has_custodian.false must be a text of 1 to 255 characters" in errors
 
 
 def test_a_country_select_needs_no_option_labels():
@@ -167,12 +169,38 @@ def test_validate_card_answer_only_accepts_offered_options():
     assert validate_card_answer(step, {"legal_gender": "Other"})[1] == ["invalid value for legal_gender"]
 
 
+def test_validate_card_answer_caps_text_at_the_column_length():
+    step = {"columns": [{"column": "house_number", "field": "a.house_number"}]}
+    assert validate_card_answer(step, {"house_number": "1" * 20})[1] == []
+    assert validate_card_answer(step, {"house_number": "1" * 21})[1] == ["invalid value for house_number"]
+
+
 def test_validate_card_answer_stores_empty_income_lines_as_zero():
     payload, errors = validate_card_answer(rules_steps()["step_applicant_pension"], {"old_age_pension": 650})
 
     assert errors == []
     rows = {row.income_type.value: row.monthly_amount for row in payload.income_entries}
     assert rows == {"Old-Age Pension": 650, "Reduced Earning Capacity Pension": 0, "Survivor Pension": 0}
+
+
+def test_a_card_amount_keeps_the_stored_office_and_reference():
+    stored = IncomeEntries(
+        income_type=IncomeTypeType.OLD_AGE_PENSION,
+        monthly_amount=decimal.Decimal("500"),
+        awarding_office="DRV Bund",
+        reference_no="12 345678 K 001",
+    )
+    user = Users(income_entries=[stored])
+    payload, _ = validate_card_answer(rules_steps()["step_applicant_pension"], {"old_age_pension": 650})
+
+    write_profile_payload(MagicMock(), user, payload)
+
+    old_age = next(row for row in user.income_entries if row.income_type == IncomeTypeType.OLD_AGE_PENSION)
+    assert (old_age.monthly_amount, old_age.awarding_office, old_age.reference_no) == (
+        650,
+        "DRV Bund",
+        "12 345678 K 001",
+    )
 
 
 def test_evaluation_payload_holds_the_stored_values_at_the_rule_fields():

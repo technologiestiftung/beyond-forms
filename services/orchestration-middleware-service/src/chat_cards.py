@@ -15,7 +15,7 @@ from pydantic import ValidationError
 from src.models import Users
 from src.schemas import UserProfileValidationSchema
 
-MAX_TEXT_LENGTH = 300
+MAX_TEXT_LENGTH = 255
 
 
 @dataclass(frozen=True)
@@ -28,6 +28,7 @@ class CardInput:
     options_source: Optional[str] = None
     optional: bool = False
     income_type: Optional[str] = None
+    max_length: int = MAX_TEXT_LENGTH
 
 
 def _income_key(income_type: str) -> str:
@@ -64,7 +65,8 @@ def _card_input(entry: dict) -> CardInput:
     column_type = Users.__table__.columns[name].type
     options = _options(entry, column_type)
     kind = entry.get("input", "choice") if options else _free_input_kind(column_type)
-    return CardInput(name, kind, options, optional=optional)
+    max_length = getattr(column_type, "length", None) or MAX_TEXT_LENGTH
+    return CardInput(name, kind, options, optional=optional, max_length=max_length)
 
 
 def card_inputs(step: dict) -> list[CardInput]:
@@ -153,7 +155,7 @@ def _matches_kind(card_input: CardInput, value: Any) -> bool:
             return True
         except (TypeError, ValueError):
             return False
-    return isinstance(value, str) and 0 < len(value.strip()) <= 255
+    return isinstance(value, str) and 0 < len(value.strip()) <= card_input.max_length
 
 
 def validate_card_answer(step: dict, values: Any) -> tuple[Optional[UserProfileValidationSchema], list[str]]:
