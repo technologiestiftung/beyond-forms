@@ -25,6 +25,7 @@
 	},
 	"card": {
 		"submit": "Speichern",
-		"saved": "Gespeichert"
+		"saved": "Gespeichert",
+		"closed": "Nicht mehr offen"
 	}
 }

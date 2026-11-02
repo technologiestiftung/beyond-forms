@@ -25,6 +25,7 @@
 	},
 	"card": {
 		"submit": "Save",
-		"saved": "Saved"
+		"saved": "Saved",
+		"closed": "No longer open"
 	}
 }
