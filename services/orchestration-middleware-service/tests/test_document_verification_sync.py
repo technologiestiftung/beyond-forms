@@ -585,3 +585,19 @@ def test_pension_row_with_amount_zero_means_no_pension(amount, receives_pension)
     applicant = map_flat_to_rules_engine_payload(db_user)["form_content"]["applicant_information"]
 
     assert applicant["applicant_receives_old_age_pension"] is receives_pension
+
+
+def test_zero_pension_rows_do_not_take_monthly_income():
+    db_user = MagicMock(spec=DbUser)
+    db_user.income_entries = [
+        IncomeEntries(income_type=IncomeTypeType.EMPLOYMENT, monthly_amount=decimal.Decimal("900.00")),
+        IncomeEntries(income_type=IncomeTypeType.OLD_AGE_PENSION, monthly_amount=decimal.Decimal("0")),
+        IncomeEntries(income_type=IncomeTypeType.SURVIVOR_PENSION, monthly_amount=decimal.Decimal("0")),
+    ]
+    db_user.monthly_income = decimal.Decimal("900.00")
+    db_user.has_permanent_reduction_in_earning_capacity = False
+
+    finances = map_flat_to_rules_engine_payload(db_user)["form_content"]["applicant_finances"]
+
+    assert finances["pension_income"] == 0
+    assert finances["non_self_employed_income"] == 900

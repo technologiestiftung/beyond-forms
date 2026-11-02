@@ -783,12 +783,13 @@ def verify_document(
             except (decimal.InvalidOperation, KeyError, TypeError, ValueError):
                 verified_amount = None
 
+        notice_kind = pension_kind(local_raw_data.get("pension_reason"))
         insert_stmt = (
             pg_insert(IncomeEntries)
             .values(
                 user_id=user.id,
                 person_id=None,
-                income_type=pension_kind(local_raw_data.get("pension_reason")),
+                income_type=notice_kind,
                 monthly_amount=verified_amount,
             )
             .on_conflict_do_nothing(
@@ -796,17 +797,26 @@ def verify_document(
                 index_where=IncomeEntries.person_id.is_(None),
             )
         )
-        pension_rows = db.query(IncomeEntries).filter(
-            IncomeEntries.user_id == user.id,
-            IncomeEntries.person_id.is_(None),
-            IncomeEntries.income_type.in_(PENSION_INCOME_TYPES),
+        pension_rows = (
+            db.query(IncomeEntries)
+            .filter(
+                IncomeEntries.user_id == user.id,
+                IncomeEntries.person_id.is_(None),
+                IncomeEntries.income_type.in_(PENSION_INCOME_TYPES),
+            )
+            .all()
         )
+        # a row with amount 0 records "no pension of that kind", which the notice disproves;
         # a pension the user already named by kind is the one the notice proves
-        if pension_rows.first() is None:
-            db.execute(insert_stmt)
-
-        if verified_amount is not None:
-            open_rows = pension_rows.filter(IncomeEntries.monthly_amount.is_(None)).all()
+        named_rows = [row for row in pension_rows if row.monthly_amount != 0]
+        if not named_rows:
+            own_row = next((row for row in pension_rows if row.income_type == notice_kind), None)
+            if own_row is None:
+                db.execute(insert_stmt)
+            else:
+                own_row.monthly_amount = verified_amount
+        elif verified_amount is not None:
+            open_rows = [row for row in named_rows if row.monthly_amount is None]
             if len(open_rows) == 1:
                 open_rows[0].monthly_amount = verified_amount
 
