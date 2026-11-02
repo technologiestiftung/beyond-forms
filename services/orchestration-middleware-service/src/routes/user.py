@@ -19,7 +19,7 @@ from src.services.user_service import (
 )
 from src.utils import get_google_id_token
 from src.mappers import map_flat_to_rules_engine_payload
-from src.services.wizard_rules import application_start_step, evaluation_payload
+from src.services.wizard_rules import evaluate, evaluation_payload
 from src.tasks.cleanup import run_background_gcs_cleanup
 from src.gcs import get_gcs_client
 
@@ -113,7 +113,6 @@ def update_user_profile(
     rules_engine_payload = map_flat_to_rules_engine_payload(db_user)
 
     validate_url = f"{ENDPOINT_RULES_ENGINE}/validate-form"
-    eval_url = f"{ENDPOINT_RULES_ENGINE}/wizard/evaluate"
     params = {}
     if payload.validate_entire_form is not None:
         params["validate_entire_form"] = payload.validate_entire_form
@@ -132,24 +131,14 @@ def update_user_profile(
             future_validate = executor.submit(
                 requests.post, validate_url, json=rules_engine_payload, params=params, headers=headers, timeout=10
             )
-            future_evaluate = executor.submit(
-                requests.post,
-                eval_url,
-                json={"form_content": evaluation_payload(db_user), "current_step_id": application_start_step()},
-                headers=headers,
-                timeout=10,
-            )
+            future_evaluate = executor.submit(evaluate, evaluation_payload(db_user))
 
             # Wait for validate-form (critical path validation)
             response = future_validate.result()
 
             # Wait for wizard evaluation (optional / non-blocking path)
             try:
-                eval_response = future_evaluate.result()
-                if eval_response.status_code == 200:
-                    wizard_data = eval_response.json().get("evaluation") or {}
-                else:
-                    logger.warning(f"Rules engine /wizard/evaluate returned status: {eval_response.status_code}")
+                wizard_data = future_evaluate.result() or {}
             except Exception as eval_err:
                 logger.warning(f"Failed to fetch wizard evaluation from rules engine: {eval_err}")
 

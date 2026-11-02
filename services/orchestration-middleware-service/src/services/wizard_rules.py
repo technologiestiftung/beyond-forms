@@ -81,6 +81,9 @@ def evaluation_payload(user: Users) -> dict:
                 income_types_by_field.setdefault(field, set()).add(entry["income_type"])
                 continue
             value = _json_value(getattr(user, entry["column"]))
+            # a cleared text input is stored as "", which still leaves the field unanswered
+            if isinstance(value, str) and not value.strip():
+                value = None
             if value is not None:
                 _set_path(payload, field, value)
 
@@ -93,8 +96,10 @@ def evaluation_payload(user: Users) -> dict:
     return payload
 
 
-def evaluate(user: Users) -> Optional[dict]:
-    """The rules engine's walk from the start of the application, or None if it can't be reached."""
+def evaluate(form_content: dict, timeout: float = 10) -> Optional[dict]:
+    """The rules engine's walk of an `evaluation_payload` from the start of the application, or
+    None if it can't be reached. Takes the built payload so a worker thread doesn't load the
+    user's rows."""
     headers = {}
     token = get_google_id_token(ENDPOINT_RULES_ENGINE)
     if token:
@@ -102,9 +107,9 @@ def evaluate(user: Users) -> Optional[dict]:
     try:
         response = requests.post(
             f"{ENDPOINT_RULES_ENGINE}/wizard/evaluate",
-            json={"form_content": evaluation_payload(user), "current_step_id": application_start_step()},
+            json={"form_content": form_content, "current_step_id": application_start_step()},
             headers=headers,
-            timeout=10,
+            timeout=timeout,
         )
         response.raise_for_status()
         return response.json().get("evaluation") or {}
