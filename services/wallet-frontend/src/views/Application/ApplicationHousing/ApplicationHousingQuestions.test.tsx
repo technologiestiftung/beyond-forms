@@ -325,4 +325,59 @@ describe("ApplicationHousingQuestions - TDD & Clean UI Verification", () => {
 			screen.getByLabelText("Freies Wohnrecht bei (Name der Person)"),
 		).toHaveValue("Erika Klar");
 	});
+
+	it("keeps free lodging from being saved without the holder's name", async () => {
+		renderWithRouter(<ApplicationHousingQuestions />);
+		fireEvent.click(screen.getByTestId("next-button"));
+		await screen.findByText("Wie wohnst Du zurzeit?");
+		fireEvent.click(screen.getByTestId("next-button"));
+		await screen.findByText("Bist Du Haupt- oder Untermieter?");
+		mockUpdateSection.mockClear();
+
+		fireEvent.click(screen.getByText("Ich habe freies Wohnrecht"));
+		fireEvent.blur(
+			screen.getByLabelText("Freies Wohnrecht bei (Name der Person)"),
+		);
+		fireEvent.click(screen.getByTestId("next-button"));
+
+		expect(
+			await screen.findByText("errors.freeHousingRightHolder_required"),
+		).toBeInTheDocument();
+		expect(mockUpdateSection).not.toHaveBeenCalled();
+		expect(mockNavigate).not.toHaveBeenCalled();
+	});
+
+	it("stores a tenancy choice only after the holder's save before it", async () => {
+		renderWithRouter(<ApplicationHousingQuestions />);
+		fireEvent.click(screen.getByTestId("next-button"));
+		await screen.findByText("Wie wohnst Du zurzeit?");
+		fireEvent.click(screen.getByTestId("next-button"));
+		await screen.findByText("Bist Du Haupt- oder Untermieter?");
+		mockUpdateSection.mockClear();
+		let finishHolderSave: (value: { success: boolean }) => void = () => {};
+		mockUpdateSection.mockReturnValueOnce(
+			new Promise((resolve) => {
+				finishHolderSave = resolve;
+			}),
+		);
+
+		fireEvent.click(screen.getByText("Ich habe freies Wohnrecht"));
+		const holder = screen.getByLabelText(
+			"Freies Wohnrecht bei (Name der Person)",
+		);
+		fireEvent.change(holder, { target: { value: "Erika Klar" } });
+		fireEvent.blur(holder);
+		fireEvent.click(screen.getByText("Ich bin Hauptmieter"));
+
+		await waitFor(() => expect(mockUpdateSection).toHaveBeenCalledTimes(1));
+		finishHolderSave({ success: true });
+		await waitFor(() => expect(mockUpdateSection).toHaveBeenCalledTimes(2));
+		expect(mockUpdateSection).toHaveBeenLastCalledWith({
+			section: "housing",
+			data: expect.objectContaining({
+				tenancyStatus: "Main Tenant",
+				freeHousingRightHolder: "",
+			}),
+		});
+	});
 });

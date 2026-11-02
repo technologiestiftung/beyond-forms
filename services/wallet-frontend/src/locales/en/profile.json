@@ -688,6 +688,7 @@
 		"firstName_required": "First name is required",
 		"lastName_required": "Last name is required",
 		"placeOfBirth_required": "Place of birth is required",
+		"freeHousingRightHolder_required": "Please enter who grants you free lodging",
 		"upload_failed": "Upload failed",
 		"system_error": "A system error occurred",
 		"file_type_invalid": "This file format is not supported. Allowed formats are PDF, JPG, PNG and HEIC.",

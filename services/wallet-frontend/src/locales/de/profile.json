@@ -688,6 +688,7 @@
 		"firstName_required": "Vorname ist erforderlich",
 		"lastName_required": "Nachname ist erforderlich",
 		"placeOfBirth_required": "Geburtsort ist erforderlich",
+		"freeHousingRightHolder_required": "Bitte gib an, wer dir das freie Wohnrecht gewährt",
 		"upload_failed": "Upload fehlgeschlagen",
 		"system_error": "Ein Systemfehler ist aufgetreten",
 		"file_type_invalid": "Dieses Dateiformat wird nicht unterstützt. Erlaubt sind PDF, JPG, PNG oder HEIC.",

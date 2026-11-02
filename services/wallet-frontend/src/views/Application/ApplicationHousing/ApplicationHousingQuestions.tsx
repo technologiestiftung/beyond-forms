@@ -319,15 +319,25 @@ export const ApplicationHousingQuestions: React.FC = () => {
 		return 0; // Exit to overview
 	};
 
+	// saves run one after another, so the user's latest choice is stored last
+	const saveQueue = useRef<Promise<unknown>>(Promise.resolve());
+	const enqueueSave = <T,>(save: () => Promise<T>): Promise<T> => {
+		const next = saveQueue.current.then(save);
+		saveQueue.current = next.catch(() => undefined);
+		return next;
+	};
+
 	const saveFields = async (
 		section: "address" | "housing",
 		fields: Record<string, string | number | boolean | null | undefined>,
 	) => {
 		try {
-			const result = await updateSection({
-				section,
-				data: { ...fields, validateEntireForm: false },
-			});
+			const result = await enqueueSave(() =>
+				updateSection({
+					section,
+					data: { ...fields, validateEntireForm: false },
+				}),
+			);
 
 			if (!result.success) {
 				setSaveError(result.message || t("errors.save_failed"));
@@ -398,6 +408,13 @@ export const ApplicationHousingQuestions: React.FC = () => {
 				currentValues.accomodationType as Profile["housing"]["accomodationType"];
 		} else if (page === 3) {
 			const isFreeLodging = currentValues.tenancyStatus === FREE_LODGING;
+			// free lodging is stored only as the holder's name
+			if (isFreeLodging && !currentValues.freeHousingRightHolder?.trim()) {
+				return {
+					success: false,
+					message: t("errors.freeHousingRightHolder_required"),
+				};
+			}
 			housingData.tenancyStatus = isFreeLodging
 				? null
 				: (currentValues.tenancyStatus as Profile["housing"]["tenancyStatus"]);
@@ -436,7 +453,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 	const onNextPage = async () => {
 		const currentValues = getValues();
-		const result = await savePageData(currentPage, currentValues);
+		const result = await enqueueSave(() =>
+			savePageData(currentPage, currentValues),
+		);
 
 		if (!result.success) {
 			setSaveError(result.message || t("errors.save_failed"));
@@ -457,7 +476,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 	const onPreviousPage = async () => {
 		const currentValues = getValues();
-		const result = await savePageData(currentPage, currentValues);
+		const result = await enqueueSave(() =>
+			savePageData(currentPage, currentValues),
+		);
 
 		if (!result.success) {
 			setSaveError(result.message || t("errors.save_failed"));
@@ -729,15 +750,18 @@ export const ApplicationHousingQuestions: React.FC = () => {
 										id="freeHousingRightHolder"
 										label={t("housing.labels.free_housing_right_holder")}
 										register={register("freeHousingRightHolder")}
-										onBlur={() =>
-											saveFields("housing", {
-												freeHousingRightHolder: getValues(
-													"freeHousingRightHolder",
-												),
+										onBlur={() => {
+											const holder = getValues("freeHousingRightHolder");
+											// a blank name would store no free lodging at all
+											if (!holder?.trim()) {
+												return;
+											}
+											void saveFields("housing", {
+												freeHousingRightHolder: holder,
 												tenancyStatus: null,
 												landlordName: "",
-											})
-										}
+											});
+										}}
 									/>
 								</div>
 							)}
