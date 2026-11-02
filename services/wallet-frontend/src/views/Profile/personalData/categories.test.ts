@@ -66,4 +66,16 @@ describe("profile income lines", () => {
 		);
 		expect(answeredIncomeEntries(rows)).toEqual([rows[0]]);
 	});
+
+	it("saves a cleared stored line as 0", () => {
+		const stored = [{ incomeType: "Alimony", monthlyAmount: 120 }];
+		const rows = profileIncomeEntries(stored).map((row) => ({
+			...row,
+			monthlyAmount: null,
+		}));
+
+		expect(answeredIncomeEntries(rows, stored)).toEqual([
+			{ incomeType: "Alimony", monthlyAmount: 0 },
+		]);
+	});
 });

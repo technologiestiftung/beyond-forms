@@ -34,12 +34,28 @@ export const profileIncomeEntries = (stored: IncomeEntry[]): IncomeEntry[] =>
 			)?.monthlyAmount ?? null,
 	}));
 
-/** The rows worth saving: a line left empty is not an answer. */
-export const answeredIncomeEntries = (rows: IncomeEntry[]): IncomeEntry[] =>
-	rows.filter(
-		(row) =>
-			typeof row.monthlyAmount === "number" && !Number.isNaN(row.monthlyAmount),
-	);
+const hasAmount = (row: IncomeEntry) =>
+	typeof row.monthlyAmount === "number" && !Number.isNaN(row.monthlyAmount);
+
+/**
+ * The rows worth saving: a line left empty is not an answer, unless it held a
+ * stored amount, which clearing sets to 0 since the save only merges rows.
+ */
+export const answeredIncomeEntries = (
+	rows: IncomeEntry[],
+	stored: IncomeEntry[] = [],
+): IncomeEntry[] => {
+	const storedRows = profileIncomeEntries(stored);
+	return rows.flatMap((row) => {
+		if (hasAmount(row)) {
+			return [row];
+		}
+		const storedRow = storedRows.find((s) => s.incomeType === row.incomeType);
+		return storedRow && hasAmount(storedRow)
+			? [{ ...row, monthlyAmount: 0 }]
+			: [];
+	});
+};
 
 /**
  * Flattens what is actually saved, without the placeholder values the selects
