@@ -87,7 +87,10 @@ export const PersonalDataEdit: React.FC = () => {
 
 		const value =
 			fieldName === "incomeEntries"
-				? answeredIncomeEntries(getValues("incomeEntries") ?? [])
+				? answeredIncomeEntries(
+						getValues("incomeEntries") ?? [],
+						profileData?.financial?.incomeEntries,
+					)
 				: getValues(fieldName);
 		const section = FIELD_SECTION[fieldName] ?? "personalData";
 		const data = (
@@ -125,6 +128,10 @@ export const PersonalDataEdit: React.FC = () => {
 		try {
 			const result = await submitProfile({
 				...values,
+				incomeEntries: answeredIncomeEntries(
+					values.incomeEntries ?? [],
+					profileData?.financial?.incomeEntries,
+				),
 				validate_entire_form: false,
 			});
 			if (result?.success) {
