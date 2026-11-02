@@ -214,7 +214,15 @@ curl -s "$API/profile" -H "$H" | jq '{rent_total, heating_costs, monthly_income}
 curl -s "$API/files"   -H "$H" | jq -r '.[] | select(.status!="verified") | .document_type'
 ```
 
-`POST /chat` also exists — it is the product's own assistant, and it answers such questions in generated German prose. Use it when you are testing *that* surface. Do not use it to look things up: it paraphrases the record instead of returning it, costs a model call, and sends the person's data through another model to tell you something the fields already say exactly.
+`POST /chat/stream` also exists — it is the product's own assistant, and it answers such questions in generated German prose. Use it when you are testing *that* surface. Do not use it to look things up: it paraphrases the record instead of returning it, costs a model call, and sends the person's data through another model to tell you something the fields already say exactly.
+
+It speaks [AG-UI](https://docs.ag-ui.com): the body is a `RunAgentInput` and the reply is a stream of Server-Sent Events. The server keeps the history, so send only the new user message. The answer is the concatenated `delta` of the `TEXT_MESSAGE_CHUNK` events; the run ends with `RUN_FINISHED` or `RUN_ERROR`.
+
+```bash
+curl -sN -X POST "$API/chat/stream" -H "$H" -H 'Content-Type: application/json' \
+  -d '{"threadId":"t","runId":"r1","messages":[{"id":"1","role":"user","content":"Welche Unterlagen fehlen noch?"}]}' \
+  | sed -n 's/^data: //p' | jq -rj 'select(.type=="TEXT_MESSAGE_CHUNK") | .delta'; echo
+```
 
 Uploading a document runs the full pipeline asynchronously — the extraction appears on the document a few seconds later:
 
@@ -305,7 +313,6 @@ Each service publishes its own live contract. When something is not documented a
 
 ```bash
 curl -s "$RULES/openapi.json" | jq -r '.paths | keys[]'
-curl -s "$API/openapi.json" | jq '.components.schemas.ChatRequest'
 ```
 
 ## Common Pitfalls

@@ -1,18 +1,4 @@
-import json
-import uuid
 from typing import Any, Optional
-
-
-def ndjson_token(content: str) -> str:
-    return json.dumps({"type": "token", "content": content}) + "\n"
-
-
-def ndjson_done(conversation_id: uuid.UUID) -> str:
-    return json.dumps({"type": "done", "conversation_id": str(conversation_id)}) + "\n"
-
-
-def ndjson_error(message: str) -> str:
-    return json.dumps({"type": "error", "content": message}) + "\n"
 
 
 def get_google_id_token(audience: str) -> str | None:

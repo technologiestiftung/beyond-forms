@@ -1,95 +1,119 @@
 import { describe, it, expect } from "vitest";
 import {
-	calculateTotalIncome,
-	countIncomeCategories,
-	withPensionSources,
+	OTHER_INCOME_TYPES,
+	PENSION_INCOME_TYPES,
+	employmentRows,
+	incomeRows,
+	storedEmploymentIncome,
+	storedIncomeAmounts,
+	storedIncomeOptions,
+	totalIncome,
 } from "./incomeAssetsHelpers";
 
-const noIncome = {
-	pensionTypes: [],
-	pensionAmount: "",
-	employmentType: "",
-	employmentAmount: "",
-	otherIncomeTypes: [],
-	otherIncomeAmount: "",
-};
-
-describe("countIncomeCategories", () => {
-	it("counts pension, employment and other income once each", () => {
+describe("incomeRows", () => {
+	it("writes every line of the page, 0 for the ones not chosen", () => {
 		expect(
-			countIncomeCategories(
-				["pension", "pension_retirement", "employment_employed", "other_sick"],
-				false,
-			),
-		).toBe(3);
-	});
-
-	it("counts legacy other-income sources", () => {
-		expect(countIncomeCategories(["pension", "Kindergeld"], false)).toBe(2);
-	});
-
-	it("trusts the employment source over a stale employed flag", () => {
-		expect(
-			countIncomeCategories(["pension", "employment_unemployed"], true),
-		).toBe(1);
-	});
-
-	it("falls back to the employed flag without an employment source", () => {
-		expect(countIncomeCategories(["pension"], true)).toBe(2);
-	});
-});
-
-describe("calculateTotalIncome", () => {
-	it("returns null when nothing was answered", () => {
-		expect(calculateTotalIncome(noIncome)).toBeNull();
-	});
-
-	it("returns null when a selected income has no amount", () => {
-		expect(
-			calculateTotalIncome({
-				...noIncome,
-				pensionTypes: ["retirement"],
-				pensionAmount: "",
-				employmentType: "employed",
-				employmentAmount: "1000",
+			incomeRows(PENSION_INCOME_TYPES, ["retirement"], {
+				retirement: "650,50",
 			}),
-		).toBeNull();
-	});
-
-	it("sums the selected incomes and ignores categories answered with none", () => {
-		expect(
-			calculateTotalIncome({
-				pensionTypes: ["retirement"],
-				pensionAmount: "650,50",
-				employmentType: "unemployed",
-				employmentAmount: "",
-				otherIncomeTypes: ["none"],
-				otherIncomeAmount: "",
-			}),
-		).toBe(650.5);
-	});
-
-	it("returns 0 when every category is answered with none", () => {
-		expect(
-			calculateTotalIncome({
-				...noIncome,
-				pensionTypes: ["none"],
-				employmentType: "none",
-				otherIncomeTypes: ["none"],
-			}),
-		).toBe(0);
-	});
-});
-
-describe("withPensionSources", () => {
-	it("stores each pension type as its own source", () => {
-		expect(
-			withPensionSources(["employment_employed"], ["retirement", "reduced"]),
 		).toEqual([
-			"employment_employed",
-			"pension",
-			"pension_retirement",
-			"pension_reduced",
+			{ incomeType: "Old-Age Pension", monthlyAmount: 650.5 },
+			{ incomeType: "Reduced Earning Capacity Pension", monthlyAmount: 0 },
+			{ incomeType: "Survivor Pension", monthlyAmount: 0 },
 		]);
+	});
+
+	it("writes 0 on every line for none", () => {
+		expect(
+			incomeRows(OTHER_INCOME_TYPES, ["none"], {}).map((r) => r.monthlyAmount),
+		).toEqual([0, 0, 0]);
+	});
+
+	it("keeps a chosen line without an amount", () => {
+		expect(incomeRows(OTHER_INCOME_TYPES, ["alimony"], {})[1]).toEqual({
+			incomeType: "Alimony",
+			monthlyAmount: null,
+		});
+	});
+
+	it("writes nothing while nothing is chosen", () => {
+		expect(incomeRows(PENSION_INCOME_TYPES, [], {})).toEqual([]);
+	});
+});
+
+describe("storedIncomeOptions", () => {
+	it("chooses the lines with income", () => {
+		const entries = [
+			{ incomeType: "Old-Age Pension", monthlyAmount: 650 },
+			{ incomeType: "Survivor Pension", monthlyAmount: 0 },
+		];
+		expect(storedIncomeOptions(PENSION_INCOME_TYPES, entries)).toEqual([
+			"retirement",
+		]);
+		expect(storedIncomeAmounts(PENSION_INCOME_TYPES, entries)).toEqual({
+			retirement: "650",
+		});
+	});
+
+	it("reads stored zeros as none and no rows as unanswered", () => {
+		expect(
+			storedIncomeOptions(OTHER_INCOME_TYPES, [
+				{ incomeType: "Alimony", monthlyAmount: 0 },
+			]),
+		).toEqual(["none"]);
+		expect(storedIncomeOptions(OTHER_INCOME_TYPES, [])).toEqual([]);
+	});
+
+	it("ignores the rows of other household members", () => {
+		expect(
+			storedIncomeOptions(PENSION_INCOME_TYPES, [
+				{
+					incomeType: "Old-Age Pension",
+					monthlyAmount: 900,
+					personSortOrder: 0,
+				},
+			]),
+		).toEqual([]);
+	});
+});
+
+describe("employment income", () => {
+	it("puts the amount of the self-employed on their own line", () => {
+		const rows = employmentRows("self_employed", "1200");
+		expect(rows).toEqual([
+			{ incomeType: "Employment", monthlyAmount: 0 },
+			{ incomeType: "Other Self-Employment", monthlyAmount: 1200 },
+		]);
+		expect(storedEmploymentIncome(rows)).toEqual({
+			isSelfEmployed: true,
+			amount: "1200",
+		});
+	});
+
+	it("writes 0 without employment and nothing while unanswered", () => {
+		expect(
+			employmentRows("unemployed", "500").map((r) => r.monthlyAmount),
+		).toEqual([0, 0]);
+		expect(employmentRows("", "")).toEqual([]);
+	});
+});
+
+describe("totalIncome", () => {
+	it("adds up the rows", () => {
+		expect(
+			totalIncome([
+				...incomeRows(PENSION_INCOME_TYPES, ["retirement"], {
+					retirement: "650",
+				}),
+				...employmentRows("employed", "100"),
+			]),
+		).toBe(750);
+	});
+
+	it("returns null while nothing is answered or an amount is missing", () => {
+		expect(totalIncome([])).toBeNull();
+		expect(
+			totalIncome(incomeRows(OTHER_INCOME_TYPES, ["alimony"], {})),
+		).toBeNull();
 	});
 });

@@ -446,7 +446,7 @@
 			"emp_none": "Nichts davon",
 			"other_sick": "Krankengeld",
 			"other_alimony": "Unterhalt",
-			"other_rent": "Sonstige Einnahmen (z.B. Zinsen, Untermiete)",
+			"other_rent": "Einnahmen aus Vermietung oder Verpachtung",
 			"other_none": "Nein, keine weiteren Einkünfte",
 			"benefit_options": {
 				"grundsicherung": "Grundsicherung",

@@ -34,8 +34,7 @@ class _MoneyEntrySchema(BaseModel):
     person_sort_order: Optional[int] = Field(
         None,
         description=(
-            "The sort_order of the associated person this row belongs to, or null for the "
-            "applicant's own row."
+            "The sort_order of the associated person this row belongs to, or null for the applicant's own row."
         ),
     )
 
@@ -205,6 +204,8 @@ class UserProfileValidationSchema(BaseModel):
     social_security_type: Optional[str] = None
     health_insurance_provider: Optional[str] = None
     health_insurance_status: Optional[str] = None
+    pension_insurance_provider: Optional[str] = Field(None, max_length=255)
+    pension_insurance_no: Optional[str] = Field(None, max_length=255)
     has_applied_for_asylum_benefits: Optional[bool] = None
 
     # Housing fields
@@ -238,6 +239,9 @@ class UserProfileValidationSchema(BaseModel):
     monthly_income: Optional[decimal.Decimal] = Field(None, ge=0)
     is_currently_employed: Optional[bool] = None
     has_received_previous_benefits: Optional[bool] = None
+    previous_benefits_authority: Optional[str] = Field(None, max_length=255)
+    previous_benefits_period: Optional[str] = Field(None, max_length=255)
+    previous_benefits_ref_no: Optional[str] = Field(None, max_length=255)
     has_assets: Optional[bool] = None
     assets_description: Optional[str] = Field(None, max_length=1000)
     associated_persons: Optional[list[AssociatedPersonSchema]] = None
@@ -299,6 +303,7 @@ class UserProfileValidationSchema(BaseModel):
     merkzeichen: Optional[str] = None
     has_costly_medical_nutrition: Optional[bool] = None
     is_care_dependent: Optional[bool] = None
+    has_inpatient_facility_accommodation: Optional[bool] = None
     inpatient_facility_move_in_date: Optional[date] = None
     inpatient_facility_last_residence: Optional[str] = None
     reduced_work_capacity_start_date: Optional[date] = None
@@ -467,16 +472,19 @@ class UserInformationUpdateSchema(BaseModel):
         None, description="Whether the user consents to verification against the residents' registry"
     )
     has_unavoidable_special_need: Optional[bool] = Field(
-        None, description="Whether the user has an unavoidable special need they cannot cover otherwise, e.g. costs of exercising access rights to a child (SGB II § 21 Abs. 6)"
+        None,
+        description="Whether the user has an unavoidable special need they cannot cover otherwise, e.g. costs of exercising access rights to a child (SGB II § 21 Abs. 6)",
     )
     was_self_employed_last_5_years: Optional[bool] = Field(
         None, description="Whether the user was self-employed or freelancing within the last five years"
     )
     received_wage_replacement_last_5_years: Optional[bool] = Field(
-        None, description="Whether the user received wage replacement benefits (e.g. Krankengeld, Arbeitslosengeld, Elterngeld) within the last five years"
+        None,
+        description="Whether the user received wage replacement benefits (e.g. Krankengeld, Arbeitslosengeld, Elterngeld) within the last five years",
     )
     did_military_or_voluntary_service_last_5_years: Optional[bool] = Field(
-        None, description="Whether the user did military service or a voluntary service (FSJ, BFD) within the last five years"
+        None,
+        description="Whether the user did military service or a voluntary service (FSJ, BFD) within the last five years",
     )
     cared_for_relatives_last_5_years: Optional[bool] = Field(
         None, description="Whether the user cared for relatives (care under SGB XI) within the last five years"

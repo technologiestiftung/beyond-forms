@@ -206,8 +206,19 @@ export const CompleteBankSchema = BankSchema.extend({
 	iban: z.string().min(1),
 });
 
+// One income line of the form; the backend sends amounts as decimal strings.
+export const IncomeEntrySchema = z.object({
+	incomeType: z.string(),
+	monthlyAmount: z.preprocess(
+		(value) => (typeof value === "string" ? Number(value) : value),
+		z.number().nonnegative().nullable(),
+	),
+	personSortOrder: z.number().int().nullable().optional(),
+});
+export type IncomeEntry = z.infer<typeof IncomeEntrySchema>;
+
 export const FinancialDataSchema = z.object({
-	incomeSources: z.array(z.string()).optional(),
+	incomeEntries: z.array(IncomeEntrySchema).optional(),
 	monthlyIncome: z.number().nonnegative().optional().nullable(),
 	hasAssets: z.boolean().optional(),
 	assetsDescription: z.string().max(1000).optional(),

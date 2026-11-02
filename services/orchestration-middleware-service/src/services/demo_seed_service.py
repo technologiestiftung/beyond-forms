@@ -368,9 +368,7 @@ class DemoSeedService:
         application = None
         for spec in persona["applications"]:
             _, this_id = self.user_service.get_or_create_user_application(internal_user_id, spec["form_type"])
-            this_app = (
-                self.db.query(UserApplications).filter(UserApplications.application_id == this_id).first()
-            )
+            this_app = self.db.query(UserApplications).filter(UserApplications.application_id == this_id).first()
             this_app.status = spec["status"]
             this_app.form_data = spec.get("form_data", {})
             if application_id is None:

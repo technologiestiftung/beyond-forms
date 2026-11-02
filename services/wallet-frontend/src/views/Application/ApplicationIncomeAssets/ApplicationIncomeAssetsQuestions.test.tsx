@@ -87,8 +87,7 @@ const MOCK_TRANSLATIONS: Record<string, string> = {
 	"financial.questions.job_title_label": "Berufsbezeichnung",
 	"financial.options.other_sick": "Krankengeld",
 	"financial.options.other_alimony": "Unterhalt",
-	"financial.options.other_rent":
-		"Sonstige Einnahmen (z.B. Zinsen, Untermiete)",
+	"financial.options.other_rent": "Einnahmen aus Vermietung oder Verpachtung",
 };
 
 vi.mock("react-i18next", () => ({
@@ -112,6 +111,17 @@ vi.mock("react-router-dom", async (importOriginal) => {
 		useNavigate: () => mockNavigate,
 	};
 });
+
+const NO_EMPLOYMENT_INCOME = [
+	{ incomeType: "Employment", monthlyAmount: 0 },
+	{ incomeType: "Other Self-Employment", monthlyAmount: 0 },
+];
+
+const NO_OTHER_INCOME = [
+	{ incomeType: "Health Insurance Benefits", monthlyAmount: 0 },
+	{ incomeType: "Alimony", monthlyAmount: 0 },
+	{ incomeType: "Rental and Leasing", monthlyAmount: 0 },
+];
 
 describe("ApplicationIncomeAssetsQuestions", () => {
 	const mockUpdateSection = vi.fn();
@@ -233,7 +243,14 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 			expect(mockUpdateSection).toHaveBeenCalledWith({
 				section: "financial",
 				data: {
-					incomeSources: ["pension", "pension_retirement"],
+					incomeEntries: [
+						{ incomeType: "Old-Age Pension", monthlyAmount: 650 },
+						{
+							incomeType: "Reduced Earning Capacity Pension",
+							monthlyAmount: 0,
+						},
+						{ incomeType: "Survivor Pension", monthlyAmount: 0 },
+					],
 					validateEntireForm: false,
 				},
 			});
@@ -262,11 +279,7 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 			expect(mockUpdateSection).toHaveBeenCalledWith({
 				section: "financial",
 				data: {
-					incomeSources: [
-						"pension",
-						"pension_retirement",
-						"employment_unemployed",
-					],
+					incomeEntries: NO_EMPLOYMENT_INCOME,
 					validateEntireForm: false,
 				},
 			});
@@ -286,12 +299,7 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 			expect(mockUpdateSection).toHaveBeenCalledWith({
 				section: "financial",
 				data: {
-					incomeSources: [
-						"pension",
-						"pension_retirement",
-						"employment_unemployed",
-						"none_other",
-					],
+					incomeEntries: NO_OTHER_INCOME,
 					validateEntireForm: false,
 				},
 			});
@@ -458,7 +466,14 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 			expect(mockUpdateSection).toHaveBeenCalledWith({
 				section: "financial",
 				data: {
-					incomeSources: ["none_pension"],
+					incomeEntries: [
+						{ incomeType: "Old-Age Pension", monthlyAmount: 0 },
+						{
+							incomeType: "Reduced Earning Capacity Pension",
+							monthlyAmount: 0,
+						},
+						{ incomeType: "Survivor Pension", monthlyAmount: 0 },
+					],
 					validateEntireForm: false,
 				},
 			});
@@ -483,7 +498,7 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 			expect(mockUpdateSection).toHaveBeenCalledWith({
 				section: "financial",
 				data: {
-					incomeSources: ["none_pension", "employment_none"],
+					incomeEntries: NO_EMPLOYMENT_INCOME,
 					validateEntireForm: false,
 				},
 			});
@@ -498,7 +513,7 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 			expect(mockUpdateSection).toHaveBeenCalledWith({
 				section: "financial",
 				data: {
-					incomeSources: ["none_pension", "employment_none"],
+					incomeEntries: [],
 					validateEntireForm: false,
 				},
 			});
@@ -665,7 +680,7 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 		).toBeInTheDocument();
 		fireEvent.click(screen.getByText("Krankengeld"));
 		const otherAmt = await screen.findByPlaceholderText("z.B. 100.00");
-		fireEvent.change(otherAmt, { target: { value: "invalid_num" } });
+		fireEvent.change(otherAmt, { target: { value: "1.2.3" } });
 		fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
 
 		// Assert other income invalid amount error is displayed
@@ -674,15 +689,21 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 		).toBeInTheDocument();
 	});
 
-	it("initializes checkboxes and amount correctly if profile contains qualitative E-Checker pension strings", async () => {
+	it("initializes the pension checkboxes and amounts from the stored income rows", async () => {
 		vi.mocked(useProfile).mockReturnValue({
 			profileData: {
 				personalData: {},
 				address: {},
 				household: {},
 				financial: {
-					incomeSources: ["Altersrente", "Erwerbsminderungsrente"],
-					monthlyIncome: 650.0,
+					incomeEntries: [
+						{ incomeType: "Old-Age Pension", monthlyAmount: 650 },
+						{
+							incomeType: "Reduced Earning Capacity Pension",
+							monthlyAmount: 120,
+						},
+						{ incomeType: "Survivor Pension", monthlyAmount: 0 },
+					],
 				},
 			} as unknown as Profile,
 			isLoading: false,
@@ -736,23 +757,28 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 		);
 		expect(reducedCard).toHaveClass("border-primary-blue-500");
 
-		// Pension amount input should be pre-populated with 650
-		const pensionAmt = screen.getByPlaceholderText(
-			"z.B. 650.00",
-		) as HTMLInputElement;
-		expect(pensionAmt.value).toBe("650");
+		expect(screen.getByTestId("option-card-survivor")).not.toHaveClass(
+			"border-primary-blue-500",
+		);
+		expect(document.getElementById("pension-amount-retirement")).toHaveValue(
+			"650",
+		);
+		expect(document.getElementById("pension-amount-reduced")).toHaveValue(
+			"120",
+		);
 	});
 
-	it("leaves the amounts empty when the stored total covers several income categories", async () => {
-		sessionStorage.clear();
+	it("reads stored zero pension rows as no pension", async () => {
 		vi.mocked(useProfile).mockReturnValue({
 			profileData: {
-				personalData: { isCurrentlyEmployed: true },
+				personalData: {},
 				address: {},
 				household: {},
 				financial: {
-					incomeSources: ["pension", "pension_retirement"],
-					monthlyIncome: 1650.0,
+					incomeEntries: [
+						{ incomeType: "Old-Age Pension", monthlyAmount: 0 },
+						{ incomeType: "Survivor Pension", monthlyAmount: 0 },
+					],
 				},
 			} as unknown as Profile,
 			isLoading: false,
@@ -782,10 +808,12 @@ describe("ApplicationIncomeAssetsQuestions", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Weiter" }));
 		await screen.findByText("Beziehst Du eine Rente?");
 
-		const pensionAmt = screen.getByPlaceholderText(
-			"z.B. 650.00",
-		) as HTMLInputElement;
-		expect(pensionAmt.value).toBe("");
+		expect(screen.getByTestId("option-card-no_pension")).toHaveClass(
+			"border-primary-blue-500",
+		);
+		expect(
+			screen.queryByPlaceholderText("z.B. 650.00"),
+		).not.toBeInTheDocument();
 	});
 
 	it("correctly handles German comma decimal input values without failing validation", async () => {

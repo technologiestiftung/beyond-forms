@@ -1,3 +1,5 @@
+import type { IncomeEntry } from "../../../schemas/profile.schema";
+
 export const END_PAGE = 8;
 
 const STEP_TO_PAGE_MAP: Record<string, number> = {
@@ -8,10 +10,6 @@ const STEP_TO_PAGE_MAP: Record<string, number> = {
 	step_applicant_pension: 3,
 	step_applicant_employment: 4,
 	step_applicant_employment_details: 4,
-	step_applicant_work_capacity: 4,
-	step_applicant_work_capacity_reason: 4,
-	step_applicant_income_work: 5,
-	step_applicant_income_benefits: 5,
 	step_applicant_income_other: 5,
 	step_applicant_expected_payments: 6,
 	step_applicant_expected_payments_details: 6,
@@ -58,178 +56,116 @@ export const toggleOption = (list: string[], value: string): string[] => {
 export const isWithoutEmployment = (employmentType: string) =>
 	employmentType === "unemployed" || employmentType === "none";
 
-const EMPLOYMENT_SOURCES: Record<string, string> = {
-	employed: "employment_employed",
-	self_employed: "employment_self",
-	training: "employment_student",
-	unemployed: "employment_unemployed",
-	none: "employment_none",
+/** The wizard's options and the income line of the form each one fills. */
+export const PENSION_INCOME_TYPES: Record<string, string> = {
+	retirement: "Old-Age Pension",
+	reduced: "Reduced Earning Capacity Pension",
+	survivor: "Survivor Pension",
 };
 
-/** Reverse of `EMPLOYMENT_SOURCES`: stored source key → employment type. */
-export const EMPLOYMENT_TYPE_BY_SOURCE: Record<string, string> =
-	Object.fromEntries(
-		Object.entries(EMPLOYMENT_SOURCES).map(([type, source]) => [source, type]),
+export const OTHER_INCOME_TYPES: Record<string, string> = {
+	sick_pay: "Health Insurance Benefits",
+	alimony: "Alimony",
+	other: "Rental and Leasing",
+};
+
+const EMPLOYMENT_INCOME_TYPES: Record<string, string> = {
+	employed: "Employment",
+	self_employed: "Other Self-Employment",
+};
+
+/** An amount the user typed per option, e.g. `{ retirement: "650" }`. */
+export type IncomeAmounts = Record<string, string>;
+
+const toMonthlyAmount = (amount: string | undefined) =>
+	!amount || amount.trim() === "" ? null : parseAmount(amount);
+
+const applicantRow = (entries: IncomeEntry[], incomeType: string) =>
+	entries.find(
+		(row) =>
+			row.incomeType === incomeType && !Number.isInteger(row.personSortOrder),
 	);
 
-const OTHER_INCOME_SOURCES: Record<string, string> = {
-	sick_pay: "other_sick",
-	alimony: "other_alimony",
-	other: "other_rent",
-};
+/**
+ * The rows a page writes: every line it asks about, with the typed amount for
+ * the chosen options and 0 for the others. A chosen option without an amount
+ * is stored without one; a page answered with nothing writes nothing.
+ */
+export const incomeRows = (
+	incomeTypes: Record<string, string>,
+	chosen: string[],
+	amounts: IncomeAmounts,
+): IncomeEntry[] =>
+	chosen.length === 0
+		? []
+		: Object.entries(incomeTypes).map(([option, incomeType]) => ({
+				incomeType,
+				monthlyAmount: chosen.includes(option)
+					? toMonthlyAmount(amounts[option])
+					: 0,
+			}));
 
-/** Reverse of `OTHER_INCOME_SOURCES`: stored source key → income type. */
-export const OTHER_INCOME_TYPE_BY_SOURCE: Record<string, string> =
-	Object.fromEntries(
-		Object.entries(OTHER_INCOME_SOURCES).map(([type, source]) => [
-			source,
-			type,
-		]),
-	);
-
-export const PENSION_SOURCE_KEYS = [
-	"pension",
-	"Altersrente",
-	"Erwerbsminderungsrente",
-];
-
-export const LEGACY_OTHER_INCOME_SOURCE_KEYS = [
-	"other_benefits",
-	"other",
-	"Krankengeld",
-	"Arbeitslosengeld",
-	"Kindergeld",
-];
-
-const OTHER_INCOME_SOURCE_KEYS = [
-	...Object.values(OTHER_INCOME_SOURCES),
-	...LEGACY_OTHER_INCOME_SOURCE_KEYS,
-];
-
-const EMPLOYED_SOURCES = [
-	EMPLOYMENT_SOURCES.employed,
-	EMPLOYMENT_SOURCES.self_employed,
-	EMPLOYMENT_SOURCES.training,
-];
-
-export const countIncomeCategories = (
-	sources: string[],
-	isCurrentlyEmployed?: boolean | null,
-): number => {
-	const hasEmploymentSource = sources.some((s) => s.startsWith("employment_"));
-	const isEmployed = hasEmploymentSource
-		? sources.some((s) => EMPLOYED_SOURCES.includes(s))
-		: isCurrentlyEmployed === true;
-	return [
-		sources.some((s) => PENSION_SOURCE_KEYS.includes(s)),
-		isEmployed,
-		sources.some((s) => OTHER_INCOME_SOURCE_KEYS.includes(s)),
-	].filter(Boolean).length;
-};
-
-export const withPensionSources = (
-	sources: string[],
-	pensionTypes: string[],
+/** The options the stored rows answer: those with income, or "none" when every stored line is 0. */
+export const storedIncomeOptions = (
+	incomeTypes: Record<string, string>,
+	entries: IncomeEntry[],
 ): string[] => {
-	const updated = sources.filter(
-		(s) => !s.startsWith("pension") && s !== "none_pension",
-	);
-	if (pensionTypes.includes("none")) {
-		updated.push("none_pension");
-	} else if (pensionTypes.length > 0) {
-		updated.push("pension");
-		pensionTypes.forEach((type) => {
-			updated.push(`pension_${type}`);
-		});
+	const stored = Object.entries(incomeTypes).flatMap(([option, incomeType]) => {
+		const row = applicantRow(entries, incomeType);
+		return row ? [{ option, hasIncome: row.monthlyAmount !== 0 }] : [];
+	});
+	if (stored.length === 0) {
+		return [];
 	}
-	return updated;
+	const withIncome = stored.filter((s) => s.hasIncome).map((s) => s.option);
+	return withIncome.length > 0 ? withIncome : ["none"];
 };
 
-export const withEmploymentSource = (
-	sources: string[],
+export const hasInvalidAmount = (chosen: string[], amounts: IncomeAmounts) =>
+	chosen.some((option) => isInvalidAmount(amounts[option] ?? ""));
+
+export const storedIncomeAmounts = (
+	incomeTypes: Record<string, string>,
+	entries: IncomeEntry[],
+): IncomeAmounts =>
+	Object.fromEntries(
+		Object.entries(incomeTypes).flatMap(([option, incomeType]) => {
+			const amount = applicantRow(entries, incomeType)?.monthlyAmount;
+			return amount ? [[option, String(amount)]] : [];
+		}),
+	);
+
+/** Employees and trainees earn on the employment line, the self-employed on their own. */
+export const employmentRows = (
 	employmentType: string,
-): string[] => {
-	const updated = sources.filter((s) => !s.startsWith("employment_"));
-	const source = EMPLOYMENT_SOURCES[employmentType];
-	if (source) {
-		updated.push(source);
+	amount: string,
+): IncomeEntry[] => {
+	if (employmentType === "") {
+		return [];
 	}
-	return updated;
+	const option =
+		employmentType === "self_employed" ? "self_employed" : "employed";
+	const chosen = isWithoutEmployment(employmentType) ? ["none"] : [option];
+	return incomeRows(EMPLOYMENT_INCOME_TYPES, chosen, { [option]: amount });
 };
 
-export const withOtherIncomeSources = (
-	sources: string[],
-	otherIncomeTypes: string[],
-): string[] => {
-	const updated = sources.filter(
-		(s) =>
-			s !== "other_benefits" &&
-			s !== "other" &&
-			s !== "none_other" &&
-			!s.startsWith("other_"),
-	);
-	if (otherIncomeTypes.includes("none")) {
-		updated.push("none_other");
-	} else if (otherIncomeTypes.length > 0) {
-		if (
-			otherIncomeTypes.includes("sick_pay") ||
-			otherIncomeTypes.includes("alimony")
-		) {
-			updated.push("other_benefits");
-		}
-		if (otherIncomeTypes.includes("other")) {
-			updated.push("other");
-		}
-		otherIncomeTypes.forEach((type) => {
-			const source = OTHER_INCOME_SOURCES[type];
-			if (source) {
-				updated.push(source);
-			}
-		});
-	}
-	return updated;
+/** The stored employment income: the self-employed line if it has any, else the employment line. */
+export const storedEmploymentIncome = (
+	entries: IncomeEntry[],
+): { isSelfEmployed: boolean; amount: string } => {
+	const amounts = storedIncomeAmounts(EMPLOYMENT_INCOME_TYPES, entries);
+	const isSelfEmployed = storedIncomeOptions(
+		EMPLOYMENT_INCOME_TYPES,
+		entries,
+	).includes("self_employed");
+	return {
+		isSelfEmployed,
+		amount: amounts[isSelfEmployed ? "self_employed" : "employed"] ?? "",
+	};
 };
 
-interface IncomeAnswers {
-	pensionTypes: string[];
-	pensionAmount: string;
-	employmentType: string;
-	employmentAmount: string;
-	otherIncomeTypes: string[];
-	otherIncomeAmount: string;
-}
-
-export const calculateTotalIncome = ({
-	pensionTypes,
-	pensionAmount,
-	employmentType,
-	employmentAmount,
-	otherIncomeTypes,
-	otherIncomeAmount,
-}: IncomeAnswers): number | null => {
-	const incomes: Array<[boolean, string]> = [
-		[pensionTypes.length > 0 && !pensionTypes.includes("none"), pensionAmount],
-		[
-			employmentType !== "" && !isWithoutEmployment(employmentType),
-			employmentAmount,
-		],
-		[
-			otherIncomeTypes.length > 0 && !otherIncomeTypes.includes("none"),
-			otherIncomeAmount,
-		],
-	];
-	const isAnswered =
-		pensionTypes.length > 0 ||
-		employmentType !== "" ||
-		otherIncomeTypes.length > 0;
-	const hasMissingAmount = incomes.some(
-		([hasIncome, amount]) => hasIncome && amount.trim() === "",
-	);
-	if (!isAnswered || hasMissingAmount) {
-		return null;
-	}
-	return incomes.reduce(
-		(sum, [hasIncome, amount]) => sum + (hasIncome ? parseAmount(amount) : 0),
-		0,
-	);
-};
+/** The total of all rows, or null while nothing is answered or a row has no amount. */
+export const totalIncome = (rows: IncomeEntry[]): number | null =>
+	rows.length === 0 || rows.some((row) => row.monthlyAmount === null)
+		? null
+		: rows.reduce((sum, row) => sum + (row.monthlyAmount ?? 0), 0);

@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from typing import Optional
 from sqlalchemy.orm import Session
@@ -62,8 +63,14 @@ class ConversationService:
                 status_code=status.HTTP_409_CONFLICT, detail="Cannot add message to a closed conversation"
             )
 
+        # now() would be the transaction start, shared by every message a request adds, and the
+        # context is ordered by created_at alone
         message = ConversationMessages(
-            fk_conversation_id=conversation_id, message_role=role, content=content, message_metadata=metadata or {}
+            fk_conversation_id=conversation_id,
+            message_role=role,
+            content=content,
+            message_metadata=metadata or {},
+            created_at=datetime.datetime.now(datetime.timezone.utc),
         )
         try:
             self.db.add(message)

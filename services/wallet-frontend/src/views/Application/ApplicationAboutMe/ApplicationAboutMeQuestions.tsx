@@ -1215,7 +1215,7 @@ export const ApplicationAboutMeQuestions: React.FC = () => {
 			step_applicant_nationality: 6,
 		};
 
-		return STEP_TO_PAGE_MAP[nextStepId] ?? -1;
+		return STEP_TO_PAGE_MAP[nextStepId] ?? fallbackPage;
 	};
 
 	const savePage1 = async () => {

@@ -21,8 +21,8 @@
     "second_nationality": null,
     "has_guardian": false,
     "has_custodian": false,
-    "displaced_status": null,
-    "residence_status": null,
+    "displaced_status": "none",
+    "residence_status": "Citizen",
     "license_plate": "B-HK 142",
     "vehicle_make": "Opel Corsa",
     "vehicle_year": "2004",
@@ -56,8 +56,9 @@
     "cable_tv_costs": 0.0,
     "number_of_rooms": 3,
     "living_area": 68.0,
-    "sublet_room_count": null,
+    "sublet_room_count": 0,
     "sublet_rent_income": 0.0,
+    "rent_arrears_amount": 0.0,
     "rent_paid_until": "2026-07-31",
     "landlord_name": "Wohngenossenschaft Berlin eG",
     "landlord_address": "Torstraße 12, 10119 Berlin",
@@ -65,7 +66,10 @@
     "free_housing_right_holder": null,
     "monthly_income": 650.0,
     "income_entries": [
-      { "income_type": "Pension", "monthly_amount": 650.0 }
+      { "income_type": "Old-Age Pension", "monthly_amount": 650.0 },
+      { "income_type": "Health Insurance Benefits", "monthly_amount": 0.0 },
+      { "income_type": "Alimony", "monthly_amount": 0.0 },
+      { "income_type": "Rental and Leasing", "monthly_amount": 0.0 }
     ],
     "has_assets": true,
     "asset_entries": [

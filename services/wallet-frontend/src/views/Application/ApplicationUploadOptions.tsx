@@ -12,7 +12,11 @@ import {
 } from "../../components/Application/ApplicationStepLayout";
 
 type WizardCategory =
-	"about_me" | "housing" | "income_assets" | "health" | "household";
+	| "about_me"
+	| "housing"
+	| "income_assets"
+	| "health"
+	| "household";
 
 const CategoryIntroRoutes: Record<WizardCategory, string> = {
 	about_me: AppRoutes.ApplicationAboutMeIntro,

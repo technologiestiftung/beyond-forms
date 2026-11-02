@@ -41,7 +41,8 @@ export const useProfile = (options?: UseProfileOptions) => {
 		enabled: options?.enabled,
 		refetchInterval: (query) => {
 			const activeData = query.state.data as
-				{ profile: Profile | null; files: WalletDocument[] } | undefined;
+				| { profile: Profile | null; files: WalletDocument[] }
+				| undefined;
 			if (!activeData) {
 				return false;
 			}

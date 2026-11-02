@@ -9,6 +9,7 @@ from beyondforms.auth import User as AuthUser, get_current_user, require_authent
 from src.db import get_db
 from src.main import app
 from src.models import Users as DbUser, UserDocuments as DbDocument, IncomeEntries, IncomeTypeType
+from src.routes.files import pension_kind
 
 client = TestClient(app)
 
@@ -477,6 +478,20 @@ def test_verify_document_maps_tenancy_status_boolean(mock_post, mock_db):
     assert mock_user.tenancy_status == "Main Tenant"
 
 
+@pytest.mark.parametrize(
+    "reason, kind",
+    [
+        ("Regelaltersrente", IncomeTypeType.OLD_AGE_PENSION),
+        (None, IncomeTypeType.OLD_AGE_PENSION),
+        ("Rente wegen voller Erwerbsminderung", IncomeTypeType.REDUCED_EARNING_CAPACITY_PENSION),
+        ("disability", IncomeTypeType.REDUCED_EARNING_CAPACITY_PENSION),
+        ("Hinterbliebenenrente", IncomeTypeType.SURVIVOR_PENSION),
+    ],
+)
+def test_pension_kind_follows_the_reason_on_the_notice(reason, kind):
+    assert pension_kind(reason) == kind
+
+
 @patch("requests.post")
 def test_verify_document_pension_notice_persists_verified_amount(mock_post, mock_db):
     document_id = uuid.uuid4()
@@ -497,6 +512,8 @@ def test_verify_document_pension_notice_persists_verified_amount(mock_post, mock
             query_mock.filter.return_value.first.return_value = mock_doc
         elif model is DbUser:
             query_mock.filter.return_value.first.return_value = mock_user
+        elif model is IncomeEntries:
+            query_mock.filter.return_value.all.return_value = []
         return query_mock
 
     mock_db.query.side_effect = db_query_side_effect
@@ -523,13 +540,93 @@ def test_verify_document_pension_notice_persists_verified_amount(mock_post, mock
     bound_values = insert_stmt.compile().params
     assert bound_values["user_id"] == mock_user.id
     assert bound_values["person_id"] is None
-    assert bound_values["income_type"] == IncomeTypeType.PENSION
+    assert bound_values["income_type"] == IncomeTypeType.OLD_AGE_PENSION
     assert bound_values["monthly_amount"] == decimal.Decimal("650.00")
 
-    income_query_mock = query_mocks[IncomeEntries]
-    income_query_mock.filter.return_value.update.assert_called_once_with(
-        {"monthly_amount": decimal.Decimal("650.00")}
+
+@patch("requests.post")
+def test_verify_document_pension_notice_keeps_a_pension_named_by_kind(mock_post, mock_db):
+    document_id = uuid.uuid4()
+    mock_user = MagicMock(spec=DbUser)
+    mock_user.id = uuid.uuid4()
+    mock_doc = MagicMock(spec=DbDocument)
+    mock_doc.document_id = document_id
+    mock_doc.document_type = "pension_notice"
+    mock_doc.raw_data = {"monthly_amount": "650.00"}
+    old_age = IncomeEntries(income_type=IncomeTypeType.OLD_AGE_PENSION)
+
+    def db_query_side_effect(model):
+        query_mock = MagicMock()
+        if model is DbDocument:
+            query_mock.filter.return_value.first.return_value = mock_doc
+        elif model is DbUser:
+            query_mock.filter.return_value.first.return_value = mock_user
+        elif model is IncomeEntries:
+            query_mock.filter.return_value.all.return_value = [old_age]
+        return query_mock
+
+    mock_db.query.side_effect = db_query_side_effect
+    mock_post.return_value = Mock(status_code=200, json=lambda: {"status": "success", "profile_sync": {}})
+
+    response = client.post(
+        f"/api/v1/documents/{document_id}/verify",
+        json={
+            "document_type": "pension_notice",
+            "corrected_data": {"monthly_amount": "650.00"},
+            "verified_fields": ["monthly_amount"],
+        },
     )
+
+    assert response.status_code == 200
+    mock_db.execute.assert_not_called()
+    assert old_age.monthly_amount == decimal.Decimal("650.00")
+
+
+@pytest.mark.parametrize("notice_kind_has_row", [True, False])
+@patch("requests.post")
+def test_verify_document_pension_notice_overrides_rows_that_said_no_pension(mock_post, mock_db, notice_kind_has_row):
+    document_id = uuid.uuid4()
+    mock_user = MagicMock(spec=DbUser)
+    mock_user.id = uuid.uuid4()
+    mock_doc = MagicMock(spec=DbDocument)
+    mock_doc.document_id = document_id
+    mock_doc.document_type = "pension_notice"
+    mock_doc.raw_data = {"monthly_amount": "650.00"}
+    old_age = IncomeEntries(income_type=IncomeTypeType.OLD_AGE_PENSION, monthly_amount=decimal.Decimal("0"))
+    survivor = IncomeEntries(income_type=IncomeTypeType.SURVIVOR_PENSION, monthly_amount=decimal.Decimal("0"))
+    rows = [old_age, survivor] if notice_kind_has_row else [survivor]
+
+    def db_query_side_effect(model):
+        query_mock = MagicMock()
+        if model is DbDocument:
+            query_mock.filter.return_value.first.return_value = mock_doc
+        elif model is DbUser:
+            query_mock.filter.return_value.first.return_value = mock_user
+        elif model is IncomeEntries:
+            query_mock.filter.return_value.all.return_value = rows
+        return query_mock
+
+    mock_db.query.side_effect = db_query_side_effect
+    mock_post.return_value = Mock(status_code=200, json=lambda: {"status": "success", "profile_sync": {}})
+
+    response = client.post(
+        f"/api/v1/documents/{document_id}/verify",
+        json={
+            "document_type": "pension_notice",
+            "corrected_data": {"monthly_amount": "650.00"},
+            "verified_fields": ["monthly_amount"],
+        },
+    )
+
+    assert response.status_code == 200
+    assert survivor.monthly_amount == 0
+    if notice_kind_has_row:
+        mock_db.execute.assert_not_called()
+        assert old_age.monthly_amount == decimal.Decimal("650.00")
+    else:
+        bound_values = mock_db.execute.call_args[0][0].compile().params
+        assert bound_values["income_type"] == IncomeTypeType.OLD_AGE_PENSION
+        assert bound_values["monthly_amount"] == decimal.Decimal("650.00")
 
 
 @patch("requests.post")
@@ -552,6 +649,8 @@ def test_verify_document_pension_notice_without_verified_amount_only_ensures_row
             query_mock.filter.return_value.first.return_value = mock_doc
         elif model is DbUser:
             query_mock.filter.return_value.first.return_value = mock_user
+        elif model is IncomeEntries:
+            query_mock.filter.return_value.first.return_value = None
         return query_mock
 
     mock_db.query.side_effect = db_query_side_effect
@@ -576,4 +675,4 @@ def test_verify_document_pension_notice_without_verified_amount_only_ensures_row
     mock_db.execute.assert_called_once()
     insert_stmt = mock_db.execute.call_args[0][0]
     assert insert_stmt.compile().params["monthly_amount"] is None
-    assert IncomeEntries not in query_mocks
+    query_mocks[IncomeEntries].filter.return_value.filter.assert_not_called()

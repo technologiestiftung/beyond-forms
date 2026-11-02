@@ -332,9 +332,7 @@ def test_ensure_skips_a_persona_that_already_has_a_profile():
         results = service.ensure_missing_personas()
 
     seed.assert_not_called()
-    assert results == [
-        {"persona": "helmut", "phone_number": "+493023125102", "status": "already_present"}
-    ]
+    assert results == [{"persona": "helmut", "phone_number": "+493023125102", "status": "already_present"}]
 
 
 def test_ensure_reseeds_a_persona_whose_fixture_hash_changed():

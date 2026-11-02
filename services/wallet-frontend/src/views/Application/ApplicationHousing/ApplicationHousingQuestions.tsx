@@ -31,6 +31,10 @@ interface FieldProps {
 	error?: string;
 }
 
+// Only the wizard knows this option; it is stored as no tenancy status plus the
+// name of the person who grants the free right of residence.
+const FREE_LODGING = "FreeLodging";
+
 const FormField: React.FC<FieldProps> = ({
 	id,
 	label,
@@ -203,7 +207,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 				accomodationType:
 					profileData.housing?.accomodationType ?? "Rental Apartment",
-				tenancyStatus: profileData.housing?.tenancyStatus ?? "Main Tenant",
+				tenancyStatus: profileData.housing?.freeHousingRightHolder
+					? FREE_LODGING
+					: (profileData.housing?.tenancyStatus ?? "Main Tenant"),
 				landlordName: profileData.housing?.landlordName ?? "",
 				freeHousingRightHolder:
 					profileData.housing?.freeHousingRightHolder ?? "",
@@ -313,16 +319,25 @@ export const ApplicationHousingQuestions: React.FC = () => {
 		return 0; // Exit to overview
 	};
 
-	const handleSaveField = async (
+	// saves run one after another, so the user's latest choice is stored last
+	const saveQueue = useRef<Promise<unknown>>(Promise.resolve());
+	const enqueueSave = <T,>(save: () => Promise<T>): Promise<T> => {
+		const next = saveQueue.current.then(save);
+		saveQueue.current = next.catch(() => undefined);
+		return next;
+	};
+
+	const saveFields = async (
 		section: "address" | "housing",
-		key: string,
-		val: string | number | boolean | null | undefined,
+		fields: Record<string, string | number | boolean | null | undefined>,
 	) => {
 		try {
-			const result = await updateSection({
-				section,
-				data: { [key]: val, validateEntireForm: false },
-			});
+			const result = await enqueueSave(() =>
+				updateSection({
+					section,
+					data: { ...fields, validateEntireForm: false },
+				}),
+			);
 
 			if (!result.success) {
 				setSaveError(result.message || t("errors.save_failed"));
@@ -332,10 +347,16 @@ export const ApplicationHousingQuestions: React.FC = () => {
 			setSaveSuccess(true);
 			setTimeout(() => setSaveSuccess(false), 1500);
 		} catch (error) {
-			console.error("Failed to auto-save field:", key, error);
+			console.error("Failed to auto-save fields:", Object.keys(fields), error);
 			setSaveError(t("errors.save_failed"));
 		}
 	};
+
+	const handleSaveField = (
+		section: "address" | "housing",
+		key: string,
+		val: string | number | boolean | null | undefined,
+	) => saveFields(section, { [key]: val });
 
 	const savePageData = async (
 		page: number,
@@ -386,24 +407,23 @@ export const ApplicationHousingQuestions: React.FC = () => {
 			housingData.accomodationType =
 				currentValues.accomodationType as Profile["housing"]["accomodationType"];
 		} else if (page === 3) {
-			housingData.tenancyStatus =
-				currentValues.tenancyStatus as Profile["housing"]["tenancyStatus"];
-			if (
-				currentValues.tenancyStatus === "Main Tenant" ||
-				currentValues.tenancyStatus === "Subtenant"
-			) {
-				housingData.landlordName = currentValues.landlordName || "";
-				housingData.freeHousingRightHolder = "";
-			} else if (
-				currentValues.tenancyStatus === null &&
-				currentValues.freeHousingRightHolder === "Ja"
-			) {
-				housingData.landlordName = "";
-				housingData.freeHousingRightHolder = "Ja";
-			} else {
-				housingData.landlordName = "";
-				housingData.freeHousingRightHolder = "";
+			const isFreeLodging = currentValues.tenancyStatus === FREE_LODGING;
+			// free lodging is stored only as the holder's name
+			if (isFreeLodging && !currentValues.freeHousingRightHolder?.trim()) {
+				return {
+					success: false,
+					message: t("errors.freeHousingRightHolder_required"),
+				};
 			}
+			housingData.tenancyStatus = isFreeLodging
+				? null
+				: (currentValues.tenancyStatus as Profile["housing"]["tenancyStatus"]);
+			housingData.landlordName = isFreeLodging
+				? ""
+				: currentValues.landlordName || "";
+			housingData.freeHousingRightHolder = isFreeLodging
+				? currentValues.freeHousingRightHolder || ""
+				: "";
 		} else if (page === 4) {
 			housingData.subletRoomCount = currentValues.subletRoomCount;
 			housingData.subletRentIncome = currentValues.subletRentIncome;
@@ -433,7 +453,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 	const onNextPage = async () => {
 		const currentValues = getValues();
-		const result = await savePageData(currentPage, currentValues);
+		const result = await enqueueSave(() =>
+			savePageData(currentPage, currentValues),
+		);
 
 		if (!result.success) {
 			setSaveError(result.message || t("errors.save_failed"));
@@ -454,7 +476,9 @@ export const ApplicationHousingQuestions: React.FC = () => {
 
 	const onPreviousPage = async () => {
 		const currentValues = getValues();
-		const result = await savePageData(currentPage, currentValues);
+		const result = await enqueueSave(() =>
+			savePageData(currentPage, currentValues),
+		);
 
 		if (!result.success) {
 			setSaveError(result.message || t("errors.save_failed"));
@@ -676,11 +700,10 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								selected={values.tenancyStatus === "Main Tenant"}
 								onClick={() => {
 									setValue("tenancyStatus", "Main Tenant");
-									void handleSaveField(
-										"housing",
-										"tenancyStatus",
-										"Main Tenant",
-									);
+									void saveFields("housing", {
+										tenancyStatus: "Main Tenant",
+										freeHousingRightHolder: "",
+									});
 								}}
 							/>
 							<OptionCard
@@ -690,27 +713,18 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								selected={values.tenancyStatus === "Subtenant"}
 								onClick={() => {
 									setValue("tenancyStatus", "Subtenant");
-									void handleSaveField("housing", "tenancyStatus", "Subtenant");
+									void saveFields("housing", {
+										tenancyStatus: "Subtenant",
+										freeHousingRightHolder: "",
+									});
 								}}
 							/>
 							<OptionCard
 								testIdPrefix="housing-option"
 								id="FreeLodging"
 								title={t("housing.options.tenancy_free")}
-								selected={
-									values.tenancyStatus === null &&
-									!!values.freeHousingRightHolder
-								}
-								onClick={() => {
-									setValue("tenancyStatus", null);
-									setValue("freeHousingRightHolder", "Ja");
-									void handleSaveField("housing", "tenancyStatus", null);
-									void handleSaveField(
-										"housing",
-										"freeHousingRightHolder",
-										"Ja",
-									);
-								}}
+								selected={values.tenancyStatus === FREE_LODGING}
+								onClick={() => setValue("tenancyStatus", FREE_LODGING)}
 							/>
 
 							{values.tenancyStatus === "Subtenant" && (
@@ -730,23 +744,27 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								</div>
 							)}
 
-							{values.tenancyStatus === null &&
-								!!values.freeHousingRightHolder && (
-									<div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm mt-2 animate-fadeIn">
-										<FormField
-											id="freeHousingRightHolder"
-											label={t("housing.labels.free_housing_right_holder")}
-											register={register("freeHousingRightHolder")}
-											onBlur={() =>
-												handleSaveField(
-													"housing",
-													"freeHousingRightHolder",
-													getValues("freeHousingRightHolder"),
-												)
+							{values.tenancyStatus === FREE_LODGING && (
+								<div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm mt-2 animate-fadeIn">
+									<FormField
+										id="freeHousingRightHolder"
+										label={t("housing.labels.free_housing_right_holder")}
+										register={register("freeHousingRightHolder")}
+										onBlur={() => {
+											const holder = getValues("freeHousingRightHolder");
+											// a blank name would store no free lodging at all
+											if (!holder?.trim()) {
+												return;
 											}
-										/>
-									</div>
-								)}
+											void saveFields("housing", {
+												freeHousingRightHolder: holder,
+												tenancyStatus: null,
+												landlordName: "",
+											});
+										}}
+									/>
+								</div>
+							)}
 						</div>
 					</div>
 				);

@@ -95,52 +95,72 @@ const PersonalDataEdit = lazyWithRetry(() =>
 	})),
 );
 const ApplicationHouseholdIntro = lazyWithRetry(() =>
-	import("../views/Application/ApplicationHousehold/ApplicationHouseholdIntro").then((m) => ({
+	import(
+		"../views/Application/ApplicationHousehold/ApplicationHouseholdIntro"
+	).then((m) => ({
 		default: m.ApplicationHouseholdIntro,
 	})),
 );
 const ApplicationHouseholdQuestions = lazyWithRetry(() =>
-	import("../views/Application/ApplicationHousehold/ApplicationHouseholdQuestions").then((m) => ({
+	import(
+		"../views/Application/ApplicationHousehold/ApplicationHouseholdQuestions"
+	).then((m) => ({
 		default: m.ApplicationHouseholdQuestions,
 	})),
 );
 const ApplicationHousingQuestions = lazyWithRetry(() =>
-	import("../views/Application/ApplicationHousing/ApplicationHousingQuestions").then((m) => ({
+	import(
+		"../views/Application/ApplicationHousing/ApplicationHousingQuestions"
+	).then((m) => ({
 		default: m.ApplicationHousingQuestions,
 	})),
 );
 const ApplicationHousingIntro = lazyWithRetry(() =>
-	import("../views/Application/ApplicationHousing/ApplicationHousingIntro").then((m) => ({
+	import(
+		"../views/Application/ApplicationHousing/ApplicationHousingIntro"
+	).then((m) => ({
 		default: m.ApplicationHousingIntro,
 	})),
 );
 const ApplicationAboutMeIntro = lazyWithRetry(() =>
-	import("../views/Application/ApplicationAboutMe/ApplicationAboutMeIntro").then((m) => ({
+	import(
+		"../views/Application/ApplicationAboutMe/ApplicationAboutMeIntro"
+	).then((m) => ({
 		default: m.ApplicationAboutMeIntro,
 	})),
 );
 const ApplicationAboutMeQuestions = lazyWithRetry(() =>
-	import("../views/Application/ApplicationAboutMe/ApplicationAboutMeQuestions").then((m) => ({
+	import(
+		"../views/Application/ApplicationAboutMe/ApplicationAboutMeQuestions"
+	).then((m) => ({
 		default: m.ApplicationAboutMeQuestions,
 	})),
 );
 const ApplicationIncomeAssetsIntro = lazyWithRetry(() =>
-	import("../views/Application/ApplicationIncomeAssets/ApplicationIncomeAssetsIntro").then((m) => ({
+	import(
+		"../views/Application/ApplicationIncomeAssets/ApplicationIncomeAssetsIntro"
+	).then((m) => ({
 		default: m.ApplicationIncomeAssetsIntro,
 	})),
 );
 const ApplicationIncomeAssetsQuestions = lazyWithRetry(() =>
-	import("../views/Application/ApplicationIncomeAssets/ApplicationIncomeAssetsQuestions").then((m) => ({
+	import(
+		"../views/Application/ApplicationIncomeAssets/ApplicationIncomeAssetsQuestions"
+	).then((m) => ({
 		default: m.ApplicationIncomeAssetsQuestions,
 	})),
 );
 const ApplicationHealthIntro = lazyWithRetry(() =>
-	import("../views/Application/ApplicationHealth/ApplicationHealthIntro").then((m) => ({
-		default: m.ApplicationHealthIntro,
-	})),
+	import("../views/Application/ApplicationHealth/ApplicationHealthIntro").then(
+		(m) => ({
+			default: m.ApplicationHealthIntro,
+		}),
+	),
 );
 const ApplicationHealthQuestions = lazyWithRetry(() =>
-	import("../views/Application/ApplicationHealth/ApplicationHealthQuestions").then((m) => ({
+	import(
+		"../views/Application/ApplicationHealth/ApplicationHealthQuestions"
+	).then((m) => ({
 		default: m.ApplicationHealthQuestions,
 	})),
 );

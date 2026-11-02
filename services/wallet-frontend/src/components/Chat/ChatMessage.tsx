@@ -1,9 +1,9 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import type { ChatMessage as ChatMessageType } from "../../store/useChatStore";
+import type { ChatTextMessage } from "../../store/useChatStore";
 
-export const ChatMessage: React.FC<{ message: ChatMessageType }> = ({
+export const ChatMessage: React.FC<{ message: ChatTextMessage }> = ({
 	message,
 }) => {
 	const { role, id, content } = message;

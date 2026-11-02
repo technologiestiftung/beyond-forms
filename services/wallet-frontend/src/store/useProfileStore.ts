@@ -7,7 +7,11 @@ export type MilestoneLevel = 0 | 1 | 2 | typeof MAX_MILESTONE_LEVEL;
 
 export type ProfileTab = "persona" | "financial" | "documents" | "settings";
 export type ApplicationStatus =
-	"idle" | "draft" | "in_progress" | "submitted" | "success";
+	| "idle"
+	| "draft"
+	| "in_progress"
+	| "submitted"
+	| "success";
 
 interface ProfileUIState {
 	isEditMode: boolean;

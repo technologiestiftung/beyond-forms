@@ -1,4 +1,8 @@
-import type { IChatService, SendMessageOptions } from "./IChatService";
+import type {
+	IChatService,
+	SendMessageOptions,
+	SendToolResultOptions,
+} from "./IChatService";
 
 const MOCK_REPLIES = [
 	"Das kann ich Dir gern erklären. Grundsicherung richtet sich u. a. an Personen, die erwerbsgemindert sind und Hilfe zum Lebensunterhalt brauchen.",
@@ -24,6 +28,11 @@ export class MockChatService implements IChatService {
 
 		onResponse(text);
 		onDone();
+	}
+
+	async sendToolResult(options: SendToolResultOptions): Promise<void> {
+		options.onResponse("Danke, das habe ich gespeichert.");
+		options.onDone();
 	}
 
 	async newChat(): Promise<void> {

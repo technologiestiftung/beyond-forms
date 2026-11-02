@@ -446,7 +446,7 @@
 			"emp_none": "None of the above",
 			"other_sick": "Sickness benefit",
 			"other_alimony": "Alimony / maintenance",
-			"other_rent": "Other income (e.g. interest, subletting)",
+			"other_rent": "Income from renting or leasing",
 			"other_none": "No, no other income",
 			"benefit_options": {
 				"grundsicherung": "Basic income support",
