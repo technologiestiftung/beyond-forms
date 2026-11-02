@@ -6,7 +6,7 @@ from src.models import (
     INCOME_TYPE_DE,
     MARITAL_STATUS_DE,
     NATIONALITY_DE,
-    PENSION_INCOME_TYPES,
+    PENSION_INCOME_KEYS,
     AssociatedPersons,
     AssociationType,
     BenefitClaimKindType,
@@ -163,12 +163,9 @@ def _claim_rows(claims: Iterable[Any], kind: BenefitClaimKindType) -> List[Dict[
     return [row_to_dict(row) for row in sorted(rows, key=lambda claim: claim.sort_order)]
 
 
-_PENSION_KEYS = frozenset(pension_type.value for pension_type in PENSION_INCOME_TYPES)
-
-
 def _with_pension_line(by_type: Dict[str, Any], combine: Callable[[List[Any]], Any]) -> Dict[str, Any]:
     """Folds every pension kind into `Pension`, the form's single "Renten/Pensionen" line."""
-    values = [value for key, value in by_type.items() if key in _PENSION_KEYS and value not in (None, "")]
+    values = [value for key, value in by_type.items() if key in PENSION_INCOME_KEYS and value not in (None, "")]
     if not values:
         return by_type
     return {**by_type, "Pension": combine(values)}
