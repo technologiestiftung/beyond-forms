@@ -156,10 +156,14 @@ def _reconcile_money_grid_items(user_row: DbUser, key: str, items: object) -> ob
 
     for item in items:
         try:
-            dumped = schema.model_validate(item).model_dump(mode="json")
+            validated = schema.model_validate(item)
         except ValidationError:
             return items
-        merged[(dumped["person_sort_order"], dumped[type_field])] = dumped
+        dumped = validated.model_dump(mode="json")
+        row_key = (dumped["person_sort_order"], dumped[type_field])
+        # a row that only sends its amount keeps its stored office and reference
+        stored = merged.get(row_key)
+        merged[row_key] = {**stored, **validated.model_dump(mode="json", exclude_unset=True)} if stored else dumped
 
     return list(merged.values())
 
