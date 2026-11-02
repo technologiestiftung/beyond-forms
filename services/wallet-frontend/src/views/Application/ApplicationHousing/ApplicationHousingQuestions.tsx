@@ -319,15 +319,14 @@ export const ApplicationHousingQuestions: React.FC = () => {
 		return 0; // Exit to overview
 	};
 
-	const handleSaveField = async (
+	const saveFields = async (
 		section: "address" | "housing",
-		key: string,
-		val: string | number | boolean | null | undefined,
+		fields: Record<string, string | number | boolean | null | undefined>,
 	) => {
 		try {
 			const result = await updateSection({
 				section,
-				data: { [key]: val, validateEntireForm: false },
+				data: { ...fields, validateEntireForm: false },
 			});
 
 			if (!result.success) {
@@ -338,10 +337,16 @@ export const ApplicationHousingQuestions: React.FC = () => {
 			setSaveSuccess(true);
 			setTimeout(() => setSaveSuccess(false), 1500);
 		} catch (error) {
-			console.error("Failed to auto-save field:", key, error);
+			console.error("Failed to auto-save fields:", Object.keys(fields), error);
 			setSaveError(t("errors.save_failed"));
 		}
 	};
+
+	const handleSaveField = (
+		section: "address" | "housing",
+		key: string,
+		val: string | number | boolean | null | undefined,
+	) => saveFields(section, { [key]: val });
 
 	const savePageData = async (
 		page: number,
@@ -674,11 +679,10 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								selected={values.tenancyStatus === "Main Tenant"}
 								onClick={() => {
 									setValue("tenancyStatus", "Main Tenant");
-									void handleSaveField(
-										"housing",
-										"tenancyStatus",
-										"Main Tenant",
-									);
+									void saveFields("housing", {
+										tenancyStatus: "Main Tenant",
+										freeHousingRightHolder: "",
+									});
 								}}
 							/>
 							<OptionCard
@@ -688,7 +692,10 @@ export const ApplicationHousingQuestions: React.FC = () => {
 								selected={values.tenancyStatus === "Subtenant"}
 								onClick={() => {
 									setValue("tenancyStatus", "Subtenant");
-									void handleSaveField("housing", "tenancyStatus", "Subtenant");
+									void saveFields("housing", {
+										tenancyStatus: "Subtenant",
+										freeHousingRightHolder: "",
+									});
 								}}
 							/>
 							<OptionCard
@@ -723,11 +730,13 @@ export const ApplicationHousingQuestions: React.FC = () => {
 										label={t("housing.labels.free_housing_right_holder")}
 										register={register("freeHousingRightHolder")}
 										onBlur={() =>
-											handleSaveField(
-												"housing",
-												"freeHousingRightHolder",
-												getValues("freeHousingRightHolder"),
-											)
+											saveFields("housing", {
+												freeHousingRightHolder: getValues(
+													"freeHousingRightHolder",
+												),
+												tenancyStatus: null,
+												landlordName: "",
+											})
 										}
 									/>
 								</div>
