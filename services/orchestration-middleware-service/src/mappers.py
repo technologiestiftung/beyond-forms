@@ -2,7 +2,7 @@ from typing import Any, Optional
 import datetime
 import logging
 import re
-from src.models import PENSION_INCOME_TYPES, Users as DbUser
+from src.models import PENSION_INCOME_KEYS, Users as DbUser
 from unittest.mock import Mock
 
 logger = logging.getLogger(__name__)
@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 # whenever `has_received_benefits_before` is true. Without a value there, every
 # applicant who has received benefits before is rejected as un-submittable.
 # TODO: replace the free-text column with a real date column so this parse can go away.
-_PENSION_KEYS = frozenset(pension_type.value for pension_type in PENSION_INCOME_TYPES)
 _ISO_DATE_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
 _DE_DATE_RE = re.compile(r"(\d{1,2})\.(\d{1,2})\.(\d{4})")
 _YEAR_MONTH_RE = re.compile(r"(\d{4})-(\d{2})(?!\d)")
@@ -232,7 +231,7 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
     pension_kinds = {
         getattr(row.income_type, "value", row.income_type)
         for row in income_rows
-        if getattr(row.income_type, "value", row.income_type) in _PENSION_KEYS and row.monthly_amount != 0
+        if getattr(row.income_type, "value", row.income_type) in PENSION_INCOME_KEYS and row.monthly_amount != 0
     }
     # a generic or survivor's pension says nothing about its reason, so the earning capacity decides
     unspecific_pension = bool(pension_kinds - {"Old-Age Pension", "Reduced Earning Capacity Pension"})
@@ -253,7 +252,7 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
             pass
 
     _INCOME_CATEGORY_LINES = {
-        "pension_income": _PENSION_KEYS,
+        "pension_income": PENSION_INCOME_KEYS,
         "non_self_employed_income": {"Employment"},
         "social_benefits_income": {
             "Social Assistance",
@@ -275,7 +274,13 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
 
     _category_rows = {name: _rows_for(lines) for name, lines in _INCOME_CATEGORY_LINES.items()}
     _category_totals = {name: _explicit_total(rows) for name, rows in _category_rows.items()}
-    _amountless_categories = {name for name, rows in _category_rows.items() if rows and not _category_totals[name]}
+    # a row with amount 0 records "none", so only a row without an amount needs a stand-in
+    _amountless_categories = {
+        name
+        for name, rows in _category_rows.items()
+        if not _category_totals[name]
+        and any(getattr(row, "monthly_amount", None) is None or isinstance(row.monthly_amount, Mock) for row in rows)
+    }
 
     def _line_total(name: str) -> float:
         """The summed monthly amounts of the named income lines. A line recorded without
@@ -286,7 +291,7 @@ def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
         total = _category_totals[name]
         if total:
             return total
-        if len(_amountless_categories) == 1:
+        if name in _amountless_categories and len(_amountless_categories) == 1:
             return income_val or 0.0
         return 0.0
 

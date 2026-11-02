@@ -199,6 +199,7 @@ PENSION_INCOME_TYPES = frozenset(
         IncomeTypeType.SURVIVOR_PENSION,
     }
 )
+PENSION_INCOME_KEYS = frozenset(pension_type.value for pension_type in PENSION_INCOME_TYPES)
 
 INCOME_TYPE_DE = {
     IncomeTypeType.EMPLOYMENT: "Nichtselbstständige Tätigkeit",
@@ -211,7 +212,7 @@ INCOME_TYPE_DE = {
     IncomeTypeType.PENSION: "Rente/Pension",
     IncomeTypeType.OLD_AGE_PENSION: "Altersrente",
     IncomeTypeType.REDUCED_EARNING_CAPACITY_PENSION: "Rente wegen Erwerbsminderung",
-    IncomeTypeType.SURVIVOR_PENSION: "Hinterbliebendenrente",
+    IncomeTypeType.SURVIVOR_PENSION: "Hinterbliebenenrente",
     IncomeTypeType.SOCIAL_ASSISTANCE: "Sozialhilfeleistungen",
     IncomeTypeType.BASIC_SECURITY_BENEFITS: "Grundsicherungsleistungen",
     IncomeTypeType.ASYLUM_SEEKER_BENEFITS: "Asylbewerberleistungen",
