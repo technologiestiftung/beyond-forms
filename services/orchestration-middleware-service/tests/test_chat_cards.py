@@ -173,6 +173,10 @@ def test_validate_card_answer_caps_text_at_the_column_length():
     step = {"columns": [{"column": "house_number", "field": "a.house_number"}]}
     assert validate_card_answer(step, {"house_number": "1" * 20})[1] == []
     assert validate_card_answer(step, {"house_number": "1" * 21})[1] == ["invalid value for house_number"]
+    payload, errors = validate_card_answer(step, {"house_number": " " + "1" * 20 + " "})
+    assert errors == []
+    assert payload.house_number == "1" * 20
+    assert validate_card_answer(step, {"house_number": "   "})[1] == ["invalid value for house_number"]
 
 
 def test_validate_card_answer_stores_empty_income_lines_as_zero():

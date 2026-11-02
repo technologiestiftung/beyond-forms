@@ -155,7 +155,7 @@ def _matches_kind(card_input: CardInput, value: Any) -> bool:
             return True
         except (TypeError, ValueError):
             return False
-    return isinstance(value, str) and 0 < len(value.strip()) <= card_input.max_length
+    return isinstance(value, str) and 0 < len(value) <= card_input.max_length
 
 
 def validate_card_answer(step: dict, values: Any) -> tuple[Optional[UserProfileValidationSchema], list[str]]:
@@ -163,6 +163,7 @@ def validate_card_answer(step: dict, values: Any) -> tuple[Optional[UserProfileV
     `income_entries` rows."""
     if not isinstance(values, dict):
         return None, ["values must be an object"]
+    values = {key: value.strip() if isinstance(value, str) else value for key, value in values.items()}
     inputs = {i.key: i for i in card_inputs(step)}
     errors = [f"{key} is not part of this card" for key in values if key not in inputs]
     errors += [f"{key} is missing" for key, i in inputs.items() if not i.optional and values.get(key) is None]
