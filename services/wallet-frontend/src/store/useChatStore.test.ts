@@ -131,4 +131,47 @@ describe("useChatStore", () => {
 		expect(cards()[0].answer).toBeUndefined();
 		expect(useChatStore.getState().error).toBe("Network down");
 	});
+
+	it("keeps the answer when the reply fails after the server saved it", async () => {
+		showCard();
+		await useChatStore.getState().sendMessage("Wohnkosten");
+		vi.mocked(chatService.sendToolResult).mockImplementation(
+			async ({ onRunStarted, onError }: ChatStreamCallbacks) => {
+				onRunStarted?.();
+				onError("Streaming Error");
+			},
+		);
+
+		await useChatStore.getState().answerCard("call_card", { rent_total: 1 });
+
+		expect(cards()[0].answer).toEqual({ rent_total: 1 });
+	});
+
+	it("closes a card the server no longer takes an answer for", async () => {
+		showCard();
+		await useChatStore.getState().sendMessage("Wohnkosten");
+		vi.mocked(chatService.sendToolResult).mockImplementation(
+			async ({ onError }: ChatStreamCallbacks) =>
+				onError("This card has already been answered", 409),
+		);
+
+		await useChatStore.getState().answerCard("call_card", { rent_total: 1 });
+
+		expect(cards()[0]).toMatchObject({ answer: undefined, closed: true });
+	});
+
+	it("closes open cards once a typed message reaches the server", async () => {
+		showCard();
+		await useChatStore.getState().sendMessage("Wohnkosten");
+		vi.mocked(chatService.sendMessage).mockImplementation(
+			async ({ onRunStarted, onDone }: ChatStreamCallbacks) => {
+				onRunStarted?.();
+				onDone();
+			},
+		);
+
+		await useChatStore.getState().sendMessage("Lieber so: 520 Euro");
+
+		expect(cards()[0].closed).toBe(true);
+	});
 });

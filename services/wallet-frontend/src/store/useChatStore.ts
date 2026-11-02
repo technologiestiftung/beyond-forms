@@ -17,18 +17,24 @@ export type ChatTextMessage = {
 	content: string;
 };
 
-/** A card the assistant showed inline; `answer` holds the values once the user submitted it. */
+/**
+ * A card the assistant showed inline; `answer` holds the values once the user submitted it.
+ * `closed` marks a card the server no longer takes an answer for, e.g. after the user typed instead.
+ */
 export type ChatCardMessage = {
 	id: string;
 	role: "card";
 	toolCallId: string;
 	card: ChatCardView;
 	answer?: Record<string, ChatCardValue>;
+	closed?: boolean;
 };
 
 export type ChatMessage = ChatTextMessage | ChatCardMessage;
 
 const SHOW_CARD_TOOL = "show_card";
+
+type ReplyOutcome = { succeeded: boolean; started: boolean; status?: number };
 
 interface ChatState {
 	messages: ChatMessage[];
@@ -49,11 +55,13 @@ export const useChatStore = create<ChatState>()(
 		(set, get) => {
 			/**
 			 * Streams one assistant reply into a new message. Cards the assistant shows
-			 * are appended after its text. Resolves to whether the reply arrived.
+			 * are appended after its text. Resolves to whether the reply arrived, and
+			 * whether the server accepted the request at all.
 			 */
 			const streamReply = async (
 				request: (callbacks: ChatStreamCallbacks) => Promise<void>,
-			): Promise<boolean> => {
+				onStarted?: () => void,
+			): Promise<ReplyOutcome> => {
 				const assistantId = crypto.randomUUID();
 				set((s) => ({
 					messages: [
@@ -64,8 +72,9 @@ export const useChatStore = create<ChatState>()(
 					error: null,
 				}));
 
-				let succeeded = false;
-				const fail = (message: string) => {
+				const outcome: ReplyOutcome = { succeeded: false, started: false };
+				const fail = (message: string, status?: number) => {
+					outcome.status = status;
 					set((s) => ({
 						messages: s.messages.filter((m) => m.id !== assistantId),
 						isLoading: false,
@@ -75,6 +84,10 @@ export const useChatStore = create<ChatState>()(
 
 				try {
 					await request({
+						onRunStarted: () => {
+							outcome.started = true;
+							onStarted?.();
+						},
 						onResponse: (response) => {
 							set((s) => ({
 								messages: s.messages.map((m) =>
@@ -100,7 +113,7 @@ export const useChatStore = create<ChatState>()(
 							}));
 						},
 						onDone: () => {
-							succeeded = true;
+							outcome.succeeded = true;
 							set((s) => ({
 								isLoading: false,
 								messages: s.messages.filter(
@@ -117,7 +130,7 @@ export const useChatStore = create<ChatState>()(
 				} catch (e) {
 					fail(e instanceof Error ? e.message : "Unknown error");
 				}
-				return succeeded;
+				return outcome;
 			};
 
 			return {
@@ -143,8 +156,19 @@ export const useChatStore = create<ChatState>()(
 							},
 						],
 					}));
-					await streamReply((callbacks) =>
-						chatService.sendMessage({ content: trimmed, ...callbacks }),
+					// the server answers any open card with this message instead
+					const closeOpenCards = () =>
+						set((s) => ({
+							messages: s.messages.map((m) =>
+								m.role === "card" && m.answer === undefined
+									? { ...m, closed: true }
+									: m,
+							),
+						}));
+					await streamReply(
+						(callbacks) =>
+							chatService.sendMessage({ content: trimmed, ...callbacks }),
+						closeOpenCards,
 					);
 				},
 
@@ -156,7 +180,12 @@ export const useChatStore = create<ChatState>()(
 						(m): m is ChatCardMessage =>
 							m.role === "card" && m.toolCallId === toolCallId,
 					);
-					if (!card || card.answer !== undefined || get().isLoading) {
+					if (
+						!card ||
+						card.answer !== undefined ||
+						card.closed ||
+						get().isLoading
+					) {
 						return;
 					}
 
@@ -170,17 +199,27 @@ export const useChatStore = create<ChatState>()(
 						}));
 
 					setAnswer(values);
-					const succeeded = await streamReply((callbacks) =>
-						chatService.sendToolResult({
-							toolCallId,
-							content: JSON.stringify({ values }),
-							...callbacks,
-						}),
+					const { succeeded, started, status } = await streamReply(
+						(callbacks) =>
+							chatService.sendToolResult({
+								toolCallId,
+								content: JSON.stringify({ values }),
+								...callbacks,
+							}),
 					);
-					if (!succeeded) {
-						// lets the user submit the card again
-						setAnswer(undefined);
+					// the server saves the answer before it starts the reply
+					if (succeeded || started) {
+						return;
 					}
+					set((s) => ({
+						messages: s.messages.map((m) =>
+							m.id === card.id
+								? // a 409 means the card no longer takes an answer;
+									// anything else lets the user submit it again
+									{ ...m, answer: undefined, closed: status === 409 }
+								: m,
+						),
+					}));
 				},
 
 				clearError: () => set({ error: null }),

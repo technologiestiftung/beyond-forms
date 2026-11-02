@@ -159,7 +159,7 @@ describe("HttpChatService", () => {
 		await done;
 
 		expect(onError).toHaveBeenCalledTimes(1);
-		expect(onError).toHaveBeenCalledWith("Streaming error");
+		expect(onError).toHaveBeenCalledWith("Streaming error", undefined);
 		expect(onDone).not.toHaveBeenCalled();
 	});
 
@@ -175,7 +175,7 @@ describe("HttpChatService", () => {
 		await done;
 
 		expect(onError).toHaveBeenCalledTimes(1);
-		expect(onError).toHaveBeenCalledWith("Invalid token");
+		expect(onError).toHaveBeenCalledWith("Invalid token", 401);
 	});
 
 	it("joins validation error details", async () => {
@@ -191,7 +191,7 @@ describe("HttpChatService", () => {
 		const { done, onError } = send(service);
 		await done;
 
-		expect(onError).toHaveBeenCalledWith("field required, too long");
+		expect(onError).toHaveBeenCalledWith("field required, too long", 422);
 	});
 
 	it("calls onError when fetch rejects", async () => {
@@ -201,7 +201,7 @@ describe("HttpChatService", () => {
 		await done;
 
 		expect(onError).toHaveBeenCalledTimes(1);
-		expect(onError).toHaveBeenCalledWith("Network down");
+		expect(onError).toHaveBeenCalledWith("Network down", undefined);
 	});
 
 	it("calls onError when the stream ends without RUN_FINISHED", async () => {

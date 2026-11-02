@@ -7,8 +7,9 @@ export interface ChatToolCall {
 export interface ChatStreamCallbacks {
 	onResponse: (response: string) => void;
 	onToolCall?: (call: ChatToolCall) => void;
+	onRunStarted?: () => void;
 	onDone: () => void;
-	onError: (error: string) => void;
+	onError: (error: string, status?: number) => void;
 	signal?: AbortSignal;
 }
 

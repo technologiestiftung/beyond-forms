@@ -138,9 +138,11 @@ export const ChatCard: React.FC<ChatCardProps> = ({
 	});
 	const values = useWatch({ control });
 	const submitted = answer !== undefined;
+	const closed = !submitted && Boolean(message.closed);
 	const cardValues = toCardValues(card.inputs, values);
 	const canSubmit =
 		!submitted &&
+		!closed &&
 		!disabled &&
 		cardValues !== null &&
 		card.inputs.every(
@@ -173,7 +175,7 @@ export const ChatCard: React.FC<ChatCardProps> = ({
 			</div>
 
 			<fieldset
-				disabled={submitted || disabled}
+				disabled={submitted || closed || disabled}
 				className="flex flex-col gap-4"
 			>
 				{card.inputs.map((input) => (
@@ -188,7 +190,7 @@ export const ChatCard: React.FC<ChatCardProps> = ({
 				))}
 			</fieldset>
 
-			{!submitted && (
+			{!submitted && !closed && (
 				<PrimaryButton type="submit" disabled={!canSubmit}>
 					{t("card.submit")}
 				</PrimaryButton>
@@ -196,6 +198,11 @@ export const ChatCard: React.FC<ChatCardProps> = ({
 			{submitted && (
 				<p className="text-xs font-semibold text-slate-500 text-left">
 					{t("card.saved")}
+				</p>
+			)}
+			{closed && (
+				<p className="text-xs font-semibold text-slate-500 text-left">
+					{t("card.closed")}
 				</p>
 			)}
 		</form>

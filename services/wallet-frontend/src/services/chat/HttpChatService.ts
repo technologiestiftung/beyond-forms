@@ -13,6 +13,11 @@ function authHeader(): Record<string, string> {
 	return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+function errorStatus(error: unknown): number | undefined {
+	const status = (error as { status?: unknown } | null)?.status;
+	return typeof status === "number" ? status : undefined;
+}
+
 function errorMessage(error: unknown): string {
 	if (!(error instanceof Error)) {
 		return "Network error";
@@ -54,7 +59,8 @@ export class HttpChatService implements IChatService {
 		message: Message,
 		callbacks: ChatStreamCallbacks,
 	): Promise<void> {
-		const { onResponse, onToolCall, onDone, onError, signal } = callbacks;
+		const { onResponse, onToolCall, onRunStarted, onDone, onError, signal } =
+			callbacks;
 		if (signal?.aborted) {
 			return;
 		}
@@ -73,18 +79,19 @@ export class HttpChatService implements IChatService {
 
 		let text = "";
 		let settled = false;
-		const fail = (reason: string) => {
+		const fail = (reason: string, status?: number) => {
 			if (settled || signal?.aborted) {
 				return;
 			}
 			settled = true;
-			onError(reason);
+			onError(reason, status);
 		};
 
 		try {
 			await agent.runAgent(
 				{ abortController },
 				{
+					onRunStartedEvent: () => onRunStarted?.(),
 					// one tool round = one assistant message; keep them in one bubble
 					onTextMessageStartEvent: () => {
 						if (text) {
@@ -109,11 +116,12 @@ export class HttpChatService implements IChatService {
 						}
 					},
 					onRunErrorEvent: ({ event }) => fail(event.message),
-					onRunFailed: ({ error }) => fail(errorMessage(error)),
+					onRunFailed: ({ error }) =>
+						fail(errorMessage(error), errorStatus(error)),
 				},
 			);
 		} catch (e) {
-			fail(errorMessage(e));
+			fail(errorMessage(e), errorStatus(e));
 		}
 
 		fail("Stream connection lost before completion");
