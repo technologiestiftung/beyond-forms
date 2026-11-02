@@ -700,7 +700,7 @@ def test_chat_stream_saves_a_card_answer_and_continues(
 
 
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_stream_does_not_offer_a_card_answered_in_this_chat(
+def test_chat_stream_offers_an_answered_card_again_while_the_rules_engine_stops_there(
     mock_completion, mock_conv_service, mock_conv, profile_row
 ):
     mock_conv_service.get_conversation_context.return_value = [
@@ -710,7 +710,8 @@ def test_chat_stream_does_not_offer_a_card_answered_in_this_chat(
 
     client.post("/chat/stream", json=_run_input("Weiter"))
 
-    assert _offered_card(mock_completion) is None
+    assert _offered_card(mock_completion) == "step_applicant_name"
+    assert "not complete yet" in mock_completion.call_args.kwargs["messages"][0]["content"]
 
 
 @pytest.mark.parametrize(
