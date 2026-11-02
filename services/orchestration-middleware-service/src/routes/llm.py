@@ -32,7 +32,7 @@ from beyondforms.auth import User as AuthUser, get_current_user, require_authent
 from src.schemas import AssociatedPersonSchema, UserInformationUpdateSchema
 from src.tools import AVAILABLE_TOOLS, SHOW_CARD_TOOL_NAME
 from src.chat_cards import APPLICATION_DONE_PROMPT, build_card_view, card_prompt, validate_card_answer
-from src.services.wizard_rules import evaluate, rules_steps
+from src.services.wizard_rules import evaluate, evaluation_payload, rules_steps
 from ag_ui.core import RunStartedEvent, RunFinishedEvent, RunErrorEvent, TextMessageChunkEvent, ToolCallChunkEvent
 from ag_ui.encoder import EventEncoder
 from ag_ui.core.types import RunAgentInput
@@ -68,6 +68,9 @@ _ENUM_ALLOWED_VALUES: dict[str, str] = {
 MAX_TOOL_CALL_ROUNDS = 5
 CHAT_CONTEXT_WINDOW_SIZE = int(os.getenv("CHAT_CONTEXT_WINDOW_SIZE", "20"))
 MAX_CARD_ANSWER_LENGTH = 4000
+# the rules engine answers from a local decision tree in milliseconds; past this the reply
+# goes out without a card instead of keeping the user waiting
+CARD_EVALUATION_TIMEOUT_SECONDS = 3
 
 router = APIRouter(tags=["llm"])
 logger = logging.getLogger(__name__)
@@ -300,19 +303,23 @@ def _load_user_row(db: Session, user_service: UserService, current_user: AuthUse
         return None
 
 
-async def _next_card(user_row: Optional[DbUser], answered_card_ids: set[str]) -> tuple[Optional[str], str]:
-    """The step the rules engine stops at, if it is a card not yet answered in this chat, and
-    what the model is told about it."""
-    if user_row is None:
+async def _next_card(form_content: Optional[dict], answered_card_ids: set[str]) -> tuple[Optional[str], str]:
+    """The step the rules engine stops at, if it is a card, and what the model is told about it."""
+    if form_content is None:
         return None, ""
-    evaluation = await asyncio.to_thread(evaluate, user_row)
+    evaluation = await asyncio.to_thread(evaluate, form_content, CARD_EVALUATION_TIMEOUT_SECONDS)
     step_id = (evaluation or {}).get("next_step")
     if step_id == "END":
         return None, APPLICATION_DONE_PROMPT
     step = rules_steps().get(step_id, {})
-    if step_id in answered_card_ids or not step.get("columns"):
+    if not step.get("columns"):
         return None, ""
-    return step_id, card_prompt(step_id, step)
+    prompt = card_prompt(step_id, step)
+    if step_id in answered_card_ids:
+        prompt += (
+            "\nThe user already answered this card, but it is not complete yet: show it again and say what is missing."
+        )
+    return step_id, prompt
 
 
 def _card_view(
@@ -342,9 +349,7 @@ async def _run_server_tool(tool_name_to_function_dict: dict, tool_call: dict):
         return {"error": f"Error executing tool {function_name}: {fn_err}"}
 
 
-def _save_card_answer(
-    db: Session, user_service: UserService, current_user: AuthUser, card_call: dict, content: str
-) -> str:
+def _save_card_answer(db: Session, user_row: Optional[DbUser], card_call: dict, content: str) -> str:
     """Validates and saves the values a card submitted; returns the tool result for the model."""
     card_id = _tool_args(card_call).get("card_id")
     step = rules_steps().get(card_id)
@@ -352,7 +357,6 @@ def _save_card_answer(
         values = json.loads(content).get("values")
     except (json.JSONDecodeError, AttributeError):
         values = None
-    user_row = _load_user_row(db, user_service, current_user)
     if not step or user_row is None:
         raise HTTPException(status_code=422, detail="This card can't be saved")
     payload, errors = validate_card_answer(step, values)
@@ -386,6 +390,7 @@ async def handle_chat_stream(
     conversation = conv_service.get_or_create_in_progress_conversation()
     conversation_id = conversation.id
 
+    user_row = _load_user_row(db, user_service, current_user)
     previous_context = conv_service.get_conversation_context(conversation_id, limit=CHAT_CONTEXT_WINDOW_SIZE)
     open_calls = _unanswered_tool_calls(previous_context)
     answered_card = None
@@ -396,7 +401,7 @@ async def handle_chat_stream(
         )
         if answered_card is None:
             raise HTTPException(status_code=409, detail="This card has already been answered")
-        content = _save_card_answer(db, user_service, current_user, answered_card, content)
+        content = _save_card_answer(db, user_row, answered_card, content)
 
     # The user typed instead of answering a card; Gemini rejects a tool call without a result
     for open_call in open_calls:
@@ -426,8 +431,10 @@ async def handle_chat_stream(
 
     context_messages = conv_service.get_conversation_context(conversation_id, limit=CHAT_CONTEXT_WINDOW_SIZE)
 
-    user_row = _load_user_row(db, user_service, current_user)
-    offered_card, card_instructions = await _next_card(user_row, _answered_card_ids(context_messages))
+    # evaluation_payload may lazy-load income rows on `db`, which the worker thread in
+    # _next_card must not touch, so only the finished dict is handed over
+    form_content = evaluation_payload(user_row) if user_row is not None else None
+    answered_card_ids = _answered_card_ids(context_messages)
     available_tools = AVAILABLE_TOOLS
 
     tool_name_to_function_dict = {
@@ -438,17 +445,16 @@ async def handle_chat_stream(
         "berlin_social_services_knowledge_base": berlin_social_services_knowledge_base,
     }
 
-    messages = _prepare_chat_messages(context_messages, card_instructions)
-
     async def event_generator():
-        nonlocal messages
-
         encoder = EventEncoder()
 
         thread_id = str(conversation_id)
         run_id = str(input_data.run_id)
 
         yield encoder.encode(RunStartedEvent(thread_id=thread_id, run_id=run_id))
+
+        offered_card, card_instructions = await _next_card(form_content, answered_card_ids)
+        messages = _prepare_chat_messages(context_messages, card_instructions)
 
         for round_num in range(1, MAX_TOOL_CALL_ROUNDS + 1):
             message_id = str(uuid.uuid4())
