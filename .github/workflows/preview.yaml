@@ -1,0 +1,186 @@
+name: Frontend Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    paths:
+      - "services/wallet-frontend/**"
+      - "libs/**"
+      - "demo/**"
+      - ".github/workflows/preview.yaml"
+      - ".github/scripts/upsert-pr-comment.sh"
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions: {}
+
+env:
+  SERVICE: bf-preview-wallet-frontend
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  COMMENT_MARKER: "<!-- frontend-preview -->"
+
+jobs:
+  deploy:
+    # Fork and Dependabot runs get no OIDC token, so they cannot deploy.
+    if: >-
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    environment:
+      name: preview
+      url: ${{ steps.deploy.outputs.url }}
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    env:
+      REGION: ${{ vars.GCP_REGION }}
+      PROJECT: ${{ vars.GCP_DEPLOY_PROJECT_ID }}
+      IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_CIS_PROJECT_ID }}/beyondforms-preview/wallet-frontend:pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # The build runs PR code, so GCP credentials must only exist after it finishes.
+      - name: Build image
+        run: docker build --target production -f services/wallet-frontend/Dockerfile -t "$IMAGE" .
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: bf-preview-deployer@${{ vars.GCP_DEPLOY_PROJECT_ID }}.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v3
+
+      - name: Push image
+        run: |
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          docker push "$IMAGE"
+
+      - name: Deploy tagged revision
+        id: deploy
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          TAG="pr-$PR_NUMBER"
+          SUFFIX="$TAG-${HEAD_SHA:0:7}-$RUN_ATTEMPT"
+          REVISION="$SERVICE-$SUFFIX"
+
+          # All PRs update the same Cloud Run service, so a concurrent deploy can make an update fail.
+          retry() {
+            for n in 1 2 3 4; do
+              "$@" && return 0
+              [ "$n" = 4 ] && return 1
+              echo "::warning::Attempt $n failed, retrying in $((n * 15))s"
+              sleep $((n * 15))
+            done
+          }
+
+          deploy() {
+            if gcloud run revisions describe "$REVISION" --project "$PROJECT" --region "$REGION" > /dev/null 2>&1; then
+              echo "Revision $REVISION already exists"
+              return 0
+            fi
+            gcloud run deploy "$SERVICE" \
+              --project "$PROJECT" \
+              --region "$REGION" \
+              --image "$IMAGE" \
+              --service-account "bf-preview-runtime@$PROJECT.iam.gserviceaccount.com" \
+              --revision-suffix "$SUFFIX" \
+              --no-traffic \
+              --tag "$TAG" \
+              --quiet
+          }
+
+          retry deploy
+          retry gcloud run services update-traffic "$SERVICE" --project "$PROJECT" --region "$REGION" \
+            --update-tags "$TAG=$REVISION" --quiet
+
+          URL=$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format=json \
+            | jq -r --arg tag "$TAG" '.status.traffic[] | select(.tag == $tag) | .url')
+          if [ -z "$URL" ]; then
+            echo "::error::No URL found for tag $TAG"
+            exit 1
+          fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+          gcloud run revisions list --service "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(metadata.name)' \
+            | { grep -- "-$TAG-" || true; } | { grep -vx "$REVISION" || true; } \
+            | while read -r old; do
+                gcloud run revisions delete "$old" --project "$PROJECT" --region "$REGION" --quiet \
+                  || echo "::warning::Could not delete old preview revision $old"
+              done
+
+      - name: Comment preview link
+        env:
+          GH_TOKEN: ${{ github.token }}
+          URL: ${{ steps.deploy.outputs.url }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          BODY="$COMMENT_MARKER
+          **Frontend preview:** $URL
+
+          Built from \`${HEAD_SHA:0:7}\`. Uses the staging backend and staging login."
+          bash .github/scripts/upsert-pr-comment.sh "$BODY"
+
+  cleanup:
+    if: >-
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    environment: preview
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    env:
+      REGION: ${{ vars.GCP_REGION }}
+      PROJECT: ${{ vars.GCP_DEPLOY_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: bf-preview-deployer@${{ vars.GCP_DEPLOY_PROJECT_ID }}.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v3
+
+      - name: Remove preview tag and revisions
+        run: |
+          TAG="pr-$PR_NUMBER"
+          TAGGED=$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format=json \
+            | jq -r --arg tag "$TAG" '.status.traffic[] | select(.tag == $tag) | .revisionName')
+          if [ -n "$TAGGED" ]; then
+            for n in 1 2 3 4; do
+              gcloud run services update-traffic "$SERVICE" --project "$PROJECT" --region "$REGION" --remove-tags "$TAG" --quiet && break
+              [ "$n" = 4 ] && exit 1
+              echo "::warning::Attempt $n failed, retrying in $((n * 15))s"
+              sleep $((n * 15))
+            done
+          fi
+
+          gcloud run revisions list --service "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(metadata.name)' \
+            | { grep -- "-$TAG-" || true; } \
+            | while read -r rev; do
+                gcloud run revisions delete "$rev" --project "$PROJECT" --region "$REGION" --quiet \
+                  || echo "::warning::Could not delete preview revision $rev"
+              done
+
+      - name: Update PR comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY="$COMMENT_MARKER
+          **Frontend preview:** removed because the PR was closed."
+          bash .github/scripts/upsert-pr-comment.sh "$BODY"
