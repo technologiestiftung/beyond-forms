@@ -8,7 +8,7 @@ def construct_db_url(user: str, password: str, host: str, port: str, name: str) 
     # URL-encode the credentials to handle special characters (e.g. '@') in user/password
     quoted_user = urllib.parse.quote(user, safe="")
     quoted_password = urllib.parse.quote(password, safe="")
-    return f"postgresql://{quoted_user}:{quoted_password}@{host}:{port}/{name}"
+    return f"postgresql+psycopg2://{quoted_user}:{quoted_password}@{host}:{port}/{name}"
 
 
 DB_USER = os.environ.get("POSTGRES_USER", "devuser")

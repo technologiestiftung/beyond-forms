@@ -1,4 +1,28 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>technologiestiftung/renovate-config"]
+  "extends": ["github>technologiestiftung/renovate-config"],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 7am on monday"]
+  },
+  "vulnerabilityAlerts": { "groupName": "security fixes" },
+  "packageRules": [
+    {
+      "matchManagers": ["pep621"],
+      "matchDepTypes": ["project.dependencies", "dependency-groups"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "matchManagers": ["pep621"],
+      "matchDepTypes": ["project.dependencies", "dependency-groups"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "python-non-major"
+    },
+    {
+      "matchManagers": ["pep621"],
+      "matchDepTypes": ["project.dependencies", "dependency-groups"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "python-major"
+    }
+  ]
 }

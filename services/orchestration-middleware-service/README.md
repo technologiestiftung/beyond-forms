@@ -105,5 +105,5 @@ To execute the Locust load tests against the orchestration middleware service:
 ### Automatically generate data models from the database locally
 
 ```bash
-uv run sqlacodegen postgresql://devuser:devpassword@localhost:5432/devdb > src/models.py
+uv run sqlacodegen postgresql+psycopg2://devuser:devpassword@localhost:5432/devdb > src/models.py
 ```

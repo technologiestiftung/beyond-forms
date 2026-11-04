@@ -6,23 +6,23 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "beyondforms-document-schemas",
-    "fastapi[standard]",
-    "uvicorn",
-    "python-multipart",
-    "litellm",
-    "pydantic",
-    "pydantic-settings",
-    "python-dotenv",
-    "tenacity",
-    "litellm[google]",
-    "numpy",
-    "google-cloud-storage",
+    "fastapi[standard]~=0.162.0",
+    "uvicorn~=0.54.0",
+    "python-multipart~=0.0.33",
+    "litellm~=1.108",
+    "pydantic~=2.14",
+    "pydantic-settings~=2.16",
+    "python-dotenv~=1.2",
+    "tenacity~=9.1",
+    "litellm[google]~=1.108",
+    "numpy~=2.5",
+    "google-cloud-storage~=3.17",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest",
-    "pytest-asyncio",
+    "pytest~=9.2",
+    "pytest-asyncio~=1.4",
 ]
 
 [build-system]

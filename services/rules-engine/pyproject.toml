@@ -7,12 +7,12 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "beyondforms-document-schemas",
-    "uvicorn",
-    "python-dotenv",
-    "pydantic",
-    "fastapi[standard]",
-    "loguru",
-    "json5",
+    "uvicorn~=0.54.0",
+    "python-dotenv~=1.2",
+    "pydantic~=2.14",
+    "fastapi[standard]~=0.162.0",
+    "loguru~=0.7.3",
+    "json5~=0.17.3",
 ]
 
 
@@ -32,12 +32,12 @@ packages = ["src/app"]
 
 [dependency-groups]
 dev = [
-    "pre-commit",
-    "pytest",
-    "httpx",
-    "mock",
-    "mypy",
-    "ruff",
+    "pre-commit~=4.7",
+    "pytest~=9.2",
+    "httpx~=0.28.1",
+    "mock~=5.2",
+    "mypy~=2.4",
+    "ruff~=0.17.3",
 ]
 
 [tool.pytest.ini_options]

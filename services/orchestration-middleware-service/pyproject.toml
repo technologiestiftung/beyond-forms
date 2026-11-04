@@ -5,29 +5,29 @@ description = "The Middleware Orchestration API serves as the central hub for ou
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "fastapi[standard]",
-    "google-cloud-aiplatform",
-    "litellm",
-    "google-cloud-storage",
-    "google-cloud-pubsub",
-    "psycopg2-binary",
-    "python-dotenv",
-    "sqlalchemy",
+    "fastapi[standard]~=0.162.0",
+    "google-cloud-aiplatform~=1.165",
+    "litellm~=1.108",
+    "google-cloud-storage~=3.17",
+    "google-cloud-pubsub~=2.43",
+    "psycopg2-binary~=2.9",
+    "python-dotenv~=1.2",
+    "sqlalchemy~=2.1",
     "beyondforms-auth",
     "beyondforms-document-schemas",
-    "reportlab",
-    "sqlacodegen",
-    "pydantic",
-    "firebase-admin",
-    "httpx",
-    "pyjexl",
-    "aiofiles",
-    "pyjwt[crypto]",
-    "pyopenssl",
-    "Pillow",
-    "pillow-heif",
-    "ag-ui-protocol>=1.0.0",
-    "json5>=0.15.0",
+    "reportlab~=5.1",
+    "sqlacodegen~=4.0",
+    "pydantic~=2.14",
+    "firebase-admin~=7.7",
+    "httpx~=0.28.1",
+    "pyjexl~=0.3.0",
+    "aiofiles>=25.1.0",
+    "pyjwt[crypto]~=2.15",
+    "pyopenssl~=26.4",
+    "Pillow~=13.0",
+    "pillow-heif~=1.8",
+    "ag-ui-protocol~=1.0",
+    "json5~=0.17.3",
 ]
 
 [tool.uv.sources]
@@ -46,9 +46,9 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pytest",
-    "pytest-asyncio",
-    "locust",
+    "pytest~=9.2",
+    "pytest-asyncio~=1.4",
+    "locust~=2.47",
 ]
 
 [tool.hatch.build.targets.wheel]
