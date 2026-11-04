@@ -45,7 +45,7 @@ jobs:
         with:
           persist-credentials: false
 
-      # The build runs PR code, so GCP credentials must only exist after it finishes.
+      # Runner steps can request the GCP token; PR code must only run inside docker build.
       - name: Build image
         run: docker build --target production -f services/wallet-frontend/Dockerfile -t "$IMAGE" .
 
@@ -67,7 +67,10 @@ jobs:
         env:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           RUN_ATTEMPT: ${{ github.run_attempt }}
+          API_PROXY_URL: ${{ vars.API_PROXY_URL }}
+          AUTH_PROXY_URL: ${{ vars.AUTH_PROXY_URL }}
         run: |
+          : "${API_PROXY_URL:?missing, run scripts/setup_preview.sh}" "${AUTH_PROXY_URL:?missing, run scripts/setup_preview.sh}"
           TAG="pr-$PR_NUMBER"
           SUFFIX="$TAG-${HEAD_SHA:0:7}-$RUN_ATTEMPT"
           REVISION="$SERVICE-$SUFFIX"
@@ -92,6 +95,7 @@ jobs:
               --region "$REGION" \
               --image "$IMAGE" \
               --service-account "bf-preview-runtime@$PROJECT.iam.gserviceaccount.com" \
+              --set-env-vars "API_PROXY_URL=$API_PROXY_URL,AUTH_PROXY_URL=$AUTH_PROXY_URL" \
               --revision-suffix "$SUFFIX" \
               --no-traffic \
               --tag "$TAG" \
@@ -183,4 +187,4 @@ jobs:
         run: |
           BODY="$COMMENT_MARKER
           **Frontend preview:** removed because the PR was closed."
-          bash .github/scripts/upsert-pr-comment.sh "$BODY"
+          bash .github/scripts/upsert-pr-comment.sh "$BODY" --update-only

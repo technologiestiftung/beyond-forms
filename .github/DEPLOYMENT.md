@@ -69,24 +69,16 @@ gh secret   set ALLOYDB_HOST --env staging   --body "<ip>"
 
 ## Frontend PR previews
 
-`.github/workflows/preview.yaml` deploys `wallet-frontend` for every PR that
-touches `services/wallet-frontend/`, `libs/` or `demo/`, and comments the link
-on the PR. Previews use the **staging backend and staging login**. Closing the
-PR removes the preview. PRs from forks and from Dependabot get no preview.
+`.github/workflows/preview.yaml` deploys `wallet-frontend` for PRs that change
+`services/wallet-frontend/`, `libs/` or `demo/` and comments the link. Previews
+use the staging backend and login. Closing the PR removes the preview, except
+when it is closed with a merge conflict. Runs triggered by forks or Dependabot
+don't deploy.
 
-Each PR is a tagged revision (`pr-<number>`) of one Cloud Run service with no
-traffic of its own. The deploy identity can only touch that service, so a PR
-cannot reach staging or production resources.
+Each PR is a tagged revision (`pr-<number>`) of the Cloud Run service
+`bf-preview-wallet-frontend`. The deploy identity has rights only on that
+service, its image repository and a runtime account without roles. Set up or
+repair everything with `scripts/setup_preview.sh`.
 
-One-time setup (already done; listed for rebuilding):
-
-| Resource | Where | Notes |
-|---|---|---|
-| Artifact Registry repo `beyondforms-preview` | `GCP_CIS_PROJECT_ID` | `bf-preview-deployer` has `artifactregistry.writer` on it |
-| SA `bf-preview-deployer` | `GCP_DEPLOY_PROJECT_ID` | `workloadIdentityUser` for subject `repo:<owner>/<repo>:environment:preview` only |
-| SA `bf-preview-runtime` | `GCP_DEPLOY_PROJECT_ID` | no roles; deployer has `iam.serviceAccountUser` on it |
-| Cloud Run service `bf-preview-wallet-frontend` | `GCP_DEPLOY_PROJECT_ID` | created by hand with `--no-invoker-iam-check`, runtime SA and staging `API_PROXY_URL`/`AUTH_PROXY_URL`; deployer has `run.developer` on this service only |
-| GitHub environment `preview` | repo settings | no branch restriction, no secrets |
-
-Never grant the deployer project-level roles: PR workflows run code from the PR
-branch, so anything this identity can do, any branch can do.
+Never grant the deploy identity project-level roles: a PR runs its own copy of
+the workflow, so any branch can use them.
