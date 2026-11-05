@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "pydantic~=2.14",
-    "fastapi~=0.162.0",
+    "fastapi~=0.159.1",
     "pyjwt[crypto]~=2.15",
 ]
 
@@ -16,7 +16,7 @@ default = true
 
 [dependency-groups]
 dev = [
-    "pytest~=9.2",
+    "pytest~=9.1",
     "pytest-asyncio~=1.4",
     "requests~=2.34",
 ]

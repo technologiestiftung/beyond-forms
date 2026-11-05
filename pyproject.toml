@@ -10,3 +10,6 @@ members = [
     "services/rules-engine",
     "tools/schema_utils",
 ]
+
+[tool.uv]
+exclude-newer = "14 days"

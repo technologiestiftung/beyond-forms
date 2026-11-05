@@ -5,9 +5,9 @@ description = "The Middleware Orchestration API serves as the central hub for ou
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "fastapi[standard]~=0.162.0",
+    "fastapi[standard]~=0.159.1",
     "google-cloud-aiplatform~=1.165",
-    "litellm~=1.108",
+    "litellm~=1.106",
     "google-cloud-storage~=3.17",
     "google-cloud-pubsub~=2.43",
     "psycopg2-binary~=2.9",
@@ -46,7 +46,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pytest~=9.2",
+    "pytest~=9.1",
     "pytest-asyncio~=1.4",
     "locust~=2.47",
 ]

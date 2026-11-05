@@ -20,7 +20,7 @@ packages = ["src/beyondforms"]
 
 [dependency-groups]
 dev = [
-    "pytest~=9.2",
+    "pytest~=9.1",
 ]
 
 [tool.pytest.ini_options]

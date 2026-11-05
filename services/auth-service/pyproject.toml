@@ -5,7 +5,7 @@ description = "A service to manage authentication via Authentik"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi~=0.162.0",
+    "fastapi~=0.159.1",
     "uvicorn~=0.54.0",
     "pydantic~=2.14",
     "pydantic-settings~=2.16",
@@ -33,10 +33,10 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pytest~=9.2",
+    "pytest~=9.1",
     "pytest-asyncio~=1.4",
     "httpx~=0.28.1",
-    "ruff~=0.17.3",
+    "ruff~=0.17.1",
 ]
 
 [tool.hatch.build.targets.wheel]

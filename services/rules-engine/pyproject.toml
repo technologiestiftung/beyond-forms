@@ -10,7 +10,7 @@ dependencies = [
     "uvicorn~=0.54.0",
     "python-dotenv~=1.2",
     "pydantic~=2.14",
-    "fastapi[standard]~=0.162.0",
+    "fastapi[standard]~=0.159.1",
     "loguru~=0.7.3",
     "json5~=0.17.3",
 ]
@@ -33,11 +33,11 @@ packages = ["src/app"]
 [dependency-groups]
 dev = [
     "pre-commit~=4.7",
-    "pytest~=9.2",
+    "pytest~=9.1",
     "httpx~=0.28.1",
     "mock~=5.2",
     "mypy~=2.4",
-    "ruff~=0.17.3",
+    "ruff~=0.17.1",
 ]
 
 [tool.pytest.ini_options]
