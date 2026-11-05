@@ -23,11 +23,13 @@ env:
 
 jobs:
   deploy:
-    # Fork and Dependabot runs get no OIDC token, so they cannot deploy.
+    # Fork and Dependabot runs get no OIDC token. Renovate runs do, so skip them
+    # until a person has pushed to the branch.
     if: >-
       github.event.action != 'closed' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
-      github.actor != 'dependabot[bot]'
+      github.actor != 'dependabot[bot]' &&
+      github.actor != 'renovate[bot]'
     runs-on: ubuntu-latest
     environment:
       name: preview
@@ -137,7 +139,8 @@ jobs:
     if: >-
       github.event.action == 'closed' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
-      github.actor != 'dependabot[bot]'
+      github.actor != 'dependabot[bot]' &&
+      github.actor != 'renovate[bot]'
     runs-on: ubuntu-latest
     environment: preview
     permissions:

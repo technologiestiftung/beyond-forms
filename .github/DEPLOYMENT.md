@@ -72,8 +72,8 @@ gh secret   set ALLOYDB_HOST --env staging   --body "<ip>"
 `.github/workflows/preview.yaml` deploys `wallet-frontend` for PRs that change
 `services/wallet-frontend/`, `libs/` or `demo/` and comments the link. Previews
 use the staging backend and login. Closing the PR removes the preview, except
-when it is closed with a merge conflict. Runs triggered by forks or Dependabot
-don't deploy.
+when it is closed with a merge conflict. Runs triggered by forks, Dependabot
+or Renovate don't deploy.
 
 Each PR is a tagged revision (`pr-<number>`) of the Cloud Run service
 `bf-preview-wallet-frontend`. The deploy identity has rights only on that
