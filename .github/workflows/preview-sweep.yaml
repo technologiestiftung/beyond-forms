@@ -1,0 +1,67 @@
+name: Frontend Preview Sweep
+
+# Removes previews whose PR is closed but whose cleanup never ran, e.g. PRs
+# closed with a merge conflict or closed by Dependabot or Renovate.
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: preview-sweep
+
+permissions: {}
+
+env:
+  SERVICE: bf-preview-wallet-frontend
+  COMMENT_MARKER: "<!-- frontend-preview -->"
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    environment: preview
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    env:
+      REGION: ${{ vars.GCP_REGION }}
+      PROJECT: ${{ vars.GCP_DEPLOY_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: bf-preview-deployer@${{ vars.GCP_DEPLOY_PROJECT_ID }}.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+
+      - name: Remove previews of closed PRs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PRS=$(gcloud run revisions list --service "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(metadata.name)' \
+            | sed -n "s/^$SERVICE-pr-\([0-9]*\)-.*/\1/p" | sort -un)
+          BODY="$COMMENT_MARKER
+          **Frontend preview:** removed because the PR was closed."
+          FAILED=0
+          for pr in $PRS; do
+            if ! STATE=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$pr" --jq .state); then
+              echo "::warning::Could not read the state of PR #$pr, skipping"
+              continue
+            fi
+            [ "$STATE" = closed ] || continue
+            echo "Removing preview of closed PR #$pr"
+            if bash .github/scripts/remove-preview.sh "$pr"; then
+              PR_NUMBER="$pr" bash .github/scripts/upsert-pr-comment.sh "$BODY" --update-only \
+                || echo "::warning::Could not update the comment on PR #$pr"
+            else
+              echo "::error::Could not remove the preview of PR #$pr"
+              FAILED=1
+            fi
+          done
+          exit "$FAILED"

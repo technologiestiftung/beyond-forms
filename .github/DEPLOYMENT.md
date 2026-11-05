@@ -66,3 +66,19 @@ gh variable set DB_NAME     --env staging    --body "dev"
 gh variable set DB_NAME     --env production --body "prod"
 gh secret   set ALLOYDB_HOST --env staging   --body "<ip>"
 ```
+
+## Frontend PR previews
+
+`.github/workflows/preview.yaml` deploys `wallet-frontend` for PRs that change
+`services/wallet-frontend/`, `libs/` or `demo/` and comments the link. Previews
+use the staging backend and login. Closing the PR removes the preview, and
+`.github/workflows/preview-sweep.yaml` removes any the close missed once a
+day. Runs triggered by forks, Dependabot or Renovate don't deploy.
+
+Each PR is a tagged revision (`pr-<number>`) of the Cloud Run service
+`bf-preview-wallet-frontend`. The deploy identity has rights only on that
+service, its image repository and a runtime account without roles. Set up or
+repair everything with `scripts/setup_preview.sh`.
+
+Never grant the deploy identity project-level roles: a PR runs its own copy of
+the workflow, so any branch can use them.
