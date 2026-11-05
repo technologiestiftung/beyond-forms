@@ -56,9 +56,8 @@ gcloud iam service-accounts add-iam-policy-binding "$DEPLOYER" --project="$DEPLO
 echo "Cloud Run service $SERVICE..."
 if ! gcloud run services describe "$SERVICE" --region="$REGION" --project="$DEPLOY_PROJECT" &> /dev/null; then
   gcloud run deploy "$SERVICE" --region="$REGION" --project="$DEPLOY_PROJECT" \
-    --image="$REGION-docker.pkg.dev/$REGISTRY_PROJECT/beyondforms/wallet-frontend:latest" \
-    --service-account="$RUNTIME" --no-invoker-iam-check --max-instances=2 \
-    --set-env-vars="API_PROXY_URL=$API_PROXY_URL,AUTH_PROXY_URL=$AUTH_PROXY_URL" --quiet
+    --image=us-docker.pkg.dev/cloudrun/container/hello \
+    --service-account="$RUNTIME" --no-invoker-iam-check --max-instances=2 --quiet
 fi
 gcloud run services add-iam-policy-binding "$SERVICE" --region="$REGION" --project="$DEPLOY_PROJECT" \
   --member="serviceAccount:$DEPLOYER" --role=roles/run.developer > /dev/null
