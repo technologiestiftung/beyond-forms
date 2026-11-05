@@ -8,7 +8,7 @@ on:
       - "libs/**"
       - "demo/**"
       - ".github/workflows/preview.yaml"
-      - ".github/scripts/upsert-pr-comment.sh"
+      - ".github/scripts/*.sh"
 
 concurrency:
   group: preview-${{ github.event.pull_request.number }}
@@ -165,25 +165,7 @@ jobs:
       - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
 
       - name: Remove preview tag and revisions
-        run: |
-          TAG="pr-$PR_NUMBER"
-          TAGGED=$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format=json \
-            | jq -r --arg tag "$TAG" '.status.traffic[] | select(.tag == $tag) | .revisionName')
-          if [ -n "$TAGGED" ]; then
-            for n in 1 2 3 4; do
-              gcloud run services update-traffic "$SERVICE" --project "$PROJECT" --region "$REGION" --remove-tags "$TAG" --quiet && break
-              [ "$n" = 4 ] && exit 1
-              echo "::warning::Attempt $n failed, retrying in $((n * 15))s"
-              sleep $((n * 15))
-            done
-          fi
-
-          gcloud run revisions list --service "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(metadata.name)' \
-            | { grep -- "-$TAG-" || true; } \
-            | while read -r rev; do
-                gcloud run revisions delete "$rev" --project "$PROJECT" --region "$REGION" --quiet \
-                  || echo "::warning::Could not delete preview revision $rev"
-              done
+        run: bash .github/scripts/remove-preview.sh "$PR_NUMBER"
 
       - name: Update PR comment
         env:
