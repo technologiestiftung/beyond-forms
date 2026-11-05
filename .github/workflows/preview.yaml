@@ -12,7 +12,8 @@ on:
 
 concurrency:
   group: preview-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  # A close waits for a running deploy: a cancelled deploy can still finish in Cloud Run after cleanup.
+  cancel-in-progress: ${{ github.event.action != 'closed' }}
 
 permissions: {}
 
