@@ -192,10 +192,16 @@ export const DocumentStatusListItem = ({
 						</span>
 						<div className="flex items-center gap-2 mt-0.5">
 							{/* Hidden so the row reads "<slot> Hinzufügen" rather than repeating "Dokument". */}
-							<span className={styles.badge} aria-hidden={isRow}>
+							<span
+								className={styles.badge}
+								aria-hidden={isRow && slot.badgeKey === "docs.badges.doc"}
+							>
 								{t(slot.badgeKey)}
 							</span>
 						</div>
+						{isRow && isVerified && (
+							<span className="sr-only">{t("docs.view_short")}</span>
+						)}
 					</div>
 					<div
 						className="flex items-center gap-2 shrink-0 self-center"

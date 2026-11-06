@@ -199,6 +199,7 @@
 		"category_document_count_one": "1 Dokument",
 		"category_document_count_other": "{{count}} Dokumente",
 		"add_short": "Hinzufügen",
+		"view_short": "Ansehen",
 		"upload_dialog_aria": "Dokument hinzufügen",
 		"dropzone_title": "Dokument hierher ziehen",
 		"dropzone_hint": "oder wähle eine Datei von Deinem Computer aus."
