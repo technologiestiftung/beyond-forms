@@ -130,31 +130,6 @@ export const DocumentStatusListItem = ({
 		}
 	};
 
-	// Without this the row reads out as "<slot> Dokument Hinzufügen", repeating
-	// the card's own "Dokument hinzufügen" action.
-	const getRowAriaLabel = () => {
-		// Processing and failed rows announce their own status text instead.
-		if (
-			isProcessing ||
-			uploadedFile?.status === ProcessingStatusEnum.enum.FAILED
-		) {
-			return undefined;
-		}
-		if (isVerified) {
-			return t("docs.view_slot_aria", {
-				title: slotTitle,
-			});
-		}
-		if (hasUploadedFile) {
-			return t("docs.review_slot_aria", {
-				title: slotTitle,
-			});
-		}
-		return t("docs.add_slot_aria", {
-			title: slotTitle,
-		});
-	};
-
 	const renderStatusIndicator = () => {
 		if (isProcessing) {
 			return (
@@ -204,7 +179,6 @@ export const DocumentStatusListItem = ({
 					data-testid={
 						isVerified ? `preview-doc-btn-${slot.id}` : `slot-btn-${slot.id}`
 					}
-					aria-label={isRow ? getRowAriaLabel() : undefined}
 					className={`group flex justify-between flex-1 text-left min-w-0 gap-4 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-blue-500 ${
 						styles.button
 					} ${isProcessing ? "cursor-not-allowed" : styles.hover}`}
@@ -217,7 +191,10 @@ export const DocumentStatusListItem = ({
 							{slotTitle}
 						</span>
 						<div className="flex items-center gap-2 mt-0.5">
-							<span className={styles.badge}>{t(slot.badgeKey)}</span>
+							{/* Hidden so the row reads "<slot> Hinzufügen" rather than repeating "Dokument". */}
+							<span className={styles.badge} aria-hidden={isRow}>
+								{t(slot.badgeKey)}
+							</span>
 						</div>
 					</div>
 					<div

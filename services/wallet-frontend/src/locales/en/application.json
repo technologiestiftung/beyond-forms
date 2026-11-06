@@ -200,11 +200,8 @@
 		"category_document_count_other": "{{count}} documents",
 		"add_short": "Add",
 		"upload_dialog_aria": "Add document",
-		"add_slot_aria": "Add {{title}}",
-		"view_slot_aria": "View {{title}}",
 		"dropzone_title": "Drag a document here",
-		"dropzone_hint": "or upload a file from your computer.",
-		"review_slot_aria": "Review {{title}}"
+		"dropzone_hint": "or upload a file from your computer."
 	},
 	"common": {
 		"delete": "Delete",

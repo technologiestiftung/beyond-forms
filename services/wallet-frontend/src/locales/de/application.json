@@ -200,11 +200,8 @@
 		"category_document_count_other": "{{count}} Dokumente",
 		"add_short": "Hinzufügen",
 		"upload_dialog_aria": "Dokument hinzufügen",
-		"add_slot_aria": "{{title}} hinzufügen",
-		"view_slot_aria": "{{title}} ansehen",
 		"dropzone_title": "Dokument hierher ziehen",
-		"dropzone_hint": "oder wähle eine Datei von Deinem Computer aus.",
-		"review_slot_aria": "{{title}} prüfen"
+		"dropzone_hint": "oder wähle eine Datei von Deinem Computer aus."
 	},
 	"common": {
 		"delete": "Löschen",
