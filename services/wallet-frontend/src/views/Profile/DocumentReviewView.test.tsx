@@ -295,7 +295,7 @@ describe("DocumentReviewView - Validation & Smart Error Handling", () => {
 		).mockResolvedValueOnce({
 			ok: true,
 			status: 200,
-			json: async () => ({ status: "success" }),
+			json: async () => ({}),
 		});
 
 		fireEvent.click(screen.getByText("review.confirm_all"));
@@ -338,7 +338,7 @@ describe("DocumentReviewView - Validation & Smart Error Handling", () => {
 		).mockResolvedValueOnce({
 			ok: true,
 			status: 200,
-			json: async () => ({ status: "success" }),
+			json: async () => ({}),
 		});
 
 		fireEvent.click(screen.getByText("review.confirm_all"));

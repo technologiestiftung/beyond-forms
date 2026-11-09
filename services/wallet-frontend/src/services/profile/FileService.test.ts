@@ -115,11 +115,10 @@ describe("FileService", () => {
 			status: 200,
 			json: () =>
 				Promise.resolve([
-					{ name: "id-card.pdf", document_id: "doc-123", status: "success" },
+					{ name: "id-card.pdf", document_id: "doc-123" },
 					{
 						name: "bank-statement.pdf",
 						document_id: "doc-456",
-						status: "success",
 					},
 				]),
 		} as Response);
@@ -159,7 +158,7 @@ describe("FileService", () => {
 			status: 200,
 			json: () =>
 				Promise.resolve([
-					{ name: "id-card.pdf", document_id: "doc-123", status: "success" },
+					{ name: "id-card.pdf", document_id: "doc-123" },
 					{
 						name: "bank-statement.pdf",
 						error_message: "File too large",

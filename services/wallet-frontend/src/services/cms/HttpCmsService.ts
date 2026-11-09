@@ -29,7 +29,7 @@ export class HttpCmsService implements ICmsService {
 
 	async updateTutorialProgress(
 		payload: TutorialProgressUpdatePayload,
-	): Promise<{ status: string }> {
+	): Promise<void> {
 		const response = await authenticatedFetch(
 			`${env.VITE_API_URL}/cms/my-tutorials/progress`,
 			{
@@ -44,6 +44,5 @@ export class HttpCmsService implements ICmsService {
 				`Failed to update tutorial progress: ${response.statusText}`,
 			);
 		}
-		return response.json();
 	}
 }

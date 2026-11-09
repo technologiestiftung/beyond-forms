@@ -7,5 +7,5 @@ export interface ICmsService {
 	getMyTutorials(): Promise<TutorialResponse[]>;
 	updateTutorialProgress(
 		payload: TutorialProgressUpdatePayload,
-	): Promise<{ status: string }>;
+	): Promise<void>;
 }
