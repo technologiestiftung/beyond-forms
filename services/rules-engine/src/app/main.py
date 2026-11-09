@@ -1,6 +1,7 @@
 import logging
 import uvicorn
 from fastapi import FastAPI, Body, Query, HTTPException
+from fastapi.responses import JSONResponse
 from pydantic import ValidationError, TypeAdapter, BaseModel
 from typing import Any, Optional
 
@@ -9,8 +10,7 @@ from app import domain
 from app.domain.registry import form_registry, field_registry
 from app.validation.verified_fields import validate_document_verified_fields, validate_profile_fields
 from app.domain.decision_tree import DecisionTreeEvaluator
-from app.web.request_bodies import FormRequestBody, FieldTypeRequest
-from app.web.utils import api_response, format_validation_errors
+from app.validation.error_formatting import format_validation_errors
 
 logger = logging.getLogger(__name__)
 
@@ -18,45 +18,50 @@ app = FastAPI(title="Rules-Engine")
 
 logger.info(f"Registry initialized with {len(domain.field_registry._registry)} fields.")
 
+class FormRequestBody(BaseModel):
+    form_type: str
+    form_content: dict
+
+
+class FieldTypeRequest(BaseModel):
+    field_type: str
+    field_value: Any
+
+
 
 # --- Global Exception Handlers ---
-@app.exception_handler(HTTPException)
-async def custom_http_exception_handler(request, exc):
-    return api_response(status_str="error", code=exc.status_code, detail=exc.detail)
-
-
 @app.exception_handler(Exception)
 async def universal_exception_handler(request, exc):
     logger.exception("Unhandled Server Exception:")
-    return api_response(status_str="error", code=500, detail="Internal Server Error")
+    return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 
 
 # --- Routes ---
 @app.get("/health")
 async def health():
-    return api_response()
+    return {"status": "healthy"}
 
 
 @app.get("/get-available-forms")
 async def get_available_forms():
-    return api_response("available-forms", form_registry.list_keys())
+    return {"available-forms": form_registry.list_keys()}
 
 
 @app.get("/get-form-definition/{form_name}")
 async def get_form_definition(form_name: str):
     form_definition = form_registry.get_or_404(form_name)
-    return api_response("form-definition", form_definition.model_json_schema())
+    return {"form-definition": form_definition.model_json_schema()}
 
 
 @app.get("/get-available-field-types")
 async def get_available_field_types():
-    return api_response("available-field-types", field_registry.list_keys())
+    return {"available-field-types": field_registry.list_keys()}
 
 
 @app.get("/get-field-type-definition/{field_name}")
 async def get_field_type_definition(field_name: str):
     field_type = field_registry.get_or_404(field_name)
-    return api_response("field-definition", TypeAdapter(field_type).json_schema())
+    return {"field-definition": TypeAdapter(field_type).json_schema()}
 
 
 def count_required_fields(model_class: type[BaseModel]) -> int:
@@ -95,14 +100,13 @@ async def validate(
 
     try:
         validated_data = form_class.model_validate(request.form_content)
-        return api_response(
-            "form_content",
-            validated_data.model_dump(),
-            total_required_fields=total_required_fields,
-            missing_field_count=0,
-            missing_fields=[],
-            is_submittable=True,
-        )
+        return {
+            "form_content": validated_data.model_dump(),
+            "total_required_fields": total_required_fields,
+            "missing_field_count": 0,
+            "missing_fields": [],
+            "is_submittable": True,
+        }
 
     except ValidationError as e:
         all_errors = format_validation_errors(e.errors())
@@ -117,27 +121,26 @@ async def validate(
         }
 
         if validate_entire_form:
-            return api_response(
-                status_str="error",
-                code=422,
-                detail="Validation failed.",
-                validation_errors=all_errors,
-                **resp_metadata,
+            return JSONResponse(
+                status_code=422,
+                content={
+                    "detail": "Validation failed.",
+                    "validation_errors": all_errors,
+                    **resp_metadata,
+                },
             )
 
         if validation_errors:
-            return api_response(
-                status_str="error",
-                code=422,
-                detail="Validation failed.",
-                validation_errors=validation_errors,
-                **resp_metadata,
+            return JSONResponse(
+                status_code=422,
+                content={
+                    "detail": "Validation failed.",
+                    "validation_errors": validation_errors,
+                    **resp_metadata,
+                },
             )
 
-        return api_response(
-            validation_type="partial",
-            **resp_metadata,
-        )
+        return {"validation_type": "partial", **resp_metadata}
 
 
 class BatchValidationRequest(BaseModel):
@@ -151,37 +154,34 @@ async def validate_fields(request: BatchValidationRequest = Body(...)):
         try:
             validation_result = validate_document_verified_fields(request.document_type, request.fields)
         except ValueError:
-            return api_response(
-                status_str="error",
-                code=400,
-                detail=f"Unknown document type: {request.document_type}",
-            )
+            raise HTTPException(status_code=400, detail=f"Unknown document type: {request.document_type}")
 
         if validation_result.errors:
-            return api_response(
-                status_str="error",
-                code=422,
-                detail="Validation failed",
-                validation_errors=validation_result.errors,
+            return JSONResponse(
+                status_code=422,
+                content={
+                    "detail": "Validation failed",
+                    "validation_errors": validation_result.errors,
+                },
             )
 
-        return api_response(
-            "validated_fields",
-            validation_result.validated_fields,
-            profile_sync=validation_result.profile_sync,
-        )
+        return {
+            "validated_fields": validation_result.validated_fields,
+            "profile_sync": validation_result.profile_sync,
+        }
 
     validation_result = validate_profile_fields(request.fields)
 
     if validation_result.errors:
-        return api_response(
-            status_str="error",
-            code=422,
-            detail="Validation failed",
-            validation_errors=validation_result.errors,
+        return JSONResponse(
+            status_code=422,
+            content={
+                "detail": "Validation failed",
+                "validation_errors": validation_result.errors,
+            },
         )
 
-    return api_response("validated_fields", validation_result.validated_fields)
+    return {"validated_fields": validation_result.validated_fields}
 
 
 @app.post("/validate-field")
@@ -190,13 +190,14 @@ async def validate_field(request: FieldTypeRequest = Body(...)):
 
     try:
         validated_value = TypeAdapter(field_type).validate_python(request.field_value)
-        return api_response("validated_value", validated_value)
+        return {"validated_value": validated_value}
     except ValidationError as e:
-        return api_response(
-            status_str="error",
-            code=422,
-            detail=f"Validation failed for type: {request.field_type}",
-            validation_errors=format_validation_errors(e.errors()),
+        return JSONResponse(
+            status_code=422,
+            content={
+                "detail": f"Validation failed for type: {request.field_type}",
+                "validation_errors": format_validation_errors(e.errors()),
+            },
         )
 
 
@@ -210,10 +211,10 @@ async def evaluate_wizard(request: WizardEvaluationRequest = Body(...)):
     try:
         evaluator = DecisionTreeEvaluator()
         result = evaluator.evaluate(request.form_content, request.current_step_id)
-        return api_response("evaluation", result)
+        return {"evaluation": result}
     except Exception as e:
         logger.exception("Failed to evaluate wizard rules:")
-        return api_response(status_str="error", code=500, detail=str(e))
+        return JSONResponse(status_code=500, content={"detail": str(e)})
 
 
 if __name__ == "__main__":
