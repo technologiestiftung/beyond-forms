@@ -392,7 +392,6 @@ def test_verify_document_splits_fullname_success(mock_post, mock_db):
     response = client.post(f"/api/v1/documents/{document_id}/verify", json=payload)
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
 
     called_json = mock_post.call_args[1]["json"]
     assert called_json["fields"] == {"full_name": "Helmut Karl Klar"}

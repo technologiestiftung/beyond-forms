@@ -160,7 +160,6 @@ async def test_evaluate_wizard_endpoint_success():
     payload = {"form_content": {"eligibility_check": {"lives_in_germany": True}}}
     mock_response = MagicMock()
     mock_response.json.return_value = {
-        "status": "success",
         "evaluation": {
             "visited_steps": ["step_eligibility_nationality"],
             "next_step": "step_eligibility_residence",
@@ -176,5 +175,4 @@ async def test_evaluate_wizard_endpoint_success():
 
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "success"
     assert data["evaluation"]["next_step"] == "step_eligibility_residence"

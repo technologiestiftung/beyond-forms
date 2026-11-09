@@ -110,11 +110,6 @@ def process_message(message):
 
             dis_result = response.json()
 
-            if dis_result.get("status") == "error":
-                raise RuntimeError(f"DIS reported error: {dis_result.get('detail')}")
-
-            dis_data = dis_result.get("data", {})
-
         except Exception as e:
             logger.error(f"DIS invocation failed: {e}")
             _update_db_failed(db, document_id, "DIS_INVOCATION_FAILED", str(e))
@@ -122,16 +117,14 @@ def process_message(message):
             return
 
         # 4. Parse Results & Update DB
-        dis_data = dis_result.get("data", {})
-
         if used_stateless_extract:
-            # Stateless extract returns: {extracted_data: {...}}
-            extraction_result = dis_data.get("extracted_data", {})
+            # Stateless extract returns the extracted fields directly
+            extraction_result = dis_result if isinstance(dis_result, dict) else {}
             doc_type = DIS_TO_SLOT_ID_MAP.get(user_selected_type, "OTHER")
         else:
             # Classify returns: {classified_document: {...}, extraction_result: {...}}
-            classified_doc = dis_data.get("classified_document", {})
-            extraction_result = dis_data.get("extraction_result", {})
+            classified_doc = dis_result.get("classified_document", {})
+            extraction_result = dis_result.get("extraction_result", {})
             raw_doc_type = classified_doc.get("document_type", "unknown")
             doc_type = DIS_TO_SLOT_ID_MAP.get(raw_doc_type, "OTHER")
 

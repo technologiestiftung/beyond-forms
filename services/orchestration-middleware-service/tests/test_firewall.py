@@ -114,6 +114,5 @@ def test_update_profile_validation_error_422(mock_post):
 
     assert response.status_code == 200
     resp_data = response.json()
-    assert resp_data["status"] == "success"
     assert resp_data["validation_status"] == "draft"
     assert len(resp_data["rules_warnings"]) > 0

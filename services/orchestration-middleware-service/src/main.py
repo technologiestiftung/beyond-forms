@@ -84,7 +84,7 @@ async def health_check():
     """
     Health check endpoint for service monitoring
     """
-    return {"status": "healthy!"}
+    return {"status": "healthy"}
 
 
 @app.get("/version")
@@ -145,7 +145,7 @@ async def notify_document_processed(
             if ws in active_connections[uid]:
                 active_connections[uid].remove(ws)
 
-    return {"status": "success"}
+    return {}
 
 
 @app.websocket("/ws/documents")

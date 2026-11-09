@@ -252,7 +252,6 @@ def _upload_file_impl(
         "name": new_uploaded_file.name,
         "object_name": new_uploaded_file.object_name,
         "document_id": str(new_user_document.document_id),
-        "status": "success",
     }
 
 
@@ -822,7 +821,7 @@ def verify_document(
 
     db.commit()
 
-    return {"status": "success"}
+    return {}
 
 
 @router.delete("/api/v1/documents/{document_id}")
@@ -865,4 +864,4 @@ def delete_user_document(
         logger.critical(f"Database metadata delete failed after GCS erasure! Inconsistency risk: {db_err}")
         raise HTTPException(status_code=500, detail="Metadata sync failed.")
 
-    return {"status": "success", "message": "Document deleted successfully"}
+    return {"message": "Document deleted successfully"}

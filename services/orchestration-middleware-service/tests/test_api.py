@@ -59,7 +59,7 @@ def override_dependencies(mock_db, mock_conv_service):
 def test_health_check():
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "healthy!"}
+    assert response.json() == {"status": "healthy"}
 
 
 def test_verify_auth_authenticated():
@@ -957,5 +957,5 @@ def test_delete_conversation(mock_conv_service):
 
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "success"
+    assert data == {"message": "Conversation deleted"}
     mock_conv_service.delete_conversation.assert_called_once_with(conversation_id)

@@ -4,7 +4,7 @@ Service for exhaustive extraction of fillable fields from PDF documents and gene
 
 ## API Specification
 
-The service implements a **Pure JSON** API protocol using **Base64** for binary data transport.
+The service implements a **JSON** API protocol using **Base64** for binary data transport.
 
 ### Endpoints
 
