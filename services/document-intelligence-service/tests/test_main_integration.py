@@ -36,7 +36,7 @@ def test_health_check():
     """
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "success", "code": 200}
+    assert response.json() == {"status": "healthy"}
 
 
 def test_get_available_document_types():
@@ -47,7 +47,6 @@ def test_get_available_document_types():
     assert response.status_code == 200
 
     data = response.json()
-    assert data["status"] == "success"
     assert isinstance(data["available-forms"], list)
 
 
@@ -71,26 +70,21 @@ async def test_classify_endpoint_full_flow(mock_classifier, mock_extractor):
     assert response.status_code == 200
 
     json_response = response.json()
-    assert json_response["status"] == "success"
-
-    payload = json_response["data"]
-    assert payload["filename"] == "test_identity.jpg"
-    assert payload["classified_document"]["document_type"] == "identity_document"
-    assert "extraction_result" in payload
-    assert payload["extraction_result"]["given_names"] == "Max"
+    assert json_response["filename"] == "test_identity.jpg"
+    assert json_response["classified_document"]["document_type"] == "identity_document"
+    assert "extraction_result" in json_response
+    assert json_response["extraction_result"]["given_names"] == "Max"
 
 
 def test_not_found_error_handler():
     """
-    Verify that 404 errors are wrapped in the standard flat API envelope.
+    Verify that 404 errors return a standard FastAPI error body.
     """
     response = client.get("/this-route-does-not-exist")
 
     assert response.status_code == 404
     data = response.json()
 
-    assert data["status"] == "error"
-    assert data["code"] == 404
     assert data["detail"] == "The requested resource was not found."
 
 
@@ -108,8 +102,7 @@ def test_unsupported_media_type_real_trigger():
     response = asyncio.run(unsupported_media_type_handler(None, MockExc()))
 
     content = json.loads(response.body)
-    assert content["status"] == "error"
-    assert content["code"] == 415
+    assert "Unsupported Media Type" in content["detail"]
 
 
 def test_stateless_extract_endpoint():
@@ -148,5 +141,4 @@ def test_stateless_extract_endpoint():
 
         assert response.status_code == 200
         json_response = response.json()
-        assert json_response["status"] == "success"
-        assert json_response["data"]["extracted_data"]["first_name"] == "Jane"
+        assert json_response["first_name"] == "Jane"

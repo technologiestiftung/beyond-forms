@@ -1,5 +1,6 @@
 import os
 import json
+import string # not sure this is neeeded
 import logging
 from typing import Any, Callable, Coroutine, Optional, Type, Dict
 from litellm import acompletion
@@ -7,18 +8,17 @@ from pydantic import BaseModel
 
 from app.document_classifier.system_prompts import UNKNOWN_TYPE
 from beyondforms.document_schemas.validation import parse_document_fields
-from utils.labels import get_label_mappings
 from domain.classified_document import ClassifiedDocument
 from beyondforms.document_schemas.document_registry import DocumentRegistry
 from entity_extractor.system_prompts import (
     ENTITY_EXTRACTION_PROMPT,
     generate_entity_extraction_prompt_tail,
 )
-from utils.llm_calls import get_number_of_retries
 
 logger = logging.getLogger(__name__)
 
 NEGATIVE_ALLOWED_FIELDS = {"account_balance", "balance_due"}
+_LABELS = string.ascii_letters  # A-Z, a-z
 
 Extractor = Callable[[ClassifiedDocument, str, str], Coroutine[Any, Any, Optional[BaseModel]]]
 
@@ -146,7 +146,7 @@ You MUST return a JSON object containing only requested properties. Set value to
                 ],
                 temperature=0,
                 response_format=extraction_schema,
-                num_retries=get_number_of_retries(),
+                num_retries=int(os.getenv("LLM_RETRIES", "3")),
                 vertex_project=os.getenv("GCLOUD_PROJECT"),
                 vertex_location="global",
                 **mock_kwargs,
@@ -294,7 +294,7 @@ You MUST return a JSON object matching the specified response schema, containing
                 ],
                 temperature=0,
                 response_format=extraction_schema,
-                num_retries=get_number_of_retries(),
+                num_retries=int(os.getenv("LLM_RETRIES", "3")),
                 vertex_project=os.getenv("GCLOUD_PROJECT"),
                 vertex_location="global",
             )
@@ -313,8 +313,6 @@ You MUST return a JSON object matching the specified response schema, containing
 
 
 def init_entity_extractor(model_name: str, document_registry: DocumentRegistry) -> Extractor:
-    label_to_slug, _ = get_label_mappings()
-
     async def entity_extractor(document: ClassifiedDocument, base64_data: str, mime_type: str) -> Optional[dict]:
         if document.document_type == UNKNOWN_TYPE:
             logger.warning(f"Document type is {UNKNOWN_TYPE}. Skipping extraction.")
