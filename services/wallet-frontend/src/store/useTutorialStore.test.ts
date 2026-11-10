@@ -75,7 +75,7 @@ describe("useTutorialStore (TDD Phase)", () => {
 			],
 		});
 
-		mockUpdateTutorialProgress.mockResolvedValueOnce({ status: "success" });
+		mockUpdateTutorialProgress.mockResolvedValueOnce(undefined);
 
 		await useTutorialStore.getState().completeTutorial("uuid-1");
 

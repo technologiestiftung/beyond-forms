@@ -36,7 +36,6 @@ def test_validate_form_returns_success_for_valid_user_information(mock_form_regi
     response_data = response.json()
 
     assert response.status_code == 200
-    assert response_data["status"] == "success"
     assert response_data["form_content"]["first_name"] == "Jane"
     assert "total_required_fields" in response_data
     assert response_data["is_submittable"] is True
@@ -65,7 +64,6 @@ def test_validate_form_returns_error_for_missing_required_fields(mock_form_regis
     response_data = response.json()
 
     assert response.status_code == 422
-    assert response_data["status"] == "error"
     assert any("last_name" in error["field_path"] for error in response_data["validation_errors"])
     assert "total_required_fields" in response_data
     assert response_data["is_submittable"] is False

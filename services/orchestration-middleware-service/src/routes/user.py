@@ -162,7 +162,6 @@ def update_user_profile(
                 return JSONResponse(
                     status_code=200,
                     content={
-                        "status": "success",
                         "validation_status": "draft",
                         "rules_warnings": response_data.get("validation_errors") or [],
                         "wizard_evaluation": wizard_data or None,
@@ -175,7 +174,6 @@ def update_user_profile(
 
         # Build combined response on success
         combined_response = {
-            "status": "success",
             "validation_status": "valid",
             "rules_warnings": [],
             "wizard_evaluation": wizard_data or None,
@@ -322,4 +320,4 @@ async def delete_profile(
         logger.error(f"Failed database transaction during account deletion: {db_err}")
         raise HTTPException(status_code=500, detail="Failed to delete account from database.")
 
-    return {"status": "success", "message": "Account deleted successfully"}
+    return {"message": "Account deleted successfully"}

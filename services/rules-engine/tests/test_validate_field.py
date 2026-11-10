@@ -33,7 +33,6 @@ def test_validation_error_for_invalid_email_format(mock_field_registry: Dict[str
     response_data = response.json()
 
     assert response.status_code == 422
-    assert response_data["status"] == "error"
     assert len(response_data["validation_errors"]) > 0
 
 
@@ -45,7 +44,6 @@ def test_success_for_valid_email_format(mock_field_registry: Dict[str, Any]) -> 
     response_data = response.json()
 
     assert response.status_code == 200
-    assert response_data["code"] == 200
     assert response_data["validated_value"] == valid_email
 
 
@@ -59,7 +57,6 @@ def test_validate_fields_endpoint_fail_closed_on_unknown() -> None:
     response_data = response.json()
 
     assert response.status_code == 422
-    assert response_data["status"] == "error"
     assert "some_completely_random_unknown_field_name" in response_data["validation_errors"]
 
 
@@ -90,7 +87,6 @@ def test_validate_fields_rejects_invalid_legal_gender() -> None:
     response_data = response.json()
 
     assert response.status_code == 422
-    assert response_data["status"] == "error"
     assert "legal_gender" in response_data["validation_errors"]
 
 
@@ -102,7 +98,6 @@ def test_validate_fields_rejects_unrecognised_legal_gender() -> None:
     response_data = response.json()
 
     assert response.status_code == 422
-    assert response_data["status"] == "error"
     assert "legal_gender" in response_data["validation_errors"]
 
 
@@ -116,7 +111,6 @@ def test_validate_fields_with_document_type_rejects_unknown_field_on_identity_do
     )
     assert response.status_code == 422
     body = response.json()
-    assert body["status"] == "error"
     assert "gender" in body["validation_errors"]
 
 
@@ -130,7 +124,6 @@ def test_validate_fields_with_document_type_rejects_invalid_gender_on_residence_
     )
     assert response.status_code == 422
     body = response.json()
-    assert body["status"] == "error"
     assert "gender" in body["validation_errors"]
 
 

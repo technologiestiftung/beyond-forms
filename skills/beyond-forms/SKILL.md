@@ -106,7 +106,7 @@ Extract against a known type, skipping classification:
 
 ```bash
 curl -s --max-time 180 -X POST "$DOCS/api/v1/stateless/extract" \
-  -F "file=@rentenbescheid.pdf" -F "document_type=pension_notice" | jq '.data.extracted_data'
+  -F "file=@rentenbescheid.pdf" -F "document_type=pension_notice" | jq .
 ```
 
 | Method | Path | Purpose |

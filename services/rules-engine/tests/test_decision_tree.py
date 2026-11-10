@@ -119,7 +119,6 @@ def test_decision_tree_api_endpoint() -> None:
     assert response.status_code == 200
 
     data = response.json()
-    assert data["status"] == "success"
     evaluation = data["evaluation"]
     assert "step_eligibility_nationality" in evaluation["visited_steps"]
     assert "ID card or passport" in evaluation["required_documents"]

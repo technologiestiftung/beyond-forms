@@ -11,7 +11,7 @@ from app.domain.ocr_field_mappings import (
 )
 from app.domain.registry import field_registry
 from app.validation.address import parse_address
-from app.web.utils import format_validation_errors
+from app.validation.error_formatting import format_validation_errors
 from beyondforms.document_schemas.document_registry import document_registry
 from beyondforms.document_schemas.validation import format_pydantic_errors, validate_strict
 

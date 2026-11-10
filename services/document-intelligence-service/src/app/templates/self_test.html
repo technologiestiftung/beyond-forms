@@ -548,12 +548,7 @@
           .then((res) => {
             loading.style.display = "none";
 
-            if (res.status === "error") {
-              throw new Error(res.detail || "Unknown error occurred");
-            }
-
-            const data = res.data;
-            if (!data) {
+            if (!res || (typeof res === "object" && Object.keys(res).length === 0)) {
               throw new Error("No data returned from service");
             }
 
@@ -561,13 +556,13 @@
               document.getElementById("docType").textContent =
                 docTypeSelect.value;
               document.getElementById("resFilename").textContent = file.name;
-              renderFields(data.extracted_data);
+              renderFields(res);
             } else {
               document.getElementById("docType").textContent =
-                data.classified_document?.document_type || "Unknown";
+                res.classified_document?.document_type || "Unknown";
               document.getElementById("resFilename").textContent =
-                data.filename || file.name;
-              renderFields(data.extraction_result);
+                res.filename || file.name;
+              renderFields(res.extraction_result);
             }
 
             resultContainer.style.display = "block";

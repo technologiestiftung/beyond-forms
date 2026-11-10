@@ -107,7 +107,7 @@ def test_update_profile_success(mock_post, mock_db):
     response = client.post("/profile", json=payload)
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json()["validation_status"] == "valid"
 
     # Verify user was updated
     assert mock_user.first_name == "Sandor"
@@ -167,7 +167,7 @@ def test_update_profile_all_fields_success(mock_post, mock_db):
     response = client.post("/profile", json=payload)
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json()["validation_status"] == "valid"
 
     assert mock_user.first_name == "Sandor"
     assert mock_user.last_name == "Miller"
@@ -218,7 +218,7 @@ def test_update_profile_echecker_sync_fields_success(mock_post, mock_db):
     response = client.post("/profile", json=payload)
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json()["validation_status"] == "valid"
 
     assert mock_user.is_resident_in_germany is True
     assert mock_user.has_permanent_reduction_in_earning_capacity is True
@@ -258,7 +258,7 @@ def test_update_profile_health_and_household_fields_success(mock_post, mock_db):
     response = client.post("/profile", json=payload)
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json()["validation_status"] == "valid"
 
     assert mock_user.persons_in_household_count == 3
     assert mock_user.marital_status == "Married"
@@ -354,7 +354,7 @@ def test_update_profile_validate_entire_form(mock_post, mock_db):
     response = client.post("/profile", json=payload)
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json()["validation_status"] == "valid"
 
     # Verify rules engine call params had validate_entire_form=True
     assert mock_post.call_count >= 1
@@ -500,7 +500,7 @@ def test_delete_profile_success(mock_storage_client, mock_async_client, mock_db)
         response = client.delete("/profile")
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json() == {"message": "Account deleted successfully"}
 
     # Assert db.delete and commit were called
     mock_db.delete.assert_called_once_with(mock_user)
@@ -566,7 +566,7 @@ def test_delete_profile_no_authentik_token(mock_storage_client, mock_async_clien
         response = client.delete("/profile")
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json() == {"message": "Account deleted successfully"}
 
     # Assert db.delete and commit were called
     mock_db.delete.assert_called_once_with(mock_user)

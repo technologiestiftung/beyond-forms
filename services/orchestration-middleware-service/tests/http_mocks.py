@@ -8,7 +8,6 @@ def validate_fields_success_response(
     response = Mock()
     response.status_code = 200
     response.json.return_value = {
-        "status": "success",
         "validated_fields": validated_fields or {},
         "profile_sync": profile_sync or {},
     }
@@ -20,7 +19,7 @@ def validate_fields_error_response(errors: dict) -> Mock:
     response = Mock()
     response.status_code = 422
     response.json.return_value = {
-        "status": "error",
+        "detail": "Validation failed",
         "validation_errors": errors,
     }
     return response

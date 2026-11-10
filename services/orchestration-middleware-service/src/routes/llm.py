@@ -584,7 +584,7 @@ async def handle_new_chat(
     """
     conv_service.close_all_in_progress_conversations()
     db.commit()
-    return {"status": "success", "message": "Started new chat session"}
+    return {"message": "Started new chat session"}
 
 
 @router.get("/conversations")
@@ -654,4 +654,4 @@ def delete_conversation_endpoint(
     """
     conv_service.delete_conversation(conversation_id)
 
-    return {"status": "success", "message": "Conversation deleted"}
+    return {"message": "Conversation deleted"}
