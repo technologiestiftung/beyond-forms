@@ -88,7 +88,7 @@ def process_message(message):
                         logger.info(
                             f"User selected '{user_selected_type}' → DIS type '{dis_doc_type}', using stateless extract"
                         )
-                        extract_data = {"gcs_uri": gcs_uri, "document_type": dis_doc_type}
+                        extract_data = {"gcs-uri": gcs_uri, "document_type": dis_doc_type}
                         response = client.post(
                             f"{ENDPOINT_DOC_INTELLIGENCE}/api/v1/stateless/extract",
                             data=extract_data,

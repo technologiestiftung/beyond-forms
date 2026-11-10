@@ -18,6 +18,15 @@ from entity_extractor.system_prompts import (
 logger = logging.getLogger(__name__)
 
 NEGATIVE_ALLOWED_FIELDS = {"account_balance", "balance_due"}
+
+
+def _llm_retries() -> int:
+    try:
+        return int(os.getenv("LLM_RETRIES", "3"))
+    except ValueError:
+        return 3
+
+
 _LABELS = string.ascii_letters  # A-Z, a-z
 
 Extractor = Callable[[ClassifiedDocument, str, str], Coroutine[Any, Any, Optional[BaseModel]]]
@@ -146,7 +155,7 @@ You MUST return a JSON object containing only requested properties. Set value to
                 ],
                 temperature=0,
                 response_format=extraction_schema,
-                num_retries=int(os.getenv("LLM_RETRIES", "3")),
+                num_retries=_llm_retries(),
                 vertex_project=os.getenv("GCLOUD_PROJECT"),
                 vertex_location="global",
                 **mock_kwargs,
@@ -294,7 +303,7 @@ You MUST return a JSON object matching the specified response schema, containing
                 ],
                 temperature=0,
                 response_format=extraction_schema,
-                num_retries=int(os.getenv("LLM_RETRIES", "3")),
+                num_retries=_llm_retries(),
                 vertex_project=os.getenv("GCLOUD_PROJECT"),
                 vertex_location="global",
             )

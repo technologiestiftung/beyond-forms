@@ -235,6 +235,8 @@ async def classify(
 
         return return_values
 
+    except HTTPException:
+        raise
     except Exception as exception:
         logger.error(f"Classification failed: {exception}", exc_info=True)
         return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
@@ -311,6 +313,8 @@ async def stateless_extract(
 
             return result_data
 
+    except HTTPException:
+        raise
     except Exception as exception:
         logger.error(f"Stateless extraction failed: {exception}", exc_info=True)
         return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})

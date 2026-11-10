@@ -214,7 +214,7 @@ async def evaluate_wizard(request: WizardEvaluationRequest = Body(...)):
         return {"evaluation": result}
     except Exception as e:
         logger.exception("Failed to evaluate wizard rules:")
-        return JSONResponse(status_code=500, content={"detail": str(e)})
+        return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 
 
 if __name__ == "__main__":

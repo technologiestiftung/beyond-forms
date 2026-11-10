@@ -114,7 +114,7 @@ def test_process_message_with_user_selected_type_uses_stateless_extract(mock_db_
     dis_call = mock_client_instance.post.call_args_list[0]
     assert "/api/v1/stateless/extract" in dis_call[0][0]
     assert dis_call[1]["data"]["document_type"] == "bank_statements"
-    assert dis_call[1]["data"]["gcs_uri"] == "gs://test-bucket/test-object"
+    assert dis_call[1]["data"]["gcs-uri"] == "gs://test-bucket/test-object"
 
     update_calls = [
         call for call in mock_db_session.execute.call_args_list if "UPDATE user_documents" in str(call[0][0])
