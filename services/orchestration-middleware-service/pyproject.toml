@@ -7,7 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]~=0.159.1",
     "google-cloud-aiplatform~=1.165",
-    "litellm~=1.106",
+    "litellm[mcp]~=1.106",
     "google-cloud-storage~=3.17",
     "google-cloud-pubsub~=2.43",
     "psycopg2-binary~=2.9",
