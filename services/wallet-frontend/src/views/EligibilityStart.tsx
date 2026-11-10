@@ -7,6 +7,7 @@ import { AppRoutes, getEligibilityRoute } from "../constants/routes";
 import { i18nKeys } from "../i18n/i18nKeys";
 
 import { useEligibilityStore } from "../store/useEligibilityStore";
+import { useDiscoveryStore } from "../store/useDiscoveryStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { PrimaryButton } from "../components/ui/PrimaryButton";
 import { IntroCarousel } from "../components/Eligibility/IntroCarousel";
@@ -16,6 +17,7 @@ export const EligibilityStart: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const resetEligibility = useEligibilityStore((s) => s.resetForm);
+	const resetDiscovery = useDiscoveryStore((s) => s.reset);
 	const isAuthenticated = !!useAuthStore((s) => s.token);
 
 	React.useEffect(() => {
@@ -23,8 +25,9 @@ export const EligibilityStart: React.FC = () => {
 			navigate(AppRoutes.Dashboard);
 		} else {
 			resetEligibility();
+			resetDiscovery();
 		}
-	}, [isAuthenticated, navigate, resetEligibility]);
+	}, [isAuthenticated, navigate, resetEligibility, resetDiscovery]);
 
 	const handleGoToCheck = () => {
 		navigate(getEligibilityRoute("household"));

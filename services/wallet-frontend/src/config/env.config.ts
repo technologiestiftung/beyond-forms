@@ -18,6 +18,10 @@ const EnvSchema = z.object({
 	VITE_BYPASS_AUTH: z
 		.preprocess((val) => val === "true" || val === true, z.boolean())
 		.default(false),
+	/** "shacl" runs the eligibility check on the knowledge base in /knowledge instead of benefitRules.ts */
+	VITE_ELIGIBILITY_ENGINE: z
+		.preprocess(emptyToUndefined, z.enum(["legacy", "shacl"]))
+		.default("legacy"),
 });
 
 const rawEnv = {
@@ -26,6 +30,7 @@ const rawEnv = {
 	VITE_USE_MOCK_AUTH: import.meta.env.VITE_USE_MOCK_AUTH,
 	VITE_USE_MOCKS: import.meta.env.VITE_USE_MOCKS,
 	VITE_BYPASS_AUTH: import.meta.env.VITE_BYPASS_AUTH,
+	VITE_ELIGIBILITY_ENGINE: import.meta.env.VITE_ELIGIBILITY_ENGINE,
 };
 
 const _env = EnvSchema.safeParse(rawEnv);

@@ -80,6 +80,19 @@ services:
       - app-network
     restart: unless-stopped
 
+  eligibility-service:
+    build:
+      context: .
+      dockerfile: ./services/eligibility-service/Dockerfile
+      target: production
+    image: eligibility-service:latest
+    container_name: eligibility-service
+    ports:
+      - "8009:8080"
+    networks:
+      - app-network
+    restart: unless-stopped
+
   rules-engine:
     build:
       context: .
@@ -127,6 +140,7 @@ services:
       - AUTHENTIK_SERVER_URL=${AUTHENTIK_SERVER_URL:-http://authentik-server:9000}
       - AUTHENTIK_PUBLIC_KEY_PATH=${AUTHENTIK_PUBLIC_KEY_PATH:-/app/auth/certs/pub/oidc_public.pem}
       - ENDPOINT_RULES_ENGINE=http://rules-engine:8080
+      - ENDPOINT_ELIGIBILITY_SERVICE=http://eligibility-service:8080
       - ENDPOINT_FORMS_FILLER=http://forms-filling-service:8080
       - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-3.7-flash}
       - CHAT_CONTEXT_WINDOW_SIZE=20

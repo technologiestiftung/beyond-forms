@@ -15,7 +15,7 @@ interface FormCompletenessResponse {
  * Mirrors the 3-tier thresholds of calculateCompletenessIndicatorLevel (utils/profile.ts)
  * so per-form and profile-wide progress bars read consistently.
  */
-function levelFromRatio(filled: number, total: number): MilestoneLevel {
+export function levelFromRatio(filled: number, total: number): MilestoneLevel {
 	if (total === 0 || filled === 0) {
 		return 0;
 	}
@@ -34,9 +34,10 @@ function levelFromRatio(filled: number, total: number): MilestoneLevel {
  * on how many of the profile fields its mapping reads from are actually filled in —
  * unlike the Grundsicherung milestone, this doesn't require document verification.
  */
-export function useFormCompleteness(formType: string) {
+export function useFormCompleteness(formType: string, { enabled = true } = {}) {
 	const { data, isLoading } = useQuery<MilestoneLevel>({
 		queryKey: ["profile", "form-completeness", formType],
+		enabled,
 		queryFn: async () => {
 			if (env.VITE_USE_MOCKS || env.VITE_USE_MOCK_AUTH) {
 				// Mock/dev profiles are seeded fully filled in; skip the network call.

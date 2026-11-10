@@ -1,0 +1,8 @@
+@prefix bf: <https://beyond-forms.example/ns#> .
+
+# Links requirement profiles to the applications BeyondForms can fill (form_type in user_applications)
+
+bf:grundsicherungsgeld bf:hasApplicationForm "antrag_grundsicherungsgeld" .
+bf:grundsicherungImAlter bf:hasApplicationForm "antrag_grundsicherung_im_alter" .
+bf:wohngeld bf:hasApplicationForm "antrag_wohngeld" .
+bf:kinderzuschlag bf:hasApplicationForm "antrag_kinderzuschlag" .

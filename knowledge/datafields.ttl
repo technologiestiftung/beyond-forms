@@ -1,0 +1,409 @@
+@prefix bf: <https://beyond-forms.example/ns#> .
+@prefix ff: <https://foerderfunke.org/default#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Answered data fields. bf:datatype is one of bf:selection, bf:boolean, bf:date, bf:euroAmount, bf:childList, bf:text,
+# bf:country (ISO 3166-1 alpha-2 code, the frontend shows the country names).
+# bf:questionPriority breaks ties when several fields are missed by the same number of benefits (lower first).
+# rdfs:label is the short category shown above the question, rdfs:comment the tip.
+
+bf:householdComposition a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:section bf:sectionFamily ;
+    bf:datatype bf:selection ;
+    bf:questionPriority 10 ;
+    rdfs:label "Haushalt"@de , "Household"@en ;
+    schema:question "Wer lebt in Deinem Haushalt?"@de , "Who lives in your household?"@en ;
+    rdfs:comment "Wie viele Menschen zusammenleben, verändert die Berechnung. Kinder zählen mit."@de ,
+        "How many people live together changes the calculation. Children count too."@en ;
+    bf:answerOptions ( bf:householdComposition-single bf:householdComposition-singleParent bf:householdComposition-coupleNoChildren bf:householdComposition-coupleWithChildren ) .
+
+bf:householdComposition-single a bf:AnswerOption ;
+    bf:code "SINGLE" ; bf:adults 1 ; bf:hasChildren false ;
+    rdfs:label "Ich lebe allein."@de , "I live alone."@en .
+bf:householdComposition-singleParent a bf:AnswerOption ;
+    bf:code "SINGLE_PARENT" ; bf:adults 1 ; bf:hasChildren true ;
+    rdfs:label "Ich bin alleinerziehend."@de , "I am a single parent."@en .
+bf:householdComposition-coupleNoChildren a bf:AnswerOption ;
+    bf:code "COUPLE_NO_CHILDREN" ; bf:adults 2 ; bf:hasChildren false ;
+    rdfs:label "Wir sind ein Paar, ohne Kinder im Haushalt."@de , "We are a couple, without children in the household."@en .
+bf:householdComposition-coupleWithChildren a bf:AnswerOption ;
+    bf:code "COUPLE_WITH_CHILDREN" ; bf:adults 2 ; bf:hasChildren true ;
+    rdfs:label "Wir sind ein Paar, mit Kindern im Haushalt."@de , "We are a couple, with children in the household."@en .
+
+bf:hasChild a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:section bf:sectionFamily ;
+    bf:datatype bf:childList ;
+    bf:questionPriority 20 ;
+    skos:exactMatch ff:hasChild ;
+    rdfs:label "Kinder im Haushalt"@de , "Children in the household"@en ;
+    schema:question "Wann sind Deine Kinder geboren?"@de , "When were your children born?"@en ;
+    rdfs:comment "Das Alter der Kinder ist wichtig, weil für Kinder eigene Beträge gelten. Manche Leistungen gibt es nur für Kinder unter 18 oder unter 25 Jahren."@de ,
+        "Your children's ages matter because separate amounts apply to children. Some benefits only exist for children under 18 or under 25."@en .
+
+bf:birthDate a bf:DataField ;
+    bf:appliesTo bf:Citizen , bf:Partner , bf:Child ;
+    bf:section bf:sectionPersonal ;
+    bf:storedAs "date_of_birth" ;
+    bf:partnerQuestion "Wann ist Dein Partner oder Deine Partnerin geboren?"@de , "When was your partner born?"@en ;
+    bf:datatype bf:date ;
+    bf:questionPriority 30 ;
+    skos:exactMatch ff:birthDate ;
+    rdfs:label "Geburtsdatum"@de , "Date of birth"@en ;
+    schema:question "Wann bist Du geboren?"@de , "When were you born?"@en ;
+    rdfs:comment "Dein Alter entscheidet mit, welche Leistungen für Dich infrage kommen. Ab der Regelaltersgrenze gelten andere Regeln als davor."@de ,
+        "Your age helps decide which benefits may apply to you. Different rules apply once you reach the standard retirement age."@en .
+
+bf:livesInGermany a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:boolean ;
+    bf:questionPriority 40 ;
+    skos:closeMatch ff:habitualResidence ;
+    rdfs:label "Wohnsitz"@de , "Residence"@en ;
+    schema:question "Wohnst Du in Deutschland?"@de , "Do you live in Germany?"@en ;
+    rdfs:comment "Die Leistungen, die Klaro prüft, gibt es nur, wenn Du dauerhaft in Deutschland lebst."@de ,
+        "The benefits Klaro checks are only available if you live in Germany permanently."@en ;
+    bf:answerOptions ( bf:livesInGermany-yes bf:livesInGermany-no ) .
+
+bf:livesInGermany-yes a bf:AnswerOption ; bf:code "YES" ; bf:value true ; rdfs:label "Ja"@de , "Yes"@en .
+bf:livesInGermany-no a bf:AnswerOption ; bf:code "NO" ; bf:value false ; rdfs:label "Nein"@de , "No"@en .
+
+bf:isEmployed a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:boolean ;
+    bf:questionPriority 50 ;
+    rdfs:label "Arbeit"@de , "Work"@en ;
+    schema:question "Arbeitest Du im Moment?"@de , "Are you currently working?"@en ;
+    rdfs:comment "Wenn Du mit einem Partner oder einer Partnerin zusammenlebst, zählt dessen Arbeit auch dazu."@de ,
+        "If you live with a partner, their work counts too."@en ;
+    bf:answerOptions ( bf:isEmployed-yes bf:isEmployed-no ) .
+
+bf:isEmployed-yes a bf:AnswerOption ; bf:code "YES" ; bf:value true ; rdfs:label "Ja, ich arbeite."@de , "Yes, I work."@en .
+bf:isEmployed-no a bf:AnswerOption ; bf:code "NO" ; bf:value false ; rdfs:label "Nein, im Moment nicht."@de , "No, not at the moment."@en .
+
+bf:monthlyGrossIncome a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:euroAmount ;
+    bf:questionPriority 60 ;
+    rdfs:label "Arbeit"@de , "Work"@en ;
+    schema:question "Wie hoch ist das Bruttoeinkommen im Monat?"@de , "What is the monthly gross income?"@en ;
+    rdfs:comment "Brutto heißt: der Betrag vor Steuern und Abgaben. Du findest ihn auf der Lohnabrechnung. Lebst Du mit einem Partner oder einer Partnerin zusammen, rechne beides zusammen."@de ,
+        "Gross means the amount before taxes and contributions. You can find it on your payslip. If you live with a partner, add both together."@en .
+
+bf:workCapacity a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:selection ;
+    bf:questionPriority 70 ;
+    skos:closeMatch ff:workAbility ;
+    rdfs:label "Arbeitskapazität"@de , "Ability to work"@en ;
+    schema:question "Kannst Du mindestens drei Stunden am Tag arbeiten?"@de , "Can you work at least three hours a day?"@en ;
+    rdfs:comment "Drei Stunden sind eine Grenze im Gesetz. Danach richtet sich, welche Stelle für Dich zuständig ist. Wir fragen das auch, wenn Du arbeitest: Manche Menschen arbeiten zum Beispiel in einer Werkstatt und gelten trotzdem als erwerbsgemindert."@de ,
+        "Three hours is a limit set by law. It decides which office is responsible for you. We also ask if you work: some people work in a sheltered workshop, for example, and still count as having reduced earning capacity."@en ;
+    bf:answerOptions ( bf:workCapacity-full bf:workCapacity-temporarilyReduced bf:workCapacity-permanentlyReduced ) .
+
+bf:workCapacity-full a bf:AnswerOption ; bf:code "FULL" ;
+    rdfs:label "Ja, mindestens drei Stunden am Tag."@de , "Yes, at least three hours a day."@en .
+bf:workCapacity-temporarilyReduced a bf:AnswerOption ; bf:code "TEMPORARILY_REDUCED" ;
+    rdfs:label "Im Moment nicht, aber vielleicht später wieder."@de , "Not at the moment, but maybe again later."@en .
+bf:workCapacity-permanentlyReduced a bf:AnswerOption ; bf:code "PERMANENTLY_REDUCED" ;
+    rdfs:label "Nein, dauerhaft nicht."@de , "No, permanently not."@en .
+
+bf:monthlyNetHouseholdIncome a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:euroAmount ;
+    bf:questionPriority 80 ;
+    rdfs:label "Haushaltseinkommen"@de , "Income"@en ;
+    schema:question "Wie viel Geld hat Dein Haushalt im Monat insgesamt?"@de , "How much money does your household have per month in total?"@en ;
+    rdfs:comment "Zähle alles zusammen, was jeden Monat reinkommt: Lohn nach Abzügen, Rente, Kindergeld, Unterhalt, andere Leistungen. Ein ungefährer Betrag genügt."@de ,
+        "Add up everything that comes in each month: wages after deductions, pension, child benefit, maintenance, other benefits. An approximate amount is enough."@en .
+
+bf:monthlyWarmRent a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:euroAmount ;
+    bf:questionPriority 90 ;
+    rdfs:label "Warmmiete"@de , "Housing"@en ;
+    schema:question "Wie hoch ist Deine Warmmiete im Monat?"@de , "How much is your monthly rent including utilities?"@en ;
+    rdfs:comment "Warmmiete heißt: Miete plus Nebenkosten plus Heizkosten. Der Betrag steht in Deinem Mietvertrag oder auf dem Kontoauszug."@de ,
+        "This means rent plus service charges plus heating costs. The amount is in your tenancy agreement or on your bank statement."@en .
+
+bf:assetsBand a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:selection ;
+    bf:questionPriority 100 ;
+    rdfs:label "Ersparnisse"@de , "Savings"@en ;
+    schema:question "Wie viel Geld hast Du gespart?"@de , "How much money have you saved?"@en ;
+    rdfs:comment "Gemeint ist alles, was Du zurückgelegt hast: Konto, Sparbuch, Bargeld, Wertpapiere. Einen Teil darfst Du behalten — wie viel, hängt von Deinem Alter ab. Eine grobe Schätzung genügt."@de ,
+        "This means everything you have put aside: account, savings book, cash, securities. You may keep part of it — how much depends on your age. A rough estimate is enough."@en ;
+    bf:answerOptions ( bf:assetsBand-under5000 bf:assetsBand-5000to10000 bf:assetsBand-10000to12500 bf:assetsBand-12500to20000 bf:assetsBand-over20000 ) .
+
+bf:assetsBand-under5000 a bf:AnswerOption ; bf:code "UNDER_5000" ; bf:min 0 ; bf:max 5000 ;
+    rdfs:label "Weniger als 5.000 Euro."@de , "Less than 5,000 euros."@en .
+bf:assetsBand-5000to10000 a bf:AnswerOption ; bf:code "FROM_5000_TO_10000" ; bf:min 5000 ; bf:max 10000 ;
+    rdfs:label "Zwischen 5.000 und 10.000 Euro."@de , "Between 5,000 and 10,000 euros."@en .
+bf:assetsBand-10000to12500 a bf:AnswerOption ; bf:code "FROM_10000_TO_12500" ; bf:min 10000 ; bf:max 12500 ;
+    rdfs:label "Zwischen 10.000 und 12.500 Euro."@de , "Between 10,000 and 12,500 euros."@en .
+bf:assetsBand-12500to20000 a bf:AnswerOption ; bf:code "FROM_12500_TO_20000" ; bf:min 12500 ; bf:max 20000 ;
+    rdfs:label "Zwischen 12.500 und 20.000 Euro."@de , "Between 12,500 and 20,000 euros."@en .
+bf:assetsBand-over20000 a bf:AnswerOption ; bf:code "OVER_20000" ; bf:min 20000 ;
+    rdfs:label "Mehr als 20.000 Euro."@de , "More than 20,000 euros."@en .
+
+# Wohngeld (§§ 9, 14, 16 WoGG) works with rent without heating and with gross income, so these are asked separately
+
+bf:monthlyGrossHouseholdIncome a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:euroAmount ;
+    bf:questionPriority 85 ;
+    rdfs:label "Haushaltseinkommen"@de , "Income"@en ;
+    schema:question "Wie hoch ist das Bruttoeinkommen Deines Haushalts im Monat, ohne Kindergeld?"@de ,
+        "What is your household's gross income per month, without child benefit?"@en ;
+    rdfs:comment "Brutto heißt: vor Steuern und Abgaben. Zähle Lohn, Rente, Arbeitslosengeld und andere Einkünfte aller Personen im Haushalt zusammen. Kindergeld zählt beim Wohngeld nicht als Einkommen."@de ,
+        "Gross means before taxes and contributions. Add up wages, pensions, unemployment benefit and other income of everyone in the household. Child benefit does not count as income for housing benefit."@en .
+
+bf:incomeDeductions a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:selection ;
+    bf:questionPriority 87 ;
+    rdfs:label "Abzüge"@de , "Deductions"@en ;
+    schema:question "Was wird von diesem Einkommen abgezogen?"@de , "What is deducted from this income?"@en ;
+    rdfs:comment "Für jede dieser Abgaben zieht das Wohngeldamt pauschal 10 Prozent vom Einkommen ab. Du findest die Abzüge auf der Lohnabrechnung oder dem Rentenbescheid."@de ,
+        "For each of these deductions the housing benefit office subtracts a flat 10 percent from the income. You can find them on your payslip or pension notice."@en ;
+    bf:answerOptions ( bf:incomeDeductions-taxHealthPension bf:incomeDeductions-healthPension bf:incomeDeductions-taxHealth bf:incomeDeductions-health bf:incomeDeductions-none ) .
+
+bf:incomeDeductions-taxHealthPension a bf:AnswerOption ; bf:code "TAX_HEALTH_PENSION" ; bf:deductionShare 0.3 ;
+    rdfs:label "Steuern, Kranken- und Rentenversicherung. So ist es bei den meisten Beschäftigten."@de ,
+        "Taxes, health and pension insurance. This is the case for most employees."@en .
+bf:incomeDeductions-healthPension a bf:AnswerOption ; bf:code "HEALTH_PENSION" ; bf:deductionShare 0.2 ;
+    rdfs:label "Kranken- und Rentenversicherung, aber keine Steuern."@de , "Health and pension insurance, but no taxes."@en .
+bf:incomeDeductions-taxHealth a bf:AnswerOption ; bf:code "TAX_HEALTH" ; bf:deductionShare 0.2 ;
+    rdfs:label "Steuern und Krankenversicherung, aber keine Rentenversicherung."@de , "Taxes and health insurance, but no pension insurance."@en .
+bf:incomeDeductions-health a bf:AnswerOption ; bf:code "HEALTH" ; bf:deductionShare 0.1 ;
+    rdfs:label "Nur Kranken- und Pflegeversicherung. So ist es bei vielen Rentnerinnen und Rentnern."@de ,
+        "Only health and care insurance. This is the case for many pensioners."@en .
+bf:incomeDeductions-none a bf:AnswerOption ; bf:code "NONE" ; bf:deductionShare 0 ;
+    rdfs:label "Nichts davon."@de , "None of these."@en .
+
+bf:monthlyRentWithoutHeating a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:euroAmount ;
+    bf:questionPriority 92 ;
+    rdfs:label "Miete"@de , "Rent"@en ;
+    schema:question "Wie hoch ist Deine Miete ohne Heizkosten?"@de , "How much is your rent without heating costs?"@en ;
+    rdfs:comment "Gemeint ist die Kaltmiete plus Nebenkosten wie Wasser oder Müllabfuhr, aber ohne Heizung und Warmwasser. Für die Heizkosten rechnet das Wohngeld einen festen Betrag dazu."@de ,
+        "This means the base rent plus service charges such as water or waste collection, but without heating and hot water. Housing benefit adds a fixed amount for heating."@en .
+
+# Only asked when the savings band straddles the amount the household may keep
+bf:assetsAmount a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:euroAmount ;
+    bf:questionPriority 105 ;
+    rdfs:label "Ersparnisse"@de , "Savings"@en ;
+    schema:question "Wie viel Geld hast Du genau gespart?"@de , "How much money exactly have you saved?"@en ;
+    rdfs:comment "Deine Ersparnisse liegen ungefähr bei dem Betrag, den Du behalten darfst. Mit dem genauen Betrag können wir es besser einschätzen."@de ,
+        "Your savings are around the amount you may keep. With the exact amount we can tell more precisely."@en .
+
+bf:citizenship a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:selection ;
+    bf:questionPriority 110 ;
+    skos:closeMatch ff:citizenship ;
+    rdfs:label "Staatsangehörigkeit"@de , "Citizenship"@en ;
+    schema:question "Welche Staatsangehörigkeit hast Du?"@de , "What is your citizenship?"@en ;
+    rdfs:comment "Je nach Staatsangehörigkeit und Aufenthaltsstatus gelten unterschiedliche Gesetze."@de ,
+        "Different laws apply depending on citizenship and residence status."@en ;
+    bf:answerOptions ( bf:citizenship-german bf:citizenship-eu bf:citizenship-nonEu ) .
+
+bf:citizenship-german a bf:AnswerOption ; bf:code "GERMAN" ; bf:requiresResidenceTitle false ;
+    rdfs:label "Deutsch."@de , "German."@en .
+bf:citizenship-eu a bf:AnswerOption ; bf:code "EU" ; bf:requiresResidenceTitle false ;
+    rdfs:label "Aus einem anderen EU-Land."@de , "From another EU country."@en .
+bf:citizenship-nonEu a bf:AnswerOption ; bf:code "NON_EU" ; bf:requiresResidenceTitle true ;
+    rdfs:label "Aus einem Land außerhalb der EU."@de , "From a country outside the EU."@en .
+
+bf:hasSecureResidenceStatus a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:boolean ;
+    bf:questionPriority 120 ;
+    rdfs:label "Aufenthaltsstatus"@de , "Residence status"@en ;
+    schema:question "Hast Du einen gesicherten Aufenthaltstitel?"@de , "Do you have a secure residence permit?"@en ;
+    rdfs:comment "Gesichert heißt zum Beispiel: Niederlassungserlaubnis, unbefristete Aufenthaltserlaubnis oder Anerkennung als Flüchtling. Bist Du noch im Asylverfahren, gibt es ein eigenes System."@de ,
+        "Secure means, for example: settlement permit, permanent residence permit or recognition as a refugee. If you are still in the asylum procedure, there is a separate system — Klaro will point this out at the end."@en ;
+    bf:answerOptions ( bf:hasSecureResidenceStatus-yes bf:hasSecureResidenceStatus-no ) .
+
+bf:hasSecureResidenceStatus-yes a bf:AnswerOption ; bf:code "YES" ; bf:value true ; rdfs:label "Ja"@de , "Yes"@en .
+bf:hasSecureResidenceStatus-no a bf:AnswerOption ; bf:code "NO" ; bf:value false ;
+    rdfs:label "Nein, oder ich bin mir nicht sicher."@de , "No, or I am not sure."@en .
+
+# Derived data fields, see materialization.ttl
+
+bf:hasAge a bf:DerivedDataField ; rdfs:label "Alter"@de , "Age"@en ; skos:exactMatch ff:hasAge .
+bf:hasReachedRetirementAge a bf:DerivedDataField ; rdfs:label "Regelaltersgrenze erreicht"@de , "Standard retirement age reached"@en .
+bf:householdRegelbedarf a bf:DerivedDataField ; rdfs:label "Regelbedarf des Haushalts"@de , "Household standard needs"@en .
+bf:monthlyNeeds a bf:DerivedDataField ; rdfs:label "Bedarf inklusive Warmmiete"@de , "Needs including rent"@en .
+bf:incomeCoversNeeds a bf:DerivedDataField ; rdfs:label "Einkommen deckt Bedarf"@de , "Income covers needs"@en .
+bf:assetAllowanceSgb2 a bf:DerivedDataField ; rdfs:label "Schonvermögen SGB II"@de , "Protected assets SGB II"@en .
+bf:assetAllowanceSgb12 a bf:DerivedDataField ; rdfs:label "Schonvermögen SGB XII"@de , "Protected assets SGB XII"@en .
+bf:assetsWithinAllowanceSgb2 a bf:DerivedDataField ; rdfs:label "Ersparnisse im Schonvermögen SGB II"@de , "Savings within protected assets SGB II"@en .
+bf:assetsWithinAllowanceSgb12 a bf:DerivedDataField ; rdfs:label "Ersparnisse im Schonvermögen SGB XII"@de , "Savings within protected assets SGB XII"@en .
+bf:qualifiesByAgeOrReducedCapacity a bf:DerivedDataField ; rdfs:label "Alter oder dauerhafte Erwerbsminderung"@de , "Retirement age or permanently reduced earning capacity"@en .
+bf:householdSize a bf:DerivedDataField ; rdfs:label "Haushaltsmitglieder"@de , "Household members"@en .
+bf:wohngeldRent a bf:DerivedDataField ; rdfs:label "Zu berücksichtigende Miete (M)"@de , "Rent taken into account (M)"@en .
+bf:wohngeldIncome a bf:DerivedDataField ; rdfs:label "Monatliches Gesamteinkommen (Y)"@de , "Monthly total income (Y)"@en .
+bf:wohngeldAmount a bf:DerivedDataField ; rdfs:label "Wohngeld nach § 19 WoGG"@de , "Housing benefit under § 19 WoGG"@en .
+bf:wohngeldAboveMinimum a bf:DerivedDataField ; rdfs:label "Wohngeld mindestens 10 Euro"@de , "Housing benefit at least 10 euros"@en .
+bf:hasChildUnder25 a bf:DerivedDataField ; rdfs:label "Kind unter 25"@de , "Child under 25"@en .
+bf:effectiveGrossIncome a bf:DerivedDataField ; rdfs:label "Bruttoeinkommen"@de , "Gross income"@en .
+bf:kizMinimumIncomeReached a bf:DerivedDataField ; rdfs:label "Mindesteinkommen Kinderzuschlag erreicht"@de , "Child supplement minimum income reached"@en .
+bf:residenceStatusAnswered a bf:DerivedDataField ; rdfs:label "Aufenthaltsstatus bekannt"@de , "Residence status known"@en .
+
+# Fields the application forms ask for. bf:storedAs names the column of the person's row in the backend profile
+# (users for the applicant, associated_persons for partner and children); bf:storedValue maps an option to its stored value.
+
+bf:firstName a bf:DataField ;
+    bf:appliesTo bf:Citizen , bf:Partner , bf:Child ;
+    bf:datatype bf:text ;
+    bf:section bf:sectionPersonal ;
+    bf:questionPriority 1 ;
+    bf:storedAs "first_name" ;
+    rdfs:label "Vorname"@de , "First name"@en ;
+    schema:question "Wie ist Dein Vorname?"@de , "What is your first name?"@en ;
+    bf:partnerQuestion "Wie ist der Vorname Deines Partners oder Deiner Partnerin?"@de , "What is your partner's first name?"@en ;
+    bf:childQuestion "Wie ist der Vorname Deines {{number}}. Kindes?"@de , "What is the first name of your child no. {{number}}?"@en .
+
+bf:lastName a bf:DataField ;
+    bf:appliesTo bf:Citizen , bf:Partner , bf:Child ;
+    bf:datatype bf:text ;
+    bf:section bf:sectionPersonal ;
+    bf:questionPriority 2 ;
+    bf:storedAs "last_name" ;
+    rdfs:label "Nachname"@de , "Last name"@en ;
+    schema:question "Wie ist Dein Nachname?"@de , "What is your last name?"@en ;
+    bf:partnerQuestion "Wie ist der Nachname Deines Partners oder Deiner Partnerin?"@de , "What is your partner's last name?"@en ;
+    bf:childQuestion "Wie ist der Nachname Deines {{number}}. Kindes?"@de , "What is the last name of your child no. {{number}}?"@en .
+
+bf:legalGender a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:selection ;
+    bf:section bf:sectionPersonal ;
+    bf:questionPriority 35 ;
+    bf:storedAs "legal_gender" ;
+    rdfs:label "Geschlecht"@de , "Gender"@en ;
+    schema:question "Welches Geschlecht ist in Deinem Ausweis eingetragen?"@de , "Which gender is entered in your ID?"@en ;
+    bf:answerOptions ( bf:legalGender-female bf:legalGender-male bf:legalGender-diverse ) .
+
+bf:legalGender-female a bf:AnswerOption ; bf:code "FEMALE" ; bf:storedValue "Female" ; rdfs:label "Weiblich"@de , "Female"@en .
+bf:legalGender-male a bf:AnswerOption ; bf:code "MALE" ; bf:storedValue "Male" ; rdfs:label "Männlich"@de , "Male"@en .
+bf:legalGender-diverse a bf:AnswerOption ; bf:code "DIVERSE" ; bf:storedValue "Diverse" ; rdfs:label "Divers"@de , "Diverse"@en .
+
+bf:nationality a bf:DataField ;
+    bf:appliesTo bf:Citizen , bf:Partner ;
+    bf:datatype bf:country ;
+    bf:section bf:sectionPersonal ;
+    bf:questionPriority 40 ;
+    bf:storedAs "nationality" ;
+    rdfs:label "Staatsangehörigkeit"@de , "Nationality"@en ;
+    schema:question "Welche Staatsangehörigkeit hast Du?"@de , "What is your nationality?"@en ;
+    bf:partnerQuestion "Welche Staatsangehörigkeit hat Dein Partner oder Deine Partnerin?"@de , "What is your partner's nationality?"@en ;
+    rdfs:comment "Wenn Du mehrere Staatsangehörigkeiten hast, wähle die, die in Deinem Ausweis oder Pass steht, mit dem Du Dich in Deutschland ausweist."@de ,
+        "If you have more than one nationality, choose the one in the ID or passport you use in Germany."@en .
+
+bf:street a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:text ;
+    bf:section bf:sectionAddress ;
+    bf:questionPriority 1 ;
+    bf:storedAs "street" ;
+    rdfs:label "Straße"@de , "Street"@en ;
+    schema:question "In welcher Straße wohnst Du?"@de , "Which street do you live in?"@en .
+
+bf:houseNumber a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:text ;
+    bf:section bf:sectionAddress ;
+    bf:questionPriority 2 ;
+    bf:storedAs "house_number" ;
+    rdfs:label "Hausnummer"@de , "House number"@en ;
+    schema:question "Welche Hausnummer hat Deine Wohnung?"@de , "What is your house number?"@en .
+
+bf:zipCode a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:text ;
+    bf:section bf:sectionAddress ;
+    bf:questionPriority 3 ;
+    bf:storedAs "zip_code" ;
+    rdfs:label "Postleitzahl"@de , "Postcode"@en ;
+    schema:question "Wie ist Deine Postleitzahl?"@de , "What is your postcode?"@en .
+
+bf:city a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:text ;
+    bf:section bf:sectionAddress ;
+    bf:questionPriority 4 ;
+    bf:storedAs "city" ;
+    rdfs:label "Ort"@de , "City"@en ;
+    schema:question "In welchem Ort wohnst Du?"@de , "Which city do you live in?"@en .
+
+bf:maritalStatus a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:selection ;
+    bf:section bf:sectionFamily ;
+    bf:questionPriority 5 ;
+    bf:storedAs "marital_status" ;
+    rdfs:label "Familienstand"@de , "Marital status"@en ;
+    schema:question "Was ist Dein Familienstand?"@de , "What is your marital status?"@en ;
+    bf:answerOptions ( bf:maritalStatus-single bf:maritalStatus-married bf:maritalStatus-registeredPartnership bf:maritalStatus-separated bf:maritalStatus-divorced bf:maritalStatus-widowed ) .
+
+bf:maritalStatus-single a bf:AnswerOption ; bf:code "SINGLE" ; bf:storedValue "Single" ; rdfs:label "Ledig"@de , "Single"@en .
+bf:maritalStatus-married a bf:AnswerOption ; bf:code "MARRIED" ; bf:storedValue "Married" ; bf:hasStartDate true ;
+    rdfs:label "Verheiratet"@de , "Married"@en .
+bf:maritalStatus-registeredPartnership a bf:AnswerOption ; bf:code "REGISTERED_CIVIL_PARTNERSHIP" ; bf:storedValue "Registered Civil Partnership" ; bf:hasStartDate true ;
+    rdfs:label "In eingetragener Lebenspartnerschaft"@de , "In a registered civil partnership"@en .
+bf:maritalStatus-separated a bf:AnswerOption ; bf:code "PERMANENTLY_SEPARATED" ; bf:storedValue "Permanently Separated" ; bf:hasStartDate true ;
+    rdfs:label "Dauernd getrennt lebend"@de , "Permanently separated"@en .
+bf:maritalStatus-divorced a bf:AnswerOption ; bf:code "DIVORCED" ; bf:storedValue "Divorced" ; rdfs:label "Geschieden"@de , "Divorced"@en .
+bf:maritalStatus-widowed a bf:AnswerOption ; bf:code "WIDOWED" ; bf:storedValue "Widowed" ; rdfs:label "Verwitwet"@de , "Widowed"@en .
+
+bf:marriedSince a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:date ;
+    bf:section bf:sectionFamily ;
+    bf:questionPriority 6 ;
+    bf:storedAs "married_since" ;
+    rdfs:label "Familienstand"@de , "Marital status"@en ;
+    schema:question "Seit wann gilt dieser Familienstand?"@de , "Since when has this marital status applied?"@en .
+
+bf:childBenefitNumber a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:text ;
+    bf:section bf:sectionChildBenefit ;
+    bf:questionPriority 1 ;
+    bf:storedAs "reference_no" ;
+    bf:incomeType "Child Benefit" ;
+    rdfs:label "Kindergeldnummer"@de , "Child benefit number"@en ;
+    schema:question "Wie lautet Deine Kindergeldnummer?"@de , "What is your child benefit number?"@en ;
+    rdfs:comment "Du findest sie auf jedem Schreiben der Familienkasse. Sie besteht aus drei Ziffern, den Buchstaben FK und sechs weiteren Ziffern."@de ,
+        "You can find it on every letter from the Familienkasse. It consists of three digits, the letters FK and six more digits."@en .
+
+bf:iban a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:text ;
+    bf:section bf:sectionBank ;
+    bf:questionPriority 1 ;
+    bf:storedAs "iban" ;
+    rdfs:label "IBAN"@de , "IBAN"@en ;
+    schema:question "Auf welches Konto soll das Geld überwiesen werden? Bitte gib die IBAN ein."@de , "Which account should the money be paid into? Please enter the IBAN."@en ;
+    rdfs:comment "Die IBAN steht auf Deiner Bankkarte oder im Online-Banking. Deutsche IBANs beginnen mit DE und haben 22 Zeichen."@de ,
+        "The IBAN is on your bank card or in online banking. German IBANs start with DE and have 22 characters."@en .
+
+bf:accountHolder a bf:DataField ;
+    bf:appliesTo bf:Citizen ;
+    bf:datatype bf:text ;
+    bf:section bf:sectionBank ;
+    bf:questionPriority 2 ;
+    bf:storedAs "account_holder" ;
+    rdfs:label "Kontoinhaber*in"@de , "Account holder"@en ;
+    schema:question "Auf wen läuft das Konto?"@de , "Who is the account holder?"@en .
+

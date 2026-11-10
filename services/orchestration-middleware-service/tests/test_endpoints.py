@@ -80,6 +80,25 @@ def test_get_profile_success(mock_cleanup, mock_db):
 
 
 @patch("src.routes.user.run_background_gcs_cleanup")
+def test_get_profile_includes_income_entries(mock_cleanup, mock_db):
+    mock_user = DbUser(id=uuid.uuid4(), phone_number="1234567890")
+    mock_user.income_entries = [IncomeEntries(income_type=IncomeTypeType.CHILD_BENEFIT, reference_no="123FK456789")]
+    mock_db.query.return_value.filter.return_value.first.return_value = mock_user
+
+    data = client.get("/profile").json()
+
+    assert data["income_entries"] == [
+        {
+            "person_sort_order": None,
+            "income_type": "Child Benefit",
+            "monthly_amount": None,
+            "awarding_office": None,
+            "reference_no": "123FK456789",
+        }
+    ]
+
+
+@patch("src.routes.user.run_background_gcs_cleanup")
 def test_get_profile_not_found(mock_cleanup, mock_db):
     # Mock no user found
     mock_db.query.return_value.filter.return_value.first.return_value = None

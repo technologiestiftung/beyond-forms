@@ -1,0 +1,437 @@
+@prefix bf: <https://beyond-forms.example/ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# The engine runs these rules in dependency order, derived from bf:input, bf:optionalInput, bf:dependsOn and bf:output.
+# bf:dependsOn only orders rules; it never turns into a question.
+# $TODAY is replaced by the evaluation date as an xsd:date literal.
+
+bf:ruleCurrentConstants a bf:MaterializationRule ;
+    rdfs:label "Marks the value of each constant series that is valid today"@en ;
+    bf:output bf:isCurrent ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?constant bf:isCurrent true }
+        WHERE {
+            ?constant a bf:Constant ; bf:series ?series .
+            OPTIONAL { ?constant bf:validFrom ?from }
+            FILTER(!BOUND(?from) || ?from <= $TODAY)
+            FILTER NOT EXISTS {
+                ?newer a bf:Constant ; bf:series ?series ; bf:validFrom ?newerFrom .
+                FILTER(?newer != ?constant && ?newerFrom <= $TODAY && (!BOUND(?from) || ?newerFrom > ?from))
+            }
+        }
+    """ .
+
+bf:ruleAge a bf:MaterializationRule ;
+    rdfs:label "Age in completed years"@en ;
+    bf:input bf:birthDate ;
+    bf:output bf:hasAge ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:hasAge ?age }
+        WHERE {
+            ?person bf:birthDate ?birthDate .
+            BIND(YEAR($TODAY) - YEAR(?birthDate)
+                - IF(MONTH($TODAY) < MONTH(?birthDate) || (MONTH($TODAY) = MONTH(?birthDate) && DAY($TODAY) < DAY(?birthDate)), 1, 0) AS ?age)
+        }
+    """ .
+
+bf:ruleRetirementAge a bf:MaterializationRule ;
+    rdfs:label "Whether the Regelaltersgrenze is reached, to the month"@en ;
+    bf:input bf:birthDate ;
+    bf:dependsOn bf:isCurrent ;
+    bf:output bf:hasReachedRetirementAge ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:hasReachedRetirementAge ?reached }
+        WHERE {
+            ?person a bf:Citizen ; bf:birthDate ?birthDate .
+            BIND(YEAR(?birthDate) AS ?birthYear)
+            ?series bf:key bf:retirementAgeMonths .
+            ?constant bf:series ?series ; bf:isCurrent true ; bf:value ?retirementMonths .
+            OPTIONAL { ?series bf:minBirthYear ?minYear }
+            OPTIONAL { ?series bf:maxBirthYear ?maxYear }
+            FILTER((!BOUND(?minYear) || ?birthYear >= ?minYear) && (!BOUND(?maxYear) || ?birthYear <= ?maxYear))
+            BIND((YEAR($TODAY) - ?birthYear) * 12 + (MONTH($TODAY) - MONTH(?birthDate))
+                - IF(DAY($TODAY) < DAY(?birthDate), 1, 0) AS ?monthsOld)
+            BIND(?monthsOld >= ?retirementMonths AS ?reached)
+        }
+    """ .
+
+bf:ruleHouseholdRegelbedarf a bf:MaterializationRule ;
+    rdfs:label "Regelbedarf of the household: adults plus each child by age"@en ;
+    bf:input bf:householdComposition ;
+    bf:optionalInput bf:hasChild ;
+    bf:dependsOn bf:isCurrent , bf:hasAge ;
+    bf:output bf:householdRegelbedarf ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:householdRegelbedarf ?total }
+        WHERE {
+            ?person a bf:Citizen ; bf:householdComposition ?composition .
+            ?composition bf:adults ?adults ; bf:hasChildren ?withChildren .
+            ?singleSeries bf:key bf:regelbedarfSingle .
+            ?single bf:series ?singleSeries ; bf:isCurrent true ; bf:value ?singleRate .
+            ?partnerSeries bf:key bf:regelbedarfPartner .
+            ?partner bf:series ?partnerSeries ; bf:isCurrent true ; bf:value ?partnerRate .
+            OPTIONAL {
+                SELECT ?person (SUM(?rate) AS ?childSum) WHERE {
+                    ?person bf:hasChild ?child .
+                    ?child bf:hasAge ?age .
+                    ?series bf:key bf:regelbedarfChild .
+                    ?constant bf:series ?series ; bf:isCurrent true ; bf:value ?rate .
+                    OPTIONAL { ?series bf:minAge ?minAge }
+                    OPTIONAL { ?series bf:maxAge ?maxAge }
+                    FILTER((!BOUND(?minAge) || ?age >= ?minAge) && (!BOUND(?maxAge) || ?age <= ?maxAge))
+                } GROUP BY ?person
+            }
+            FILTER(!?withChildren || BOUND(?childSum))
+            BIND(IF(?adults = 2, 2 * ?partnerRate, ?singleRate) + IF(?withChildren, ?childSum, 0) AS ?total)
+        }
+    """ .
+
+bf:ruleMonthlyNeeds a bf:MaterializationRule ;
+    rdfs:label "Needs: Regelbedarf plus warm rent"@en ;
+    bf:input bf:householdRegelbedarf , bf:monthlyWarmRent ;
+    bf:output bf:monthlyNeeds ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:monthlyNeeds ?needs }
+        WHERE {
+            ?person bf:householdRegelbedarf ?regelbedarf ; bf:monthlyWarmRent ?rent .
+            BIND(?regelbedarf + ?rent AS ?needs)
+        }
+    """ .
+
+bf:ruleIncomeCoversNeeds a bf:MaterializationRule ;
+    rdfs:label "Whether the net household income covers the needs"@en ;
+    bf:input bf:monthlyNetHouseholdIncome , bf:monthlyNeeds ;
+    bf:output bf:incomeCoversNeeds ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:incomeCoversNeeds ?covers }
+        WHERE {
+            ?person bf:monthlyNetHouseholdIncome ?income ; bf:monthlyNeeds ?needs .
+            BIND(?income >= ?needs AS ?covers)
+        }
+    """ .
+
+bf:ruleAssetAllowanceSgb2 a bf:MaterializationRule ;
+    rdfs:label "Schonvermögen SGB II: one age tier per household member. The partner's age is not asked, so the partner gets the applicant's tier."@en ;
+    bf:input bf:birthDate , bf:householdComposition ;
+    bf:optionalInput bf:hasChild ;
+    bf:dependsOn bf:isCurrent ;
+    bf:output bf:assetAllowanceSgb2 ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:assetAllowanceSgb2 ?allowance }
+        WHERE {
+            ?person a bf:Citizen ; bf:birthDate ?birthDate ; bf:householdComposition ?composition .
+            ?composition bf:adults ?adults ; bf:hasChildren ?withChildren .
+            # The higher tier applies from the start of the month the age is reached
+            BIND(YEAR($TODAY) - YEAR(?birthDate) - IF(MONTH($TODAY) < MONTH(?birthDate), 1, 0) AS ?age)
+            ?series bf:key bf:assetAllowanceSgb2PerPerson .
+            ?constant bf:series ?series ; bf:isCurrent true ; bf:value ?perAdult .
+            OPTIONAL { ?series bf:minAge ?minAge }
+            OPTIONAL { ?series bf:maxAge ?maxAge }
+            FILTER((!BOUND(?minAge) || ?age >= ?minAge) && (!BOUND(?maxAge) || ?age <= ?maxAge))
+            OPTIONAL {
+                SELECT ?person (SUM(?childAmount) AS ?childSum) WHERE {
+                    ?person bf:hasChild ?child .
+                    ?child bf:birthDate ?childBirthDate .
+                    BIND(YEAR($TODAY) - YEAR(?childBirthDate) - IF(MONTH($TODAY) < MONTH(?childBirthDate), 1, 0) AS ?childAge)
+                    ?childSeries bf:key bf:assetAllowanceSgb2PerPerson .
+                    ?childConstant bf:series ?childSeries ; bf:isCurrent true ; bf:value ?childAmount .
+                    OPTIONAL { ?childSeries bf:minAge ?childMinAge }
+                    OPTIONAL { ?childSeries bf:maxAge ?childMaxAge }
+                    FILTER((!BOUND(?childMinAge) || ?childAge >= ?childMinAge) && (!BOUND(?childMaxAge) || ?childAge <= ?childMaxAge))
+                } GROUP BY ?person
+            }
+            FILTER(!?withChildren || BOUND(?childSum))
+            BIND(?perAdult * ?adults + IF(?withChildren, ?childSum, 0) AS ?allowance)
+        }
+    """ .
+
+bf:ruleAssetAllowanceSgb12 a bf:MaterializationRule ;
+    rdfs:label "Schonvermögen SGB XII: an amount per adult plus an amount per child the household supports"@en ;
+    bf:input bf:householdComposition ;
+    bf:optionalInput bf:hasChild ;
+    bf:dependsOn bf:isCurrent ;
+    bf:output bf:assetAllowanceSgb12 ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:assetAllowanceSgb12 ?allowance }
+        WHERE {
+            ?person a bf:Citizen ; bf:householdComposition ?composition .
+            ?composition bf:adults ?adults ; bf:hasChildren ?withChildren .
+            ?adultSeries bf:key bf:assetAllowanceSgb12PerAdult .
+            ?adultConstant bf:series ?adultSeries ; bf:isCurrent true ; bf:value ?perAdult .
+            ?dependentSeries bf:key bf:assetAllowanceSgb12PerDependent .
+            ?dependentConstant bf:series ?dependentSeries ; bf:isCurrent true ; bf:value ?perDependent .
+            OPTIONAL {
+                SELECT ?person (COUNT(?child) AS ?children) WHERE { ?person bf:hasChild ?child } GROUP BY ?person
+            }
+            FILTER(!?withChildren || BOUND(?children))
+            BIND(?perAdult * ?adults + IF(?withChildren, ?perDependent * ?children, 0) AS ?allowance)
+        }
+    """ .
+
+bf:ruleAssetsWithinAllowanceSgb2 a bf:MaterializationRule ;
+    rdfs:label "Whether the savings stay within the SGB II allowance; the exact amount is only needed when the band straddles it"@en ;
+    bf:input bf:assetsBand , bf:assetAllowanceSgb2 ;
+    bf:optionalInput bf:assetsAmount ;
+    bf:output bf:assetsWithinAllowanceSgb2 ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:assetsWithinAllowanceSgb2 ?within }
+        WHERE {
+            ?person bf:assetsBand ?band ; bf:assetAllowanceSgb2 ?allowance .
+            ?band bf:min ?min .
+            OPTIONAL { ?band bf:max ?max }
+            OPTIONAL { ?person bf:assetsAmount ?amount }
+            FILTER((BOUND(?max) && ?max <= ?allowance) || ?min >= ?allowance || BOUND(?amount))
+            BIND(IF(BOUND(?max) && ?max <= ?allowance, true, IF(?min >= ?allowance, false, ?amount <= ?allowance)) AS ?within)
+        }
+    """ .
+
+bf:ruleAssetsWithinAllowanceSgb12 a bf:MaterializationRule ;
+    rdfs:label "Whether the savings stay within the SGB XII allowance; the exact amount is only needed when the band straddles it"@en ;
+    bf:input bf:assetsBand , bf:assetAllowanceSgb12 ;
+    bf:optionalInput bf:assetsAmount ;
+    bf:output bf:assetsWithinAllowanceSgb12 ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:assetsWithinAllowanceSgb12 ?within }
+        WHERE {
+            ?person bf:assetsBand ?band ; bf:assetAllowanceSgb12 ?allowance .
+            ?band bf:min ?min .
+            OPTIONAL { ?band bf:max ?max }
+            OPTIONAL { ?person bf:assetsAmount ?amount }
+            FILTER((BOUND(?max) && ?max <= ?allowance) || ?min >= ?allowance || BOUND(?amount))
+            BIND(IF(BOUND(?max) && ?max <= ?allowance, true, IF(?min >= ?allowance, false, ?amount <= ?allowance)) AS ?within)
+        }
+    """ .
+
+bf:ruleQualifiesByAgeOrReducedCapacity a bf:MaterializationRule ;
+    rdfs:label "Retirement age reached, or an adult with permanently reduced earning capacity (§ 41 SGB XII)"@en ;
+    bf:input bf:hasReachedRetirementAge , bf:hasAge ;
+    bf:optionalInput bf:workCapacity ;
+    bf:output bf:qualifiesByAgeOrReducedCapacity ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:qualifiesByAgeOrReducedCapacity ?qualifies }
+        WHERE {
+            ?person bf:hasReachedRetirementAge ?retired ; bf:hasAge ?age .
+            OPTIONAL { ?person bf:workCapacity ?capacity }
+            FILTER(?retired || BOUND(?capacity))
+            BIND(?retired || (?age >= 18 && COALESCE(?capacity = bf:workCapacity-permanentlyReduced, false)) AS ?qualifies)
+        }
+    """ .
+
+bf:ruleHasChildUnder25 a bf:MaterializationRule ;
+    rdfs:label "Whether a child under 25 lives in the household"@en ;
+    bf:input bf:householdComposition ;
+    bf:optionalInput bf:hasChild ;
+    bf:dependsOn bf:hasAge ;
+    bf:output bf:hasChildUnder25 ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:hasChildUnder25 ?under25 }
+        WHERE {
+            ?person a bf:Citizen ; bf:householdComposition ?composition .
+            ?composition bf:hasChildren ?withChildren .
+            FILTER(!?withChildren || EXISTS { ?person bf:hasChild ?anyChild })
+            BIND(?withChildren && EXISTS { ?person bf:hasChild ?child . ?child bf:hasAge ?age . FILTER(?age < 25) } AS ?under25)
+        }
+    """ .
+
+bf:ruleEffectiveGrossIncome a bf:MaterializationRule ;
+    rdfs:label "Gross income, zero when not working"@en ;
+    bf:input bf:isEmployed ;
+    bf:optionalInput bf:monthlyGrossIncome ;
+    bf:output bf:effectiveGrossIncome ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:effectiveGrossIncome ?gross }
+        WHERE {
+            ?person bf:isEmployed ?employed .
+            OPTIONAL { ?person bf:monthlyGrossIncome ?stated }
+            FILTER(!?employed || BOUND(?stated))
+            BIND(IF(?employed, ?stated, 0) AS ?gross)
+        }
+    """ .
+
+bf:ruleKizMinimumIncome a bf:MaterializationRule ;
+    rdfs:label "Whether the gross income reaches the Kinderzuschlag minimum for single parents or couples"@en ;
+    bf:input bf:effectiveGrossIncome , bf:householdComposition ;
+    bf:dependsOn bf:isCurrent ;
+    bf:output bf:kizMinimumIncomeReached ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:kizMinimumIncomeReached ?reached }
+        WHERE {
+            ?person bf:effectiveGrossIncome ?gross ; bf:householdComposition ?composition .
+            ?composition bf:adults ?adults .
+            ?singleSeries bf:key bf:kizMinGrossSingleParent .
+            ?single bf:series ?singleSeries ; bf:isCurrent true ; bf:value ?singleMinimum .
+            ?coupleSeries bf:key bf:kizMinGrossCouple .
+            ?couple bf:series ?coupleSeries ; bf:isCurrent true ; bf:value ?coupleMinimum .
+            BIND(?gross >= IF(?adults = 2, ?coupleMinimum, ?singleMinimum) AS ?reached)
+        }
+    """ .
+
+bf:ruleResidenceStatusAnswered a bf:MaterializationRule ;
+    rdfs:label "Whether citizenship, and for non-EU citizens the residence title, are known"@en ;
+    bf:input bf:citizenship ;
+    bf:optionalInput bf:hasSecureResidenceStatus ;
+    bf:output bf:residenceStatusAnswered ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:residenceStatusAnswered true }
+        WHERE {
+            ?person bf:citizenship ?citizenship .
+            ?citizenship bf:requiresResidenceTitle ?requiresTitle .
+            FILTER(!?requiresTitle || EXISTS { ?person bf:hasSecureResidenceStatus ?secure })
+        }
+    """ .
+
+# Wohngeld, § 19 WoGG with Anlagen 1 to 3. Simplifications: Berlin's Mietenstufe only; no Werbungskosten,
+# no Freibeträge besides § 17 Nr. 3; households above 12 members use the values for 12.
+
+bf:ruleHouseholdSize a bf:MaterializationRule ;
+    rdfs:label "Household members: adults plus children in the household"@en ;
+    bf:input bf:householdComposition ;
+    bf:optionalInput bf:hasChild ;
+    bf:output bf:householdSize ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:householdSize ?size }
+        WHERE {
+            ?person a bf:Citizen ; bf:householdComposition ?composition .
+            ?composition bf:adults ?adults ; bf:hasChildren ?withChildren .
+            OPTIONAL {
+                SELECT ?person (COUNT(?child) AS ?children) WHERE { ?person bf:hasChild ?child } GROUP BY ?person
+            }
+            FILTER(!?withChildren || BOUND(?children))
+            BIND(?adults + IF(?withChildren, ?children, 0) AS ?size)
+        }
+    """ .
+
+bf:ruleWohngeldRent a bf:MaterializationRule ;
+    rdfs:label "M: rent without heating up to the Höchstbetrag plus Klimakomponente (§ 11 Abs. 1 Nr. 1), plus the heating relief (§ 11 Abs. 1 Nr. 2)"@en ;
+    bf:input bf:monthlyRentWithoutHeating , bf:householdSize ;
+    bf:dependsOn bf:isCurrent ;
+    bf:output bf:wohngeldRent ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:wohngeldRent ?m }
+        WHERE {
+            ?person bf:monthlyRentWithoutHeating ?rent ; bf:householdSize ?size .
+            BIND(IF(?size > 5, 5, ?size) AS ?row)
+            BIND(IF(?size > 5, ?size - 5, 0) AS ?additional)
+            ?stufeSeries bf:key bf:mietenstufe . ?stufe bf:series ?stufeSeries ; bf:isCurrent true ; bf:value ?mietenstufe .
+            ?capSeries bf:key bf:wohngeldMaxRent ; bf:householdSize ?row ; bf:mietenstufe ?mietenstufe .
+            ?cap bf:series ?capSeries ; bf:isCurrent true ; bf:value ?capBase .
+            ?capExtraSeries bf:key bf:wohngeldMaxRentPerAdditionalMember ; bf:mietenstufe ?mietenstufe .
+            ?capExtra bf:series ?capExtraSeries ; bf:isCurrent true ; bf:value ?capPerMember .
+            ?climateSeries bf:key bf:wohngeldClimateComponent ; bf:householdSize ?row .
+            ?climate bf:series ?climateSeries ; bf:isCurrent true ; bf:value ?climateBase .
+            ?climateExtraSeries bf:key bf:wohngeldClimateComponentPerAdditionalMember .
+            ?climateExtra bf:series ?climateExtraSeries ; bf:isCurrent true ; bf:value ?climatePerMember .
+            ?heatingSeries bf:key bf:wohngeldHeatingRelief ; bf:householdSize ?row .
+            ?heating bf:series ?heatingSeries ; bf:isCurrent true ; bf:value ?heatingBase .
+            ?heatingExtraSeries bf:key bf:wohngeldHeatingReliefPerAdditionalMember .
+            ?heatingExtra bf:series ?heatingExtraSeries ; bf:isCurrent true ; bf:value ?heatingPerMember .
+            BIND(?capBase + ?additional * ?capPerMember + ?climateBase + ?additional * ?climatePerMember AS ?ceiling)
+            BIND(IF(?rent < ?ceiling, ?rent, ?ceiling) + ?heatingBase + ?additional * ?heatingPerMember AS ?m)
+        }
+    """ .
+
+bf:ruleWohngeldIncome a bf:MaterializationRule ;
+    rdfs:label "Y: monthly total income after the flat deductions (§ 16) and the single-parent allowance (§ 17 Nr. 3), §§ 13 to 17 WoGG"@en ;
+    bf:input bf:monthlyGrossHouseholdIncome , bf:incomeDeductions , bf:householdComposition ;
+    bf:optionalInput bf:hasChild ;
+    bf:dependsOn bf:isCurrent , bf:hasAge ;
+    bf:output bf:wohngeldIncome ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:wohngeldIncome ?y }
+        WHERE {
+            ?person a bf:Citizen ; bf:monthlyGrossHouseholdIncome ?gross ; bf:incomeDeductions ?deductions ; bf:householdComposition ?composition .
+            ?deductions bf:deductionShare ?share .
+            ?composition bf:adults ?adults ; bf:hasChildren ?withChildren .
+            FILTER(!?withChildren || EXISTS { ?person bf:hasChild ?anyChild })
+            ?allowanceSeries bf:key bf:wohngeldSingleParentAllowancePerYear .
+            ?allowance bf:series ?allowanceSeries ; bf:isCurrent true ; bf:value ?singleParentAllowance .
+            BIND(?adults = 1 && ?withChildren && EXISTS { ?person bf:hasChild ?child . ?child bf:hasAge ?age . FILTER(?age < 18) } AS ?singleParent)
+            BIND(?gross * 12 * (1 - ?share) - IF(?singleParent, ?singleParentAllowance, 0) AS ?yearly)
+            BIND(IF(?yearly > 0, ?yearly, 0) / 12 AS ?y)
+        }
+    """ .
+
+bf:ruleWohngeldAmount a bf:MaterializationRule ;
+    rdfs:label "Monthly Wohngeld: § 19 Abs. 1 formula with the minimum values and rounding of Anlage 3"@en ;
+    bf:input bf:wohngeldRent , bf:wohngeldIncome , bf:householdSize ;
+    bf:dependsOn bf:isCurrent ;
+    bf:output bf:wohngeldAmount ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:wohngeldAmount ?amount }
+        WHERE {
+            ?person bf:wohngeldRent ?rawM ; bf:wohngeldIncome ?rawY ; bf:householdSize ?size .
+            BIND(IF(?size > 12, 12, ?size) AS ?row)
+            ?aSeries bf:key bf:wohngeldCoefficientA ; bf:householdSize ?row . ?aValue bf:series ?aSeries ; bf:isCurrent true ; bf:value ?a .
+            ?bSeries bf:key bf:wohngeldCoefficientB ; bf:householdSize ?row . ?bValue bf:series ?bSeries ; bf:isCurrent true ; bf:value ?b .
+            ?cSeries bf:key bf:wohngeldCoefficientC ; bf:householdSize ?row . ?cValue bf:series ?cSeries ; bf:isCurrent true ; bf:value ?c .
+            ?mFloorSeries bf:key bf:wohngeldMinimumRent ; bf:householdSize ?row . ?mFloor bf:series ?mFloorSeries ; bf:isCurrent true ; bf:value ?minM .
+            ?yFloorSeries bf:key bf:wohngeldMinimumIncome ; bf:householdSize ?row . ?yFloor bf:series ?yFloorSeries ; bf:isCurrent true ; bf:value ?minY .
+            BIND(IF(?rawM < ?minM, ?minM, ?rawM) AS ?m)
+            BIND(IF(?rawY < ?minY, ?minY, ?rawY) AS ?y)
+            BIND(1.15 * (?m - (?a + ?b * ?m + ?c * ?y) * ?y) AS ?unrounded)
+            BIND(FLOOR(?unrounded + 0.5) AS ?amount)
+        }
+    """ .
+
+bf:ruleWohngeldAboveMinimum a bf:MaterializationRule ;
+    rdfs:label "No Wohngeld below the minimum amount, § 21 Nr. 1 WoGG"@en ;
+    bf:input bf:wohngeldAmount ;
+    bf:dependsOn bf:isCurrent ;
+    bf:output bf:wohngeldAboveMinimum ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:wohngeldAboveMinimum ?above }
+        WHERE {
+            ?person bf:wohngeldAmount ?amount .
+            ?series bf:key bf:wohngeldMinimumAmount . ?constant bf:series ?series ; bf:isCurrent true ; bf:value ?minimum .
+            BIND(?amount >= ?minimum AS ?above)
+        }
+    """ .
+
+# Application forms
+
+bf:rulePartner a bf:MaterializationRule ;
+    rdfs:label "Couples have a partner whose details the forms ask for"@en ;
+    bf:input bf:householdComposition ;
+    bf:output bf:hasPartner ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person bf:hasPartner ?partner . ?partner a bf:Partner }
+        WHERE {
+            ?person a bf:Citizen ; bf:householdComposition ?composition .
+            ?composition bf:adults 2 .
+            BIND(IRI(CONCAT(STR(?person), "-partner")) AS ?partner)
+        }
+    """ .
+
+bf:ruleMarriedApplicant a bf:MaterializationRule ;
+    rdfs:label "Applicants whose marital status started on a date the forms ask for"@en ;
+    bf:input bf:maritalStatus ;
+    bf:output bf:MarriedApplicant ;
+    bf:sparqlConstruct """
+        PREFIX bf: <https://beyond-forms.example/ns#>
+        CONSTRUCT { ?person a bf:MarriedApplicant }
+        WHERE {
+            ?person a bf:Citizen ; bf:maritalStatus ?status .
+            ?status bf:hasStartDate true .
+        }
+    """ .

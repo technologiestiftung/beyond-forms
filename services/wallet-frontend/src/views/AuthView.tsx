@@ -3,6 +3,8 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useAuthStore, type AuthStatus } from "../store/useAuthStore";
 import { useEligibilityStore } from "../store/useEligibilityStore";
+import { selectProfile, useDiscoveryStore } from "../store/useDiscoveryStore";
+import { env } from "../config/env.config";
 import { applicationService } from "../services/application.service";
 import { PhoneNumberForm } from "../components/Auth/PhoneNumberForm";
 import { OTPForm } from "../components/Auth/OTPForm";
@@ -24,7 +26,10 @@ export const AuthView: React.FC = () => {
 
 	const status: AuthStatus = useAuthStore((s) => s.status);
 	const currentPhoneNumber = useAuthStore((s) => s.phoneNumber);
-	const answers = useEligibilityStore((s) => s.answers);
+	const legacyAnswers = useEligibilityStore((s) => s.answers);
+	const discoveryAnswers = useDiscoveryStore((s) => s.answers);
+	const answers =
+		env.VITE_ELIGIBILITY_ENGINE === "shacl" ? discoveryAnswers : legacyAnswers;
 	// Defaults to true if a phone number is already set on mount (e.g. after a
 	// page reload mid manual entry) so that state isn't stranded behind the
 	// picker; a fresh session always starts at the picker.
@@ -49,7 +54,7 @@ export const AuthView: React.FC = () => {
 		error: syncMutationError,
 		reset: resetSyncError,
 	} = useMutation({
-		mutationFn: async (data: typeof answers) => {
+		mutationFn: async (data: typeof legacyAnswers) => {
 			const result = await applicationService.syncGuestData(data);
 			if (!result.success) {
 				throw new Error(result.message || t("sync.error_failed"));
@@ -78,7 +83,16 @@ export const AuthView: React.FC = () => {
 				Object.keys(answers).length > 0
 			) {
 				hasSyncedRef.current = true;
-				syncData(answers);
+				if (env.VITE_ELIGIBILITY_ENGINE === "shacl") {
+					void import("../services/eligibility/discoveryEngine").then(
+						({ toEligibilityCheck }) =>
+							syncData(
+								toEligibilityCheck(selectProfile(useDiscoveryStore.getState())),
+							),
+					);
+				} else {
+					syncData(legacyAnswers);
+				}
 			} else if (isReturningUser) {
 				void navigate(AppRoutes.Dashboard);
 			}
@@ -89,6 +103,7 @@ export const AuthView: React.FC = () => {
 		isSyncing,
 		navigate,
 		answers,
+		legacyAnswers,
 		origin,
 		syncData,
 	]);

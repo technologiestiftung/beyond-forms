@@ -44,6 +44,10 @@ export default defineConfig({
 			VITE_USE_MOCK_AUTH: "true",
 			VITE_USE_MOCKS: "true",
 			VITE_E2E_TEST: "true",
+			VITE_ELIGIBILITY_ENGINE:
+				(typeof process !== "undefined" &&
+					process.env.VITE_ELIGIBILITY_ENGINE) ||
+				"legacy",
 		},
 	},
 });

@@ -18,16 +18,16 @@ const REGELBEDARF = {
 	age0to5: 357,
 } as const;
 
-/** SGB II Schonvermögen per adult, by age, from 1 July 2026 */
+/** SGB II Schonvermögen per household member by age, from 1 July 2026, § 12 Abs. 2 SGB II */
 const SGB_II_ALLOWANCE_BY_AGE = [
-	{ maxAge: 30, amount: 5_000 },
-	{ maxAge: 40, amount: 10_000 },
-	{ maxAge: 50, amount: 12_500 },
+	{ maxAge: 29, amount: 5_000 },
+	{ maxAge: 39, amount: 10_000 },
+	{ maxAge: 49, amount: 12_500 },
 	{ maxAge: Infinity, amount: 20_000 },
 ] as const;
 
-/** SGB XII Schonvermögen per adult */
-const SGB_XII_ALLOWANCE = 10_000;
+/** SGB XII Schonvermögen per adult and per dependent child, § 1 VO zu § 90 Abs. 2 Nr. 9 SGB XII */
+const SGB_XII_ALLOWANCE = { adult: 10_000, child: 500 } as const;
 
 /** Kinderzuschlag minimum gross income */
 const KIZ_MIN_GROSS = { singleParent: 600, couple: 900 } as const;
@@ -99,6 +99,18 @@ export const hasReachedRetirementAge = (
 	return monthsOld >= retirementAgeInMonths(by);
 };
 
+/** The higher SGB II allowance already applies in the month the age is reached */
+const ageInMonthOf = (dateOfBirth: string, today: string): number => {
+	const [by, bm] = dateOfBirth.split("-").map(Number);
+	const [ty, tm] = today.split("-").map(Number);
+	return ty - by - (tm < bm ? 1 : 0);
+};
+
+const sgbIIAllowance = (dateOfBirth: string, today: string): number =>
+	SGB_II_ALLOWANCE_BY_AGE.find(
+		(tier) => ageInMonthOf(dateOfBirth, today) <= tier.maxAge,
+	)?.amount ?? 0;
+
 const isCouple = (a: Answers) =>
 	a.householdComposition === HouseholdComposition.COUPLE_NO_CHILDREN ||
 	a.householdComposition === HouseholdComposition.COUPLE_WITH_CHILDREN;
@@ -162,10 +174,15 @@ const assessGrundsicherungsgeld = (
 	if (a.workCapacity === WorkCapacity.PERMANENTLY_REDUCED) {
 		return { status: BenefitStatus.NO, reason: "permanently_unable_to_work" };
 	}
-	const age = ageOn(a.dateOfBirth ?? today, today);
-	const perAdult =
-		SGB_II_ALLOWANCE_BY_AGE.find((tier) => age <= tier.maxAge)?.amount ?? 0;
-	const result = meansTest(a, today, perAdult * adults(a));
+	// The partner's age is not asked, so both adults get the applicant's tier
+	const children = hasChildren(a) ? (a.children ?? []) : [];
+	const allowance =
+		sgbIIAllowance(a.dateOfBirth ?? today, today) * adults(a) +
+		children.reduce(
+			(sum, child) => sum + sgbIIAllowance(child.dateOfBirth, today),
+			0,
+		);
+	const result = meansTest(a, today, allowance);
 	// Whether "not at the moment" means under or over six months decides between SGB II and SGB XII
 	if (
 		a.workCapacity === WorkCapacity.TEMPORARILY_REDUCED &&
@@ -194,7 +211,12 @@ const assessGrundsicherungAlter = (
 			reason: "not_retired_nor_unable_to_work",
 		};
 	}
-	return meansTest(a, today, SGB_XII_ALLOWANCE * adults(a));
+	return meansTest(
+		a,
+		today,
+		SGB_XII_ALLOWANCE.adult * adults(a) +
+			SGB_XII_ALLOWANCE.child * childAges(a, today).length,
+	);
 };
 
 const assessWohngeld = (a: Answers, today: string) => {
