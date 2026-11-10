@@ -29,6 +29,23 @@ logger = logging.getLogger(__name__)
 
 FORM_NAME_PATTERN = re.compile(r"^[a-zA-Z0-9_-]+$")
 _DOCUMENT_REF_RE = re.compile(r"documents\.([a-zA-Z_][a-zA-Z0-9_]*)(?:\.([a-zA-Z_][a-zA-Z0-9_]*))?")
+_ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _parse_iso_dates(raw_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Document extraction stores dates as ISO strings, while profile columns arrive as
+    `date` objects. Parsing them here lets document dates go through the same TT.MM.JJJJ
+    formatting as profile dates instead of reaching the form as JJJJ-MM-TT."""
+    parsed = {}
+    for key, value in raw_data.items():
+        if isinstance(value, str) and _ISO_DATE_RE.match(value):
+            try:
+                value = datetime.date.fromisoformat(value)
+            except ValueError:
+                pass
+        parsed[key] = value
+    return parsed
+
 
 # Distinguishes "referenced as a whole object" (refs[type] is None) from
 # "not referenced by the mapping at all" (absent from refs).
@@ -469,9 +486,11 @@ class FormService:
                         if needed is _UNREFERENCED:
                             continue
                         if needed is None:
-                            documents_ctx[alias] = dict(doc.raw_data)
+                            documents_ctx[alias] = _parse_iso_dates(doc.raw_data)
                         else:
-                            documents_ctx[alias] = {k: v for k, v in doc.raw_data.items() if k in needed}
+                            documents_ctx[alias] = _parse_iso_dates(
+                                {k: v for k, v in doc.raw_data.items() if k in needed}
+                            )
             except DatabaseError:
                 logger.warning("Internal database error")
             except DisconnectionError:

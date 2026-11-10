@@ -1,6 +1,6 @@
 # Document Intelligence Service
 
-An automated document processing service built with **FastAPI** and **LiteLLM**. It provides high-speed document classification and schema-based entity extraction using Vision Language Models (VLMs) like **Gemini 3.5 Flash**.
+An automated document processing service. It provides high-speed document classification and schema-based entity extraction using multimodal LLMs.
 
 ## 🚀 Quick Start
 
@@ -99,7 +99,6 @@ Returns the JSON Schema for a specific document type.
 ## 🧪 Extensions
 
 - **Adding New Documents:** Define a new class in `document_types.py` using the `@register_document("slug")` decorator. To add a new document type, simply inherit from `BaseDocument` and add your fields with descriptive `Field(...)` helpers—the LLM will automatically use those descriptions as extraction instructions.
-- **Error Handling:** All errors are wrapped in a standard JSON envelope via `api_response` in `app/utils/web.py`.
 
 ---
 

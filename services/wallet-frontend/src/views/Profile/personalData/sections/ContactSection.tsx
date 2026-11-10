@@ -11,11 +11,11 @@ export const ContactSection: React.FC<SectionProps> = ({
 	return (
 		<div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-5 w-full">
 			<h2 className="text-sm font-extrabold text-slate-950 tracking-wide uppercase mb-1">
-				{t("personal.groups.contact", "Kontakt")}
+				{t("personal.groups.contact")}
 			</h2>
 			<FormField
 				id="email"
-				label={t("personal.fields.email", "E-Mail-Adresse")}
+				label={t("personal.fields.email")}
 				type="email"
 				register={register("email")}
 				onBlur={() => handleFieldBlur("email")}
@@ -23,7 +23,7 @@ export const ContactSection: React.FC<SectionProps> = ({
 			/>
 			<FormField
 				id="phoneNumber"
-				label={t("personal.fields.phoneNumber", "Telefonnummer")}
+				label={t("personal.fields.phoneNumber")}
 				register={register("phoneNumber")}
 				onBlur={() => handleFieldBlur("phoneNumber")}
 				error={formErrors.phoneNumber?.message}

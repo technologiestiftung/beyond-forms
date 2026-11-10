@@ -135,7 +135,6 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 								onClick={() => toggleLanguage(lang)}
 								aria-label={t("switch_to_language", {
 									language: lang,
-									defaultValue: `Switch to ${lang}`,
 								})}
 								aria-pressed={isActive}
 								className={`h-9 w-11 cursor-pointer rounded-full text-xs font-bold focus-visible:outline-2 focus-visible:outline-primary-blue-500 ${

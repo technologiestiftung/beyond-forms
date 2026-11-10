@@ -13,15 +13,13 @@ from src.models import Users as DbUser, UploadedFiles, UserDocuments
 from src.schemas import AssociatedPersonSchema, IncomeEntrySchema, UserProfileValidationSchema
 from src.services.user_service import (
     ProfileWriteError,
-    RELATION_KEYS,
     UserService,
-    apply_profile_key,
     get_user_service,
-    ordered_profile_items,
+    write_profile_payload,
 )
-from src.services.berlin_districts import sync_berlin_district
 from src.utils import get_google_id_token
 from src.mappers import map_flat_to_rules_engine_payload
+from src.services.wizard_rules import evaluate, evaluation_payload
 from src.tasks.cleanup import run_background_gcs_cleanup
 from src.gcs import get_gcs_client
 
@@ -37,8 +35,6 @@ def _delete_gcs_files_sync(files: list[tuple[str, str]]):
         except Exception as e:
             logger.error(f"Failed to delete GCS blob {object_name} from {bucket_name}: {e}")
 
-
-DISTRICT_SYNC_FIELDS = frozenset({"street", "house_number", "zip_code", "city"})
 
 logger = logging.getLogger(__name__)
 
@@ -72,13 +68,11 @@ def get_profile(
     background_tasks.add_task(run_background_gcs_cleanup, db_user.id)
 
     user_data = {c.name: getattr(db_user, c.name) for c in db_user.__table__.columns}
-    if user_data.get("displaced_status") is None:
-        user_data["displaced_status"] = "none"
     user_data["associated_persons"] = [
         AssociatedPersonSchema.model_validate(person).model_dump(mode="json") for person in db_user.associated_persons
     ]
     user_data["income_entries"] = [
-        IncomeEntrySchema.model_validate(entry).model_dump(mode="json") for entry in db_user.income_entries
+        IncomeEntrySchema.model_validate(row).model_dump(mode="json") for row in db_user.income_entries
     ]
 
     return user_data
@@ -105,33 +99,10 @@ def update_user_profile(
 
     # Persist incoming fields to database first (decoupled draft)
     logger.info(f"[DEBUG] update_user_profile payload: {payload.model_dump(exclude_unset=True)}")
-    exclude_keys = {"validate_entire_form"}
-    address_changed = False
-    for key, value in ordered_profile_items(payload.model_dump(exclude_unset=True)):
-        if key not in exclude_keys:
-            if key in RELATION_KEYS:
-                # Already validated by the request schema, so hand over the model
-                # instances rather than round-tripping the dumped dicts.
-                value = getattr(payload, key)
-            try:
-                if apply_profile_key(db_user, key, value):
-                    continue
-            except ProfileWriteError as exc:
-                raise HTTPException(status_code=422, detail=str(exc)) from exc
-            if key == "displaced_status" and value == "none":
-                value = None
-            if key in DISTRICT_SYNC_FIELDS and getattr(db_user, key) != value:
-                address_changed = True
-            setattr(db_user, key, value)
-
-    if address_changed:
-        db_user.district = sync_berlin_district(
-            db=db,
-            street=db_user.street,
-            house_number=db_user.house_number,
-            zip_code=db_user.zip_code,
-            city=db_user.city,
-        )
+    try:
+        write_profile_payload(db, db_user, payload)
+    except ProfileWriteError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     logger.info(
         f"[DEBUG] db_user attributes updated: street={db_user.street}, house_number={db_user.house_number}, zip_code={db_user.zip_code}, city={db_user.city}, district={db_user.district}"
@@ -142,7 +113,6 @@ def update_user_profile(
     rules_engine_payload = map_flat_to_rules_engine_payload(db_user)
 
     validate_url = f"{ENDPOINT_RULES_ENGINE}/validate-form"
-    eval_url = f"{ENDPOINT_RULES_ENGINE}/wizard/evaluate"
     params = {}
     if payload.validate_entire_form is not None:
         params["validate_entire_form"] = payload.validate_entire_form
@@ -161,24 +131,14 @@ def update_user_profile(
             future_validate = executor.submit(
                 requests.post, validate_url, json=rules_engine_payload, params=params, headers=headers, timeout=10
             )
-            future_evaluate = executor.submit(
-                requests.post,
-                eval_url,
-                json={"form_content": rules_engine_payload["form_content"], "current_step_id": "step_applicant_name"},
-                headers=headers,
-                timeout=10,
-            )
+            future_evaluate = executor.submit(evaluate, evaluation_payload(db_user))
 
             # Wait for validate-form (critical path validation)
             response = future_validate.result()
 
             # Wait for wizard evaluation (optional / non-blocking path)
             try:
-                eval_response = future_evaluate.result()
-                if eval_response.status_code == 200:
-                    wizard_data = eval_response.json().get("evaluation") or {}
-                else:
-                    logger.warning(f"Rules engine /wizard/evaluate returned status: {eval_response.status_code}")
+                wizard_data = future_evaluate.result() or {}
             except Exception as eval_err:
                 logger.warning(f"Failed to fetch wizard evaluation from rules engine: {eval_err}")
 
@@ -202,7 +162,6 @@ def update_user_profile(
                 return JSONResponse(
                     status_code=200,
                     content={
-                        "status": "success",
                         "validation_status": "draft",
                         "rules_warnings": response_data.get("validation_errors") or [],
                         "wizard_evaluation": wizard_data or None,
@@ -215,7 +174,6 @@ def update_user_profile(
 
         # Build combined response on success
         combined_response = {
-            "status": "success",
             "validation_status": "valid",
             "rules_warnings": [],
             "wizard_evaluation": wizard_data or None,
@@ -362,4 +320,4 @@ async def delete_profile(
         logger.error(f"Failed database transaction during account deletion: {db_err}")
         raise HTTPException(status_code=500, detail="Failed to delete account from database.")
 
-    return {"status": "success", "message": "Account deleted successfully"}
+    return {"message": "Account deleted successfully"}

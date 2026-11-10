@@ -17,6 +17,7 @@ import {
 	getSavedProfileFields,
 	FIELD_SECTION,
 	BANK_FIELDS,
+	answeredIncomeEntries,
 } from "./personalData/formDefaults";
 import {
 	PROFILE_CATEGORIES,
@@ -84,7 +85,13 @@ export const PersonalDataEdit: React.FC = () => {
 			return;
 		}
 
-		const value = getValues(fieldName);
+		const value =
+			fieldName === "incomeEntries"
+				? answeredIncomeEntries(
+						getValues("incomeEntries") ?? [],
+						profileData?.financial?.incomeEntries,
+					)
+				: getValues(fieldName);
 		const section = FIELD_SECTION[fieldName] ?? "personalData";
 		const data = (
 			BANK_FIELDS.has(fieldName)
@@ -106,9 +113,7 @@ export const PersonalDataEdit: React.FC = () => {
 				setTimeout(() => setSaveSuccess(false), 1500);
 			} catch (error) {
 				console.error("Failed to auto-save field:", fieldName, error);
-				setSaveError(
-					t("personal.errors.system_error", "A system error occurred"),
-				);
+				setSaveError(t("personal.errors.system_error"));
 			}
 		})();
 
@@ -123,6 +128,10 @@ export const PersonalDataEdit: React.FC = () => {
 		try {
 			const result = await submitProfile({
 				...values,
+				incomeEntries: answeredIncomeEntries(
+					values.incomeEntries ?? [],
+					profileData?.financial?.incomeEntries,
+				),
 				validate_entire_form: false,
 			});
 			if (result?.success) {
@@ -132,9 +141,7 @@ export const PersonalDataEdit: React.FC = () => {
 			}
 		} catch (error) {
 			console.error("Failed to submit profile:", error);
-			setSaveError(
-				t("personal.errors.system_error", "A system error occurred"),
-			);
+			setSaveError(t("personal.errors.system_error"));
 		}
 	};
 
@@ -146,12 +153,7 @@ export const PersonalDataEdit: React.FC = () => {
 	const handleInvalidSubmit = (
 		errors: FieldErrors<CombinedWizardFormValues>,
 	) => {
-		setSaveError(
-			t(
-				"personal.errors.validation_failed",
-				"Bitte prüfe die markierten Angaben.",
-			),
-		);
+		setSaveError(t("personal.errors.validation_failed"));
 
 		const firstField = Object.keys(errors)[0];
 		if (!firstField) {
@@ -197,7 +199,7 @@ export const PersonalDataEdit: React.FC = () => {
 								aria-hidden="true"
 							/>
 							<span className="text-xs font-bold text-slate-800">
-								{t("personal.actions.saving", "Saving...")}
+								{t("personal.actions.saving")}
 							</span>
 						</>
 					) : (
@@ -207,7 +209,7 @@ export const PersonalDataEdit: React.FC = () => {
 								aria-hidden="true"
 							/>
 							<span className="text-xs font-bold text-slate-800">
-								{t("personal.actions.saved", "Saved")}
+								{t("personal.actions.saved")}
 							</span>
 						</>
 					)}
@@ -219,13 +221,10 @@ export const PersonalDataEdit: React.FC = () => {
 					<Pencil className="w-6 h-6 text-slate-700" aria-hidden="true" />
 				</div>
 				<h1 className="text-2xl font-extrabold text-slate-900 tracking-tight lg:text-[32px] lg:leading-10">
-					{t("personal.title", "Persönliche Daten")}
+					{t("personal.title")}
 				</h1>
 				<p className="hidden lg:block text-base text-brand-grey">
-					{t(
-						"personal.subtitle",
-						"Deine Angaben werden für alle Anträge übernommen. Du kannst sie jederzeit ändern.",
-					)}
+					{t("personal.subtitle")}
 				</p>
 			</div>
 
@@ -288,8 +287,8 @@ export const PersonalDataEdit: React.FC = () => {
 							className="lg:w-auto lg:ml-auto"
 						>
 							{isUpdating || isSubmitting
-								? t("common.saving", "Speichern...")
-								: t("common.save_close", "Speichern und schließen")}
+								? t("common.saving")
+								: t("common.save_close")}
 						</PrimaryButton>
 					</div>
 				</form>

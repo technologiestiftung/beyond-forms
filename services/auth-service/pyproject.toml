@@ -5,16 +5,16 @@ description = "A service to manage authentication via Authentik"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi",
-    "uvicorn",
-    "pydantic",
-    "pydantic-settings",
-    "python-dotenv",
-    "authentik-client",
+    "fastapi~=0.159.1",
+    "uvicorn~=0.54.0",
+    "pydantic~=2.14",
+    "pydantic-settings~=2.16",
+    "python-dotenv~=1.2",
+    "authentik-client>=2026.8.5",
     "beyondforms-auth",
-    "requests",
-    "asyncpg",
-    "pyjwt[crypto]",
+    "requests~=2.34",
+    "asyncpg~=0.32.0",
+    "pyjwt[crypto]~=2.15",
 ]
 
 [[tool.uv.index]]
@@ -33,10 +33,10 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pytest",
-    "pytest-asyncio",
-    "httpx",
-    "ruff",
+    "pytest~=9.1",
+    "pytest-asyncio~=1.4",
+    "httpx~=0.28.1",
+    "ruff~=0.17.1",
 ]
 
 [tool.hatch.build.targets.wheel]

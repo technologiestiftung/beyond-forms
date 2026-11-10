@@ -119,7 +119,7 @@ testWithAuthenticatedUser.describe(
 			"Application overview",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard/application/overview");
-				await expect(page.getByTestId("segmented-progress-bar")).toBeVisible();
+				await expect(page.getByTestId("questionnaire-status-list")).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);

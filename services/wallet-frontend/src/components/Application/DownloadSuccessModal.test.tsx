@@ -2,17 +2,6 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { DownloadSuccessModal, WELFARE_OFFICES } from "./DownloadSuccessModal";
 
-vi.mock("react-i18next", () => ({
-	useTranslation: () => ({
-		t: (key: string, defaultText: string) => {
-			if (key === "overview.success_modal.hours_label") {
-				return "Öffnungszeiten:";
-			}
-			return defaultText;
-		},
-	}),
-}));
-
 describe("DownloadSuccessModal", () => {
 	it("renders nothing when closed", () => {
 		const { container } = render(
@@ -27,19 +16,17 @@ describe("DownloadSuccessModal", () => {
 			<DownloadSuccessModal isOpen={true} onClose={onClose} district={null} />,
 		);
 
-		expect(screen.getByText("PDF heruntergeladen!")).toBeDefined();
+		expect(screen.getByText("overview.success_modal.title")).toBeDefined();
+		expect(screen.getByText("overview.success_modal.subtitle")).toBeDefined();
 		expect(
-			screen.getByText(
-				"Dein Antrag liegt auf Deinem Gerät bereit zum Ausdrucken.",
-			),
+			screen.getByText("overview.success_modal.default_office_name"),
 		).toBeDefined();
-		expect(screen.getByText("Zuständiges Sozialamt")).toBeDefined();
 		expect(
-			screen.getByText("Zuständiges Sozialamt online suchen"),
+			screen.getByText("overview.success_modal.default_office_link"),
 		).toBeDefined();
 
 		const ctaButton = screen.getByRole("button", {
-			name: /Zurück zu Antrag auf Grundsicherung/i,
+			name: "overview.success_modal.cta_button",
 		});
 		expect(ctaButton).toBeDefined();
 		fireEvent.click(ctaButton);
@@ -60,7 +47,9 @@ describe("DownloadSuccessModal", () => {
 		expect(screen.getByText(office.name)).toBeDefined();
 		expect(screen.getByText(office.street)).toBeDefined();
 		expect(screen.getByText(office.zipCity)).toBeDefined();
-		expect(screen.getByText("Öffnungszeiten:")).toBeDefined();
+		expect(
+			screen.getByText("overview.success_modal.hours_label"),
+		).toBeDefined();
 
 		office.hours.forEach((hour) => {
 			expect(screen.getByText(hour)).toBeDefined();
@@ -73,7 +62,7 @@ describe("DownloadSuccessModal", () => {
 			<DownloadSuccessModal isOpen={true} onClose={onClose} district={null} />,
 		);
 
-		const closeBtn = screen.getByLabelText("Schließen");
+		const closeBtn = screen.getByLabelText("docs.close_aria");
 		fireEvent.click(closeBtn);
 		expect(onClose).toHaveBeenCalledTimes(1);
 	});

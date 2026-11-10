@@ -11,7 +11,7 @@ export const AddressSection: React.FC<SectionProps> = ({
 	return (
 		<div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-5 w-full">
 			<h2 className="text-sm font-extrabold text-slate-950 tracking-wide uppercase mb-1">
-				{t("personal.groups.address", "Meldeadresse")}
+				{t("personal.groups.address")}
 			</h2>
 			<FormField
 				id="street"
@@ -32,7 +32,7 @@ export const AddressSection: React.FC<SectionProps> = ({
 				label={t("personal.fields.city")}
 				register={register("city")}
 				onBlur={() => handleFieldBlur("city")}
-				placeholderText={`-- ${t("common.please_select", "Bitte auswählen")} --`}
+				placeholderText={`-- ${t("common.please_select")} --`}
 				options={[{ code: "Berlin", name: "Berlin" }]}
 				error={formErrors.city?.message}
 			/>
@@ -41,7 +41,7 @@ export const AddressSection: React.FC<SectionProps> = ({
 				label={t("personal.fields.state")}
 				register={register("state")}
 				onBlur={() => handleFieldBlur("state")}
-				placeholderText={`-- ${t("common.please_select", "Bitte auswählen")} --`}
+				placeholderText={`-- ${t("common.please_select")} --`}
 				options={[{ code: "Berlin", name: "Berlin" }]}
 			/>
 			<FormField

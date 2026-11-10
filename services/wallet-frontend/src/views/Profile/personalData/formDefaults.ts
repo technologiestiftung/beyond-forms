@@ -1,4 +1,4 @@
-import type { Profile } from "../../../schemas/profile.schema";
+import type { IncomeEntry, Profile } from "../../../schemas/profile.schema";
 import type { CombinedWizardFormValues } from "./types";
 
 /**
@@ -9,6 +9,53 @@ import type { CombinedWizardFormValues } from "./types";
 export const emptyStringToUndefinedNumber = (
 	value: string,
 ): number | undefined => (value === "" ? undefined : Number(value));
+
+/** The applicant's income lines the profile page edits, in the order it shows them. */
+export const PROFILE_INCOME_TYPES = [
+	"Old-Age Pension",
+	"Reduced Earning Capacity Pension",
+	"Survivor Pension",
+	"Employment",
+	"Other Self-Employment",
+	"Health Insurance Benefits",
+	"Alimony",
+	"Rental and Leasing",
+];
+
+/** One form row per income line, holding the stored amount if there is one. */
+export const profileIncomeEntries = (stored: IncomeEntry[]): IncomeEntry[] =>
+	PROFILE_INCOME_TYPES.map((incomeType) => ({
+		incomeType,
+		monthlyAmount:
+			stored.find(
+				(row) =>
+					row.incomeType === incomeType &&
+					!Number.isInteger(row.personSortOrder),
+			)?.monthlyAmount ?? null,
+	}));
+
+const hasAmount = (row: IncomeEntry) =>
+	typeof row.monthlyAmount === "number" && !Number.isNaN(row.monthlyAmount);
+
+/**
+ * The rows worth saving: a line left empty is not an answer, unless it held a
+ * stored amount, which clearing sets to 0 since the save only merges rows.
+ */
+export const answeredIncomeEntries = (
+	rows: IncomeEntry[],
+	stored: IncomeEntry[] = [],
+): IncomeEntry[] => {
+	const storedRows = profileIncomeEntries(stored);
+	return rows.flatMap((row) => {
+		if (hasAmount(row)) {
+			return [row];
+		}
+		const storedRow = storedRows.find((s) => s.incomeType === row.incomeType);
+		return storedRow && hasAmount(storedRow)
+			? [{ ...row, monthlyAmount: 0 }]
+			: [];
+	});
+};
 
 /**
  * Flattens what is actually saved, without the placeholder values the selects
@@ -57,7 +104,7 @@ export function getProfileFormDefaults(
 		identificationNumbers: "",
 		taxId: "",
 		state: "Berlin",
-		incomeSources: [],
+		incomeEntries: profileIncomeEntries([]),
 	};
 
 	if (!profileData) {
@@ -88,7 +135,7 @@ export function getProfileFormDefaults(
 		legalGender: personal.legalGender || "Diverse",
 		maritalStatus: personal.maritalStatus || "Single",
 		state: addr.state || "Berlin",
-		incomeSources: financial.incomeSources || [],
+		incomeEntries: profileIncomeEntries(financial.incomeEntries ?? []),
 	};
 }
 
@@ -134,7 +181,7 @@ export const FIELD_SECTION: Record<string, keyof Profile> = {
 	commerciallyUsedAreaSqm: "housing",
 	// financial
 	monthlyIncome: "financial",
-	incomeSources: "financial",
+	incomeEntries: "financial",
 	hasAssets: "financial",
 	assetsDescription: "financial",
 	professionalExpenses: "financial",

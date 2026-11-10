@@ -13,7 +13,14 @@ from src.services.form_service import (
     _extract_required_context_fields,
     _is_context_value_filled,
 )
-from src.services.form_context import age_context, derived_context, money_context, person_context, row_to_dict
+from src.services.form_context import (
+    age_context,
+    derived_context,
+    free_housing_right_context,
+    money_context,
+    person_context,
+    row_to_dict,
+)
 from src.models import (
     AssetEntries,
     AssociatedPersons,
@@ -324,6 +331,31 @@ async def test_fill_form_documents_namespace_isolated_from_users(form_service, m
 
 
 @pytest.mark.asyncio
+async def test_fill_form_formats_document_dates_like_profile_dates(form_service, mock_user):
+    _set_application_query(form_service, _mock_application({}))
+    _set_documents_query(
+        form_service,
+        [_mock_document("identity_document", {"valid_until": "2031-03-14", "id_number": "2024-01-01X"}, "verified")],
+    )
+
+    mock_mapping = {
+        "p1_valid": "{{ documents.identity_document.valid_until ? documents.identity_document.valid_until : '' }}",
+        "p1_id": "{{ documents.identity_document.id_number }}",
+    }
+
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mock_mapping, {}, b"%PDF")),
+        patch("httpx.AsyncClient.post") as mock_post,
+    ):
+        mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
+        await form_service.fill_form("test_form", mock_user)
+
+        values = mock_post.call_args.kwargs["json"]["field_values"]
+        assert values["p1_valid"] == "14.03.2031"
+        assert values["p1_id"] == "2024-01-01X"
+
+
+@pytest.mark.asyncio
 async def test_fill_form_ignores_unverified_documents(form_service, mock_user):
     _set_application_query(form_service, _mock_application({}))
     _set_documents_query(
@@ -454,7 +486,7 @@ async def test_fill_form_resolves_dis_type_from_a_slot_id_document(form_service,
         mock_post.return_value = MagicMock(status_code=200, content=b"PDF")
         await form_service.fill_form("antrag_grundsicherung_im_alter", mock_user)
 
-        assert mock_post.call_args.kwargs["json"]["field_values"]["p1_id_valid"] == "2030-05-19"
+        assert mock_post.call_args.kwargs["json"]["field_values"]["p1_id_valid"] == "19.05.2030"
 
 
 @pytest.mark.asyncio
@@ -751,7 +783,9 @@ async def test_get_completeness_ignores_documents_namespace(form_service, mock_u
         ({"first_name": "Max", "is_care_dependent": True, "care_level": "Level 2"}, (2, 2)),
     ],
 )
-async def test_get_completeness_counts_follow_up_fields_only_when_gate_is_yes(form_service, mock_user, context, expected):
+async def test_get_completeness_counts_follow_up_fields_only_when_gate_is_yes(
+    form_service, mock_user, context, expected
+):
     mock_mapping = {
         "p1_check": "{{ first_name != null ? first_name : '' }}",
         "p1_care": "{{ care_level ? care_level : '' }}",
@@ -796,6 +830,17 @@ def test_person_context_labels_fall_back_without_inventing():
     ctx = person_context([person])
     assert ctx["household_members"][0]["nationality_de"] == "JP"
     assert ctx["household_members"][0]["marital_status_de"] == ""
+
+
+@pytest.mark.parametrize(
+    "holder, first_name, last_name",
+    [("Erika Maria Klar", "Erika Maria", "Klar"), ("Klar", "", "Klar"), (None, "", ""), ("  ", "", "")],
+)
+def test_free_housing_right_holder_is_split_into_first_names_and_surname(holder, first_name, last_name):
+    assert free_housing_right_context(holder) == {
+        "free_housing_right_holder_first_name": first_name,
+        "free_housing_right_holder_last_name": last_name,
+    }
 
 
 def test_age_context_exposes_what_the_dropped_view_derived():
@@ -857,9 +902,7 @@ def _money_rows(person_id=None):
             reference_no="12 345678 K 001",
         ),
         IncomeEntries(person_id=person_id, income_type="Child Benefit", monthly_amount=decimal.Decimal("250.00")),
-        ExpenseEntries(
-            person_id=person_id, expense_type="Health Insurance", monthly_amount=decimal.Decimal("120.50")
-        ),
+        ExpenseEntries(person_id=person_id, expense_type="Health Insurance", monthly_amount=decimal.Decimal("120.50")),
         AssetEntries(
             person_id=person_id, asset_type="Securities", amount=decimal.Decimal("3000"), description="Fondsanteile"
         ),
@@ -872,6 +915,30 @@ def _money_rows(person_id=None):
             office_reference="Wohngeldstelle Mitte / WG-4711",
         ),
     ]
+
+
+def test_money_context_adds_every_pension_kind_into_the_pension_line():
+    """The form has one "Renten/Pensionen" line, while each pension keeps its own row."""
+    ctx = money_context(
+        [
+            IncomeEntries(
+                income_type="Old-Age Pension",
+                monthly_amount=decimal.Decimal("400.00"),
+                awarding_office="DRV Bund",
+            ),
+            IncomeEntries(
+                income_type="Survivor Pension",
+                monthly_amount=decimal.Decimal("200.00"),
+                awarding_office="DRV Berlin-Brandenburg",
+            ),
+            IncomeEntries(income_type="Reduced Earning Capacity Pension", monthly_amount=decimal.Decimal("0")),
+        ],
+        None,
+    )
+
+    assert ctx["income"]["Pension"] == decimal.Decimal("600.00")
+    assert ctx["income"]["Old-Age Pension"] == decimal.Decimal("400.00")
+    assert ctx["income_office"]["Pension"] == "DRV Bund, DRV Berlin-Brandenburg"
 
 
 def test_money_context_keys_grids_by_their_form_row():
@@ -906,9 +973,7 @@ def test_money_context_separates_the_applicant_from_each_person():
     applicant's rows would print the wrong person's income."""
     partner_id = uuid.uuid4()
     rows = _money_rows() + _money_rows(person_id=partner_id)
-    rows.append(
-        IncomeEntries(person_id=partner_id, income_type="Alimony", monthly_amount=decimal.Decimal("300.00"))
-    )
+    rows.append(IncomeEntries(person_id=partner_id, income_type="Alimony", monthly_amount=decimal.Decimal("300.00")))
 
     assert money_context(rows, None)["income"].get("Alimony") is None
     assert money_context(rows, partner_id)["income"]["Alimony"] == decimal.Decimal("300.00")
@@ -1019,8 +1084,7 @@ def test_count_unmapped_required_fields_skips_optional_filled_and_container_entr
 async def test_get_completeness_counts_unmapped_required_fields_as_unfilled(form_service, mock_user, tmp_path):
     form_service.mapping_path = str(tmp_path)
     (tmp_path / "test_form.toml").write_text(
-        '["p1_mapped"]\ntype = "string"\nvalue = "{{ first_name }}"\n\n'
-        '["p1_unmapped"]\ntype = "radio"\nvalue = ""\n',
+        '["p1_mapped"]\ntype = "string"\nvalue = "{{ first_name }}"\n\n["p1_unmapped"]\ntype = "radio"\nvalue = ""\n',
         encoding="utf-8",
     )
     mock_mapping = {"p1_mapped": "{{ first_name }}", "p1_unmapped": ""}

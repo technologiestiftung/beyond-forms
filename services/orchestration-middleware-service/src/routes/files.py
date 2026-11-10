@@ -28,6 +28,7 @@ from src.models import (
     DocumentStatusType,
     IncomeEntries,
     IncomeTypeType,
+    PENSION_INCOME_TYPES,
     UploadedFiles,
     UserApplications,
     UserDocuments,
@@ -72,6 +73,23 @@ class LazyStorageClient:
 
     def __getattr__(self, name: str):
         return getattr(self.client, name)
+
+
+_PENSION_REASON_WORDS = (
+    (IncomeTypeType.REDUCED_EARNING_CAPACITY_PENSION, ("erwerbsminderung", "disab", "reduced earning")),
+    (IncomeTypeType.SURVIVOR_PENSION, ("hinterblieben", "witwe", "witwer", "waise", "survivor", "widow", "orphan")),
+)
+
+
+def pension_kind(reason: Optional[str]) -> IncomeTypeType:
+    """The kind of pension a Rentenbescheid grants, read from its stated reason. A notice
+    that names no other reason counts as an old-age pension, the usual case for
+    Grundsicherung im Alter."""
+    text = (reason or "").lower()
+    for kind, words in _PENSION_REASON_WORDS:
+        if any(word in text for word in words):
+            return kind
+    return IncomeTypeType.OLD_AGE_PENSION
 
 
 def get_storage_client() -> LazyStorageClient:
@@ -234,7 +252,6 @@ def _upload_file_impl(
         "name": new_uploaded_file.name,
         "object_name": new_uploaded_file.object_name,
         "document_id": str(new_user_document.document_id),
-        "status": "success",
     }
 
 
@@ -754,7 +771,7 @@ def verify_document(
 
     if slot_id == "pension_notice":
         # A verified Rentenbescheid proves the applicant has pension income, so make sure
-        # the applicant's 'Pension' row exists, carrying the verified amount when one was
+        # the applicant has a row for its kind of pension, carrying the verified amount when one was
         # confirmed. on_conflict_do_nothing targets the partial unique index on
         # (user_id, income_type) WHERE person_id IS NULL, so this can't race a concurrent
         # verification into a duplicate row the way a separate pre-check + insert could.
@@ -765,12 +782,13 @@ def verify_document(
             except (decimal.InvalidOperation, KeyError, TypeError, ValueError):
                 verified_amount = None
 
+        notice_kind = pension_kind(local_raw_data.get("pension_reason"))
         insert_stmt = (
             pg_insert(IncomeEntries)
             .values(
                 user_id=user.id,
                 person_id=None,
-                income_type=IncomeTypeType.PENSION,
+                income_type=notice_kind,
                 monthly_amount=verified_amount,
             )
             .on_conflict_do_nothing(
@@ -778,19 +796,32 @@ def verify_document(
                 index_where=IncomeEntries.person_id.is_(None),
             )
         )
-        db.execute(insert_stmt)
-
-        if verified_amount is not None:
-            db.query(IncomeEntries).filter(
+        pension_rows = (
+            db.query(IncomeEntries)
+            .filter(
                 IncomeEntries.user_id == user.id,
                 IncomeEntries.person_id.is_(None),
-                IncomeEntries.income_type == IncomeTypeType.PENSION,
-                IncomeEntries.monthly_amount.is_(None),
-            ).update({"monthly_amount": verified_amount})
+                IncomeEntries.income_type.in_(PENSION_INCOME_TYPES),
+            )
+            .all()
+        )
+        # a row with amount 0 records "no pension of that kind", which the notice disproves;
+        # a pension the user already named by kind is the one the notice proves
+        named_rows = [row for row in pension_rows if row.monthly_amount != 0]
+        if not named_rows:
+            own_row = next((row for row in pension_rows if row.income_type == notice_kind), None)
+            if own_row is None:
+                db.execute(insert_stmt)
+            else:
+                own_row.monthly_amount = verified_amount
+        elif verified_amount is not None:
+            open_rows = [row for row in named_rows if row.monthly_amount is None]
+            if len(open_rows) == 1:
+                open_rows[0].monthly_amount = verified_amount
 
     db.commit()
 
-    return {"status": "success"}
+    return {}
 
 
 @router.delete("/api/v1/documents/{document_id}")
@@ -833,4 +864,4 @@ def delete_user_document(
         logger.critical(f"Database metadata delete failed after GCS erasure! Inconsistency risk: {db_err}")
         raise HTTPException(status_code=500, detail="Metadata sync failed.")
 
-    return {"status": "success", "message": "Document deleted successfully"}
+    return {"message": "Document deleted successfully"}

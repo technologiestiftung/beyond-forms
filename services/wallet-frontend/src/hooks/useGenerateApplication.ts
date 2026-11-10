@@ -68,12 +68,7 @@ export function useGenerateApplication(formType: string) {
 			};
 		} catch (err) {
 			console.error(`Failed to generate ${formType}:`, err);
-			setError(
-				t(
-					"sections.applications.generate_error",
-					"Konnte den Antrag nicht generieren. Bitte versuche es später noch einmal.",
-				),
-			);
+			setError(t("sections.applications.generate_error"));
 			return null;
 		} finally {
 			setIsGenerating(false);

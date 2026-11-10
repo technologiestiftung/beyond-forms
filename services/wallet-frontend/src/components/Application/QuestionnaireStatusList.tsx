@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { Check } from "lucide-react";
 import { useProfile } from "../../hooks/useProfile";
+import { StatusPill, type StatusPillTone } from "../ui/StatusPill";
 import {
 	getMappedInformationSections,
 	getActiveSkippedCategories,
@@ -23,46 +24,59 @@ interface QuestionnaireStatusListProps {
 
 interface StatusBadgeProps {
 	locked: boolean;
+	completed?: boolean;
+	started?: boolean;
 	totalQuestions?: number;
 	answeredQuestions?: number;
-	badgeKey?: string;
-	badge?: string;
+	badgeKey: string;
 	t: TFunction;
 }
 
+const ICON_POSITION = "lg:row-start-1 lg:row-span-2 lg:col-start-4";
+
+const BADGE_POSITION =
+	"flex items-center gap-2 mt-0.5 lg:row-start-1 lg:row-span-2 lg:col-start-3 lg:mt-0";
+
 const StatusBadge: React.FC<StatusBadgeProps> = ({
 	locked,
+	completed,
+	started,
 	totalQuestions,
 	answeredQuestions,
 	badgeKey,
-	badge,
 	t,
 }) => {
 	if (locked) {
 		return null;
 	}
 
+	let tone: StatusPillTone = "neutral";
+	if (completed) {
+		tone = "success";
+	} else if (started) {
+		tone = "warning";
+	}
+
 	if (totalQuestions !== undefined && answeredQuestions !== undefined) {
 		return (
-			<div className="flex items-center gap-2 mt-0.5">
-				<span className="px-3 py-0.5 bg-primary-blue-20 rounded-full text-[10px] font-bold text-primary-blue-500 tracking-wider">
-					Fragen: {answeredQuestions}/{totalQuestions}
-				</span>
+			<div className={BADGE_POSITION}>
+				<StatusPill tone={tone} size="compact">
+					{t("questionnaire.questions_count", {
+						answered: answeredQuestions,
+						total: totalQuestions,
+					})}
+				</StatusPill>
 			</div>
 		);
 	}
 
-	if (badgeKey || badge) {
-		return (
-			<div className="flex items-center gap-2 mt-0.5">
-				<span className="px-3 py-0.5 bg-primary-blue-20 rounded-full text-xs text-primary-green-800">
-					{badgeKey ? t(badgeKey, badge ?? "") : badge}
-				</span>
-			</div>
-		);
-	}
-
-	return null;
+	return (
+		<div className={BADGE_POSITION}>
+			<StatusPill tone={tone} size="compact">
+				{t(badgeKey)}
+			</StatusPill>
+		</div>
+	);
 };
 
 interface StatusIconProps {
@@ -74,7 +88,7 @@ const StatusIcon: React.FC<StatusIconProps> = ({ completed, started }) => {
 	if (completed) {
 		return (
 			<div
-				className="size-5 bg-primary-blue-500 rounded-full flex items-center justify-center text-white shrink-0"
+				className={`size-5 bg-primary-blue-500 rounded-full flex items-center justify-center text-white shrink-0 ${ICON_POSITION}`}
 				data-testid="status-completed"
 			>
 				<Check className="size-3.5 stroke-[4]" />
@@ -84,7 +98,7 @@ const StatusIcon: React.FC<StatusIconProps> = ({ completed, started }) => {
 	if (started) {
 		return (
 			<div
-				className="size-5 border border-primary-blue-500 rounded-full flex items-center justify-center text-primary-blue-500 shrink-0"
+				className={`size-5 border border-primary-blue-500 rounded-full flex items-center justify-center text-primary-blue-500 shrink-0 ${ICON_POSITION}`}
 				data-testid="status-started"
 			>
 				<Check className="size-3.5 stroke-[4]" />
@@ -93,7 +107,7 @@ const StatusIcon: React.FC<StatusIconProps> = ({ completed, started }) => {
 	}
 	return (
 		<div
-			className="size-5 border border-slate-300 rounded-full flex items-center justify-center text-slate-300 shrink-0"
+			className={`size-5 border border-slate-300 rounded-full flex items-center justify-center text-slate-300 shrink-0 ${ICON_POSITION}`}
 			data-testid="status-pending"
 		>
 			<Check className="size-3.5 stroke-[2]" />
@@ -107,7 +121,7 @@ export const QuestionnaireStatusList: React.FC<
 	const { t } = useTranslation("application");
 	const { profileData } = useProfile();
 
-	const infoSections = getMappedInformationSections(profileData || {}, t).map(
+	const infoSections = getMappedInformationSections(profileData || {}).map(
 		(section, index, arr) => {
 			const completed = section.completed;
 			const skipped = getActiveSkippedCategories(profileData || {});
@@ -127,21 +141,13 @@ export const QuestionnaireStatusList: React.FC<
 
 	return (
 		<div
-			className="flex flex-col gap-4 w-full min-w-0 max-w-md mx-auto"
+			className="flex flex-col gap-4 w-full min-w-0 max-w-md mx-auto lg:max-w-none"
 			data-testid="questionnaire-status-list"
 		>
 			<div className="flex flex-col gap-4 w-full text-left">
 				<div className="flex flex-col gap-4">
 					{infoSections.length > 0 ? (
 						infoSections.map((section) => {
-							const isCompletedOrStarted = section.completed || section.started;
-							const iconBgClass = isCompletedOrStarted
-								? "bg-brand-muted-bright"
-								: "bg-slate-100";
-							const iconColorClass = isCompletedOrStarted
-								? "text-primary-blue-500"
-								: "text-brand-grey";
-
 							return (
 								<div
 									key={section.id}
@@ -152,32 +158,27 @@ export const QuestionnaireStatusList: React.FC<
 									<button
 										type="button"
 										onClick={() => onCategoryClick?.(section.id)}
-										className="p-3.5 flex items-start gap-3 w-full text-left hover:bg-primary-blue-20/50 transition-colors"
+										className="p-3.5 flex items-start gap-3 w-full text-left hover:bg-primary-blue-20/50 transition-colors lg:px-6 lg:py-5 lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto_auto] lg:items-center lg:gap-x-4 lg:gap-y-0.5"
 									>
-										<div
-											className={`size-12 rounded-xl flex items-center justify-center shrink-0 font-extrabold text-lg ${iconBgClass}`}
-										>
-											<section.icon className={`size-5 ${iconColorClass}`} />
+										<div className="size-12 rounded-xl flex items-center justify-center shrink-0 font-extrabold text-lg bg-primary-blue-20 lg:row-start-1 lg:row-span-2 lg:col-start-1">
+											<section.icon className="size-5 text-primary-blue-500" />
 										</div>
-										<div className="flex flex-col gap-1 pr-2 min-w-0 flex-1">
-											<span className="text-body-lg font-semibold text-brand-black wrap-break-word">
-												{section.titleKey
-													? t(section.titleKey, section.title)
-													: section.title}
+										<div className="flex flex-col gap-1 pr-2 min-w-0 flex-1 lg:contents">
+											<span className="text-body-lg font-semibold text-brand-black wrap-break-word lg:row-start-1 lg:col-start-2">
+												{t(section.titleKey)}
 											</span>
-											{section.subtitleKey || section.subtitle ? (
-												<p className="text-xs text-brand-black leading-relaxed">
-													{section.subtitleKey
-														? t(section.subtitleKey, section.subtitle)
-														: section.subtitle}
-												</p>
-											) : null}
+											<p
+												className={`text-xs text-brand-black leading-relaxed lg:row-start-2 lg:col-start-2 lg:self-start lg:max-w-[60ch] lg:text-body ${section.locked ? "" : "lg:text-brand-grey"}`}
+											>
+												{t(section.subtitleKey)}
+											</p>
 											<StatusBadge
 												locked={!!section.locked}
+												completed={section.completed}
+												started={section.started}
 												totalQuestions={section.totalQuestions}
 												answeredQuestions={section.answeredQuestions}
 												badgeKey={section.badgeKey}
-												badge={section.badge}
 												t={t}
 											/>
 										</div>
@@ -191,7 +192,7 @@ export const QuestionnaireStatusList: React.FC<
 						})
 					) : (
 						<p className="text-center text-xs text-slate-500 font-medium py-8 px-4 bg-white rounded-3xl border border-brand-border-subtle shadow-cards">
-							{t("questionnaire.empty", "Keine Informationen vorhanden")}
+							{t("questionnaire.empty")}
 						</p>
 					)}
 				</div>

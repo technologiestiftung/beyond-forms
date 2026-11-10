@@ -51,11 +51,11 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({
 			>
 				<div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50 shrink-0">
 					<h3 className="font-bold text-slate-800 text-lg">
-						{t("overview.preview_title", "Antragsentwurf Vorschau")}
+						{t("overview.preview_title")}
 					</h3>
 					<button
 						onClick={onClose}
-						aria-label={t("overview.close_modal_button", "Schließen")}
+						aria-label={t("overview.close_modal_button")}
 						className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700 transition-colors cursor-pointer"
 					>
 						<X className="w-4 h-4" />
@@ -65,7 +65,7 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({
 				<div className="flex-1 bg-slate-100 relative flex flex-col items-center justify-center">
 					<iframe
 						src={pdfUrl || ""}
-						title="PDF Vorschau"
+						title={t("overview.pdf_preview_title")}
 						className="w-full h-full border-none"
 					/>
 				</div>
@@ -76,7 +76,7 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({
 						className="w-full sm:w-auto"
 						data-testid={downloadButtonTestId}
 					>
-						{t("overview.download_button", "Herunterladen")}
+						{t("overview.download_button")}
 					</PrimaryButton>
 				</div>
 

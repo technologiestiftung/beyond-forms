@@ -1,5 +1,3 @@
-# services/orchestration-middleware-service/src/constants.py
-
 SLOT_ID_TO_DIS_TYPE = {
     "id_card": "identity_document",
     "registration": "registration_certificate",

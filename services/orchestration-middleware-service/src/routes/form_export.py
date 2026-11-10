@@ -195,6 +195,10 @@ async def export_filled_form(
     try:
         pdf_content = await form_service.fill_form(form_type, db_user)
         filename = _build_export_filename(form_type, db_user)
+        # get_db only closes the session once the background tasks are done, and the scrub
+        # task below sleeps 300 s. This handler only reads, so hand the connection back now;
+        # otherwise every export pins one pooled connection for five minutes.
+        db.close()
         object_name = f"exports/ephemeral/{current_user.user_id}/{uuid.uuid4()}_{filename}"
 
         env_val = os.environ.get("ENV", "development")

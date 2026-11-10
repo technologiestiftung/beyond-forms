@@ -215,9 +215,7 @@ def default_paths(project_root: str) -> Tuple[str, str, str]:
     return (
         os.path.join(project_root, "services/orchestration-middleware-service/src/schemas.py"),
         os.path.join(project_root, "services/orchestration-middleware-service/src/models.py"),
-        os.path.join(
-            project_root, "libs/document-schemas/src/beyondforms/document_schemas/document_types.py"
-        ),
+        os.path.join(project_root, "libs/document-schemas/src/beyondforms/document_schemas/document_types.py"),
     )
 
 
@@ -321,6 +319,11 @@ _DERIVED_DESCRIPTIONS = {
     "sort_order - the list a form's Person 2..N / hhm1..hhmN slots are filled from. The APPLICANT IS NOT "
     "IN THIS LIST, so household_members[0] is the first *other* person.",
     "household_members_count": "How many people household_members holds (the applicant not counted).",
+    "previous_benefits_period_within_last_three_years": "True when the previous benefits period ended "
+    "within the last three years or is still running, false when it ended earlier, null when no end date "
+    "could be parsed.",
+    "household_has_disability": "True when any household member (the applicant not counted) has a disability "
+    "ID, is care dependent or has a care level.",
     "income": "The APPLICANT's monthly income per income line, keyed by income type - e.g. "
     "`{{ income.Pension ? income.Pension : '' }}` for the 'Renten/Pensionen' row. A type the citizen has no "
     "income of is simply absent, which the usual guard reads as falsy. Each person object carries its own "
@@ -487,7 +490,9 @@ def _money_rows_for_person(models, person_id: Any, data: Dict[str, Any]) -> list
         if scalar:
             rows.append(
                 models.IncomeEntries(
-                    person_id=person_id, income_type=models.IncomeTypeType.PENSION, monthly_amount=_decimal_or_none(scalar)
+                    person_id=person_id,
+                    income_type=models.IncomeTypeType.PENSION,
+                    monthly_amount=_decimal_or_none(scalar),
                 )
             )
 

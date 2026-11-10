@@ -91,4 +91,4 @@ def update_progress(
         logger.exception("Failed to update progress")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-    return {"status": "success"}
+    return {}

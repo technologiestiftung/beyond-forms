@@ -218,12 +218,12 @@ export class FileService {
 
 			const data = (await response.json()) as Array<{
 				name: string;
-				status: string;
+				status?: string | null;
 				document_id?: string;
 				error_message?: string;
 			}>;
 			return data.map((item, index) => {
-				if (item.status === "success") {
+				if (item.status !== "failed") {
 					return {
 						success: true,
 						document: {

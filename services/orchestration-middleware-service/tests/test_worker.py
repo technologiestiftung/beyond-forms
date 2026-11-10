@@ -32,11 +32,8 @@ def test_process_message_with_soft_validations(mock_db_session, mock_httpx):
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "status": "success",
-        "data": {
-            "classified_document": {"document_type": "Identity Document"},
-            "extraction_result": {"first_name": "Max", "warnings": ["PAGINATION_MISSING_PAGES", "LEGIBILITY_ISSUES"]},
-        },
+        "classified_document": {"document_type": "Identity Document"},
+        "extraction_result": {"first_name": "Max", "warnings": ["PAGINATION_MISSING_PAGES", "LEGIBILITY_ISSUES"]},
     }
 
     mock_client_instance = MagicMock()
@@ -73,11 +70,8 @@ def test_process_message_without_warnings(mock_db_session, mock_httpx):
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "status": "success",
-        "data": {
-            "classified_document": {"document_type": "Identity Document"},
-            "extraction_result": {"first_name": "Max"},
-        },
+        "classified_document": {"document_type": "Identity Document"},
+        "extraction_result": {"first_name": "Max"},
     }
     mock_client_instance = MagicMock()
     mock_client_instance.post.return_value = mock_response
@@ -105,10 +99,8 @@ def test_process_message_with_user_selected_type_uses_stateless_extract(mock_db_
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "status": "success",
-        "data": {
-            "extracted_data": {"iban": "DE89370400440532013000", "account_balance": "1234.56"},
-        },
+        "iban": "DE89370400440532013000",
+        "account_balance": "1234.56",
     }
 
     mock_client_instance = MagicMock()
@@ -122,7 +114,7 @@ def test_process_message_with_user_selected_type_uses_stateless_extract(mock_db_
     dis_call = mock_client_instance.post.call_args_list[0]
     assert "/api/v1/stateless/extract" in dis_call[0][0]
     assert dis_call[1]["data"]["document_type"] == "bank_statements"
-    assert dis_call[1]["data"]["gcs_uri"] == "gs://test-bucket/test-object"
+    assert dis_call[1]["data"]["gcs-uri"] == "gs://test-bucket/test-object"
 
     update_calls = [
         call for call in mock_db_session.execute.call_args_list if "UPDATE user_documents" in str(call[0][0])

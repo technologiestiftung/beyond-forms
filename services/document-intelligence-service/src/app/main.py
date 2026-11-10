@@ -10,12 +10,11 @@ from typing import Annotated, Optional
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from google.cloud import storage
 
 from app.document_classifier.classifier import init_document_classifier
 from beyondforms.document_schemas.document_registry import document_registry
-from app.utils.web import api_response
 from entity_extractor.extractor import init_entity_extractor
 from app.entity_extractor.system_prompts import (
     ENTITY_EXTRACTION_PROMPT,
@@ -90,38 +89,26 @@ app.add_middleware(
 
 
 # --- Global Exception Handlers ---
-@app.exception_handler(HTTPException)
-async def custom_http_exception_handler(request, exc):
-    return api_response(status_str="error", code=exc.status_code, detail=exc.detail)
-
-
 @app.exception_handler(Exception)
 async def universal_exception_handler(request, exc):
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
-    return api_response(status_str="error", code=500, detail="Internal Server Error")
+    return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 
 
 @app.exception_handler(415)
 async def unsupported_media_type_handler(request, exc):
-    return api_response(
-        status_str="error",
-        code=415,
-        content={"detail": "Unsupported Media Type. Allowed types: application/pdf, image/png, image/jpeg"},
-    )
+    return JSONResponse(status_code=415, content={"detail": "Unsupported Media Type. Allowed types: application/pdf, image/png, image/jpeg"})
 
 
 @app.exception_handler(404)
 async def not_found_handler(request, exc):
-    return api_response(status_str="error", code=404, detail="The requested resource was not found.")
+    return JSONResponse(status_code=404, content={"detail": "The requested resource was not found."})
 
 
 @app.exception_handler(422)
 async def unprocessable_entity_handler(request, exc):
     logger.error(f"Unprocessable Entity: {str(exc)}", exc_info=True)
-    return api_response(
-        status_code=422,
-        content={"detail": "The request could not be processed. Please check the input and try again."},
-    )
+    return JSONResponse(status_code=422, content={"detail": "The request could not be processed. Please check the input and try again."})
 
 
 # --- Routes ---
@@ -135,7 +122,7 @@ async def root():
 
 @app.get("/health")
 async def health():
-    return api_response(status_str="success", code=200)
+    return {"status": "healthy"}
 
 
 @app.get("/self-test", response_class=HTMLResponse)
@@ -147,13 +134,13 @@ async def self_test():
 
 @app.get("/get-available-document-types")
 async def get_available_document_types():
-    return api_response("available-forms", document_registry.list_keys())
+    return {"available-forms": document_registry.list_keys()}
 
 
 @app.get("/get-document-type-definition/{document_type_name}")
 async def get_document_type_definition(document_type_name: str):
     document_type_definition = document_registry.get_or_raise(document_type_name)
-    return api_response("document-type-definition", document_type_definition.model_json_schema())
+    return {"document-type-definition": document_type_definition.model_json_schema()}
 
 
 def _resolve_file_bytes(file: Optional[UploadFile], gcs_uri: Optional[str]) -> tuple[bytes, str]:
@@ -184,11 +171,7 @@ async def classify(
     desired_output_structure: Annotated[Optional[str], Form(alias="desired-output-structure")] = None,
 ):
     if not file and not gcs_uri:
-        return api_response(
-            status_str="error",
-            code=400,
-            detail="Either 'file' or 'gcs_uri' is required",
-        )
+        raise HTTPException(status_code=400, detail="Either 'file' or 'gcs_uri' is required")
 
     try:
         file_bytes, safe_filename = _resolve_file_bytes(file, gcs_uri)
@@ -222,11 +205,7 @@ async def classify(
                 try:
                     schema_dict = json.loads(desired_output_structure)
                 except json.JSONDecodeError:
-                    return api_response(
-                        status_str="error",
-                        code=400,
-                        detail="Invalid dynamic structure schema provided",
-                    )
+                    raise HTTPException(status_code=400, detail="Invalid dynamic structure schema provided")
 
                 from app.entity_extractor.extractor import extract_data_from_document
 
@@ -254,42 +233,32 @@ async def classify(
                 else:
                     return_values["extraction_result"] = extracted_data
 
-        return api_response(data=return_values)
+        return return_values
 
+    except HTTPException:
+        raise
     except Exception as exception:
         logger.error(f"Classification failed: {exception}", exc_info=True)
-        return api_response(status_str="error", code=500, detail="Internal Server Error")
+        return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 
 
 @app.post("/api/v1/stateless/extract")
 async def stateless_extract(
     file: Optional[UploadFile] = File(None),
-    gcs_uri: Annotated[Optional[str], Form()] = None,
+    gcs_uri: Annotated[Optional[str], Form(alias="gcs-uri")] = None,
     schema: Optional[str] = Form(None),
     document_type: Optional[str] = Form(None),
     model_name: Annotated[str, Form(alias="model")] = None,
     wrap_metadata: Annotated[bool, Form(alias="wrap-metadata")] = False,
 ):
     if not file and not gcs_uri:
-        return api_response(
-            status_str="error",
-            code=400,
-            detail="Either 'file' or 'gcs_uri' is required",
-        )
+        raise HTTPException(status_code=400, detail="Either 'file' or 'gcs_uri' is required")
 
     if not schema and not document_type:
-        return api_response(
-            status_str="error",
-            code=400,
-            detail="Either 'schema' or 'document_type' is required",
-        )
+        raise HTTPException(status_code=400, detail="Either 'schema' or 'document_type' is required")
 
     if schema and document_type:
-        return api_response(
-            status_str="error",
-            code=400,
-            detail="Provide either 'schema' or 'document_type', not both",
-        )
+        raise HTTPException(status_code=400, detail="Provide either 'schema' or 'document_type', not both")
 
     doc_model = None
     if document_type:
@@ -297,16 +266,12 @@ async def stateless_extract(
             doc_model = document_registry.get_or_raise(document_type)
             schema_dict = doc_model.model_json_schema()
         except ValueError:
-            return api_response(
-                status_str="error",
-                code=400,
-                detail=f"Unknown document type: {document_type}",
-            )
+            raise HTTPException(status_code=400, detail=f"Unknown document type: {document_type}")
     else:
         try:
             schema_dict = json.loads(schema)
         except json.JSONDecodeError:
-            return api_response(status_str="error", code=400, detail="Invalid JSON schema provided")
+            raise HTTPException(status_code=400, detail="Invalid JSON schema provided")
 
     try:
         file_bytes, safe_filename = _resolve_file_bytes(file, gcs_uri)
@@ -326,7 +291,7 @@ async def stateless_extract(
                 schema_dict=schema_dict,
                 model_name=model_name or os.getenv("GEMINI_MODEL_NAME", "gemini-3.7-flash"),
             )
-            return api_response(data=extraction_res)
+            return {"data": extraction_res}
         else:
             extraction_res = await extract_data_from_document(
                 base64_data=base64_data,
@@ -346,11 +311,13 @@ async def stateless_extract(
                     result_data = filter_to_json_schema_properties(result_data, schema_dict)
                 logger.info(f"Post-filter keys: {list(result_data.keys())}")
 
-            return api_response(data={"extracted_data": result_data})
+            return result_data
 
+    except HTTPException:
+        raise
     except Exception as exception:
         logger.error(f"Stateless extraction failed: {exception}", exc_info=True)
-        return api_response(status_str="error", code=500, detail="Internal Server Error")
+        return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 
 
 if __name__ == "__main__":

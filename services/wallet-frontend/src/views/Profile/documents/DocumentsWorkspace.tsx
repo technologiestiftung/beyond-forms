@@ -63,13 +63,11 @@ export const DocumentsWorkspace: React.FC<DocumentsWorkspaceProps> = ({
 							<h2 className="text-h2 font-bold text-brand-black wrap-break-word">
 								{t(activeCategory.titleKey, {
 									ns: "application",
-									defaultValue: activeCategory.defaultTitle,
 								})}
 							</h2>
 							<p className="text-brand-grey">
 								{t(activeCategory.descriptionKey, {
 									ns: "application",
-									defaultValue: activeCategory.defaultDescription,
 								})}
 							</p>
 						</div>

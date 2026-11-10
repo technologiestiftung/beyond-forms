@@ -23,7 +23,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 		colorVariant === "green" ? "bg-slate-200" : "bg-primary-blue-100";
 
 	return (
-		<div className={`w-full font-sans flex flex-col gap-1.5 mb-6 ${className}`}>
+		<div className={`w-full font-sans flex flex-col gap-1.5 ${className}`}>
 			<div
 				className={`relative w-full h-2 rounded-full overflow-hidden ${trackColorClass}`}
 				role="progressbar"

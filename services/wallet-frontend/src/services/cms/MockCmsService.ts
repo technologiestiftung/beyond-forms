@@ -153,7 +153,7 @@ export class MockCmsService implements ICmsService {
 
 	async updateTutorialProgress(
 		payload: TutorialProgressUpdatePayload,
-	): Promise<{ status: string }> {
+	): Promise<void> {
 		const current = this.getStoredTutorials();
 		const tutorial = current.find((t) => t.id === payload.tutorial_id);
 		if (tutorial) {
@@ -161,6 +161,5 @@ export class MockCmsService implements ICmsService {
 			tutorial.progress.current_step = payload.current_step || null;
 			this.saveTutorials(current);
 		}
-		return { status: "success" };
 	}
 }

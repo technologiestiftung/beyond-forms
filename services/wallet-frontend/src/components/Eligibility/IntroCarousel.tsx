@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { i18nKeys } from "../../i18n/i18nKeys";
 import intro1 from "../../assets/illustrations/intro-1-welcome.svg";
@@ -15,6 +15,7 @@ export const IntroCarousel: React.FC = () => {
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
 	const [activeIndex, setActiveIndex] = useState(0);
+	const tapHintId = useId();
 
 	useEffect(() => {
 		const root = scrollRef.current;
@@ -115,6 +116,9 @@ export const IntroCarousel: React.FC = () => {
 			>
 				{sectionTitle}
 			</h2>
+			<span id={tapHintId} className="sr-only">
+				{t(i18nKeys.start.introCards.tapAdvance)}
+			</span>
 
 			<div
 				ref={scrollRef}
@@ -147,7 +151,7 @@ export const IntroCarousel: React.FC = () => {
 							<button
 								type="button"
 								onClick={advanceToNextSlide}
-								aria-label={t(i18nKeys.start.introCards.tapAdvance)}
+								aria-describedby={tapHintId}
 								className="flex min-h-[450px] h-auto w-full max-w-[297px] cursor-pointer flex-col gap-6 rounded-xl bg-primary-blue-100 p-6 text-left transition-opacity hover:opacity-95 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-blue-500 lg:min-h-0 lg:max-w-none lg:flex-row lg:items-center lg:gap-12 lg:rounded-2xl lg:bg-white lg:p-10 lg:shadow-cards lg:transition-shadow lg:hover:opacity-100 lg:hover:shadow-lg"
 							>
 								<div className="relative flex min-h-[170px] w-full shrink-0 items-center justify-center overflow-visible lg:min-h-[260px] lg:w-[340px]">

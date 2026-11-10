@@ -65,6 +65,6 @@ def test_handle_new_chat(mock_conv_service, mock_db):
     response = client.post("/chat/new")
 
     assert response.status_code == 200
-    assert response.json() == {"status": "success", "message": "Started new chat session"}
+    assert response.json() == {"message": "Started new chat session"}
     mock_conv_service.close_all_in_progress_conversations.assert_called_once()
     mock_db.commit.assert_called_once()

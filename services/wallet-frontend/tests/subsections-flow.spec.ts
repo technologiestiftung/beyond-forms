@@ -231,7 +231,7 @@ test.describe("Questionnaire Subsections E2E & Accessibility Audits", () => {
 		await expect(
 			page.locator("h1:has-text('Sozialhilfeleistung')"),
 		).toBeVisible();
-		await page.getByTestId("option-card-nein").click();
+		await page.getByTestId("option-card-no").click();
 		await page.getByRole("button", { name: "Weiter", exact: true }).click();
 
 		// Page 2: Previous benefits? Wait for Page 1 to hide, then select Nein and click Weiter
@@ -239,31 +239,31 @@ test.describe("Questionnaire Subsections E2E & Accessibility Audits", () => {
 			page.locator("h1:has-text('Sozialhilfeleistung')"),
 		).toBeHidden();
 		await expect(page.locator("h1:has-text('Sozialleistungen')")).toBeVisible();
-		await page.getByTestId("option-card-nein").click();
+		await page.getByTestId("option-card-no").click();
 		await page.getByRole("button", { name: "Weiter", exact: true }).click();
 
 		// Page 3: Pension Status. Wait for Page 2 to hide, then select none and click Weiter
 		await expect(page.locator("h1:has-text('Sozialleistungen')")).toBeHidden();
 		await expect(page.locator("h1:has-text('Rente')")).toBeVisible();
-		await page.getByTestId("option-card-none").click();
+		await page.getByTestId("option-card-no_pension").click();
 		await page.getByRole("button", { name: "Weiter", exact: true }).click();
 
 		// Page 4: Employment Status. Wait for Page 3 to hide, then select nichts davon and click Weiter
 		await expect(page.locator("h1:has-text('Rente')")).toBeHidden();
 		await expect(page.locator("h1:has-text('Erwerbssituation')")).toBeVisible();
-		await page.getByTestId("option-card-nichts_davon").click();
+		await page.getByTestId("option-card-no_employment").click();
 		await page.getByRole("button", { name: "Weiter", exact: true }).click();
 
 		// Page 5: Other regular monthly income. Wait for Page 4 to hide, then select keine einnahmen and click Weiter
 		await expect(page.locator("h1:has-text('Erwerbssituation')")).toBeHidden();
 		await expect(page.locator("h1:has-text('Einnahmen')")).toBeVisible();
-		await page.getByTestId("option-card-keine_einnahmen").click();
+		await page.getByTestId("option-card-no_other_income").click();
 		await page.getByRole("button", { name: "Weiter", exact: true }).click();
 
 		// Page 6: Expected one-time payments. Wait for Page 5 to hide, then select Nein and click Weiter
 		await expect(page.locator("h1:has-text('Einnahmen')")).toBeHidden();
 		await expect(page.locator("h1:has-text('Zahlung')")).toBeVisible();
-		await page.getByTestId("option-card-nein").click();
+		await page.getByTestId("option-card-no").click();
 		await page.getByRole("button", { name: "Weiter", exact: true }).click();
 
 		// Page 7: Bank Details. Wait for Page 6 to hide, then fill in bank details

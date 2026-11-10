@@ -1,10 +1,12 @@
 import datetime
-from typing import Any, Dict, Iterable, List
+import re
+from typing import Any, Callable, Dict, Iterable, List
 
 from src.models import (
     INCOME_TYPE_DE,
     MARITAL_STATUS_DE,
     NATIONALITY_DE,
+    PENSION_INCOME_KEYS,
     AssociatedPersons,
     AssociationType,
     BenefitClaimKindType,
@@ -26,6 +28,62 @@ def _blz_from_iban(iban: Any) -> Any:
     if cleaned[:2] != "DE" or len(cleaned) != 22:
         return None
     return cleaned[4:12]
+
+
+_DATE_RE = re.compile(r"\d{2}\.\d{2}\.\d{4}")
+_ZIP_CITY_RE = re.compile(r"^(\d{5})\s+(.+)$")
+_STREET_RE = re.compile(r"^(.+?)\s+(\d+\s*[a-zA-Z]?(?:\s*[-/]\s*\d+\s*[a-zA-Z]?)?)$")
+
+
+def previous_benefits_context(user_row: Dict[str, Any]) -> Dict[str, Any]:
+    """Splits the free-text period and authority the form asks for field by field. A period
+    with a single date is read as its end, matching how the demo personas record an ongoing
+    claim. The authority is "Name, ..., Straße Nr, PLZ Ort"; whatever does not parse stays
+    whole in the name rather than being guessed into a wrong field."""
+    dates = _DATE_RE.findall(user_row.get("previous_benefits_period") or "")
+    parts = [part.strip() for part in (user_row.get("previous_benefits_authority") or "").split(",") if part.strip()]
+    zip_code = city = street = house_number = None
+    if len(parts) > 2 and (zip_city := _ZIP_CITY_RE.match(parts[-1])) and (street_nr := _STREET_RE.match(parts[-2])):
+        zip_code, city = zip_city.groups()
+        street, house_number = street_nr.groups()
+        parts = parts[:-2]
+    # The profile only says *that* benefits were received, while the Jobcenter form asks
+    # about Bürgergeld/Sozialhilfe specifically. The awarding office is the only hint at the
+    # kind: an unrecognised office stays unknown instead of being read either way.
+    authority = (user_row.get("previous_benefits_authority") or "").lower()
+    if not user_row.get("has_received_previous_benefits"):
+        previous_kind = None
+    elif "jobcenter" in authority:
+        previous_kind = "Bürgergeld"
+    elif "sozialamt" in authority or "amt für soziales" in authority:
+        previous_kind = "Sozialhilfe"
+    elif "wohngeld" in authority:
+        previous_kind = "Wohngeld"
+    else:
+        previous_kind = None
+    # The form asks about the last three years; a claim counts if it ended inside that window
+    # or is still running. No parseable end date leaves the answer open.
+    within_three_years = None
+    if dates:
+        try:
+            until = datetime.datetime.strptime(dates[-1], "%d.%m.%Y").date()
+        except ValueError:
+            until = None
+        if until is not None:
+            today = datetime.date.today()
+            cutoff = today.replace(year=today.year - 3, day=28 if (today.month, today.day) == (2, 29) else today.day)
+            within_three_years = until >= cutoff
+    return {
+        "previous_benefits_kind": previous_kind,
+        "previous_benefits_from": dates[0] if len(dates) > 1 else None,
+        "previous_benefits_until": dates[-1] if dates else None,
+        "previous_benefits_period_within_last_three_years": within_three_years,
+        "previous_benefits_authority_name": ", ".join(parts) or None,
+        "previous_benefits_authority_street": street,
+        "previous_benefits_authority_house_number": house_number,
+        "previous_benefits_authority_zip_code": zip_code,
+        "previous_benefits_authority_city": city,
+    }
 
 
 def row_to_dict(row: Any) -> Dict[str, Any]:
@@ -54,12 +112,17 @@ def person_context(people: List[AssociatedPersons], money_entries: Iterable[Any]
         person = row_to_dict(row)
         person.update(label_context(person))
         person.update(money_context(money_entries if row.id is not None else (), row.id))
+        # `monthly_pension_income` predates the per-person money grid; without this a pension
+        # recorded only there reaches Wohngeld (which reads the column) but not the forms
+        # that read `income`.
+        if person.get("monthly_pension_income") is not None and "Pension" not in person["income"]:
+            person["income"] = {**person["income"], "Pension": person["monthly_pension_income"]}
+            person["has_any_income"] = True
         people.append(person)
+
     partners = [person for person in people if person["association_type"] in PARTNER_TYPES]
     household = [person for person in people if person["lives_in_household"]]
-    household_children = [
-        person for person in household if person["association_type"] == AssociationType.CHILD
-    ]
+    household_children = [person for person in household if person["association_type"] == AssociationType.CHILD]
     return {
         "associated_persons": people,
         "household_members": household,
@@ -67,6 +130,11 @@ def person_context(people: List[AssociatedPersons], money_entries: Iterable[Any]
         # pyjexl 0.3 has no length function.
         "household_members_count": len(household),
         "household_children_count": len(household_children),
+        # pyjexl has no `.some`/lambdas, so the "any household member" test happens here.
+        "household_has_disability": any(
+            person["has_disability_id"] or person["is_care_dependent"] or person["care_level"] is not None
+            for person in household
+        ),
         "associated_persons_count": len(people),
         "partner": partners[0] if partners else None,
     }
@@ -95,6 +163,18 @@ def _claim_rows(claims: Iterable[Any], kind: BenefitClaimKindType) -> List[Dict[
     return [row_to_dict(row) for row in sorted(rows, key=lambda claim: claim.sort_order)]
 
 
+def _with_pension_line(by_type: Dict[str, Any], combine: Callable[[List[Any]], Any]) -> Dict[str, Any]:
+    """Folds every pension kind into `Pension`, the form's single "Renten/Pensionen" line."""
+    values = [value for key, value in by_type.items() if key in PENSION_INCOME_KEYS and value not in (None, "")]
+    if not values:
+        return by_type
+    return {**by_type, "Pension": combine(values)}
+
+
+def _join_distinct(values: List[Any]) -> str:
+    return ", ".join(dict.fromkeys(str(value) for value in values))
+
+
 def money_context(entries: Iterable[Any], person_id: Any) -> Dict[str, Any]:
     """The money grids for exactly one person. `person_id=None` selects the applicant's
     own rows, matching the `person_id IS NULL` convention in the entry tables."""
@@ -109,9 +189,13 @@ def money_context(entries: Iterable[Any], person_id: Any) -> Dict[str, Any]:
         key=lambda row: (row.person_id is not None, str(row.person_id), str(row.id)),
     )
     return {
-        "income": _entries_by_type(income, "income_type", "monthly_amount"),
-        "income_office": _entries_by_type(all_income, "income_type", "awarding_office"),
-        "income_reference": _entries_by_type(all_income, "income_type", "reference_no"),
+        "income": _with_pension_line(_entries_by_type(income, "income_type", "monthly_amount"), sum),
+        "income_office": _with_pension_line(
+            _entries_by_type(all_income, "income_type", "awarding_office"), _join_distinct
+        ),
+        "income_reference": _with_pension_line(
+            _entries_by_type(all_income, "income_type", "reference_no"), _join_distinct
+        ),
         "expenses": _entries_by_type(expenses, "expense_type", "monthly_amount"),
         "expense_notes": _entries_by_type(expenses, "expense_type", "note"),
         "assets": _entries_by_type(assets, "asset_type", "amount"),
@@ -129,6 +213,16 @@ def money_context(entries: Iterable[Any], person_id: Any) -> Dict[str, Any]:
         ],
         "pending_benefit_claims": _claim_rows(claims, BenefitClaimKindType.PENDING_APPLICATION),
         "expected_one_time_payments": _claim_rows(claims, BenefitClaimKindType.EXPECTED_ONE_TIME_PAYMENT),
+    }
+
+
+def free_housing_right_context(holder: Any) -> Dict[str, Any]:
+    """The form asks for the holder's first name and surname separately; the profile keeps
+    one name, read as first names followed by the surname."""
+    *first_names, last_name = (holder or "").split() or [""]
+    return {
+        "free_housing_right_holder_first_name": " ".join(first_names),
+        "free_housing_right_holder_last_name": last_name,
     }
 
 
@@ -160,6 +254,8 @@ def derived_context(
         "today": datetime.date.today(),
         "blz": _blz_from_iban(user_row.get("iban")),
         **age_context(user_row.get("date_of_birth")),
+        **previous_benefits_context(user_row),
+        **free_housing_right_context(user_row.get("free_housing_right_holder")),
         **label_context(user_row),
         **money_context(money_entries, None),
         **person_context(people, money_entries),

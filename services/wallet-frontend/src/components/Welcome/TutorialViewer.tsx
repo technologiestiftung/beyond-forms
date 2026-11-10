@@ -134,8 +134,8 @@ function TutorialStepFlow({ tutorial }: TutorialStepFlowProps) {
 
 					<PrimaryButton onClick={handleNext}>
 						{stepIndex === totalSteps - 1
-							? t("onboarding.tutorial_viewer.finish", "Verstanden")
-							: t("onboarding.tutorial_viewer.next", "Weiter")}
+							? t("onboarding.tutorial_viewer.finish")
+							: t("onboarding.tutorial_viewer.next")}
 					</PrimaryButton>
 				</div>
 			</div>

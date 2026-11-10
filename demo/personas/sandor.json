@@ -10,6 +10,7 @@
   "profile": {
     "first_name": "Sandor",
     "last_name": "Haddad",
+    "email": "sandor.haddad@example.org",
     "date_of_birth": "1965-09-30",
     "place_of_birth": "Aleppo",
     "legal_gender": "Male",
@@ -24,6 +25,8 @@
     "displaced_status": null,
     "residence_status": "Asylberechtigt, Aufenthaltserlaubnis nach § 25 Abs. 1 AufenthG",
     "license_plate": "B-SH 309",
+    "vehicle_make": "VW Polo",
+    "vehicle_year": "2007",
 
     "street": "Boxhagener Straße",
     "house_number": "112",
@@ -41,6 +44,7 @@
     "pension_insurance_no": null,
 
     "is_currently_employed": false,
+    "can_work_at_least_3h_daily": true,
     "ability_to_work": "Fully able",
     "has_permanent_reduction_in_earning_capacity": false,
     "has_inpatient_facility_accommodation": false,
@@ -57,14 +61,17 @@
     "sublet_rent_income": null,
     "rent_paid_until": "2026-07-31",
     "landlord_name": "Boxi Immobilien KG",
-    "heating_type": "Gasetagenheizung",
+    "heating_type": "Gasheizung",
     "free_housing_right_holder": null,
 
     "monthly_income": 290.00,
     "income_entries": [
       { "income_type": "Asylum Seeker Benefits", "monthly_amount": 290.0 }
     ],
-    "has_assets": false,
+    "has_assets": true,
+    "asset_entries": [
+      { "asset_type": "Motor Vehicle", "amount": 900.0, "description": "VW Polo, Baujahr 2007, geschätzter Wert ca. 900 EUR" }
+    ],
     "assets_description": null,
 
     "bank_name": "N26 Bank",
@@ -90,6 +97,7 @@
     "has_costly_medical_nutrition": false,
 
     "identification_numbers": "AR8402715",
+    "azr_number": "130712648503",
     "tax_id": "51 297 806 344",
 
     "is_subsidized_housing": false,
@@ -119,9 +127,14 @@
     "rent_paid_partly_by_third_party": false,
     "receives_rent_contribution_from_others": false,
     "expects_rent_change": false,
-    "wohngeld_payment_to_applicant": false,
+    "wohngeld_payment_to_applicant": true,
     "consents_to_bank_statement_retention": true,
-    "consents_to_registry_verification": true
+    "consents_to_registry_verification": true,
+    "has_unavoidable_special_need": false,
+    "was_self_employed_last_5_years": false,
+    "received_wage_replacement_last_5_years": false,
+    "did_military_or_voluntary_service_last_5_years": false,
+    "cared_for_relatives_last_5_years": false
   },
 
   "applications": [

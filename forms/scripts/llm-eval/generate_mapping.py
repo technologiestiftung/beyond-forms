@@ -33,7 +33,7 @@ _PERSON_REF_RE = re.compile(
 _MAP_REF_RE = re.compile(
     r"(?:(?:partner|(?:household_members|associated_persons)\s*\[\s*\d+\s*\])\.)?"
     r"(income|income_office|income_reference|expenses|expense_notes|assets|asset_descriptions)"
-    r'''(?:\.([a-zA-Z_][a-zA-Z0-9_]*)|\[\s*'([^']*)'\s*\]|\[\s*"([^"]*)"\s*\])'''
+    r"""(?:\.([a-zA-Z_][a-zA-Z0-9_]*)|\[\s*'([^']*)'\s*\]|\[\s*"([^"]*)"\s*\])"""
 )
 _HEADER_RE = re.compile(r"^\[(.+)\]\s*$")
 
@@ -314,9 +314,7 @@ def main() -> None:
     parser.add_argument("--model", default="gemini-3.7-flash", help="LLM model name")
     parser.add_argument("--prompt", default="rich_schema_documents", help="Prompt template file name")
     parser.add_argument("--chunk-size", type=int, default=100, help="Fields submitted per LLM request chunk")
-    parser.add_argument(
-        "--self-correct", action="store_true", help="Run a self-correction pass on JEXL syntax crashes"
-    )
+    parser.add_argument("--self-correct", action="store_true", help="Run a self-correction pass on JEXL syntax crashes")
     parser.add_argument(
         "--overwrite-existing",
         action="store_true",

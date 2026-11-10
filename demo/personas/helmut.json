@@ -9,6 +9,7 @@
   "profile": {
     "first_name": "Helmut",
     "last_name": "Klar",
+    "email": "helmut.klar@example.org",
     "date_of_birth": "1947-02-14",
     "place_of_birth": "Berlin",
     "legal_gender": "Male",
@@ -20,8 +21,8 @@
     "second_nationality": null,
     "has_guardian": false,
     "has_custodian": false,
-    "displaced_status": null,
-    "residence_status": null,
+    "displaced_status": "none",
+    "residence_status": "Citizen",
     "license_plate": "B-HK 142",
     "vehicle_make": "Opel Corsa",
     "vehicle_year": "2004",
@@ -55,8 +56,9 @@
     "cable_tv_costs": 0.0,
     "number_of_rooms": 3,
     "living_area": 68.0,
-    "sublet_room_count": null,
+    "sublet_room_count": 0,
     "sublet_rent_income": 0.0,
+    "rent_arrears_amount": 0.0,
     "rent_paid_until": "2026-07-31",
     "landlord_name": "Wohngenossenschaft Berlin eG",
     "landlord_address": "Torstraße 12, 10119 Berlin",
@@ -64,11 +66,15 @@
     "free_housing_right_holder": null,
     "monthly_income": 650.0,
     "income_entries": [
-      { "income_type": "Pension", "monthly_amount": 650.0 }
+      { "income_type": "Old-Age Pension", "monthly_amount": 650.0 },
+      { "income_type": "Health Insurance Benefits", "monthly_amount": 0.0 },
+      { "income_type": "Alimony", "monthly_amount": 0.0 },
+      { "income_type": "Rental and Leasing", "monthly_amount": 0.0 }
     ],
     "has_assets": true,
     "asset_entries": [
-      { "asset_type": "Savings and Cash", "amount": 5267.56 }
+      { "asset_type": "Savings and Cash", "amount": 5267.56 },
+      { "asset_type": "Motor Vehicle", "amount": 1200.0, "description": "Opel Corsa, Baujahr 2004, geschätzter Wert ca. 1.200 EUR" }
     ],
     "assets_description": null,
     "bank_name": "Sparkasse Musterstadt",
@@ -139,7 +145,12 @@
     "expects_rent_change": false,
     "wohngeld_payment_to_applicant": true,
     "consents_to_bank_statement_retention": true,
-    "consents_to_registry_verification": true
+    "consents_to_registry_verification": true,
+    "has_unavoidable_special_need": false,
+    "was_self_employed_last_5_years": false,
+    "received_wage_replacement_last_5_years": false,
+    "did_military_or_voluntary_service_last_5_years": false,
+    "cared_for_relatives_last_5_years": false
   },
   "applications": [
     {

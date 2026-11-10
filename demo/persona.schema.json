@@ -155,7 +155,7 @@
             "description": "Validated against the document-intelligence schema for this slot's registry type (extra='forbid'). Computed fields such as health_insurance_proof.is_private must NOT appear."
           },
           "user_error_code": {
-            "description": "Only meaningful for failed / ready_for_review documents. These four are the codes DatenPrufenForm.tsx renders a message for.",
+            "description": "Only meaningful for failed / ready_for_review documents. These four are the codes with a review.warnings message in the wallet-frontend profile locales.",
             "enum": [
               "PAGINATION_MISSING_PAGES",
               "LEGIBILITY_ISSUES",

@@ -106,7 +106,6 @@ async def test_stateless_extract_with_metadata_envelope(mock_acompletion):
 
     assert response.status_code == 200
     res_json = response.json()
-    assert res_json["status"] == "success"
 
     data_envelope = res_json["data"]
     assert "extracted_data" in data_envelope

@@ -10,6 +10,7 @@ interface OptionCardProps {
 	onClick: () => void;
 	type?: "radio" | "checkbox";
 	dataTestId?: string;
+	testIdPrefix?: string;
 }
 
 export const OptionCard: React.FC<OptionCardProps> = ({
@@ -20,10 +21,11 @@ export const OptionCard: React.FC<OptionCardProps> = ({
 	onClick,
 	type = "radio",
 	dataTestId,
+	testIdPrefix = "option-card",
 }) => {
 	const { t } = useTranslation("common");
 	const indicatorShape = type === "checkbox" ? "rounded-lg" : "rounded-full";
-	const testId = dataTestId || `option-card-${id}`;
+	const testId = dataTestId || `${testIdPrefix}-${id}`;
 
 	let indicatorStateClasses = "border-slate-300 bg-white";
 	if (selected) {

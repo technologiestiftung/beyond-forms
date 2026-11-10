@@ -37,8 +37,7 @@ export const PersonaPicker: React.FC<PersonaPickerProps> = ({
 			await useAuthStore.getState().login(phone as PhoneNumber);
 			if (useAuthStore.getState().status === "ERROR") {
 				setError(
-					useAuthStore.getState().error ||
-						t("persona_picker.login_failed", "Anmeldung fehlgeschlagen."),
+					useAuthStore.getState().error || t("persona_picker.login_failed"),
 				);
 				return;
 			}
@@ -49,7 +48,7 @@ export const PersonaPicker: React.FC<PersonaPickerProps> = ({
 			}
 		} catch (e) {
 			console.error("Instant persona login failed:", e);
-			setError(t("persona_picker.login_failed", "Anmeldung fehlgeschlagen."));
+			setError(t("persona_picker.login_failed"));
 		}
 	};
 
@@ -83,13 +82,10 @@ export const PersonaPicker: React.FC<PersonaPickerProps> = ({
 		>
 			<div className="mb-8 text-center flex flex-col gap-4">
 				<h1 className="text-brand-black text-h1 font-bold leading-tight m-0 p-0">
-					{t("persona_picker.title", "Wer bist Du?")}
+					{t("persona_picker.title")}
 				</h1>
 				<p className="text-brand-black text-body-lg leading-relaxed m-0 p-0">
-					{t(
-						"persona_picker.subtitle",
-						"Wähle ein Demo-Profil, um Klaro direkt auszuprobieren.",
-					)}
+					{t("persona_picker.subtitle")}
 				</p>
 			</div>
 
@@ -110,7 +106,7 @@ export const PersonaPicker: React.FC<PersonaPickerProps> = ({
 								{persona.displayName}
 							</span>
 							<span className="text-sm text-brand-black/70 truncate">
-								{t(persona.statusKey, persona.fallbackStatus)}
+								{t(persona.statusKey)}
 							</span>
 						</div>
 					</button>
@@ -126,7 +122,7 @@ export const PersonaPicker: React.FC<PersonaPickerProps> = ({
 						<UserPlus className="size-6" />
 					</div>
 					<span className="font-bold text-brand-black text-body-lg">
-						{t("persona_picker.create_new_profile", "Neues Profil erstellen")}
+						{t("persona_picker.create_new_profile")}
 					</span>
 				</button>
 			</div>
@@ -146,7 +142,7 @@ export const PersonaPicker: React.FC<PersonaPickerProps> = ({
 				data-testid="use-phone-instead-link"
 				className="mt-8 text-sm font-bold text-brand-black underline underline-offset-2"
 			>
-				{t("persona_picker.use_phone_instead", "Mit Telefonnummer anmelden")}
+				{t("persona_picker.use_phone_instead")}
 			</button>
 		</div>
 	);

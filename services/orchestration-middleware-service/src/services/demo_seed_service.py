@@ -277,8 +277,17 @@ class DemoSeedService:
         )
         # `reset` nulls the `users` columns rather than deleting the row, so child rows
         # are not swept up by a cascade. Without this the previous persona's household
-        # survives into the next seed.
+        # survives into the next seed. The applicant's own money-grid rows hang off the
+        # user rather than a person, so they need clearing too, or a line dropped from the
+        # persona file lingers in every later seed.
         db_user.associated_persons.clear()
+        db_user.income_entries.clear()
+        db_user.expense_entries.clear()
+        db_user.asset_entries.clear()
+        db_user.benefit_claim_entries.clear()
+        # Deletes must hit the database before the persona's rows are inserted again:
+        # within one flush SQLAlchemy inserts first and would trip the (person, type) index.
+        self.db.flush()
         if reset_tutorials:
             from src.models import UserTutorialStates
 
@@ -359,9 +368,7 @@ class DemoSeedService:
         application = None
         for spec in persona["applications"]:
             _, this_id = self.user_service.get_or_create_user_application(internal_user_id, spec["form_type"])
-            this_app = (
-                self.db.query(UserApplications).filter(UserApplications.application_id == this_id).first()
-            )
+            this_app = self.db.query(UserApplications).filter(UserApplications.application_id == this_id).first()
             this_app.status = spec["status"]
             this_app.form_data = spec.get("form_data", {})
             if application_id is None:

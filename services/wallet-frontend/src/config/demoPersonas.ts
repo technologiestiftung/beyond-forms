@@ -9,7 +9,6 @@ export interface DemoPersona {
 	displayName: string;
 	phoneNumber: string;
 	statusKey: string;
-	fallbackStatus: string;
 	/** What the eligibility check ("bouncer") would have recorded, so the dashboard sorts out non-applicable services. */
 	eligibilityAnswers: Partial<EligibilityCheck>;
 	getProfile: () => ReturnType<typeof buildDemoProfileFromPersona>;
@@ -31,7 +30,6 @@ export const DEMO_PERSONAS: DemoPersona[] = [
 		displayName: "Helmut",
 		phoneNumber: "+493023125102",
 		statusKey: "persona_picker.personas.helmut.status",
-		fallbackStatus: "Alle Dokumente vollständig und verifiziert",
 		eligibilityAnswers: {
 			householdComposition: "COUPLE_NO_CHILDREN",
 			dateOfBirth: "1947-02-14",
@@ -54,7 +52,6 @@ export const DEMO_PERSONAS: DemoPersona[] = [
 		displayName: "Sabine",
 		phoneNumber: "+493023125101",
 		statusKey: "persona_picker.personas.sabine.status",
-		fallbackStatus: "Ein Dokument fehlt noch",
 		eligibilityAnswers: {
 			householdComposition: "SINGLE",
 			dateOfBirth: "1968-04-22",
@@ -78,7 +75,6 @@ export const DEMO_PERSONAS: DemoPersona[] = [
 		displayName: "Sandor",
 		phoneNumber: "+493023125103",
 		statusKey: "persona_picker.personas.sandor.status",
-		fallbackStatus: "Ein Dokument ist unleserlich",
 		eligibilityAnswers: {
 			householdComposition: "SINGLE",
 			dateOfBirth: "1965-09-30",

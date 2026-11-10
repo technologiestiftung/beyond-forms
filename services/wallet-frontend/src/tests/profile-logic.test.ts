@@ -103,7 +103,10 @@ describe("Profile Logic: Completion Percentage", () => {
 			},
 			financial: {
 				hasAppliedForBenefitsAwaitingDecision: false,
-				incomeSources: ["none_pension", "none_other"],
+				incomeEntries: [
+					{ incomeType: "Old-Age Pension", monthlyAmount: 0 },
+					{ incomeType: "Alimony", monthlyAmount: 0 },
+				],
 				areOneTimePaymentsExpected: false,
 				bankDetails: {
 					bankName: "Sparkasse",
@@ -153,7 +156,10 @@ describe("Profile Logic: Completion Percentage", () => {
 			},
 			financial: {
 				hasAppliedForBenefitsAwaitingDecision: false,
-				incomeSources: ["none_pension", "none_other"],
+				incomeEntries: [
+					{ incomeType: "Old-Age Pension", monthlyAmount: 0 },
+					{ incomeType: "Alimony", monthlyAmount: 0 },
+				],
 				areOneTimePaymentsExpected: false,
 				bankDetails: {
 					bankName: "Sparkasse",
@@ -269,7 +275,9 @@ describe("Profile Logic: Completeness Indicator Level (3-Tier Progress Signal)",
 						accomodationType: "Rental Apartment",
 					},
 					financial: {
-						incomeSources: ["pension"],
+						incomeEntries: [
+							{ incomeType: "Old-Age Pension", monthlyAmount: 650 },
+						],
 						hasAssets: false,
 						monthlyIncome: 650,
 						bankDetails: {
@@ -329,7 +337,10 @@ describe("Profile Logic: Completeness Indicator Level (3-Tier Progress Signal)",
 					},
 					financial: {
 						hasAppliedForBenefitsAwaitingDecision: false,
-						incomeSources: ["pension", "none_other"],
+						incomeEntries: [
+							{ incomeType: "Old-Age Pension", monthlyAmount: 650 },
+							{ incomeType: "Alimony", monthlyAmount: 0 },
+						],
 						areOneTimePaymentsExpected: false,
 						bankDetails: {
 							iban: "DE1234567890",

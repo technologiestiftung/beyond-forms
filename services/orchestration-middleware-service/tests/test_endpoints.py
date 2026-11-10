@@ -50,7 +50,11 @@ def override_dependencies(mock_db, mock_user_service):
 def test_get_profile_success(mock_cleanup, mock_db):
     # Setup mock return for User query
     mock_user_id = uuid.uuid4()
-    mock_user = DbUser(id=mock_user_id, phone_number="1234567890")
+    mock_user = DbUser(
+        id=mock_user_id,
+        phone_number="1234567890",
+        income_entries=[IncomeEntries(income_type=IncomeTypeType.OLD_AGE_PENSION, monthly_amount=650)],
+    )
     # Mock chain: db.query(User).filter(...).first()
     mock_db.query.return_value.filter.return_value.first.return_value = mock_user
 
@@ -59,6 +63,16 @@ def test_get_profile_success(mock_cleanup, mock_db):
     assert response.status_code == 200
     data = response.json()
     assert data["phone_number"] == "1234567890"
+    assert data["displaced_status"] is None
+    assert data["income_entries"] == [
+        {
+            "person_sort_order": None,
+            "income_type": "Old-Age Pension",
+            "monthly_amount": "650",
+            "awarding_office": None,
+            "reference_no": None,
+        }
+    ]
 
     # Verify query was called
     mock_db.query.assert_called_with(DbUser)
@@ -112,12 +126,30 @@ def test_update_profile_success(mock_post, mock_db):
     response = client.post("/profile", json=payload)
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json()["validation_status"] == "valid"
 
     # Verify user was updated
     assert mock_user.first_name == "Sandor"
     assert mock_user.last_name == "Miller"
     mock_db.commit.assert_called_once()
+
+
+@patch("requests.post")
+def test_update_profile_persists_wizard_fields(mock_post, mock_db):
+    mock_post.return_value = MagicMock(status_code=200, json=lambda: {"status": "success"})
+    mock_user = DbUser(id=uuid.uuid4(), phone_number="1234567890")
+    mock_db.query.return_value.filter.return_value.first.return_value = mock_user
+
+    payload = {
+        "previous_benefits_authority": "Sozialamt Mitte",
+        "previous_benefits_period": "01/2023 - 12/2024",
+        "previous_benefits_ref_no": "GS-4711",
+        "has_inpatient_facility_accommodation": True,
+    }
+    response = client.post("/profile", json=payload)
+
+    assert response.status_code == 200
+    assert {key: getattr(mock_user, key) for key in payload} == payload
 
 
 @patch("requests.post")
@@ -154,7 +186,7 @@ def test_update_profile_all_fields_success(mock_post, mock_db):
     response = client.post("/profile", json=payload)
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json()["validation_status"] == "valid"
 
     assert mock_user.first_name == "Sandor"
     assert mock_user.last_name == "Miller"
@@ -205,7 +237,7 @@ def test_update_profile_echecker_sync_fields_success(mock_post, mock_db):
     response = client.post("/profile", json=payload)
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json()["validation_status"] == "valid"
 
     assert mock_user.is_resident_in_germany is True
     assert mock_user.has_permanent_reduction_in_earning_capacity is True
@@ -245,7 +277,7 @@ def test_update_profile_health_and_household_fields_success(mock_post, mock_db):
     response = client.post("/profile", json=payload)
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json()["validation_status"] == "valid"
 
     assert mock_user.persons_in_household_count == 3
     assert mock_user.marital_status == "Married"
@@ -262,7 +294,7 @@ def test_update_profile_health_and_household_fields_success(mock_post, mock_db):
     mock_db.commit.assert_called_once()
 
 
-@patch("src.routes.user.sync_berlin_district", autospec=True)
+@patch("src.services.user_service.sync_berlin_district", autospec=True)
 @patch("requests.post")
 def test_update_profile_skips_district_sync_when_address_unchanged(mock_post, mock_sync, mock_db):
     mock_response = MagicMock()
@@ -288,7 +320,7 @@ def test_update_profile_skips_district_sync_when_address_unchanged(mock_post, mo
     assert mock_user.district == "Mitte"
 
 
-@patch("src.routes.user.sync_berlin_district", autospec=True)
+@patch("src.services.user_service.sync_berlin_district", autospec=True)
 @patch("requests.post")
 def test_update_profile_syncs_district_when_address_changes(mock_post, mock_sync, mock_db):
     mock_response = MagicMock()
@@ -341,7 +373,7 @@ def test_update_profile_validate_entire_form(mock_post, mock_db):
     response = client.post("/profile", json=payload)
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json()["validation_status"] == "valid"
 
     # Verify rules engine call params had validate_entire_form=True
     assert mock_post.call_count >= 1
@@ -433,44 +465,6 @@ def test_upload_file_success(mock_storage_client, mock_publish_event, mock_user_
     mock_db.commit.assert_called_once()
 
 
-@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_stateless_chat_success(mock_completion):
-    """
-    Verify the stateless chat endpoint parses payloads and returns responses.
-    """
-    import json
-
-    class MockMessage:
-        def __init__(self, content):
-            self.content = content
-
-    class MockChoice:
-        def __init__(self, content):
-            self.message = MockMessage(content)
-
-    class MockResponse:
-        def __init__(self, content):
-            self.choices = [MockChoice(content)]
-
-    mock_json = json.dumps(
-        {"extracted_data": {"permit_type": "Car"}, "next_question": "What date do you want the permit to start?"}
-    )
-    mock_completion.return_value = MockResponse(mock_json)
-
-    payload = {
-        "staged_data": {"first_name": "Jane"},
-        "recent_history": [{"role": "user", "content": "I want to register my car."}],
-        "target_schema": [{"id": "permit_type", "type": "string", "text": "Permit Type"}],
-    }
-
-    response = client.post("/api/v1/stateless/chat", json=payload)
-
-    assert response.status_code == 200
-    json_response = response.json()
-    assert json_response["extracted_data"]["permit_type"] == "Car"
-    assert json_response["next_question"] == "What date do you want the permit to start?"
-
-
 @patch("httpx.AsyncClient")
 @patch("google.cloud.storage.Client")
 def test_delete_profile_success(mock_storage_client, mock_async_client, mock_db):
@@ -525,7 +519,7 @@ def test_delete_profile_success(mock_storage_client, mock_async_client, mock_db)
         response = client.delete("/profile")
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json() == {"message": "Account deleted successfully"}
 
     # Assert db.delete and commit were called
     mock_db.delete.assert_called_once_with(mock_user)
@@ -591,7 +585,7 @@ def test_delete_profile_no_authentik_token(mock_storage_client, mock_async_clien
         response = client.delete("/profile")
 
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
+    assert response.json() == {"message": "Account deleted successfully"}
 
     # Assert db.delete and commit were called
     mock_db.delete.assert_called_once_with(mock_user)

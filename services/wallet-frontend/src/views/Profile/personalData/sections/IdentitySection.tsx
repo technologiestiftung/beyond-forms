@@ -12,7 +12,7 @@ export const IdentitySection: React.FC<SectionProps> = ({
 	return (
 		<div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-5 w-full">
 			<h2 className="text-sm font-extrabold text-slate-950 tracking-wide uppercase mb-1">
-				{t("personal.groups.identity", "Rechtliche Identität")}
+				{t("personal.groups.identity")}
 			</h2>
 
 			<SelectField
@@ -20,7 +20,7 @@ export const IdentitySection: React.FC<SectionProps> = ({
 				label={t("personal.fields.legalGender")}
 				register={register("legalGender")}
 				onBlur={() => handleFieldBlur("legalGender")}
-				placeholderText={`-- ${t("common.please_select", "Bitte auswählen")} --`}
+				placeholderText={`-- ${t("common.please_select")} --`}
 				options={[
 					{ code: "Female", name: t("personal.gender.Female") },
 					{ code: "Male", name: t("personal.gender.Male") },
@@ -63,7 +63,7 @@ export const IdentitySection: React.FC<SectionProps> = ({
 				label={t("personal.fields.placeOfBirth")}
 				register={register("placeOfBirth")}
 				onBlur={() => handleFieldBlur("placeOfBirth")}
-				placeholderText={`-- ${t("common.please_select", "Bitte auswählen")} --`}
+				placeholderText={`-- ${t("common.please_select")} --`}
 				options={COUNTRY_OPTIONS.map((c) => ({
 					code: c.code,
 					name: t(`personal.countries.${c.code}`),
@@ -72,28 +72,19 @@ export const IdentitySection: React.FC<SectionProps> = ({
 			/>
 			<CheckboxField
 				id="isGermanCitizen"
-				label={t(
-					"personal.fields.isGermanCitizen",
-					"Ich bin deutsche(r) Staatsbürger(in)",
-				)}
+				label={t("personal.fields.isGermanCitizen")}
 				register={register("isGermanCitizen")}
 				onBlur={() => handleFieldBlur("isGermanCitizen")}
 			/>
 			<CheckboxField
 				id="isResidentInGermany"
-				label={t(
-					"personal.fields.isResidentInGermany",
-					"Ich habe meinen gewöhnlichen Aufenthalt in Deutschland",
-				)}
+				label={t("personal.fields.isResidentInGermany")}
 				register={register("isResidentInGermany")}
 				onBlur={() => handleFieldBlur("isResidentInGermany")}
 			/>
 			<CheckboxField
 				id="isVictimOfNationalSocialistPersecution"
-				label={t(
-					"personal.fields.isVictimOfNationalSocialistPersecution",
-					"Ich bin Verfolgte(r) des Nationalsozialismus",
-				)}
+				label={t("personal.fields.isVictimOfNationalSocialistPersecution")}
 				register={register("isVictimOfNationalSocialistPersecution")}
 				onBlur={() => handleFieldBlur("isVictimOfNationalSocialistPersecution")}
 			/>

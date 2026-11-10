@@ -1,7 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { getCategoryStatuses } from "./categories";
-import { getSavedProfileFields, getProfileFormDefaults } from "./formDefaults";
 import type { Profile } from "../../../schemas/profile.schema";
+import {
+	answeredIncomeEntries,
+	getProfileFormDefaults,
+	getSavedProfileFields,
+	profileIncomeEntries,
+} from "./formDefaults";
 
 describe("getCategoryStatuses", () => {
 	it("reports an untouched profile as missing, not partially filled", () => {
@@ -41,5 +46,36 @@ describe("getCategoryStatuses", () => {
 		expect(getCategoryStatuses(getSavedProfileFields(profile)).contact).toBe(
 			"COMPLETE",
 		);
+	});
+});
+
+describe("profile income lines", () => {
+	it("shows every line with its stored amount and saves only filled lines", () => {
+		const rows = profileIncomeEntries([
+			{ incomeType: "Old-Age Pension", monthlyAmount: 650 },
+			{ incomeType: "Alimony", monthlyAmount: 120, personSortOrder: 0 },
+		]);
+
+		expect(rows).toHaveLength(8);
+		expect(rows[0]).toEqual({
+			incomeType: "Old-Age Pension",
+			monthlyAmount: 650,
+		});
+		expect(rows.find((r) => r.incomeType === "Alimony")?.monthlyAmount).toBe(
+			null,
+		);
+		expect(answeredIncomeEntries(rows)).toEqual([rows[0]]);
+	});
+
+	it("saves a cleared stored line as 0", () => {
+		const stored = [{ incomeType: "Alimony", monthlyAmount: 120 }];
+		const rows = profileIncomeEntries(stored).map((row) => ({
+			...row,
+			monthlyAmount: null,
+		}));
+
+		expect(answeredIncomeEntries(rows, stored)).toEqual([
+			{ incomeType: "Alimony", monthlyAmount: 0 },
+		]);
 	});
 });

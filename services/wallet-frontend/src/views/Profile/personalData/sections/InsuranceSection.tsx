@@ -24,14 +24,14 @@ export const InsuranceSection: React.FC<SectionProps> = ({
 	return (
 		<div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-5 w-full">
 			<h2 className="text-sm font-extrabold text-slate-950 tracking-wide uppercase mb-1">
-				{t("personal.groups.insurance", "Versicherung und Erwerbstätigkeit")}
+				{t("personal.groups.insurance")}
 			</h2>
 			<SelectField
 				id="socialSecurityType"
-				label={t("personal.fields.socialSecurityType", "Sozialversicherung")}
+				label={t("personal.fields.socialSecurityType")}
 				register={register("socialSecurityType")}
 				onBlur={() => handleFieldBlur("socialSecurityType")}
-				placeholderText={`-- ${t("common.please_select", "Bitte auswählen")} --`}
+				placeholderText={`-- ${t("common.please_select")} --`}
 				options={SOCIAL_SECURITY_OPTIONS.map((code) => ({
 					code,
 					name: t(`personal.socialSecurityType.${code}`, code),
@@ -39,13 +39,10 @@ export const InsuranceSection: React.FC<SectionProps> = ({
 			/>
 			<SelectField
 				id="healthInsuranceStatus"
-				label={t(
-					"personal.fields.healthInsuranceStatus",
-					"Art der Krankenversicherung",
-				)}
+				label={t("personal.fields.healthInsuranceStatus")}
 				register={register("healthInsuranceStatus")}
 				onBlur={() => handleFieldBlur("healthInsuranceStatus")}
-				placeholderText={`-- ${t("common.please_select", "Bitte auswählen")} --`}
+				placeholderText={`-- ${t("common.please_select")} --`}
 				options={HEALTH_INSURANCE_STATUS_OPTIONS.map((code) => ({
 					code,
 					name: t(`personal.healthInsuranceStatus.${code}`, code),
@@ -53,85 +50,61 @@ export const InsuranceSection: React.FC<SectionProps> = ({
 			/>
 			<FormField
 				id="healthInsuranceProvider"
-				label={t("personal.fields.healthInsuranceProvider", "Krankenkasse")}
+				label={t("personal.fields.healthInsuranceProvider")}
 				register={register("healthInsuranceProvider")}
 				onBlur={() => handleFieldBlur("healthInsuranceProvider")}
 			/>
 			<FormField
 				id="pensionInsuranceProvider"
-				label={t(
-					"personal.fields.pensionInsuranceProvider",
-					"Rentenversicherungsträger",
-				)}
+				label={t("personal.fields.pensionInsuranceProvider")}
 				register={register("pensionInsuranceProvider")}
 				onBlur={() => handleFieldBlur("pensionInsuranceProvider")}
 			/>
 			<FormField
 				id="pensionInsuranceNo"
-				label={t(
-					"personal.fields.pensionInsuranceNo",
-					"Rentenversicherungsnummer",
-				)}
+				label={t("personal.fields.pensionInsuranceNo")}
 				register={register("pensionInsuranceNo")}
 				onBlur={() => handleFieldBlur("pensionInsuranceNo")}
 			/>
 			<CheckboxField
 				id="isCurrentlyEmployed"
-				label={t(
-					"personal.fields.isCurrentlyEmployed",
-					"Ich bin aktuell erwerbstätig",
-				)}
+				label={t("personal.fields.isCurrentlyEmployed")}
 				register={register("isCurrentlyEmployed")}
 				onBlur={() => handleFieldBlur("isCurrentlyEmployed")}
 			/>
 			<CheckboxField
 				id="isStudentOrTrainee"
-				label={t(
-					"personal.fields.isStudentOrTrainee",
-					"Ich bin Schüler(in), Studierende(r) oder Auszubildende(r)",
-				)}
+				label={t("personal.fields.isStudentOrTrainee")}
 				register={register("isStudentOrTrainee")}
 				onBlur={() => handleFieldBlur("isStudentOrTrainee")}
 			/>
 			<CheckboxField
 				id="hasAppliedForAsylumBenefits"
-				label={t(
-					"personal.fields.hasAppliedForAsylumBenefits",
-					"Ich habe Leistungen nach dem Asylbewerberleistungsgesetz beantragt",
-				)}
+				label={t("personal.fields.hasAppliedForAsylumBenefits")}
 				register={register("hasAppliedForAsylumBenefits")}
 				onBlur={() => handleFieldBlur("hasAppliedForAsylumBenefits")}
 			/>
 			<CheckboxField
 				id="hasReceivedPreviousBenefits"
-				label={t(
-					"personal.fields.hasReceivedPreviousBenefits",
-					"Ich habe bereits einmal Sozialleistungen erhalten",
-				)}
+				label={t("personal.fields.hasReceivedPreviousBenefits")}
 				register={register("hasReceivedPreviousBenefits")}
 				onBlur={() => handleFieldBlur("hasReceivedPreviousBenefits")}
 			/>
 			<FormField
 				id="previousBenefitsAuthority"
-				label={t(
-					"personal.fields.previousBenefitsAuthority",
-					"Bewilligende Behörde",
-				)}
+				label={t("personal.fields.previousBenefitsAuthority")}
 				register={register("previousBenefitsAuthority")}
 				onBlur={() => handleFieldBlur("previousBenefitsAuthority")}
 			/>
 			<FormField
 				id="previousBenefitsPeriod"
-				label={t(
-					"personal.fields.previousBenefitsPeriod",
-					"Bewilligungszeitraum",
-				)}
+				label={t("personal.fields.previousBenefitsPeriod")}
 				register={register("previousBenefitsPeriod")}
 				onBlur={() => handleFieldBlur("previousBenefitsPeriod")}
 			/>
 			<FormField
 				id="previousBenefitsRefNo"
-				label={t("personal.fields.previousBenefitsRefNo", "Aktenzeichen")}
+				label={t("personal.fields.previousBenefitsRefNo")}
 				register={register("previousBenefitsRefNo")}
 				onBlur={() => handleFieldBlur("previousBenefitsRefNo")}
 			/>

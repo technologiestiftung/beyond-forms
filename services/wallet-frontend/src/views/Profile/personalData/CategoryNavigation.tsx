@@ -9,10 +9,10 @@ const CATEGORY_STATUS_DOT: Record<CategoryStatus, string> = {
 };
 
 /** Shared with ProfileSectionCard's status pill so both read the same. */
-const CATEGORY_STATUS_LABEL: Record<CategoryStatus, [string, string]> = {
-	COMPLETE: ["status.complete", "Vollständig"],
-	PARTIAL: ["status.partial", "Teilweise vollständig"],
-	MISSING: ["status.missing", "Fehlt noch"],
+const CATEGORY_STATUS_LABEL: Record<CategoryStatus, string> = {
+	COMPLETE: "status.complete",
+	PARTIAL: "status.partial",
+	MISSING: "status.missing",
 };
 
 export interface CategoryNavigationProps {
@@ -36,7 +36,7 @@ export const CategoryNavigation: React.FC<CategoryNavigationProps> = ({
 
 	return (
 		<nav
-			aria-label={t("personal.categories.nav_label", "Kategorien")}
+			aria-label={t("personal.categories.nav_label")}
 			data-testid="profile-category-nav"
 			className="hidden lg:flex lg:flex-col gap-5 self-start max-h-full overflow-y-auto bg-white p-6 rounded-3xl border border-slate-100 shadow-sm"
 		>
@@ -48,7 +48,6 @@ export const CategoryNavigation: React.FC<CategoryNavigationProps> = ({
 					{t("personal.categories.progress", {
 						completed: completedCount,
 						total,
-						defaultValue: `${completedCount} von ${total} Kategorien vollständig`,
 					})}
 				</p>
 				<div
@@ -70,7 +69,7 @@ export const CategoryNavigation: React.FC<CategoryNavigationProps> = ({
 				{PROFILE_CATEGORIES.map((category) => {
 					const isActive = category.id === activeCategoryId;
 					const status = categoryStatuses[category.id] ?? "MISSING";
-					const [statusKey, statusFallback] = CATEGORY_STATUS_LABEL[status];
+					const statusKey = CATEGORY_STATUS_LABEL[status];
 
 					return (
 						<li key={category.id}>
@@ -90,11 +89,9 @@ export const CategoryNavigation: React.FC<CategoryNavigationProps> = ({
 									aria-hidden="true"
 								/>
 								<span className="min-w-0 wrap-break-word">
-									{t(category.labelKey, category.labelFallback)}
+									{t(category.labelKey)}
 									{/* The dot alone encodes status by colour only. */}
-									<span className="sr-only">
-										{` (${t(statusKey, statusFallback)})`}
-									</span>
+									<span className="sr-only">{` (${t(statusKey)})`}</span>
 								</span>
 							</button>
 						</li>
