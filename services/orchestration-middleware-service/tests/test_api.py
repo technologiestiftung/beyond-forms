@@ -959,3 +959,34 @@ def test_delete_conversation(mock_conv_service):
     data = response.json()
     assert data == {"message": "Conversation deleted"}
     mock_conv_service.delete_conversation.assert_called_once_with(conversation_id)
+
+
+@patch("src.routes.llm.save_answer", new_callable=AsyncMock)
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_moves_on_after_a_question_answered_in_the_chat(
+    mock_completion, mock_save_answer, mock_conv_service, mock_conv, profile_row, rules_engine
+):
+    rules_engine.side_effect = [{"next_step": "step_applicant_place_of_birth"}, {"next_step": "step_applicant_name"}]
+    mock_save_answer.return_value = {"card_id": "step_applicant_place_of_birth", "saved": {"place_of_birth": "Berlin"}}
+    streams = iter(
+        [
+            _tool_call_stream(
+                "save_answer", json.dumps({"card_id": "step_applicant_place_of_birth", "answer": "Berlin"})
+            ),
+            _card_stream(_card_args(), call_id="call_card_2"),
+        ]
+    )
+    # the messages list is reused across rounds, so each round's system prompt is read when it is sent
+    system_prompts = []
+
+    async def complete(**kwargs):
+        system_prompts.append(kwargs["messages"][0]["content"])
+        return next(streams)
+
+    mock_completion.side_effect = complete
+
+    response = client.post("/chat/stream", json=_run_input("In Berlin"))
+
+    assert 'Next question: card_id "step_applicant_place_of_birth"' in system_prompts[0]
+    assert 'Next card: card_id "step_applicant_name"' in system_prompts[1]
+    assert [e["type"] for e in _events(response)][-2:] == ["TOOL_CALL_CHUNK", "RUN_FINISHED"]

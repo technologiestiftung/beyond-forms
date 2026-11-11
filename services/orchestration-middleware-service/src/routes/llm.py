@@ -461,6 +461,18 @@ async def _next_card(
     return step_id, prompt, card_inputs(step)
 
 
+async def _offered_question(
+    form_content: Optional[dict], db: Session, user_row: Optional[DbUser], answered_card_ids: set[str]
+) -> tuple[Optional[str], str, list[CardInput]]:
+    """The wizard's next card, or once it has none the form rules' next question."""
+    offered_card, card_instructions, offered_inputs = await _next_card(form_content, answered_card_ids)
+    if offered_card is None and user_row is not None:
+        form_card = await _next_form_card(db, user_row, answered_card_ids)
+        if form_card is not None:
+            return form_card
+    return offered_card, card_instructions, offered_inputs
+
+
 def _card_view(
     tool_call: dict, offered_card: Optional[str], offered_inputs: list[CardInput], already_shown: bool
 ) -> tuple[Optional[dict], Optional[str]]:
@@ -627,11 +639,9 @@ async def handle_chat_stream(
 
         yield encoder.encode(RunStartedEvent(thread_id=thread_id, run_id=run_id))
 
-        offered_card, card_instructions, offered_inputs = await _next_card(form_content, answered_card_ids)
-        if offered_card is None and user_row is not None:
-            form_card = await _next_form_card(db, user_row, answered_card_ids)
-            if form_card is not None:
-                offered_card, card_instructions, offered_inputs = form_card
+        offered_card, card_instructions, offered_inputs = await _offered_question(
+            form_content, db, user_row, answered_card_ids
+        )
         messages = _prepare_chat_messages(context_messages, card_instructions)
 
         for round_num in range(1, MAX_TOOL_CALL_ROUNDS + 1):
@@ -695,6 +705,7 @@ async def handle_chat_stream(
 
                 card_call = None
                 card_view = None
+                answered_in_chat = False
                 for tool_call in tool_calls_list:
                     function_name = tool_call["function"]["name"]
                     if function_name == SHOW_CARD_TOOL_NAME:
@@ -708,6 +719,9 @@ async def handle_chat_stream(
                         result = {"error": card_error}
                     else:
                         result = await _run_server_tool(tool_name_to_function_dict, tool_call)
+                        if function_name == SAVE_ANSWER_TOOL_NAME and isinstance(result, dict) and "saved" in result:
+                            answered_card_ids.add(result.get("card_id"))
+                            answered_in_chat = True
 
                     tool_content = json.dumps(result, default=str)
                     conv_service.add_message(
@@ -736,6 +750,12 @@ async def handle_chat_stream(
                         )
                     )
                     break
+                if answered_in_chat:
+                    # the reply answered the question asked in the chat, so the model moves on to the next one
+                    offered_card, card_instructions, offered_inputs = await _offered_question(
+                        evaluation_payload(user_row) if user_row is not None else None, db, user_row, answered_card_ids
+                    )
+                    messages[0] = _prepare_chat_messages([], card_instructions)[0]
                 continue
 
             if accumulated_content:
