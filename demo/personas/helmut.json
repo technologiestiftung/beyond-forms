@@ -74,7 +74,11 @@
     "has_assets": true,
     "asset_entries": [
       { "asset_type": "Savings and Cash", "amount": 5267.56 },
-      { "asset_type": "Motor Vehicle", "amount": 1200.0, "description": "Opel Corsa, Baujahr 2004, geschätzter Wert ca. 1.200 EUR" }
+      {
+        "asset_type": "Motor Vehicle",
+        "amount": 1200.0,
+        "description": "Opel Corsa, Baujahr 2004, geschätzter Wert ca. 1.200 EUR"
+      }
     ],
     "assets_description": null,
     "bank_name": "Sparkasse Musterstadt",
@@ -126,7 +130,34 @@
         "nationality": "DE",
         "relationship_to_applicant": "Ehefrau",
         "employment_status": "Rentnerin",
-        "monthly_pension_income": 520.0
+        "monthly_pension_income": 520.0,
+        "is_german_citizen": true,
+        "id_document_issuing_authority": "Bezirksamt Tempelhof-Schöneberg von Berlin",
+        "id_document_valid_until": "2031-03-02",
+        "has_guardian": false,
+        "has_custodian": false,
+        "displaced_status": "none",
+        "has_received_previous_benefits": true,
+        "previous_benefits_authority": "Bezirksamt Tempelhof-Schöneberg, Amt für Soziales, Tempelhofer Damm 165, 12099 Berlin",
+        "previous_benefits_period": "30.06.2026",
+        "previous_benefits_ref_no": "GS-TS-2021-4471",
+        "has_disability_id": false,
+        "disability_application_pending": false,
+        "social_security_type": "Pension Insurance",
+        "health_insurance_provider": "AOK Nordost",
+        "health_insurance_status": "Compulsory Insurance",
+        "pension_insurance_provider": "Deutsche Rentenversicherung Bund",
+        "pension_insurance_no": "52 031149 N 506",
+        "is_care_dependent": false,
+        "has_inpatient_facility_accommodation": false,
+        "has_permanent_reduction_in_earning_capacity": false,
+        "can_work_at_least_3h_daily": false,
+        "is_student_or_trainee": false,
+        "has_applied_for_sgb2_benefits": false,
+        "has_applied_for_asylum_benefits": false,
+        "has_child_with_substantial_income": false,
+        "have_parents_substantial_joint_income": false,
+        "reduced_work_capacity_reason": "Rentnerin"
       }
     ],
     "is_wohngeld_first_application": true,
@@ -150,7 +181,11 @@
     "was_self_employed_last_5_years": false,
     "received_wage_replacement_last_5_years": false,
     "did_military_or_voluntary_service_last_5_years": false,
-    "cared_for_relatives_last_5_years": false
+    "cared_for_relatives_last_5_years": false,
+    "previous_address": "Albrechtstraße 31, 12167 Berlin",
+    "sublet_unrentable_reason": "Die Wohnung wird von uns beiden vollständig selbst genutzt.",
+    "has_child_with_substantial_income": false,
+    "have_parents_substantial_joint_income": false
   },
   "applications": [
     {
