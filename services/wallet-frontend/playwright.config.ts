@@ -1,5 +1,22 @@
 /* global process */
+import { mkdirSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { defineConfig, devices } from "@playwright/test";
+
+// Playwright's Firefox before 158 reads the real Firefox app-data folder, which macOS 27
+// protects, and exits with "Could not find profile folder". A home folder of its own keeps
+// it away from that folder. Remove once on Playwright >= 1.65 (microsoft/playwright#42768).
+function firefoxLaunchOptions() {
+	if (process.platform !== "darwin") {
+		return {};
+	}
+	const home = join(tmpdir(), "playwright-firefox-home");
+	mkdirSync(home, { recursive: true });
+	return {
+		launchOptions: { env: { ...process.env, CFFIXED_USER_HOME: home } },
+	};
+}
 
 export default defineConfig({
 	testDir: "./tests",
@@ -25,7 +42,7 @@ export default defineConfig({
 		},
 		{
 			name: "firefox-desktop",
-			use: { ...devices["Desktop Firefox"] },
+			use: { ...devices["Desktop Firefox"], ...firefoxLaunchOptions() },
 		},
 		{
 			name: "webkit-desktop",
