@@ -14,7 +14,7 @@ import aiofiles
 import httpx
 from fastapi import Depends, Request
 from pyjexl import JEXL
-from pyjexl.parser import Identifier, Literal
+from pyjexl.parser import FilterExpression, Identifier, Literal
 from sqlalchemy.exc import DatabaseError, DisconnectionError
 from sqlalchemy.orm import Session
 
@@ -22,6 +22,7 @@ from src.constants import SLOT_ID_TO_DIS_TYPE
 from src.db import get_db
 from src.models import DocumentStatusType, UserApplications, UserDocuments, Users
 from src.services.form_context import derived_context, row_to_dict
+from src.services.form_rules import attachment_parents
 from src.services.berlin_districts import resolve_berlin_district
 from src.utils import get_google_id_token
 
@@ -30,6 +31,8 @@ logger = logging.getLogger(__name__)
 FORM_NAME_PATTERN = re.compile(r"^[a-zA-Z0-9_-]+$")
 _DOCUMENT_REF_RE = re.compile(r"documents\.([a-zA-Z_][a-zA-Z0-9_]*)(?:\.([a-zA-Z_][a-zA-Z0-9_]*))?")
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+# a mapping value that prints one context key as it is, e.g. `{{ street }}` or `{{ street ? street : '' }}`
+_PLAIN_REFERENCE_RE = re.compile(r"^\{\{\s*(\w+)\s*(?:\?\s*\1\s*:\s*''\s*)?\}\}$")
 
 
 def _parse_iso_dates(raw_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -148,6 +151,60 @@ def _count_unmapped_required_fields_at(mapping_file: str, _mtime_ns: int) -> int
         and field_info.get("type") not in (None, "unknown")
         and not field_info.get("optional", False)
     )
+
+
+def _identifier_path(node: Any) -> Optional[tuple]:
+    """`partner.nationality` -> ("partner", "nationality"), `expenses['Rent']` -> ("expenses", "Rent");
+    None for anything that is not a plain chain from the context."""
+    if isinstance(node, Identifier) and not node.relative:
+        base = _identifier_path(node.subject) if node.subject is not None else ()
+        return None if base is None else (*base, node.value)
+    if isinstance(node, FilterExpression) and isinstance(node.expression, Literal) and not node.relative:
+        base = _identifier_path(node.subject)
+        return None if base is None else (*base, node.expression.value)
+    return None
+
+
+def _collect_identifier_paths(node: Any, out: set[tuple]) -> None:
+    if node is None or isinstance(node, Literal):
+        return
+    path = _identifier_path(node)
+    if path is not None:
+        out.add(path)
+        return
+    for field_name in getattr(node, "fields", []):
+        if field_name == "parent":
+            continue
+        value = getattr(node, field_name, None)
+        for item in value if isinstance(value, list) else [value]:
+            _collect_identifier_paths(item, out)
+
+
+@functools.lru_cache(maxsize=None)
+def _mapping_paths(value: str) -> tuple[tuple, ...]:
+    """The context paths a mapping value's JEXL expressions read."""
+    paths: set[tuple] = set()
+    for match in re.finditer(r"\{\{\s*(.*?)\s*\}\}", value, flags=re.DOTALL):
+        try:
+            _collect_identifier_paths(_PATH_JEXL.parse(match.group(1)), paths)
+        except Exception:
+            return ()
+    return tuple(sorted(paths, key=str))
+
+
+_PATH_JEXL = JEXL()
+
+
+def _context_value(context: Dict[str, Any], path: tuple) -> Any:
+    node: Any = context
+    for step in path:
+        if isinstance(node, dict):
+            node = node.get(step)
+        elif isinstance(node, list) and isinstance(step, int) and 0 <= step < len(node):
+            node = node[step]
+        else:
+            return None
+    return node
 
 
 def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set[str]:
@@ -320,33 +377,18 @@ class FormService:
         self.http_client = http_client
         self.jexl = JEXL()
 
-    def _build_base_context(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], Optional[UserApplications]]:
+    def find_application(self, form_type: str, user: Users) -> Optional[UserApplications]:
         """
-        Builds the JEXL context from `Users` columns merged with the matching
-        application's `form_data`. When no row has this exact `form_type`:
-        for "antrag_grundsicherung_im_alter" specifically, first checks the legacy
-        form_type="grundsicherung" (older accounts were written under that name)
-        before falling back further, so a newer, unrelated application can't shadow
-        the legacy Grundsicherung data. Otherwise (or if that legacy lookup also
-        misses), falls back to the user's most recently updated application of any
-        form_type.
+        The application whose `form_data` a form is filled from. When no row has this
+        exact `form_type`: for "antrag_grundsicherung_im_alter" specifically, first checks
+        the legacy form_type="grundsicherung" (older accounts were written under that name)
+        before falling back further, so a newer, unrelated application can't shadow the
+        legacy Grundsicherung data. Otherwise (or if that legacy lookup also misses), falls
+        back to the user's most recently updated application of any form_type.
 
-        Does not include the `documents` namespace; `fill_form` layers that on top
-        using the returned application, since it's the only caller that needs it.
+        An attachment form (Anlage) is filled from the application of the form that links it.
         """
-        user_dict = row_to_dict(user)
-
-        if not user_dict.get("district") and user_dict.get("zip_code"):
-            city = user_dict.get("city", "")
-            if city and city.strip().lower() == "berlin":
-                user_dict["district"] = resolve_berlin_district(
-                    db=self.db,
-                    street=user_dict.get("street"),
-                    house_number=user_dict.get("house_number"),
-                    zip_code=user_dict.get("zip_code"),
-                )
-
-        form_data: Dict[str, Any] = {}
+        form_type = attachment_parents().get(form_type, form_type)
         application: Optional[UserApplications] = None
         try:
             application = (
@@ -388,12 +430,34 @@ class FormService:
                         application.application_id,
                         application.form_type,
                     )
-            if application and application.form_data:
-                form_data = application.form_data
         except DatabaseError:
             logger.warning("Internal database error")
         except DisconnectionError:
             logger.warning("Database is currently not reachable")
+        return application
+
+    def _build_base_context(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], Optional[UserApplications]]:
+        """
+        Builds the JEXL context from `Users` columns merged with the `form_data` of the
+        application `find_application` picks.
+
+        Does not include the `documents` namespace; `fill_form` layers that on top
+        using the returned application, since it's the only caller that needs it.
+        """
+        user_dict = row_to_dict(user)
+
+        if not user_dict.get("district") and user_dict.get("zip_code"):
+            city = user_dict.get("city", "")
+            if city and city.strip().lower() == "berlin":
+                user_dict["district"] = resolve_berlin_district(
+                    db=self.db,
+                    street=user_dict.get("street"),
+                    house_number=user_dict.get("house_number"),
+                    zip_code=user_dict.get("zip_code"),
+                )
+
+        application = self.find_application(form_type, user)
+        form_data: Dict[str, Any] = (application.form_data if application else None) or {}
 
         context = user_dict.copy()
         money_entries = [
@@ -437,9 +501,60 @@ class FormService:
 
     async def fill_form(self, form_type: str, user: Users) -> bytes:
         """
-        Fills a PDF form using a merged JEXL context built from the user profile
-        and the user's most recently updated `user_applications` row for the given
-        `form_type`. The application contributes two namespaces:
+        Fills a PDF form with the values `resolve_field_values` resolves.
+        """
+        filled_values, pdf_bytes = await self.resolve_field_values(form_type, user)
+
+        payload = {
+            "pdf_base64": base64.b64encode(pdf_bytes).decode("utf-8"),
+            "field_values": filled_values,
+            "ignore_read_only": True,
+        }
+
+        headers = {}
+        token = get_google_id_token(self.filler_url)
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+
+        url = f"{self.filler_url}/api/fill"
+        logger.info(f"Calling forms-filling-service at {url}")
+
+        if self.http_client:
+            response = await self.http_client.post(url, json=payload, timeout=60.0, headers=headers)
+        else:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload, timeout=60.0)
+
+        if response.status_code != 200:
+            try:
+                error_data = response.json()
+                detail = error_data.get("detail", str(error_data))
+            except Exception:
+                detail = response.text
+            logger.error(f"Forms filler error: {detail}")
+            raise Exception(f"Forms filler error: {detail}")
+        return response.content
+
+    async def plain_profile_columns(self, form_type: str) -> Dict[str, str]:
+        """The PDF fields whose mapping prints one context key unchanged, and that key. An answer to
+        such a field can be stored in that key instead of beside the mapping."""
+        mapping, _field_types, _pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
+        columns = {}
+        for field_id, val in mapping.items():
+            match = _PLAIN_REFERENCE_RE.match(val.strip()) if isinstance(val, str) else None
+            if match:
+                columns[field_id] = match.group(1)
+        return columns
+
+    async def resolve_field_values(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], bytes]:
+        filled_values, _answered, pdf_bytes = await self.resolve_field_state(form_type, user)
+        return filled_values, pdf_bytes
+
+    async def resolve_field_state(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], set[str], bytes]:
+        """
+        Resolves every PDF field of a form from a merged JEXL context built from the
+        user profile and the user's most recently updated `user_applications` row for
+        the given `form_type`. The application contributes two namespaces:
 
         * `form_data` (JSONB) — form-specific data collected via the LLM
         * `documents` — a map of `document_type` to the most recently verified
@@ -448,7 +563,12 @@ class FormService:
 
         On top-level key collision, `Users` columns take precedence over
         `form_data`. The `documents` namespace is isolated from `Users` columns
-        to avoid name collisions.
+        to avoid name collisions. A field the mapping leaves empty takes the answer
+        the chat saved for it in `form_data["pdf_fields"][form_type]`.
+
+        Checkboxes resolve to a bool, every other field to a string. Also returns the fields the
+        profile has answered: those whose mapping reads only values that are set, so an unticked box
+        whose column says "no" counts as answered while one whose column is empty does not.
         """
         mapping, field_types, pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
         needed_refs = _extract_document_refs(mapping)
@@ -497,9 +617,15 @@ class FormService:
                 logger.warning("Database is currently not reachable")
 
         context["documents"] = documents_ctx
+        form_data = (application.form_data if application else None) or {}
+        chat_answers = (form_data.get("pdf_fields") or {}).get(form_type) or {}
 
         filled_values = {}
+        answered: set[str] = set()
         for field_id, default_value in mapping.items():
+            paths = _mapping_paths(default_value) if isinstance(default_value, str) else ()
+            if paths and all(_context_value(context, path) not in (None, "") for path in paths):
+                answered.add(field_id)
             # Check if the field is a checkbox by checking parsed field types
             is_checkbox = field_types.get(field_id) == "checkbox"
 
@@ -532,6 +658,9 @@ class FormService:
             else:
                 res = default_value
 
+            if res in (None, "", False) and field_id in chat_answers:
+                res = chat_answers[field_id]
+
             # Coerce values depending on whether the field is a checkbox
             if is_checkbox:
                 res = False if res in (None, False, "", "False", "false", "0", "Off", "off") else True
@@ -549,35 +678,7 @@ class FormService:
 
             filled_values[field_id] = res
 
-        payload = {
-            "pdf_base64": base64.b64encode(pdf_bytes).decode("utf-8"),
-            "field_values": filled_values,
-            "ignore_read_only": True,
-        }
-
-        headers = {}
-        token = get_google_id_token(self.filler_url)
-        if token:
-            headers["Authorization"] = f"Bearer {token}"
-
-        url = f"{self.filler_url}/api/fill"
-        logger.info(f"Calling forms-filling-service at {url}")
-
-        if self.http_client:
-            response = await self.http_client.post(url, json=payload, timeout=60.0, headers=headers)
-        else:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(url, json=payload, timeout=60.0)
-
-        if response.status_code != 200:
-            try:
-                error_data = response.json()
-                detail = error_data.get("detail", str(error_data))
-            except Exception:
-                detail = response.text
-            logger.error(f"Forms filler error: {detail}")
-            raise Exception(f"Forms filler error: {detail}")
-        return response.content
+        return filled_values, answered, pdf_bytes
 
 
 def get_form_service(request: Request, db: Session = Depends(get_db)) -> FormService:

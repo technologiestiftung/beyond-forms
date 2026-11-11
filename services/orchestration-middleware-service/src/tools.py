@@ -1,6 +1,7 @@
 from src.chat_cards import MAX_TEXT_LENGTH
 
 SHOW_CARD_TOOL_NAME = "show_card"
+SAVE_ANSWER_TOOL_NAME = "save_answer"
 
 AVAILABLE_TOOLS = [
     {
@@ -60,6 +61,26 @@ AVAILABLE_TOOLS = [
                     "question": {"type": "string"},
                 },
                 "required": ["question"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": SAVE_ANSWER_TOOL_NAME,
+            "description": "Saves the user's answer to the question the system prompt says to ask in the chat "
+            "instead of showing a card.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "card_id": {"type": "string", "description": "The card_id the system prompt names"},
+                    "answer": {
+                        "type": "string",
+                        "maxLength": MAX_TEXT_LENGTH,
+                        "description": "The user's answer, as they gave it",
+                    },
+                },
+                "required": ["card_id", "answer"],
             },
         },
     },

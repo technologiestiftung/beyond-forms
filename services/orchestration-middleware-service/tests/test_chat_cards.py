@@ -238,3 +238,31 @@ def test_evaluation_payload_adds_up_income_rows_and_keeps_unanswered_lines_missi
     assert income["income_pension"] == 600.0
     assert income["income_alimony"] == 0.0
     assert "income_rental_income" not in income
+
+
+def test_a_single_free_text_input_is_asked_in_the_chat_instead_of_a_card():
+    prompt = card_prompt("step_applicant_place_of_birth", rules_steps()["step_applicant_place_of_birth"])
+    assert "save_answer" in prompt and "show_card" not in prompt
+    assert "show_card" in card_prompt("step_applicant_name", rules_steps()["step_applicant_name"])
+
+
+def test_a_card_for_a_question_asked_in_the_chat_is_refused():
+    from src.routes.llm import _card_view
+
+    step_id = "step_applicant_place_of_birth"
+    call = {"function": {"arguments": f'{{"card_id": "{step_id}", "question": "Wo?", "labels": {{}}}}'}}
+    view, error = _card_view(call, step_id, card_inputs(rules_steps()[step_id]), already_shown=False)
+    assert view is None and "save_answer" in error
+
+
+@pytest.mark.asyncio
+async def test_save_answer_saves_the_reply_like_the_card_would():
+    from unittest.mock import patch
+
+    from src.routes.llm import save_answer
+
+    with patch("src.routes.llm.write_profile_payload") as write_profile:
+        result = await save_answer("step_applicant_place_of_birth", " Berlin ", MagicMock(), MagicMock(), MagicMock())
+    assert result == {"card_id": "step_applicant_place_of_birth", "saved": {"place_of_birth": " Berlin "}}
+    assert write_profile.call_args.args[2].model_dump(exclude_unset=True) == {"place_of_birth": "Berlin"}
+    assert "error" in await save_answer("step_applicant_name", "Helmut", MagicMock(), MagicMock(), MagicMock())
