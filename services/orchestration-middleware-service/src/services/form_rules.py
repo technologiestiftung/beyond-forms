@@ -2,8 +2,8 @@
 The rule files `forms/scripts/extract_form_rules.py` derives from a PDF (`schemas/rules/<form>.rules.json`):
 which PDF fields form one question, what each means and when the question applies, as CEL over the
 values `FormService.resolve_field_values` resolves. A document with a `form_id` links an attachment
-form (Anlage) whose questions are asked whenever its condition holds. Once no wizard card is due, the
-chat shows the first open group as a card.
+form (Anlage) whose questions are asked whenever its condition holds. The chat asks the first open
+group next: as a card where there are options to pick from, otherwise in the chat.
 """
 
 import datetime

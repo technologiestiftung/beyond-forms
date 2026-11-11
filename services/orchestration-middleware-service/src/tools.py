@@ -74,14 +74,13 @@ AVAILABLE_TOOLS = [
                 "type": "object",
                 "properties": {
                     "card_id": {"type": "string", "description": "The card_id the system prompt names"},
-                    "answer": {
-                        "type": "string",
-                        "maxLength": MAX_TEXT_LENGTH,
-                        "description": "The user's answer, as they gave it; empty if they have nothing to "
-                        "enter for an optional question",
+                    "values": {
+                        "type": "object",
+                        "description": "The answer per key the system prompt lists, in the format it names; "
+                        "leave out an optional key the user has nothing for",
                     },
                 },
-                "required": ["card_id", "answer"],
+                "required": ["card_id", "values"],
             },
         },
     },

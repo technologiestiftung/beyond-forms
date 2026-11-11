@@ -90,7 +90,7 @@ Gemini sees each page with every field's number drawn onto its box. The AcroForm
 
 The script writes nothing if a page still fails.
 
-The mapping TOML stays the only link to the database. A field counts as filled when its mapping resolves non-empty (`FormService.resolve_field_values`). Once no wizard card is due, the chat shows the first open group of `antrag_grundsicherung_im_alter`, then of each Anlage it requires, as a card. The model words the card's question and labels from the group's field meanings. A question that may stay empty is asked once and offers "none of these".
+The mapping TOML stays the only link to the database. A field counts as filled when its mapping resolves non-empty (`FormService.resolve_field_values`). These rules alone decide what the chat asks next: the first open group of `antrag_grundsicherung_im_alter`, then of each Anlage it requires. A group with options to pick from is shown as a card; one of free inputs (text, dates, amounts) is asked in the chat and saved with `save_answer`. The model words the question and labels from the group's field meanings. A question that may stay empty is asked once and offers "none of these".
 
 Where a card answer is stored depends on the field's mapping:
 

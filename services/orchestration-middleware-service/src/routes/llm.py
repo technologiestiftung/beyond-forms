@@ -34,15 +34,11 @@ from src.tools import AVAILABLE_TOOLS, SAVE_ANSWER_TOOL_NAME, SHOW_CARD_TOOL_NAM
 from src.chat_cards import (
     APPLICATION_DONE_PROMPT,
     CardInput,
+    asked_in_chat,
     build_inputs_view,
-    card_inputs,
-    card_prompt,
     input_errors,
     inputs_prompt,
-    is_text_question,
-    validate_card_answer,
 )
-from src.services.wizard_rules import evaluate, evaluation_payload, rules_steps
 from src.services.form_rules import (
     attachment_parents,
     card_id as form_card_id,
@@ -88,10 +84,7 @@ _ENUM_ALLOWED_VALUES: dict[str, str] = {
 MAX_TOOL_CALL_ROUNDS = 5
 CHAT_CONTEXT_WINDOW_SIZE = int(os.getenv("CHAT_CONTEXT_WINDOW_SIZE", "20"))
 MAX_CARD_ANSWER_LENGTH = 4000
-# the rules engine answers from a local decision tree in milliseconds; past this the reply
-# goes out without a card instead of keeping the user waiting
-CARD_EVALUATION_TIMEOUT_SECONDS = 3
-# the PDF form whose rules (`schemas/rules/<form>.rules.json`) pick the next card once the wizard has none
+# the PDF form whose rules (`schemas/rules/<form>.rules.json`) pick every next question
 FORM_RULES_FORM_ID = "antrag_grundsicherung_im_alter"
 ANSWERED_AGAIN_PROMPT = (
     "\nThe user already answered this card, but it is not complete yet: show it again and say what is missing."
@@ -238,16 +231,18 @@ async def _open_form_groups(db: Session, user_row: DbUser) -> list[tuple[str, di
 
 
 async def _next_form_card(
-    db: Session, user_row: DbUser, answered_card_ids: set[str]
-) -> Optional[tuple[str, str, list[CardInput]]]:
+    db: Session, user_row: Optional[DbUser], answered_card_ids: set[str]
+) -> tuple[Optional[str], str, list[CardInput]]:
     """The first open group of the form rules as a card, what the model is told about it, and its inputs."""
+    if user_row is None:
+        return None, "", []
     try:
         open_groups = await _open_form_groups(db, user_row)
     except Exception:
         logger.warning("Could not resolve the fields of %s", FORM_RULES_FORM_ID, exc_info=True)
-        return None
+        return None, "", []
     if not open_groups:
-        return None
+        return None, APPLICATION_DONE_PROMPT, []
     form_id, group = open_groups[0]
     offered = form_card_id(form_id, group["id"])
     inputs = group_inputs(group)
@@ -442,37 +437,6 @@ def _load_user_row(db: Session, user_service: UserService, current_user: AuthUse
         return None
 
 
-async def _next_card(
-    form_content: Optional[dict], answered_card_ids: set[str]
-) -> tuple[Optional[str], str, list[CardInput]]:
-    """The step the rules engine stops at, if it is a card, what the model is told about it, and its inputs."""
-    if form_content is None:
-        return None, "", []
-    evaluation = await asyncio.to_thread(evaluate, form_content, CARD_EVALUATION_TIMEOUT_SECONDS)
-    step_id = (evaluation or {}).get("next_step")
-    if step_id == "END":
-        return None, APPLICATION_DONE_PROMPT, []
-    step = rules_steps().get(step_id, {})
-    if not step.get("columns"):
-        return None, "", []
-    prompt = card_prompt(step_id, step)
-    if step_id in answered_card_ids:
-        prompt += ANSWERED_AGAIN_PROMPT
-    return step_id, prompt, card_inputs(step)
-
-
-async def _offered_question(
-    form_content: Optional[dict], db: Session, user_row: Optional[DbUser], answered_card_ids: set[str]
-) -> tuple[Optional[str], str, list[CardInput]]:
-    """The wizard's next card, or once it has none the form rules' next question."""
-    offered_card, card_instructions, offered_inputs = await _next_card(form_content, answered_card_ids)
-    if offered_card is None and user_row is not None:
-        form_card = await _next_form_card(db, user_row, answered_card_ids)
-        if form_card is not None:
-            return form_card
-    return offered_card, card_instructions, offered_inputs
-
-
 def _card_view(
     tool_call: dict, offered_card: Optional[str], offered_inputs: list[CardInput], already_shown: bool
 ) -> tuple[Optional[dict], Optional[str]]:
@@ -481,7 +445,7 @@ def _card_view(
     args = _tool_args(tool_call)
     if offered_card is None or args.get("card_id") != offered_card:
         return None, f"Unknown card_id: {args.get('card_id')}"
-    if is_text_question(offered_inputs):
+    if asked_in_chat(offered_inputs):
         return None, "Ask this question in the chat instead and save the reply with save_answer."
     view, errors = build_inputs_view(offered_card, offered_inputs, args)
     if errors:
@@ -503,27 +467,29 @@ async def _run_server_tool(tool_name_to_function_dict: dict, tool_call: dict):
 
 
 async def _card_inputs(db: Session, user_row: DbUser, card_id: str) -> Optional[list[CardInput]]:
-    """The inputs the card offered next would have, or None if it is not the one offered next."""
-    if parse_form_card_id(card_id):
-        form_card = await _next_form_card(db, user_row, set())
-        return form_card[2] if form_card and form_card[0] == card_id else None
-    step = rules_steps().get(card_id)
-    return card_inputs(step) if step else None
+    """The inputs of the question offered next, or None if `card_id` is not the one offered next."""
+    offered, _prompt, inputs = await _next_form_card(db, user_row, set())
+    return inputs if offered is not None and offered == card_id else None
 
 
 async def save_answer(
-    card_id: str, answer: str, db: Session, user_row: Optional[DbUser], user_service: UserService
+    card_id: str, values: dict, db: Session, user_row: Optional[DbUser], user_service: UserService
 ) -> dict:
-    """Saves the reply to a question asked in the chat, the same way as the card it replaces."""
+    """Saves the reply to a question asked in the chat, the same way as a card answer."""
     inputs = await _card_inputs(db, user_row, card_id) if user_row is not None else None
-    if not inputs or not is_text_question(inputs):
+    if not inputs or not asked_in_chat(inputs):
         return {"error": f"{card_id} is not a question to answer in the chat; show its card instead"}
-    skipped = inputs[0].optional and not (answer or "").strip()
+    if not isinstance(values, dict):
+        return {"error": "values must be an object keyed by the question's keys"}
+    optional = {i.key for i in inputs if i.optional}
+    # an optional key the user has nothing for is saved as skipped, so it is not asked again
+    values = {
+        key: None if key in optional and isinstance(value, str) and not value.strip() else value
+        for key, value in values.items()
+    }
     card_call = {"function": {"arguments": json.dumps({"card_id": card_id})}}
     try:
-        saved = await _save_card_answer(
-            db, user_row, user_service, card_call, json.dumps({"values": {inputs[0].key: None if skipped else answer}})
-        )
+        saved = await _save_card_answer(db, user_row, user_service, card_call, json.dumps({"values": values}))
     except HTTPException as exc:
         return {"error": exc.detail}
     return json.loads(saved)
@@ -538,20 +504,9 @@ async def _save_card_answer(
         values = json.loads(content).get("values")
     except (json.JSONDecodeError, AttributeError):
         values = None
-    if parse_form_card_id(card_id) and user_row is not None:
-        await _save_form_card_answer(db, user_row, user_service, card_id, values)
-        return json.dumps({"card_id": card_id, "saved": values}, default=str)
-    step = rules_steps().get(card_id)
-    if not step or user_row is None:
+    if not parse_form_card_id(card_id) or user_row is None:
         raise HTTPException(status_code=422, detail="This card can't be saved")
-    payload, errors = validate_card_answer(step, values)
-    if errors:
-        raise HTTPException(status_code=422, detail="; ".join(errors))
-    try:
-        write_profile_payload(db, user_row, payload)
-    except ProfileWriteError as exc:
-        db.rollback()
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    await _save_form_card_answer(db, user_row, user_service, card_id, values)
     return json.dumps({"card_id": card_id, "saved": values}, default=str)
 
 
@@ -616,9 +571,6 @@ async def handle_chat_stream(
 
     context_messages = conv_service.get_conversation_context(conversation_id, limit=CHAT_CONTEXT_WINDOW_SIZE)
 
-    # evaluation_payload may lazy-load income rows on `db`, which the worker thread in
-    # _next_card must not touch, so only the finished dict is handed over
-    form_content = evaluation_payload(user_row) if user_row is not None else None
     answered_card_ids = _answered_card_ids(context_messages)
     available_tools = AVAILABLE_TOOLS
 
@@ -639,9 +591,7 @@ async def handle_chat_stream(
 
         yield encoder.encode(RunStartedEvent(thread_id=thread_id, run_id=run_id))
 
-        offered_card, card_instructions, offered_inputs = await _offered_question(
-            form_content, db, user_row, answered_card_ids
-        )
+        offered_card, card_instructions, offered_inputs = await _next_form_card(db, user_row, answered_card_ids)
         messages = _prepare_chat_messages(context_messages, card_instructions)
 
         for round_num in range(1, MAX_TOOL_CALL_ROUNDS + 1):
@@ -752,8 +702,8 @@ async def handle_chat_stream(
                     break
                 if answered_in_chat:
                     # the reply answered the question asked in the chat, so the model moves on to the next one
-                    offered_card, card_instructions, offered_inputs = await _offered_question(
-                        evaluation_payload(user_row) if user_row is not None else None, db, user_row, answered_card_ids
+                    offered_card, card_instructions, offered_inputs = await _next_form_card(
+                        db, user_row, answered_card_ids
                     )
                     messages[0] = _prepare_chat_messages([], card_instructions)[0]
                 continue

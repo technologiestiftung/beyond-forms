@@ -1,8 +1,8 @@
 """
-Chat cards: a step of the wizard rules, or an open group of a form's rules (see `form_rules`),
-shown as an input card inside the chat. A step's `columns` say what it asks and each input's type
-follows its `users` column; a group's inputs follow its PDF fields. The model only writes the
-texts: the question, a hint and the labels.
+Chat cards: an open group of a form's rules (see `form_rules`) shown as an input card inside the
+chat when it has options to pick from; a group of free inputs is asked in the chat instead. The
+group's PDF fields say what it asks; the model only writes the texts: the question, a hint and the
+labels.
 """
 
 import datetime
@@ -10,71 +10,22 @@ import decimal
 from dataclasses import dataclass
 from typing import Any, Optional
 
-import sqlalchemy as sa
-from pydantic import ValidationError
-
-from src.models import Users
-from src.schemas import UserProfileValidationSchema
-
 MAX_TEXT_LENGTH = 255
 
 
 @dataclass(frozen=True)
 class CardInput:
-    # the `users` column, or a snake_case name for an income row
+    # the PDF field's CEL var, or `answer` for a choice over several fields
     key: str
     # "choice", "select", "amount", "number", "date" or "text"
     kind: str
     options: tuple[Any, ...] = ()
     options_source: Optional[str] = None
     optional: bool = False
-    income_type: Optional[str] = None
     max_length: int = MAX_TEXT_LENGTH
     # what the input and each of its options stand for, for the model to word the labels
     about: str = ""
     option_about: tuple[str, ...] = ()
-
-
-def _income_key(income_type: str) -> str:
-    return income_type.lower().replace("-", "_").replace(" ", "_")
-
-
-def _options(entry: dict, column_type: sa.types.TypeEngine) -> tuple[Any, ...]:
-    """The rules' own options win over the ones the column allows."""
-    if "options" in entry:
-        return tuple(entry["options"])
-    if isinstance(column_type, sa.Enum):
-        return tuple(column_type.enums)
-    if isinstance(column_type, sa.Boolean):
-        return (True, False)
-    return ()
-
-
-_KIND_BY_COLUMN_TYPE = ((sa.Date, "date"), (sa.Numeric, "amount"), (sa.Integer, "number"))
-
-
-def _free_input_kind(column_type: sa.types.TypeEngine) -> str:
-    return next((kind for type_, kind in _KIND_BY_COLUMN_TYPE if isinstance(column_type, type_)), "text")
-
-
-def _card_input(entry: dict) -> CardInput:
-    if "income_type" in entry:
-        # an income line left empty is stored as 0
-        income_type = entry["income_type"]
-        return CardInput(_income_key(income_type), "amount", optional=True, income_type=income_type)
-    name = entry["column"]
-    optional = entry.get("optional", False)
-    if entry.get("options_source"):
-        return CardInput(name, "select", options_source=entry["options_source"], optional=optional)
-    column_type = Users.__table__.columns[name].type
-    options = _options(entry, column_type)
-    kind = entry.get("input", "choice") if options else _free_input_kind(column_type)
-    max_length = getattr(column_type, "length", None) or MAX_TEXT_LENGTH
-    return CardInput(name, kind, options, optional=optional, max_length=max_length)
-
-
-def card_inputs(step: dict) -> list[CardInput]:
-    return [_card_input(entry) for entry in step.get("columns", [])]
 
 
 def option_key(value: Any) -> str:
@@ -85,27 +36,36 @@ def option_key(value: Any) -> str:
 
 
 APPLICATION_DONE_PROMPT = (
-    "Every card of the user's Grundsicherungsantrag is answered, so there is no card to show. If they ask to "
+    "Every question of the user's Grundsicherungsantrag is answered, so there is no card to show. If they ask to "
     "continue, tell them their answers are complete and that they can review them under Antrag."
 )
 
+_CHAT_VALUE_FORMAT = {"date": "a date as YYYY-MM-DD", "amount": "a number", "number": "a number", "text": "text"}
 
-def is_text_question(inputs: list[CardInput]) -> bool:
-    """A card with one free text input is asked in the chat instead: the reply is the answer."""
-    return len(inputs) == 1 and inputs[0].kind == "text" and not inputs[0].options and not inputs[0].options_source
+
+def asked_in_chat(inputs: list[CardInput]) -> bool:
+    """A card helps where there are options to pick from; free inputs are simply answered in the chat."""
+    return all(not i.options and not i.options_source for i in inputs)
 
 
 def inputs_prompt(card_id: str, about: str, inputs: list[CardInput]) -> str:
-    """Tells the model which card is next and which texts `show_card` needs for it."""
-    if is_text_question(inputs):
-        meaning = f" ({inputs[0].about})" if inputs[0].about else ""
+    """Tells the model which question is next, and how to ask it and save the answer."""
+    intro = (
+        "When the user wants to start or continue their Grundsicherungsantrag (Grundsicherung im Alter und bei "
+        "Erwerbsminderung), or after they answered a question, "
+    )
+    if asked_in_chat(inputs):
+        lines = [
+            f'- "{i.key}": {_CHAT_VALUE_FORMAT.get(i.kind, "text")}{" (optional)" if i.optional else ""}'
+            + (f" - {i.about}" if i.about else "")
+            for i in inputs
+        ]
         return (
-            "When the user wants to start or continue their Grundsicherungsantrag (Grundsicherung im Alter und bei "
-            "Erwerbsminderung), or after they answered a question, ask the next question in the chat, in your own "
-            "words and without a card, so the user can simply reply.\n"
-            f'Next question: card_id "{card_id}" - {about}{meaning}\n'
-            f"When the user answers it, call `save_answer` with this card_id and their answer as text"
-            f"{'; if they have nothing to enter, call it with an empty answer' if inputs[0].optional else ''}."
+            intro + "ask the next question in the chat, in your own words and without a card, so the user can "
+            "simply reply.\n"
+            f'Next question: card_id "{card_id}" - {about}\n'
+            "When the user answers it, call `save_answer` with this card_id and their answer per key; leave out "
+            "an optional key they have nothing for:\n" + "\n".join(lines)
         )
     lines = []
     for i in inputs:
@@ -121,18 +81,11 @@ def inputs_prompt(card_id: str, about: str, inputs: list[CardInput]) -> str:
         meaning = f" - {i.about}" if i.about else ""
         lines.append(f'- "{i.key}": {detail}{" (optional)" if i.optional else ""}{meaning}')
     return (
-        "When the user wants to start or continue their Grundsicherungsantrag (Grundsicherung im Alter und bei "
-        "Erwerbsminderung), or after they answered a card, show the next card with `show_card` instead of asking "
-        "in text, with one short sentence before it.\n"
+        intro + "show the next card with `show_card` instead of asking in text, with one short sentence before it.\n"
         f'Next card: card_id "{card_id}" - {about}\n'
         "Write the question, an optional hint, a label for each input key and a label for each option value:\n"
         + "\n".join(lines)
     )
-
-
-def card_prompt(step_id: str, step: dict) -> str:
-    about = step.get("description") or step.get("title", "")
-    return inputs_prompt(step_id, f"{step.get('title', '')}: {about}", card_inputs(step))
 
 
 def _text_errors(value: Any, name: str, required: bool = True) -> list[str]:
@@ -141,10 +94,6 @@ def _text_errors(value: Any, name: str, required: bool = True) -> list[str]:
     if not isinstance(value, str) or not 0 < len(value.strip()) <= MAX_TEXT_LENGTH:
         return [f"{name} must be a text of 1 to {MAX_TEXT_LENGTH} characters"]
     return []
-
-
-def build_card_view(step_id: str, step: dict, args: dict) -> tuple[Optional[dict], list[str]]:
-    return build_inputs_view(step_id, card_inputs(step), args)
 
 
 def build_inputs_view(card_id: str, inputs: list[CardInput], args: dict) -> tuple[Optional[dict], list[str]]:
@@ -203,22 +152,3 @@ def input_errors(inputs: list[CardInput], values: Any) -> tuple[dict, list[str]]
         if key in by_key and value is not None and not _matches_kind(by_key[key], value)
     ]
     return values, errors
-
-
-def validate_card_answer(step: dict, values: Any) -> tuple[Optional[UserProfileValidationSchema], list[str]]:
-    """Checks a submitted card against its step and the profile schema; income lines become
-    `income_entries` rows."""
-    values, errors = input_errors(card_inputs(step), values)
-    if errors:
-        return None, errors
-    inputs = {i.key: i for i in card_inputs(step)}
-    payload: dict[str, Any] = {key: value for key, value in values.items() if not inputs[key].income_type}
-    income = [i for i in inputs.values() if i.income_type]
-    if income:
-        payload["income_entries"] = [
-            {"income_type": i.income_type, "monthly_amount": values.get(i.key) or 0} for i in income
-        ]
-    try:
-        return UserProfileValidationSchema.model_validate(payload), []
-    except ValidationError as error:
-        return None, [f"{'.'.join(map(str, e['loc']))}: {e['msg']}" for e in error.errors()]
