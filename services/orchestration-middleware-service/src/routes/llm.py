@@ -271,6 +271,15 @@ async def _save_form_card_answer(
     values, errors = input_errors(inputs, values)
     if errors:
         raise HTTPException(status_code=422, detail="; ".join(errors))
+    rules = load_form_rules(form_id)
+    all_fields = rules.groups[group_id]["fields"] if rules and group_id in rules.groups else group["fields"]
+    if (
+        group["answer_type"] == "multiple_choice"
+        and group["required"]
+        and len(group["fields"]) == len(all_fields)
+        and not any(values.get(i.key) is True for i in inputs)
+    ):
+        raise HTTPException(status_code=422, detail="At least one of the options must apply")
     answer = group_answer(group, values)
 
     form_service = FormService(db=db)
@@ -497,10 +506,11 @@ async def save_answer(
     inputs = await _card_inputs(db, user_row, card_id) if user_row is not None else None
     if not inputs or not is_text_question(inputs):
         return {"error": f"{card_id} is not a question to answer in the chat; show its card instead"}
+    skipped = inputs[0].optional and not (answer or "").strip()
     card_call = {"function": {"arguments": json.dumps({"card_id": card_id})}}
     try:
         saved = await _save_card_answer(
-            db, user_row, user_service, card_call, json.dumps({"values": {inputs[0].key: answer}})
+            db, user_row, user_service, card_call, json.dumps({"values": {inputs[0].key: None if skipped else answer}})
         )
     except HTTPException as exc:
         return {"error": exc.detail}

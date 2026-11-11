@@ -105,7 +105,7 @@ def inputs_prompt(card_id: str, about: str, inputs: list[CardInput]) -> str:
             "words and without a card, so the user can simply reply.\n"
             f'Next question: card_id "{card_id}" - {about}{meaning}\n'
             f"When the user answers it, call `save_answer` with this card_id and their answer as text"
-            f"{', or leave it unsaved if they have nothing to enter' if inputs[0].optional else ''}."
+            f"{'; if they have nothing to enter, call it with an empty answer' if inputs[0].optional else ''}."
         )
     lines = []
     for i in inputs:

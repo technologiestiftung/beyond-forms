@@ -77,7 +77,8 @@ AVAILABLE_TOOLS = [
                     "answer": {
                         "type": "string",
                         "maxLength": MAX_TEXT_LENGTH,
-                        "description": "The user's answer, as they gave it",
+                        "description": "The user's answer, as they gave it; empty if they have nothing to "
+                        "enter for an optional question",
                     },
                 },
                 "required": ["card_id", "answer"],

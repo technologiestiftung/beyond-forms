@@ -658,7 +658,7 @@ class FormService:
             else:
                 res = default_value
 
-            if res in (None, "", False) and field_id in chat_answers:
+            if field_id in chat_answers and field_id not in answered and (res is None or res is False or res == ""):
                 res = chat_answers[field_id]
 
             # Coerce values depending on whether the field is a checkbox

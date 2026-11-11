@@ -70,6 +70,11 @@ class GroupField(BaseModel):
         description="Only for radio and choice fields: one entry per export value, labelled with the printed "
         "text next to it. Never invent an option.",
     )
+    input: Optional[Literal["text", "money", "number", "date"]] = Field(
+        default=None,
+        description="Only when this field takes other input than its group's answer_type, e.g. 'text' for the "
+        "description line of each row in a money group",
+    )
     optional: bool = Field(
         description="True only if the form itself marks this field as optional, e.g. 'ggf. Geburtsname' or "
         "'falls vorhanden'. Never because another field can answer the question instead: such alternatives "
@@ -434,6 +439,7 @@ async def build_rules(pdf_path: Path, model: str, attachments: dict[str, str], c
                             "type": var_types[gf.var],
                             "meaning": gf.meaning,
                             "options": {o.value: o.label for o in gf.options},
+                            **({"input": gf.input} if gf.input else {}),
                             "optional": gf.optional,
                         }
                         for gf in group.fields

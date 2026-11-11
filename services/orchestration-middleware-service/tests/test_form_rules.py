@@ -262,3 +262,53 @@ async def test_a_demo_persona_is_not_asked_for_what_it_leaves_out():
     assert await _open_groups_for(persona, user) != []
     user.demo_seed_fixture_hash = "seeded"
     assert await _open_groups_for(persona, user) == []
+
+
+def test_a_list_of_boxes_keeps_asking_about_the_boxes_nobody_answered():
+    open_groups = FormRules(RULES).open_groups({"p1_expellee": True}, ALL_BUT - {"p1_expellee", "p1_resettler"})
+    assert [(g["id"], [f["field_id"] for f in g["fields"]]) for g in open_groups] == [
+        ("p1_displaced", ["p1_resettler"])
+    ]
+
+
+def test_a_document_is_only_due_while_its_question_applies():
+    routed = {**MARRIED_SINCE, "documents": [{"name": "Heiratsurkunde", "condition": "true", "form_id": "anlage_x"}]}
+    rules = FormRules({**RULES, "groups": [MARITAL, routed]})
+    assert "Heiratsurkunde" not in rules.required_documents({"p1_status": "0"})
+    assert rules.required_attachments({"p1_status": "0"}) == []
+    assert rules.required_attachments({"p1_status": "2"}) == ["anlage_1", "anlage_x"]
+
+
+def test_a_description_line_in_a_money_group_takes_text():
+    group = _group("p1_repayments", "money", [{**_field("p1_label"), "input": "text"}, _field("p1_amount")])
+    assert [(i.key, i.kind) for i in group_inputs(group)] == [("p1_label", "text"), ("p1_amount", "amount")]
+
+
+@pytest.mark.asyncio
+async def test_a_required_list_of_boxes_needs_one_ticked():
+    required = {**DISPLACED, "required": True}
+    with patch("src.routes.llm._open_form_groups", return_value=[("test_form", required)]):
+        with pytest.raises(HTTPException, match="At least one"):
+            await _save_form_card_answer(
+                MagicMock(),
+                MagicMock(),
+                MagicMock(),
+                card_id("test_form", "p1_displaced"),
+                {"p1_expellee": False, "p1_resettler": False},
+            )
+
+
+@pytest.mark.asyncio
+async def test_a_chat_answer_does_not_override_what_the_profile_says():
+    form_service = FormService(db=MagicMock(), forms_dir="/tmp/forms", forms_filler_url="http://filler")
+    application = MagicMock(form_data={"pdf_fields": {"test_form": {"p1_guardian": True, "p1_income": "500"}}})
+    mapping = {"p1_guardian": "{{ has_guardian == true }}", "p1_income": "{{ income.Pension }}"}
+    context = {"has_guardian": False, "income": {"Pension": 0}}
+    with (
+        patch(
+            "src.services.form_service._get_form_assets", return_value=(mapping, {"p1_guardian": "checkbox"}, b"%PDF")
+        ),
+        patch.object(FormService, "_build_base_context", return_value=(context, application)),
+    ):
+        values, _pdf = await form_service.resolve_field_values("test_form", MagicMock())
+    assert values == {"p1_guardian": False, "p1_income": "0"}

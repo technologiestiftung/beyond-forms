@@ -23,7 +23,7 @@ CARD_PREFIX = "form:"
 # the input of a choice card, and the option for "none of these" on a question that may stay empty
 ANSWER_KEY = "answer"
 NONE_OPTION = "none"
-_KIND_BY_ANSWER_TYPE = {"money": "amount", "number": "number", "date": "date"}
+_KIND_BY_ANSWER_TYPE = {"money": "amount", "number": "number", "date": "date", "text": "text"}
 
 
 class FormRules:
@@ -34,10 +34,11 @@ class FormRules:
         env = cel.NewEnv(
             variables={var: cel.Type.BOOL if t == "bool" else cel.Type.STRING for var, t in var_types.items()}
         )
-        documents = [d for group in rules["groups"] for d in group["documents"]]
-        expressions = {group["ask_if"] for group in rules["groups"]} | {d["condition"] for d in documents}
+        documents = [(group["ask_if"], d) for group in rules["groups"] for d in group["documents"]]
+        expressions = {group["ask_if"] for group in rules["groups"]} | {d["condition"] for _, d in documents}
         self._compiled = {expression: env.compile(expression) for expression in expressions}
-        self.attachments = [(d["form_id"], d["condition"]) for d in documents if d.get("form_id")]
+        self._documents = documents
+        self.attachments = [d["form_id"] for _, d in documents if d.get("form_id")]
 
     def _activation(self, values: dict[str, Any]) -> dict[str, Any]:
         activation = {}
@@ -62,6 +63,8 @@ class FormRules:
             filled = [bool(activation[f["var"]]) or f["field_id"] in answered_field_ids for f in group["fields"]]
             if not any(filled):
                 missing = group["fields"]
+            elif group["answer_type"] == "multiple_choice":
+                missing = [f for f, is_filled in zip(group["fields"], filled) if not is_filled and not f["optional"]]
             elif group["answer_type"] in CHOICE_TYPES or not group["required"]:
                 missing = []
             else:
@@ -70,18 +73,19 @@ class FormRules:
                 open_groups.append({**group, "fields": missing})
         return open_groups
 
-    def required_documents(self, values: dict[str, Any]) -> list[str]:
+    def _due_documents(self, values: dict[str, Any]) -> list[dict]:
         activation = self._activation(values)
-        names = [
-            d["name"] for g in self.groups.values() for d in g["documents"] if self._holds(d["condition"], activation)
+        return [
+            d
+            for ask_if, d in self._documents
+            if self._holds(ask_if, activation) and self._holds(d["condition"], activation)
         ]
-        return list(dict.fromkeys(names))
+
+    def required_documents(self, values: dict[str, Any]) -> list[str]:
+        return list(dict.fromkeys(d["name"] for d in self._due_documents(values)))
 
     def required_attachments(self, values: dict[str, Any]) -> list[str]:
-        activation = self._activation(values)
-        return list(
-            dict.fromkeys(form_id for form_id, condition in self.attachments if self._holds(condition, activation))
-        )
+        return list(dict.fromkeys(d["form_id"] for d in self._due_documents(values) if d.get("form_id")))
 
 
 @lru_cache(maxsize=None)
@@ -98,7 +102,7 @@ def attachment_parents() -> dict[str, str]:
     parents = {}
     for path in sorted(RULES_DIR.glob("*.rules.json")):
         rules = load_form_rules(path.name.removesuffix(".rules.json"))
-        for form_id, _condition in rules.attachments if rules else []:
+        for form_id in rules.attachments if rules else []:
             parents.setdefault(form_id, rules.form_id)
     return parents
 
@@ -166,7 +170,7 @@ def group_inputs(group: dict) -> list[CardInput]:
                 )
             )
         else:
-            kind = _KIND_BY_ANSWER_TYPE.get(group["answer_type"], "text")
+            kind = _KIND_BY_ANSWER_TYPE.get(f.get("input") or group["answer_type"], "text")
             inputs.append(CardInput(f["var"], kind, optional=optional or f["optional"], about=f["meaning"]))
     return inputs
 

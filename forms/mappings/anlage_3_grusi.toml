@@ -23,7 +23,7 @@ value = "{{ today }}"
 ["p1_anschrift_des_grundvermögens"]
 type = "string"
 description = "Anschrift des Grundvermögens"
-value = "{{ documents.property_ownership_proof && documents.property_ownership_proof.property_address ? documents.property_ownership_proof.property_address : (street && house_number ? street + ' ' + house_number + (zip_code && city ? ', ' + zip_code + ' ' + city : '') : '') }}"
+value = "{{ documents.property_ownership_proof && documents.property_ownership_proof.property_address ? documents.property_ownership_proof.property_address : '' }}"
 
 ["p1_name_und_anschrift_des_miteigentümers"]
 type = "string"
@@ -38,12 +38,12 @@ value = ""
 ["p1_wohnungsgröße_in_quadratmetern"]
 type = "string"
 description = "Wohnungsgröße in Quadratmetern"
-value = "{{ living_area ? living_area : (documents.rental_contract && documents.rental_contract.square_meters ? documents.rental_contract.square_meters : '') }}"
+value = "{{ (accomodation_type == 'Own Home' || accomodation_type == 'Condominium') && living_area ? living_area : '' }}"
 
 ["p1_zahl_der_zimmer"]
 type = "string"
 description = "Zahl der Zimmer"
-value = "{{ number_of_rooms ? number_of_rooms : '' }}"
+value = "{{ (accomodation_type == 'Own Home' || accomodation_type == 'Condominium') && number_of_rooms ? number_of_rooms : '' }}"
 
 ["p1_einheitswert"]
 type = "string"

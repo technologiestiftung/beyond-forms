@@ -173,27 +173,27 @@ type = "radio"
 description = "Mietschulden"
 options = ["Nein", "Ja"]
 option_labels = { "Nein" = "Nein", "Ja" = "Ja  Bei Beantwortung mit „Ja“ (ggf. auch Mehrfachnennungen) Wann" }
-value = "{{ rent_arrears_amount || rent_arrears_period ? 'Ja' : '' }}"
+value = ""
 
 ["p2_mietschulden_wann"]
 type = "checkbox"
 description = "Mietschulden wann"
-value = "{{ rent_arrears_period ? true : false }}"
+value = ""
 
 ["p2_zeitraum_der_mietschulden"]
 type = "string"
 description = "Zeitraum der Mietschulden"
-value = "{{ rent_arrears_period ? rent_arrears_period : '' }}"
+value = ""
 
 ["p2_mietschuldenhöhe"]
 type = "checkbox"
 description = "Mietschuldenhöhe"
-value = "{{ rent_arrears_amount ? true : false }}"
+value = ""
 
 ["p2_angabe_zur_mietschuldenhöhe"]
 type = "string"
 description = "Angabe zur Mietschuldenhöhe"
-value = "{{ rent_arrears_amount ? rent_arrears_amount : '' }}"
+value = ""
 
 ["p2_mietschuldenübernahme"]
 type = "checkbox"

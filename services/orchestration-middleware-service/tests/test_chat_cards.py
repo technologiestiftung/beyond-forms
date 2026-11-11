@@ -266,3 +266,18 @@ async def test_save_answer_saves_the_reply_like_the_card_would():
     assert result == {"card_id": "step_applicant_place_of_birth", "saved": {"place_of_birth": " Berlin "}}
     assert write_profile.call_args.args[2].model_dump(exclude_unset=True) == {"place_of_birth": "Berlin"}
     assert "error" in await save_answer("step_applicant_name", "Helmut", MagicMock(), MagicMock(), MagicMock())
+
+
+@pytest.mark.asyncio
+async def test_an_optional_question_answered_with_nothing_is_saved_as_skipped():
+    from unittest.mock import AsyncMock, patch
+
+    from src.chat_cards import CardInput
+    from src.routes.llm import save_answer
+
+    with (
+        patch("src.routes.llm._card_inputs", AsyncMock(return_value=[CardInput("p1_note", "text", optional=True)])),
+        patch("src.routes.llm._save_card_answer", AsyncMock(return_value='{"saved": {}}')) as save,
+    ):
+        await save_answer("form:test_form:p1_note", "  ", MagicMock(), MagicMock(), MagicMock())
+    assert save.call_args.args[4] == '{"values": {"p1_note": null}}'
