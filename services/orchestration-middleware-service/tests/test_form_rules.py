@@ -204,6 +204,7 @@ async def test_a_form_card_answer_goes_to_plain_columns_and_beside_the_mapping()
     with (
         patch("src.routes.llm._open_form_groups", return_value=[("test_form", group)]),
         patch.object(FormService, "plain_profile_columns", return_value={"p1_city": "city"}),
+        patch.object(FormService, "choice_profile_columns", return_value={}),
         patch.object(FormService, "find_application", return_value=application),
         patch("src.routes.llm.attachment_parents", return_value={}),
         patch("src.routes.llm.write_profile_payload") as write_profile,
@@ -312,3 +313,50 @@ async def test_a_chat_answer_does_not_override_what_the_profile_says():
     ):
         values, _pdf = await form_service.resolve_field_values("test_form", MagicMock())
     assert values == {"p1_guardian": False, "p1_income": "0"}
+
+
+@pytest.mark.parametrize(
+    "mapping, writes",
+    [
+        (
+            "{{ marital_status == 'Single' ? '0' : marital_status == 'Married' ? '2' : '0' }}",
+            (("0", "marital_status", "Single"), ("2", "marital_status", "Married")),
+        ),
+        ("{{ legal_gender == 'Male' ? 'Ja' : '' }}", (("Ja", "legal_gender", "Male"),)),
+        ("{{ has_guardian == true }}", ((True, "has_guardian", True), (False, "has_guardian", False))),
+        ("{{ sublet_room_count && sublet_room_count > 0 ? '0' : '' }}", ()),
+        ("{{ partner && partner.has_guardian == true }}", ()),
+        ("{{ last_name }}, {{ first_name }}", ()),
+    ],
+    ids=["radio chain", "one box", "checkbox", "compound test", "partner", "interpolation"],
+)
+def test_a_choice_mapping_is_read_backwards_only_when_it_compares_one_column(mapping, writes):
+    from src.services.form_service import _choice_writes
+
+    assert _choice_writes(mapping) == writes
+
+
+@pytest.mark.asyncio
+async def test_a_chosen_option_is_stored_in_the_column_its_mapping_reads():
+    application = MagicMock(spec=UserApplications, form_type="test_form", form_data={})
+    with (
+        patch("src.routes.llm._open_form_groups", return_value=[("test_form", MARITAL)]),
+        patch.object(FormService, "plain_profile_columns", return_value={}),
+        patch.object(
+            FormService,
+            "choice_profile_columns",
+            return_value={"p1_status": {"0": ("marital_status", "Single"), "2": ("marital_status", "Married")}},
+        ),
+        patch.object(FormService, "find_application", return_value=application),
+        patch("src.routes.llm.attachment_parents", return_value={}),
+        patch("src.routes.llm.write_profile_payload") as write_profile,
+    ):
+        await _save_form_card_answer(
+            MagicMock(),
+            MagicMock(id=uuid.uuid4()),
+            MagicMock(),
+            card_id("test_form", "p1_marital_status"),
+            {"answer": "2"},
+        )
+    assert write_profile.call_args.args[2].model_dump(exclude_unset=True) == {"marital_status": "Married"}
+    assert application.form_data == {"pdf_fields": {"test_form": {}}}

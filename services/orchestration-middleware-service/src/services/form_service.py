@@ -14,7 +14,7 @@ import aiofiles
 import httpx
 from fastapi import Depends, Request
 from pyjexl import JEXL
-from pyjexl.parser import FilterExpression, Identifier, Literal
+from pyjexl.parser import BinaryExpression, ConditionalExpression, FilterExpression, Identifier, Literal
 from sqlalchemy.exc import DatabaseError, DisconnectionError
 from sqlalchemy.orm import Session
 
@@ -193,6 +193,45 @@ def _mapping_paths(value: str) -> tuple[tuple, ...]:
 
 
 _PATH_JEXL = JEXL()
+
+
+def _column_test(node: Any) -> Optional[tuple[str, Any]]:
+    """`marital_status == 'Married'` -> ("marital_status", "Married")."""
+    if (
+        isinstance(node, BinaryExpression)
+        and node.operator.symbol == "=="
+        and isinstance(node.left, Identifier)
+        and node.left.subject is None
+        and not node.left.relative
+        and isinstance(node.right, Literal)
+    ):
+        return node.left.value, node.right.value
+    return None
+
+
+@functools.lru_cache(maxsize=None)
+def _choice_writes(value: str) -> tuple[tuple[Any, str, Any], ...]:
+    """For a mapping that picks the PDF value by comparing one column, which column value each PDF value
+    stands for: `{{ legal_gender == 'Male' ? 'Ja' : '' }}` -> (("Ja", "legal_gender", "Male"),)."""
+    match = re.fullmatch(r"\{\{(.*)\}\}", value.strip(), flags=re.DOTALL)
+    if not match or "{{" in match.group(1):
+        return ()
+    try:
+        node = _PATH_JEXL.parse(match.group(1))
+    except Exception:
+        return ()
+    if test := _column_test(node):
+        column, literal = test
+        # a checkbox `{{ has_guardian == true }}` left unticked says the column is false
+        return ((True, column, literal),) + (((False, column, False),) if literal is True else ())
+    writes = []
+    while isinstance(node, ConditionalExpression) and isinstance(node.consequent, Literal):
+        test = _column_test(node.test)
+        if test is None:
+            break
+        writes.append((node.consequent.value, *test))
+        node = node.alternate
+    return tuple(writes)
 
 
 def _context_value(context: Dict[str, Any], path: tuple) -> Any:
@@ -544,6 +583,16 @@ class FormService:
             match = _PLAIN_REFERENCE_RE.match(val.strip()) if isinstance(val, str) else None
             if match:
                 columns[field_id] = match.group(1)
+        return columns
+
+    async def choice_profile_columns(self, form_type: str) -> Dict[str, Dict[Any, Tuple[str, Any]]]:
+        """The PDF fields whose mapping picks the PDF value by comparing one column, and for each PDF
+        value the column value it stands for, so a chosen option can be stored in that column."""
+        mapping, _field_types, _pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
+        columns: Dict[str, Dict[Any, Tuple[str, Any]]] = {}
+        for field_id, val in mapping.items():
+            for pdf_value, column, column_value in _choice_writes(val) if isinstance(val, str) else ():
+                columns.setdefault(field_id, {}).setdefault(pdf_value, (column, column_value))
         return columns
 
     async def resolve_field_values(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], bytes]:

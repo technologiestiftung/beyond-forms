@@ -279,6 +279,7 @@ async def _save_form_card_answer(
 
     form_service = FormService(db=db)
     columns = await form_service.plain_profile_columns(form_id)
+    choices = await form_service.choice_profile_columns(form_id)
     kinds = {i.key: i.kind for i in inputs}
     profile = {
         columns[f["field_id"]]: values[f["var"]]
@@ -287,6 +288,11 @@ async def _save_form_card_answer(
         and kinds.get(f["var"]) in ("text", "date", "amount", "number")
         and columns.get(f["field_id"]) in _USER_FIELD_NAMES
     }
+    # a chosen option is stored as the column value its mapping turns into that option
+    for field_id, value in answer.items():
+        column, column_value = choices.get(field_id, {}).get(value, (None, None))
+        if column in _USER_FIELD_NAMES:
+            profile.setdefault(column, column_value)
     try:
         payload = UserProfileValidationSchema.model_validate(profile)
     except ValidationError:
@@ -299,7 +305,11 @@ async def _save_form_card_answer(
             db.rollback()
             payload = None
     stored = {name for name in profile} if payload is not None else set()
-    by_column = {f["field_id"]: columns.get(f["field_id"]) for f in group["fields"]}
+    by_column = {
+        f["field_id"]: columns.get(f["field_id"])
+        or next((column for column, _value in choices.get(f["field_id"], {}).values()), None)
+        for f in group["fields"]
+    }
     # every field of the card is recorded, so one left empty on purpose counts as answered
     unanswered = {f["field_id"]: False if f["type"] == "bool" else "" for f in group["fields"]}
     rest = {
