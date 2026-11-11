@@ -260,9 +260,8 @@ value = ""
 type = "radio"
 description = "Asylantrag"
 options = ["0", "1", "2", "3", "4"]
-option_labels = { "0" = "nicht beantragt", "1" = "beantragt", "2" = "Folgeantragl;l,.l.", "3" = "Zweitantrag", "4" = "Klage eingereicht am bevollmächtigter Rechtsanwalt" }
-value = "{{ has_applied_for_asylum_benefits == true ? '1' : has_applied_for_asylum_bene"
-?:..,fits == false ? '0' : '' }}"
+option_labels = { "0" = "nicht beantragt", "1" = "beantragt", "2" = "Folgeantrag", "3" = "Zweitantrag", "4" = "Klage eingereicht am bevollmächtigter Rechtsanwalt" }
+value = "{{ has_applied_for_asylum_benefits == true ? '1' : has_applied_for_asylum_benefits == false ? '0' : '' }}"
 
 ["p1_asyl_beantragt_am"]
 type = "string"
