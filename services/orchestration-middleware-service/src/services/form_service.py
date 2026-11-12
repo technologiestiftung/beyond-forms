@@ -713,7 +713,7 @@ class FormService:
             if (paths and all(known)) or (has_value and (any(known) or not paths)):
                 answered.add(field_id)
 
-            if field_id in chat_answers and field_id not in answered and (res is None or res is False or res == ""):
+            if field_id in chat_answers and field_id not in answered:
                 res = chat_answers[field_id]
 
             # Coerce values depending on whether the field is a checkbox
