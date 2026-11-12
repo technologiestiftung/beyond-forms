@@ -246,6 +246,16 @@ def _context_value(context: Dict[str, Any], path: tuple) -> Any:
     return node
 
 
+def _answered_by(context: Dict[str, Any], expression: str, value: Any) -> bool:
+    """Whether a value comes from data or is fixed, rather than being a default the mapping filled in
+    while its data is empty: every path it reads is set (an explicit "no" counts), it has a value and
+    at least one of its paths is set (a fallback chain), or it is a fixed value that reads no data."""
+    paths = _mapping_paths(expression)
+    known = [_context_value(context, path) not in (None, "") for path in paths]
+    has_value = value is not None and value is not False and value != ""
+    return bool((paths and all(known)) or (has_value and (any(known) or not paths)))
+
+
 def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set[str]:
     """
     Collects the top-level context keys a mapping's JEXL expressions read from,
@@ -677,6 +687,8 @@ class FormService:
             # Check if the field is a checkbox by checking parsed field types
             is_checkbox = field_types.get(field_id) == "checkbox"
 
+            # a template of several {{ }} needs every one of them answered, e.g. a landlord's name and address
+            segments_answered: list[bool] = []
             if isinstance(default_value, str):
                 stripped_val = default_value.strip()
                 # If the string is a pure JEXL expression, evaluate it first
@@ -692,6 +704,7 @@ class FormService:
 
                         def _eval(m):
                             val_res = self.jexl.evaluate(m.group(1), context)
+                            segments_answered.append(_answered_by(context, m.group(0), val_res))
                             if isinstance(val_res, bool):
                                 return "Ja" if val_res else ""
                             if isinstance(val_res, (datetime.date, datetime.datetime)):
@@ -706,11 +719,11 @@ class FormService:
             else:
                 res = default_value
 
-            # answered when the value comes from data or is fixed, not when the mapping only filled in a default
-            paths = _mapping_paths(default_value) if isinstance(default_value, str) else ()
-            known = [_context_value(context, path) not in (None, "") for path in paths]
-            has_value = res is not None and res is not False and res != ""
-            if (paths and all(known)) or (has_value and (any(known) or not paths)):
+            if segments_answered:
+                is_answered = all(segments_answered)
+            else:
+                is_answered = _answered_by(context, default_value if isinstance(default_value, str) else "", res)
+            if is_answered:
                 answered.add(field_id)
 
             if field_id in chat_answers and field_id not in answered:

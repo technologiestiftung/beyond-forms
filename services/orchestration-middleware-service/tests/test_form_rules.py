@@ -387,3 +387,23 @@ async def test_a_field_is_answered_by_data_or_a_fixed_value_but_not_by_a_default
         values, answered, _pdf = await form_service.resolve_field_state("test_form", MagicMock())
     assert values["p1_status_empty"] == "0"
     assert answered == {"p1_status_set", "p1_fallback", "p1_fixed", "p1_static"}
+
+
+@pytest.mark.asyncio
+async def test_a_template_needs_every_part_answered():
+    form_service = FormService(db=MagicMock(), forms_dir="/tmp/forms", forms_filler_url="http://filler")
+    template = (
+        "{{ landlord_name ? landlord_name : '' }}{{ landlord_name && landlord_address ? ', ' : '' }}"
+        "{{ landlord_address ? landlord_address : '' }}"
+    )
+    mapping = {"p3_landlord": template}
+    for context, expected in (
+        ({"landlord_name": "Wohnungsbau eG", "landlord_address": None}, set()),
+        ({"landlord_name": "Wohnungsbau eG", "landlord_address": "Torstr. 12"}, {"p3_landlord"}),
+    ):
+        with (
+            patch("src.services.form_service._get_form_assets", return_value=(mapping, {}, b"%PDF")),
+            patch.object(FormService, "_build_base_context", return_value=({**context, "documents": {}}, None)),
+        ):
+            _values, answered, _pdf = await form_service.resolve_field_state("test_form", MagicMock())
+        assert answered == expected
