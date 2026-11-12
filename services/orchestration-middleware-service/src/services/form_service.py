@@ -617,7 +617,9 @@ class FormService:
 
         Checkboxes resolve to a bool, every other field to a string. Also returns the fields the
         profile has answered: those whose mapping reads only values that are set, so an unticked box
-        whose column says "no" counts as answered while one whose column is empty does not.
+        whose column says "no" counts as answered while one whose column is empty does not; those with
+        a value from at least one set value, e.g. a fallback chain; and fixed values. A default the
+        mapping fills in while its data is empty, such as Familienstand `'0'`, does not count.
         """
         mapping, field_types, pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
         needed_refs = _extract_document_refs(mapping)
@@ -672,9 +674,6 @@ class FormService:
         filled_values = {}
         answered: set[str] = set()
         for field_id, default_value in mapping.items():
-            paths = _mapping_paths(default_value) if isinstance(default_value, str) else ()
-            if paths and all(_context_value(context, path) not in (None, "") for path in paths):
-                answered.add(field_id)
             # Check if the field is a checkbox by checking parsed field types
             is_checkbox = field_types.get(field_id) == "checkbox"
 
@@ -706,6 +705,13 @@ class FormService:
                     res = None
             else:
                 res = default_value
+
+            # answered when the value comes from data or is fixed, not when the mapping only filled in a default
+            paths = _mapping_paths(default_value) if isinstance(default_value, str) else ()
+            known = [_context_value(context, path) not in (None, "") for path in paths]
+            has_value = res is not None and res is not False and res != ""
+            if (paths and all(known)) or (has_value and (any(known) or not paths)):
+                answered.add(field_id)
 
             if field_id in chat_answers and field_id not in answered and (res is None or res is False or res == ""):
                 res = chat_answers[field_id]

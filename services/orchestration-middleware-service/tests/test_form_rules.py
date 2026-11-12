@@ -87,16 +87,17 @@ def _open_ids(values: dict, answered: set[str] = frozenset()) -> list[str]:
 
 def test_every_group_that_applies_is_open_until_something_is_filled_in():
     assert _open_ids({}) == ["p1_marital_status", "p1_gender", "p1_displaced"]
-    assert _open_ids({"p1_status": "0", "p1_female": True}, {"p1_expellee", "p1_resettler"}) == []
+    answered = {"p1_status", "p1_female", "p1_expellee", "p1_resettler"}
+    assert _open_ids({"p1_status": "0", "p1_female": True}, answered) == []
 
 
 def test_a_follow_up_only_opens_when_its_condition_holds():
     assert _open_ids({"p1_status": "0"}, ALL_BUT) == []
-    assert _open_ids({"p1_status": "2"}, ALL_BUT - {"p1_status"}) == ["p1_married_since"]
+    assert _open_ids({"p1_status": "2"}, ALL_BUT) == ["p1_married_since"]
     # once the note is given, only the required date is still missing
-    open_groups = FormRules(RULES).open_groups({"p1_status": "2", "p1_note": "Notiz"}, ALL_BUT - {"p1_status"})
+    open_groups = FormRules(RULES).open_groups({"p1_status": "2", "p1_note": "Notiz"}, ALL_BUT | {"p1_note"})
     assert [f["field_id"] for f in open_groups[0]["fields"]] == ["p1_since"]
-    assert _open_ids({"p1_status": "2", "p1_since": "01.01.2000"}, ALL_BUT - {"p1_status"}) == []
+    assert _open_ids({"p1_status": "2", "p1_since": "01.01.2000"}, ALL_BUT | {"p1_since"}) == []
 
 
 def test_a_question_that_may_stay_empty_is_asked_once():
@@ -266,7 +267,7 @@ async def test_a_demo_persona_is_not_asked_for_what_it_leaves_out():
 
 
 def test_a_list_of_boxes_keeps_asking_about_the_boxes_nobody_answered():
-    open_groups = FormRules(RULES).open_groups({"p1_expellee": True}, ALL_BUT - {"p1_expellee", "p1_resettler"})
+    open_groups = FormRules(RULES).open_groups({"p1_expellee": True}, ALL_BUT - {"p1_resettler"})
     assert [(g["id"], [f["field_id"] for f in g["fields"]]) for g in open_groups] == [
         ("p1_displaced", ["p1_resettler"])
     ]
@@ -360,3 +361,29 @@ async def test_a_chosen_option_is_stored_in_the_column_its_mapping_reads():
         )
     assert write_profile.call_args.args[2].model_dump(exclude_unset=True) == {"marital_status": "Married"}
     assert application.form_data == {"pdf_fields": {"test_form": {}}}
+
+
+def test_a_value_the_mapping_only_defaulted_does_not_answer_the_question():
+    # Familienstand resolves to '0' (ledig) while marital_status is still empty
+    assert "p1_marital_status" in _open_ids({"p1_status": "0"}, ALL_BUT - {"p1_status"})
+
+
+@pytest.mark.asyncio
+async def test_a_field_is_answered_by_data_or_a_fixed_value_but_not_by_a_default():
+    form_service = FormService(db=MagicMock(), forms_dir="/tmp/forms", forms_filler_url="http://filler")
+    mapping = {
+        "p1_status_empty": "{{ marital_status == 'Married' ? '2' : '0' }}",
+        "p1_status_set": "{{ widowed == 'Married' ? '2' : '0' }}",
+        "p1_fallback": "{{ rent ? rent : (documents.lease ? documents.lease.rent : '') }}",
+        "p1_fixed": "{{ true }}",
+        "p1_static": "Soziales",
+        "p1_blank": "",
+    }
+    context = {"marital_status": None, "widowed": "Married", "rent": 430, "documents": {}}
+    with (
+        patch("src.services.form_service._get_form_assets", return_value=(mapping, {"p1_fixed": "checkbox"}, b"%PDF")),
+        patch.object(FormService, "_build_base_context", return_value=(context, None)),
+    ):
+        values, answered, _pdf = await form_service.resolve_field_state("test_form", MagicMock())
+    assert values["p1_status_empty"] == "0"
+    assert answered == {"p1_status_set", "p1_fallback", "p1_fixed", "p1_static"}

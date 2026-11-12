@@ -52,15 +52,15 @@ class FormRules:
         return self._compiled[expression].eval(data=activation).value() is True
 
     def open_groups(self, values: dict[str, Any], answered_field_ids: set[str]) -> list[dict]:
-        """The groups that apply but are not answered yet, each with only its missing fields. A field
-        counts as answered once the chat stored an answer for it, even an empty one, so a question
-        that may stay empty is asked once and its card offers "none"."""
+        """The groups that apply but are not answered yet, each with only its missing fields. `values` decide
+        which groups apply; `answered_field_ids` which fields are answered, by the profile or by the chat,
+        even with an empty answer, so a question that may stay empty is asked once and its card offers "none"."""
         activation = self._activation(values)
         open_groups = []
         for group in self.groups.values():
             if not self._holds(group["ask_if"], activation):
                 continue
-            filled = [bool(activation[f["var"]]) or f["field_id"] in answered_field_ids for f in group["fields"]]
+            filled = [f["field_id"] in answered_field_ids for f in group["fields"]]
             if not any(filled):
                 missing = group["fields"]
             elif group["answer_type"] == "multiple_choice":
