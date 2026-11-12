@@ -117,6 +117,27 @@ def _coerce_to_column(column, value: Any) -> Any:
     return value
 
 
+def apply_persona_profile(db_user: Users, profile: dict[str, Any], slug: str) -> list[str]:
+    """Writes a persona's `profile` onto its `users` row and returns the keys it set."""
+    columns = {c.name: c for c in Users.__table__.columns}
+    applied: list[str] = []
+    for key, value in ordered_profile_items(profile):
+        if key in PROTECTED_COLUMNS:
+            raise DemoSeedError(f"Persona {slug!r} may not set protected column {key!r}.")
+        try:
+            if apply_profile_key(db_user, key, value):
+                applied.append(key)
+                continue
+        except ProfileWriteError as exc:
+            raise DemoSeedError(f"Persona {slug!r} has an invalid {key!r} entry: {exc}") from exc
+        column = columns.get(key)
+        if column is None:
+            raise DemoSeedError(f"Persona {slug!r} sets unknown `users` column {key!r}.")
+        setattr(db_user, key, _coerce_to_column(column, value))
+        applied.append(key)
+    return applied
+
+
 class DemoSeedService:
     def __init__(self, db: Session, storage_client=None, personas_dir: Optional[Path] = None):
         self.db = db
@@ -333,22 +354,7 @@ class DemoSeedService:
         if not db_user:
             raise DemoSeedError("User not found in internal database.")
 
-        columns = {c.name: c for c in Users.__table__.columns}
-        applied: list[str] = []
-        for key, value in ordered_profile_items(persona["profile"]):
-            if key in PROTECTED_COLUMNS:
-                raise DemoSeedError(f"Persona {slug!r} may not set protected column {key!r}.")
-            try:
-                if apply_profile_key(db_user, key, value):
-                    applied.append(key)
-                    continue
-            except ProfileWriteError as exc:
-                raise DemoSeedError(f"Persona {slug!r} has an invalid {key!r} entry: {exc}") from exc
-            column = columns.get(key)
-            if column is None:
-                raise DemoSeedError(f"Persona {slug!r} sets unknown `users` column {key!r}.")
-            setattr(db_user, key, _coerce_to_column(column, value))
-            applied.append(key)
+        applied = apply_persona_profile(db_user, persona["profile"], slug)
 
         db_user.demo_seed_fixture_hash = self._fixture_hash(slug)
 

@@ -14,6 +14,7 @@ import aiofiles
 import httpx
 from fastapi import Depends, Request
 from pyjexl import JEXL
+from pyjexl.evaluator import Context, Evaluator
 from pyjexl.parser import BinaryExpression, ConditionalExpression, FilterExpression, Identifier, Literal
 from sqlalchemy.exc import DatabaseError, DisconnectionError
 from sqlalchemy.orm import Session
@@ -33,6 +34,14 @@ _DOCUMENT_REF_RE = re.compile(r"documents\.([a-zA-Z_][a-zA-Z0-9_]*)(?:\.([a-zA-Z
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 # a mapping value that prints one context key as it is, e.g. `{{ street }}` or `{{ street ? street : '' }}`
 _PLAIN_REFERENCE_RE = re.compile(r"^\{\{\s*(\w+)\s*(?:\?\s*\1\s*:\s*''\s*)?\}\}$")
+_TEMPLATE_RE = re.compile(r"\{\{\s*(.*?)\s*\}\}", flags=re.DOTALL)
+_JEXL = JEXL()
+# pyjexl parses an expression on every evaluation; a mapping's expressions are the same on every call
+_parse = functools.lru_cache(maxsize=None)(_JEXL.parse)
+
+
+def _evaluate(expression: str, context: Dict[str, Any]) -> Any:
+    return Evaluator(_JEXL.config).evaluate(_parse(expression), Context(context))
 
 
 def _parse_iso_dates(raw_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -70,28 +79,6 @@ def _extract_document_refs(mapping: Dict[str, Any]) -> Dict[str, set[str] | None
             elif refs[doc_type] is not None:
                 refs[doc_type].add(key)
     return refs
-
-
-def _collect_identifier_roots(node: Any, out: set[str]) -> None:
-    """Walks a pyjexl AST node, collecting the root context key of every identifier
-    chain (e.g. `documents.wage_slips.gross_amount` contributes only `documents`)."""
-    if node is None or isinstance(node, Literal):
-        return
-    if isinstance(node, Identifier):
-        if node.subject is None and node.value != "null":
-            out.add(node.value)
-        else:
-            _collect_identifier_roots(node.subject, out)
-        return
-    for field_name in getattr(node, "fields", []):
-        if field_name == "parent":
-            continue
-        value = getattr(node, field_name, None)
-        if isinstance(value, list):
-            for item in value:
-                _collect_identifier_roots(item, out)
-        else:
-            _collect_identifier_roots(value, out)
 
 
 # Derived keys that carry a money grid's optional free-text extras, plus optional contact
@@ -157,6 +144,8 @@ def _identifier_path(node: Any) -> Optional[tuple]:
     """`partner.nationality` -> ("partner", "nationality"), `expenses['Rent']` -> ("expenses", "Rent");
     None for anything that is not a plain chain from the context."""
     if isinstance(node, Identifier) and not node.relative:
+        if node.subject is None and node.value == "null":
+            return None
         base = _identifier_path(node.subject) if node.subject is not None else ()
         return None if base is None else (*base, node.value)
     if isinstance(node, FilterExpression) and isinstance(node.expression, Literal) and not node.relative:
@@ -184,15 +173,12 @@ def _collect_identifier_paths(node: Any, out: set[tuple]) -> None:
 def _mapping_paths(value: str) -> tuple[tuple, ...]:
     """The context paths a mapping value's JEXL expressions read."""
     paths: set[tuple] = set()
-    for match in re.finditer(r"\{\{\s*(.*?)\s*\}\}", value, flags=re.DOTALL):
+    for match in _TEMPLATE_RE.finditer(value):
         try:
-            _collect_identifier_paths(_PATH_JEXL.parse(match.group(1)), paths)
+            _collect_identifier_paths(_parse(match.group(1)), paths)
         except Exception:
             return ()
     return tuple(sorted(paths, key=str))
-
-
-_PATH_JEXL = JEXL()
 
 
 def _column_test(node: Any) -> Optional[tuple[str, Any]]:
@@ -217,7 +203,7 @@ def _choice_writes(value: str) -> tuple[tuple[Any, str, Any], ...]:
     if not match or "{{" in match.group(1):
         return ()
     try:
-        node = _PATH_JEXL.parse(match.group(1))
+        node = _parse(match.group(1))
     except Exception:
         return ()
     if test := _column_test(node):
@@ -251,12 +237,12 @@ def _answered_by(context: Dict[str, Any], expression: str, value: Any) -> bool:
     while its data is empty: every path it reads is set (an explicit "no" counts), it has a value and
     at least one of its paths is set (a fallback chain), or it is a fixed value that reads no data."""
     paths = _mapping_paths(expression)
-    known = [_context_value(context, path) not in (None, "") for path in paths]
+    known = [_is_context_value_filled(_context_value(context, path)) for path in paths]
     has_value = value is not None and value is not False and value != ""
     return bool((paths and all(known)) or (has_value and (any(known) or not paths)))
 
 
-def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set[str]:
+def _extract_required_context_fields(mapping: Dict[str, Any]) -> set[str]:
     """
     Collects the top-level context keys a mapping's JEXL expressions read from,
     used to judge whether a user's profile carries enough data to fill this form.
@@ -264,16 +250,7 @@ def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set
     verified uploads rather than the profile, and the money grids' free-text extras are
     optional even for a fully answered profile - neither is required to check readiness.
     """
-    fields: set[str] = set()
-    for val in mapping.values():
-        if not isinstance(val, str):
-            continue
-        for match in re.finditer(r"\{\{\s*(.*?)\s*\}\}", val, flags=re.DOTALL):
-            try:
-                tree = jexl.parse(match.group(1))
-            except Exception:
-                continue
-            _collect_identifier_roots(tree, fields)
+    fields = {path[0] for val in mapping.values() if isinstance(val, str) for path in _mapping_paths(val)}
     return fields - _OPTIONAL_CONTEXT_FIELDS
 
 
@@ -424,9 +401,8 @@ class FormService:
         )
         self.db = db
         self.http_client = http_client
-        self.jexl = JEXL()
 
-    def find_application(self, form_type: str, user: Users) -> Optional[UserApplications]:
+    def find_application(self, form_type: str, user: Users, strict: bool = False) -> Optional[UserApplications]:
         """
         The application whose `form_data` a form is filled from. When no row has this
         exact `form_type`: for "antrag_grundsicherung_im_alter" specifically, first checks
@@ -436,6 +412,7 @@ class FormService:
         back to the user's most recently updated application of any form_type.
 
         An attachment form (Anlage) is filled from the application of the form that links it.
+        `strict` skips the fallback to an unrelated form's application, for writing answers.
         """
         form_type = attachment_parents().get(form_type, form_type)
         application: Optional[UserApplications] = None
@@ -465,7 +442,7 @@ class FormService:
                         form_type,
                         application.application_id,
                     )
-            if application is None:
+            if application is None and not strict:
                 application = (
                     self.db.query(UserApplications)
                     .filter(UserApplications.fk_user_id == user.id)
@@ -534,7 +511,7 @@ class FormService:
         these simpler (non-Grundsicherung) forms today.
         """
         mapping, _field_types, _pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
-        required_fields = _extract_required_context_fields(mapping, self.jexl)
+        required_fields = _extract_required_context_fields(mapping)
         unmapped_required = _count_unmapped_required_fields(os.path.join(self.mapping_path, f"{form_type}.toml"))
         if not required_fields and not unmapped_required:
             return 0, 0
@@ -628,8 +605,9 @@ class FormService:
         Checkboxes resolve to a bool, every other field to a string. Also returns the fields the
         profile has answered: those whose mapping reads only values that are set, so an unticked box
         whose column says "no" counts as answered while one whose column is empty does not; those with
-        a value from at least one set value, e.g. a fallback chain; and fixed values. A default the
-        mapping fills in while its data is empty, such as Familienstand `'0'`, does not count.
+        a value from at least one set value, e.g. a fallback chain; fixed values; and every field the
+        chat stored an answer for, even an empty one. A default the mapping fills in while its data is
+        empty, such as Familienstand `'0'`, does not count.
         """
         mapping, field_types, pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
         needed_refs = _extract_document_refs(mapping)
@@ -699,11 +677,11 @@ class FormService:
                         and stripped_val.count("{{") == 1
                         and stripped_val.count("}}") == 1
                     ):
-                        res = self.jexl.evaluate(stripped_val[2:-2].strip(), context)
+                        res = _evaluate(stripped_val[2:-2].strip(), context)
                     else:
 
                         def _eval(m):
-                            val_res = self.jexl.evaluate(m.group(1), context)
+                            val_res = _evaluate(m.group(1), context)
                             segments_answered.append(_answered_by(context, m.group(0), val_res))
                             if isinstance(val_res, bool):
                                 return "Ja" if val_res else ""
@@ -711,7 +689,7 @@ class FormService:
                                 return val_res.strftime("%d.%m.%Y")
                             return str(val_res) if val_res is not None else ""
 
-                        res = re.sub(r"\{\{\s*(.*?)\s*\}\}", _eval, stripped_val, flags=re.DOTALL)
+                        res = _TEMPLATE_RE.sub(_eval, stripped_val)
                 except Exception as e:
                     # One unevaluable mapping entry must not fail the whole export.
                     logger.warning(f"Mapping field {field_id!r} could not be evaluated: {e}")
@@ -746,7 +724,7 @@ class FormService:
 
             filled_values[field_id] = res
 
-        return filled_values, answered, pdf_bytes
+        return filled_values, answered | set(chat_answers), pdf_bytes
 
 
 def get_form_service(request: Request, db: Session = Depends(get_db)) -> FormService:

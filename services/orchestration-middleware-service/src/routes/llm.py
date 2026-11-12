@@ -208,26 +208,26 @@ async def _form_state(form_service: FormService, user_row: DbUser, form_id: str)
     if user_row.demo_seed_fixture_hash:
         # a demo persona lists only what it has; whatever it leaves out is zero or empty
         return values, set(values)
-    application = form_service.find_application(form_id, user_row)
-    form_data = (application.form_data if application else None) or {}
-    return values, answered | set((form_data.get("pdf_fields") or {}).get(form_id) or {})
+    return values, answered
 
 
 async def _open_form_groups(db: Session, user_row: DbUser) -> list[tuple[str, dict]]:
-    """The open groups of the application form, then of each attachment form (Anlage) its answers
-    require, in that order."""
+    """The open groups of the application form, or once it has none, of each attachment form (Anlage) its
+    answers require: the chat asks the application form first, so the attachments wait until then."""
     main_rules = load_form_rules(FORM_RULES_FORM_ID)
     if main_rules is None:
         return []
     form_service = FormService(db=db)
     main_values, main_answered = await _form_state(form_service, user_row, FORM_RULES_FORM_ID)
-    forms = [(FORM_RULES_FORM_ID, main_rules, main_values, main_answered)]
+    if main_open := main_rules.open_groups(main_values, main_answered):
+        return [(FORM_RULES_FORM_ID, group) for group in main_open]
+    open_groups = []
     for form_id in main_rules.required_attachments(main_values):
         if rules := load_form_rules(form_id):
-            forms.append((form_id, rules, *await _form_state(form_service, user_row, form_id)))
-    return [
-        (form_id, group) for form_id, rules, values, answered in forms for group in rules.open_groups(values, answered)
-    ]
+            open_groups += [
+                (form_id, group) for group in rules.open_groups(*await _form_state(form_service, user_row, form_id))
+            ]
+    return open_groups
 
 
 async def _next_form_card(
@@ -253,25 +253,28 @@ async def _next_form_card(
 
 
 async def _save_form_card_answer(
-    db: Session, user_row: DbUser, user_service: UserService, offered: str, values: object
+    db: Session, user_row: DbUser, user_service: UserService, offered: str, values: object, in_chat: bool = False
 ) -> None:
-    """Stores a form card's answer: in the profile column a field's mapping prints unchanged, otherwise in
-    the application's `form_data`, which `fill_form` reads for the fields the mapping leaves empty."""
-    form_id, group_id = parse_form_card_id(offered)
-    open_groups = dict((f"{f}:{g['id']}", g) for f, g in await _open_form_groups(db, user_row))
-    group = open_groups.get(f"{form_id}:{group_id}")
+    """Stores the answer to an open question, from its card or (`in_chat`) asked in the chat: in the profile
+    column a field's mapping prints unchanged or picks by, otherwise in the application's `form_data`, which
+    `fill_form` reads for the fields the mapping leaves empty."""
+    open_groups = {(f, g["id"]): g for f, g in await _open_form_groups(db, user_row)}
+    form_id, group_id = parse_form_card_id(offered) or (None, None)
+    group = open_groups.get((form_id, group_id))
     if group is None:
         raise HTTPException(status_code=409, detail="This question has already been answered")
     inputs = group_inputs(group)
+    if in_chat and not asked_in_chat(inputs):
+        raise HTTPException(
+            status_code=422, detail=f"{offered} is not a question to answer in the chat; show its card instead"
+        )
     values, errors = input_errors(inputs, values)
     if errors:
         raise HTTPException(status_code=422, detail="; ".join(errors))
-    rules = load_form_rules(form_id)
-    all_fields = rules.groups[group_id]["fields"] if rules and group_id in rules.groups else group["fields"]
     if (
         group["answer_type"] == "multiple_choice"
         and group["required"]
-        and len(group["fields"]) == len(all_fields)
+        and not group["partial"]
         and not any(values.get(i.key) is True for i in inputs)
     ):
         raise HTTPException(status_code=422, detail="At least one of the options must apply")
@@ -304,7 +307,7 @@ async def _save_form_card_answer(
         except ProfileWriteError:
             db.rollback()
             payload = None
-    stored = {name for name in profile} if payload is not None else set()
+    stored = set(profile) if payload is not None else set()
     by_column = {
         f["field_id"]: columns.get(f["field_id"])
         or next((column for column, _value in choices.get(f["field_id"], {}).values()), None)
@@ -316,10 +319,11 @@ async def _save_form_card_answer(
         field_id: value for field_id, value in {**unanswered, **answer}.items() if by_column.get(field_id) not in stored
     }
 
-    parent = attachment_parents().get(form_id, form_id)
-    application = form_service.find_application(form_id, user_row)
-    if application is None or application.form_type not in (parent, "grundsicherung"):
-        _, application_id = user_service.get_or_create_user_application(user_row.id, parent)
+    application = form_service.find_application(form_id, user_row, strict=True)
+    if application is None:
+        _, application_id = user_service.get_or_create_user_application(
+            user_row.id, attachment_parents().get(form_id, form_id)
+        )
         application = db.get(UserApplications, application_id)
     form_data = dict(application.form_data or {})
     pdf_fields = dict(form_data.get("pdf_fields") or {})
@@ -476,33 +480,17 @@ async def _run_server_tool(tool_name_to_function_dict: dict, tool_call: dict):
         return {"error": f"Error executing tool {function_name}: {fn_err}"}
 
 
-async def _card_inputs(db: Session, user_row: DbUser, card_id: str) -> Optional[list[CardInput]]:
-    """The inputs of the question offered next, or None if `card_id` is not the one offered next."""
-    offered, _prompt, inputs = await _next_form_card(db, user_row, set())
-    return inputs if offered is not None and offered == card_id else None
-
-
 async def save_answer(
     card_id: str, values: dict, db: Session, user_row: Optional[DbUser], user_service: UserService
 ) -> dict:
     """Saves the reply to a question asked in the chat, the same way as a card answer."""
-    inputs = await _card_inputs(db, user_row, card_id) if user_row is not None else None
-    if not inputs or not asked_in_chat(inputs):
-        return {"error": f"{card_id} is not a question to answer in the chat; show its card instead"}
-    if not isinstance(values, dict):
-        return {"error": "values must be an object keyed by the question's keys"}
-    optional = {i.key for i in inputs if i.optional}
-    # an optional key the user has nothing for is saved as skipped, so it is not asked again
-    values = {
-        key: None if key in optional and isinstance(value, str) and not value.strip() else value
-        for key, value in values.items()
-    }
-    card_call = {"function": {"arguments": json.dumps({"card_id": card_id})}}
+    if user_row is None:
+        return {"error": "There is no profile to save the answer to"}
     try:
-        saved = await _save_card_answer(db, user_row, user_service, card_call, json.dumps({"values": values}))
+        await _save_form_card_answer(db, user_row, user_service, card_id, values, in_chat=True)
     except HTTPException as exc:
         return {"error": exc.detail}
-    return json.loads(saved)
+    return {"card_id": card_id, "saved": values}
 
 
 async def _save_card_answer(

@@ -9,7 +9,7 @@ from fastapi import HTTPException
 
 from src.models import UserApplications, Users
 from src.routes.llm import _open_form_groups, _save_form_card_answer
-from src.services.demo_seed_service import _coerce_to_column
+from src.services.demo_seed_service import apply_persona_profile
 from src.services.form_rules import (
     ANSWER_KEY,
     NONE_OPTION,
@@ -22,7 +22,6 @@ from src.services.form_rules import (
     parse_card_id,
 )
 from src.services.form_service import FormService
-from src.services.user_service import apply_profile_key, ordered_profile_items
 
 REPO_ROOT = RULES_DIR.parents[1]
 
@@ -106,9 +105,8 @@ def test_a_question_that_may_stay_empty_is_asked_once():
     assert "p1_displaced" not in _open_ids({}, {"p1_expellee", "p1_resettler"})
 
 
-def test_documents_and_attachments_follow_their_condition():
+def test_attachments_follow_their_condition():
     rules = FormRules(RULES)
-    assert rules.required_documents({"p1_status": "2"}) == ["Anlage 1"]
     assert rules.required_attachments({"p1_status": "2"}) == ["anlage_1"]
     assert rules.required_attachments({"p1_status": "0"}) == []
 
@@ -232,10 +230,7 @@ async def test_a_form_card_answer_is_checked_against_the_open_group():
 def _seeded_user(persona: dict) -> Users:
     """The persona's `users` row as the demo seed writes it, without a database."""
     user = Users(id=uuid.uuid4())
-    columns = {c.name: c for c in Users.__table__.columns}
-    for key, value in ordered_profile_items(persona["profile"]):
-        if not apply_profile_key(user, key, value):
-            setattr(user, key, _coerce_to_column(columns[key], value))
+    apply_persona_profile(user, persona["profile"], persona["slug"])
     return user
 
 
@@ -276,7 +271,6 @@ def test_a_list_of_boxes_keeps_asking_about_the_boxes_nobody_answered():
 def test_a_document_is_only_due_while_its_question_applies():
     routed = {**MARRIED_SINCE, "documents": [{"name": "Heiratsurkunde", "condition": "true", "form_id": "anlage_x"}]}
     rules = FormRules({**RULES, "groups": [MARITAL, routed]})
-    assert "Heiratsurkunde" not in rules.required_documents({"p1_status": "0"})
     assert rules.required_attachments({"p1_status": "0"}) == []
     assert rules.required_attachments({"p1_status": "2"}) == ["anlage_1", "anlage_x"]
 
@@ -288,7 +282,7 @@ def test_a_description_line_in_a_money_group_takes_text():
 
 @pytest.mark.asyncio
 async def test_a_required_list_of_boxes_needs_one_ticked():
-    required = {**DISPLACED, "required": True}
+    required = {**DISPLACED, "required": True, "partial": False}
     with patch("src.routes.llm._open_form_groups", return_value=[("test_form", required)]):
         with pytest.raises(HTTPException, match="At least one"):
             await _save_form_card_answer(
@@ -407,3 +401,17 @@ async def test_a_template_needs_every_part_answered():
         ):
             _values, answered, _pdf = await form_service.resolve_field_state("test_form", MagicMock())
         assert answered == expected
+
+
+@pytest.mark.asyncio
+async def test_a_question_with_options_is_not_answered_in_the_chat():
+    with patch("src.routes.llm._open_form_groups", return_value=[("test_form", MARITAL)]):
+        with pytest.raises(HTTPException, match="show its card instead"):
+            await _save_form_card_answer(
+                MagicMock(),
+                MagicMock(),
+                MagicMock(),
+                card_id("test_form", "p1_marital_status"),
+                {ANSWER_KEY: "2"},
+                in_chat=True,
+            )

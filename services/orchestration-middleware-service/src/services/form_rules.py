@@ -63,14 +63,14 @@ class FormRules:
             filled = [f["field_id"] in answered_field_ids for f in group["fields"]]
             if not any(filled):
                 missing = group["fields"]
-            elif group["answer_type"] == "multiple_choice":
-                missing = [f for f, is_filled in zip(group["fields"], filled) if not is_filled and not f["optional"]]
-            elif group["answer_type"] in CHOICE_TYPES or not group["required"]:
+            elif group["answer_type"] != "multiple_choice" and (
+                group["answer_type"] in CHOICE_TYPES or not group["required"]
+            ):
                 missing = []
             else:
                 missing = [f for f, is_filled in zip(group["fields"], filled) if not is_filled and not f["optional"]]
             if missing:
-                open_groups.append({**group, "fields": missing})
+                open_groups.append({**group, "fields": missing, "partial": len(missing) < len(group["fields"])})
         return open_groups
 
     def _due_documents(self, values: dict[str, Any]) -> list[dict]:
@@ -80,9 +80,6 @@ class FormRules:
             for ask_if, d in self._documents
             if self._holds(ask_if, activation) and self._holds(d["condition"], activation)
         ]
-
-    def required_documents(self, values: dict[str, Any]) -> list[str]:
-        return list(dict.fromkeys(d["name"] for d in self._due_documents(values)))
 
     def required_attachments(self, values: dict[str, Any]) -> list[str]:
         return list(dict.fromkeys(d["form_id"] for d in self._due_documents(values) if d.get("form_id")))

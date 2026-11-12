@@ -692,7 +692,7 @@ def test_extract_required_context_fields_excludes_documents_and_string_literals(
         "p1_static": "Berlin",
         "p1_checkbox": True,
     }
-    fields = _extract_required_context_fields(mapping, JEXL())
+    fields = _extract_required_context_fields(mapping)
     assert fields == {"first_name", "last_name", "status"}
 
 

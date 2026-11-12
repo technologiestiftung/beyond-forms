@@ -17,12 +17,10 @@ MAX_TEXT_LENGTH = 255
 class CardInput:
     # the PDF field's CEL var, or `answer` for a choice over several fields
     key: str
-    # "choice", "select", "amount", "number", "date" or "text"
+    # "choice", "amount", "number", "date" or "text"
     kind: str
     options: tuple[Any, ...] = ()
-    options_source: Optional[str] = None
     optional: bool = False
-    max_length: int = MAX_TEXT_LENGTH
     # what the input and each of its options stand for, for the model to word the labels
     about: str = ""
     option_about: tuple[str, ...] = ()
@@ -45,7 +43,7 @@ _CHAT_VALUE_FORMAT = {"date": "a date as YYYY-MM-DD", "amount": "a number", "num
 
 def asked_in_chat(inputs: list[CardInput]) -> bool:
     """A card helps where there are options to pick from; free inputs are simply answered in the chat."""
-    return all(not i.options and not i.options_source for i in inputs)
+    return all(not i.options for i in inputs)
 
 
 def inputs_prompt(card_id: str, about: str, inputs: list[CardInput]) -> str:
@@ -69,9 +67,7 @@ def inputs_prompt(card_id: str, about: str, inputs: list[CardInput]) -> str:
         )
     lines = []
     for i in inputs:
-        if i.options_source:
-            detail = f"dropdown filled from the {i.options_source} list, no option labels"
-        elif i.options:
+        if i.options:
             keys = [option_key(o) for o in i.options]
             if i.option_about:
                 keys = [f"{key} ({meaning})" for key, meaning in zip(keys, i.option_about)]
@@ -108,9 +104,7 @@ def build_inputs_view(card_id: str, inputs: list[CardInput], args: dict) -> tupl
         item: dict[str, Any] = {"field": i.key, "kind": i.kind, "label": labels.get(i.key)}
         if i.optional:
             item["optional"] = True
-        if i.options_source:
-            item["options_source"] = i.options_source
-        elif i.options:
+        if i.options:
             given = option_labels.get(i.key) if isinstance(option_labels.get(i.key), dict) else {}
             for o in i.options:
                 errors += _text_errors(given.get(option_key(o)), f"option_labels.{i.key}.{option_key(o)}")
@@ -135,15 +129,19 @@ def _matches_kind(card_input: CardInput, value: Any) -> bool:
             return True
         except (TypeError, ValueError):
             return False
-    return isinstance(value, str) and 0 < len(value) <= card_input.max_length
+    return isinstance(value, str) and 0 < len(value) <= MAX_TEXT_LENGTH
 
 
 def input_errors(inputs: list[CardInput], values: Any) -> tuple[dict, list[str]]:
-    """The submitted values with text trimmed, and what is wrong with them for these inputs."""
+    """The submitted values with text trimmed and blank optional ones skipped, and what is wrong with them."""
     if not isinstance(values, dict):
         return {}, ["values must be an object"]
-    values = {key: value.strip() if isinstance(value, str) else value for key, value in values.items()}
     by_key = {i.key: i for i in inputs}
+    values = {key: value.strip() if isinstance(value, str) else value for key, value in values.items()}
+    # an optional input left blank is skipped, so it counts as answered without a value
+    values = {
+        key: None if value == "" and key in by_key and by_key[key].optional else value for key, value in values.items()
+    }
     errors = [f"{key} is not part of this card" for key in values if key not in by_key]
     errors += [f"{key} is missing" for key, i in by_key.items() if not i.optional and values.get(key) is None]
     errors += [
