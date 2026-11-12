@@ -32,8 +32,6 @@ logger = logging.getLogger(__name__)
 FORM_NAME_PATTERN = re.compile(r"^[a-zA-Z0-9_-]+$")
 _DOCUMENT_REF_RE = re.compile(r"documents\.([a-zA-Z_][a-zA-Z0-9_]*)(?:\.([a-zA-Z_][a-zA-Z0-9_]*))?")
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-# a mapping value that prints one context key as it is, e.g. `{{ street }}` or `{{ street ? street : '' }}`
-_PLAIN_REFERENCE_RE = re.compile(r"^\{\{\s*(\w+)\s*(?:\?\s*\1\s*:\s*''\s*)?\}\}$")
 _TEMPLATE_RE = re.compile(r"\{\{\s*(.*?)\s*\}\}", flags=re.DOTALL)
 _JEXL = JEXL()
 # pyjexl parses an expression on every evaluation; a mapping's expressions are the same on every call
@@ -181,6 +179,28 @@ def _mapping_paths(value: str) -> tuple[tuple, ...]:
     return tuple(sorted(paths, key=str))
 
 
+def _single_expression(value: str) -> Optional[Any]:
+    """The parsed expression of a mapping value that is exactly one `{{ }}`, or None."""
+    match = re.fullmatch(r"\{\{(.*)\}\}", value.strip(), flags=re.DOTALL)
+    if not match or "{{" in match.group(1):
+        return None
+    try:
+        return _parse(match.group(1))
+    except Exception:
+        return None
+
+
+@functools.lru_cache(maxsize=None)
+def _plain_path(value: str) -> Optional[tuple]:
+    """The context path a mapping prints unchanged: `{{ street }}`, `{{ street ? street : '' }}` or
+    `{{ income.Employment ? income.Employment : '' }}`."""
+    node = _single_expression(value)
+    if isinstance(node, ConditionalExpression) and isinstance(node.alternate, Literal) and node.alternate.value == "":
+        path = _identifier_path(node.test)
+        return path if path is not None and path == _identifier_path(node.consequent) else None
+    return _identifier_path(node) if node is not None else None
+
+
 def _column_test(node: Any) -> Optional[tuple[str, Any]]:
     """`marital_status == 'Married'` -> ("marital_status", "Married")."""
     if (
@@ -199,12 +219,8 @@ def _column_test(node: Any) -> Optional[tuple[str, Any]]:
 def _choice_writes(value: str) -> tuple[tuple[Any, str, Any], ...]:
     """For a mapping that picks the PDF value by comparing one column, which column value each PDF value
     stands for: `{{ legal_gender == 'Male' ? 'Ja' : '' }}` -> (("Ja", "legal_gender", "Male"),)."""
-    match = re.fullmatch(r"\{\{(.*)\}\}", value.strip(), flags=re.DOTALL)
-    if not match or "{{" in match.group(1):
-        return ()
-    try:
-        node = _parse(match.group(1))
-    except Exception:
+    node = _single_expression(value)
+    if node is None:
         return ()
     if test := _column_test(node):
         column, literal = test
@@ -561,16 +577,12 @@ class FormService:
             raise Exception(f"Forms filler error: {detail}")
         return response.content
 
-    async def plain_profile_columns(self, form_type: str) -> Dict[str, str]:
-        """The PDF fields whose mapping prints one context key unchanged, and that key. An answer to
-        such a field can be stored in that key instead of beside the mapping."""
+    async def plain_profile_paths(self, form_type: str) -> Dict[str, tuple]:
+        """The PDF fields whose mapping prints one context path unchanged, and that path, e.g. ("street",)
+        or ("income", "Employment"). An answer to such a field can be stored there instead of beside the mapping."""
         mapping, _field_types, _pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
-        columns = {}
-        for field_id, val in mapping.items():
-            match = _PLAIN_REFERENCE_RE.match(val.strip()) if isinstance(val, str) else None
-            if match:
-                columns[field_id] = match.group(1)
-        return columns
+        paths = {field_id: _plain_path(val) if isinstance(val, str) else None for field_id, val in mapping.items()}
+        return {field_id: path for field_id, path in paths.items() if path}
 
     async def choice_profile_columns(self, form_type: str) -> Dict[str, Dict[Any, Tuple[str, Any]]]:
         """The PDF fields whose mapping picks the PDF value by comparing one column, and for each PDF

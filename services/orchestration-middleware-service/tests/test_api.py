@@ -1,4 +1,5 @@
 import io
+from contextlib import contextmanager
 import re
 import uuid
 import json
@@ -482,8 +483,16 @@ BIRTHPLACE_QUESTION = f"form:{FORM}:p1_birthplace"
 @pytest.fixture
 def open_questions():
     """The groups the form rules leave open for a user with a profile; the gender choice unless a test says otherwise."""
+    user = DbUser()
+
+    @contextmanager
+    def worker_session(_user_id):
+        yield MagicMock(), user
+
     with (
-        patch("src.routes.llm._load_user_row", return_value=DbUser()),
+        patch("src.routes.llm._load_user_row", return_value=user),
+        patch("src.routes.llm._warm_form_assets", new_callable=AsyncMock),
+        patch("src.routes.llm._worker_session", worker_session),
         patch("src.routes.llm._open_form_groups", new_callable=AsyncMock) as groups,
     ):
         groups.return_value = [(FORM, GENDER)]
@@ -586,6 +595,18 @@ def test_chat_stream_offers_no_card_when_the_rules_cannot_be_evaluated(
     system_prompt = mock_completion.call_args.kwargs["messages"][0]["content"]
     assert _offered_card(mock_completion) is None
     assert "is answered" not in system_prompt
+
+
+@patch("src.routes.llm.acompletion", new_callable=AsyncMock)
+def test_chat_stream_does_not_call_the_application_complete_without_rules(
+    mock_completion, mock_conv_service, mock_conv, open_questions
+):
+    open_questions.return_value = None
+    mock_completion.return_value = _text_stream("Hallo!")
+
+    client.post("/chat/stream", json=_run_input("Weiter"))
+
+    assert "is answered" not in mock_completion.call_args.kwargs["messages"][0]["content"]
 
 
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)

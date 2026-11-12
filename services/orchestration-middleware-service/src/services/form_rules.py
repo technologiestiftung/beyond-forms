@@ -8,6 +8,7 @@ group next: as a card where there are options to pick from, otherwise in the cha
 
 import datetime
 import json
+import logging
 import os
 from functools import lru_cache
 from pathlib import Path
@@ -17,6 +18,7 @@ from cel_expr_python import cel
 
 from src.chat_cards import CardInput
 
+logger = logging.getLogger(__name__)
 RULES_DIR = Path(os.environ.get("FORM_RULES_DIR") or Path(__file__).resolve().parents[4] / "schemas" / "rules")
 CHOICE_TYPES = frozenset({"single_choice", "multiple_choice", "yes_no"})
 CARD_PREFIX = "form:"
@@ -95,12 +97,18 @@ def load_form_rules(form_id: str) -> Optional[FormRules]:
 
 @lru_cache(maxsize=1)
 def attachment_parents() -> dict[str, str]:
-    """Each attachment form and the form that links it; the attachment is filled from that form's application."""
-    parents = {}
+    """Each attachment form and the form that links it; the attachment is filled from that form's application.
+    Reads the rule files without compiling them, so one broken file leaves the other forms working."""
+    parents: dict[str, str] = {}
     for path in sorted(RULES_DIR.glob("*.rules.json")):
-        rules = load_form_rules(path.name.removesuffix(".rules.json"))
-        for form_id in rules.attachments if rules else []:
-            parents.setdefault(form_id, rules.form_id)
+        try:
+            rules = json.loads(path.read_text(encoding="utf-8"))
+            links = [d["form_id"] for g in rules["groups"] for d in g["documents"] if d.get("form_id")]
+        except (OSError, ValueError, KeyError, TypeError):
+            logger.warning("Skipping unreadable rule file %s", path.name, exc_info=True)
+            continue
+        for form_id in links:
+            parents.setdefault(form_id, rules["form_id"])
     return parents
 
 
@@ -167,9 +175,14 @@ def group_inputs(group: dict) -> list[CardInput]:
                 )
             )
         else:
-            kind = _KIND_BY_ANSWER_TYPE.get(f.get("input") or group["answer_type"], "text")
-            inputs.append(CardInput(f["var"], kind, optional=optional or f["optional"], about=f["meaning"]))
+            inputs.append(
+                CardInput(f["var"], _free_kind(group, f), optional=optional or f["optional"], about=f["meaning"])
+            )
     return inputs
+
+
+def _free_kind(group: dict, field: dict) -> str:
+    return _KIND_BY_ANSWER_TYPE.get(field.get("input") or group["answer_type"], "text")
 
 
 def _box_value(field: dict, export: Optional[str], ticked: bool) -> Any:
@@ -178,12 +191,11 @@ def _box_value(field: dict, export: Optional[str], ticked: bool) -> Any:
     return (export or "Ja") if ticked else ""
 
 
-def _text_value(value: Any) -> str:
+def _text_value(value: Any, kind: str) -> str:
     # the PDF prints dates the way the profile mapping does
-    try:
+    if kind == "date":
         return datetime.date.fromisoformat(value).strftime("%d.%m.%Y")
-    except (TypeError, ValueError):
-        return str(value)
+    return str(value)
 
 
 def group_answer(group: dict, values: dict[str, Any]) -> dict[str, Any]:
@@ -212,7 +224,9 @@ def group_answer(group: dict, values: dict[str, Any]) -> dict[str, Any]:
         if value is None:
             continue
         f = by_var[var]
-        answer[f["field_id"]] = _box_value(f, None, value) if f["type"] == "bool" else _text_value(value)
+        answer[f["field_id"]] = (
+            _box_value(f, None, value) if f["type"] == "bool" else _text_value(value, _free_kind(group, f))
+        )
     return answer
 
 

@@ -1,9 +1,11 @@
 import asyncio
+import decimal
 import enum
 import json
 import typing
+from contextlib import contextmanager
 from functools import partial
-from typing import Optional
+from typing import Any, Optional
 import os
 import uuid
 
@@ -15,7 +17,7 @@ from sqlalchemy.orm import Session
 from litellm import acompletion
 import logging
 
-from src.db import get_db
+from src.db import SessionLocal, get_db
 from src.models import Users as DbUser, ChatMessageRoleType, UserApplications
 from src.prompts import SYSTEM_PROMPT, generate_tool_usage_prompt
 from src.services.user_service import (
@@ -29,7 +31,14 @@ from src.services.user_service import (
 from src.services.conversation_service import ConversationService, get_conversation_service
 from src.services.rag_service import search_knowledge_base
 from beyondforms.auth import User as AuthUser, get_current_user, require_authenticated_user
-from src.schemas import AssociatedPersonSchema, UserInformationUpdateSchema, UserProfileValidationSchema
+from src.schemas import (
+    AssetEntrySchema,
+    AssociatedPersonSchema,
+    ExpenseEntrySchema,
+    IncomeEntrySchema,
+    UserInformationUpdateSchema,
+    UserProfileValidationSchema,
+)
 from src.tools import AVAILABLE_TOOLS, SAVE_ANSWER_TOOL_NAME, SHOW_CARD_TOOL_NAME
 from src.chat_cards import (
     APPLICATION_DONE_PROMPT,
@@ -48,13 +57,22 @@ from src.services.form_rules import (
     load_form_rules,
     parse_card_id as parse_form_card_id,
 )
-from src.services.form_service import FormService
+from src.services.form_service import FormService, _get_form_assets
 from ag_ui.core import RunStartedEvent, RunFinishedEvent, RunErrorEvent, TextMessageChunkEvent, ToolCallChunkEvent
 from ag_ui.encoder import EventEncoder
 from ag_ui.core.types import RunAgentInput
 
 
 _USER_FIELD_NAMES: frozenset[str] = frozenset(UserInformationUpdateSchema.model_fields)
+_MONEY_GRIDS = {
+    "income": ("income_entries", "income_type", "monthly_amount", IncomeEntrySchema),
+    "expenses": ("expense_entries", "expense_type", "monthly_amount", ExpenseEntrySchema),
+    "assets": ("asset_entries", "asset_type", "amount", AssetEntrySchema),
+}
+# the columns a chat answer can be written to: profile columns the write schema knows, not the money grids
+_PROFILE_COLUMNS = (_USER_FIELD_NAMES & frozenset(UserProfileValidationSchema.model_fields)) - {
+    attr for attr, *_ in _MONEY_GRIDS.values()
+}
 
 
 def _unwrap_annotation(annotation):
@@ -86,6 +104,8 @@ CHAT_CONTEXT_WINDOW_SIZE = int(os.getenv("CHAT_CONTEXT_WINDOW_SIZE", "20"))
 MAX_CARD_ANSWER_LENGTH = 4000
 # the PDF form whose rules (`schemas/rules/<form>.rules.json`) pick every next question
 FORM_RULES_FORM_ID = "antrag_grundsicherung_im_alter"
+# past this the reply goes out without a question instead of keeping the user waiting
+FORM_EVALUATION_TIMEOUT_SECONDS = 3
 ANSWERED_AGAIN_PROMPT = (
     "\nThe user already answered this card, but it is not complete yet: show it again and say what is missing."
 )
@@ -211,12 +231,13 @@ async def _form_state(form_service: FormService, user_row: DbUser, form_id: str)
     return values, answered
 
 
-async def _open_form_groups(db: Session, user_row: DbUser) -> list[tuple[str, dict]]:
+async def _open_form_groups(db: Session, user_row: DbUser) -> Optional[list[tuple[str, dict]]]:
     """The open groups of the application form, or once it has none, of each attachment form (Anlage) its
-    answers require: the chat asks the application form first, so the attachments wait until then."""
+    answers require: the chat asks the application form first, so the attachments wait until then.
+    None if there are no rules to evaluate."""
     main_rules = load_form_rules(FORM_RULES_FORM_ID)
     if main_rules is None:
-        return []
+        return None
     form_service = FormService(db=db)
     main_values, main_answered = await _form_state(form_service, user_row, FORM_RULES_FORM_ID)
     if main_open := main_rules.open_groups(main_values, main_answered):
@@ -230,6 +251,29 @@ async def _open_form_groups(db: Session, user_row: DbUser) -> list[tuple[str, di
     return open_groups
 
 
+@contextmanager
+def _worker_session(user_id):
+    """A session of its own for a worker thread, which must not touch the request's session, and the user in it."""
+    db = SessionLocal()
+    try:
+        yield db, db.get(DbUser, user_id)
+    finally:
+        db.close()
+
+
+def _open_form_groups_in_worker(user_id) -> Optional[list[tuple[str, dict]]]:
+    with _worker_session(user_id) as (db, user_row):
+        return asyncio.run(_open_form_groups(db, user_row)) if user_row is not None else None
+
+
+async def _warm_form_assets(db: Session) -> None:
+    """Loads the mappings into the shared cache on the event loop, so the worker thread only reads them."""
+    main_rules = load_form_rules(FORM_RULES_FORM_ID)
+    form_service = FormService(db=db)
+    for form_id in [FORM_RULES_FORM_ID, *(main_rules.attachments if main_rules else [])]:
+        await _get_form_assets(form_id, form_service.mapping_path, form_service.pdfs_path)
+
+
 async def _next_form_card(
     db: Session, user_row: Optional[DbUser], answered_card_ids: set[str]
 ) -> tuple[Optional[str], str, list[CardInput]]:
@@ -237,9 +281,16 @@ async def _next_form_card(
     if user_row is None:
         return None, "", []
     try:
-        open_groups = await _open_form_groups(db, user_row)
+        await _warm_form_assets(db)
+        # the evaluation queries and evaluates hundreds of mappings, so it runs off the event loop and may
+        # not hold up the reply
+        open_groups = await asyncio.wait_for(
+            asyncio.to_thread(_open_form_groups_in_worker, user_row.id), FORM_EVALUATION_TIMEOUT_SECONDS
+        )
     except Exception:
         logger.warning("Could not resolve the fields of %s", FORM_RULES_FORM_ID, exc_info=True)
+        return None, "", []
+    if open_groups is None:
         return None, "", []
     if not open_groups:
         return None, APPLICATION_DONE_PROMPT, []
@@ -258,7 +309,7 @@ async def _save_form_card_answer(
     """Stores the answer to an open question, from its card or (`in_chat`) asked in the chat: in the profile
     column a field's mapping prints unchanged or picks by, otherwise in the application's `form_data`, which
     `fill_form` reads for the fields the mapping leaves empty."""
-    open_groups = {(f, g["id"]): g for f, g in await _open_form_groups(db, user_row)}
+    open_groups = {(f, g["id"]): g for f, g in await _open_form_groups(db, user_row) or []}
     form_id, group_id = parse_form_card_id(offered) or (None, None)
     group = open_groups.get((form_id, group_id))
     if group is None:
@@ -281,42 +332,34 @@ async def _save_form_card_answer(
     answer = group_answer(group, values)
 
     form_service = FormService(db=db)
-    columns = await form_service.plain_profile_columns(form_id)
+    paths = await form_service.plain_profile_paths(form_id)
     choices = await form_service.choice_profile_columns(form_id)
     kinds = {i.key: i.kind for i in inputs}
-    profile = {
-        columns[f["field_id"]]: values[f["var"]]
+    # where each field's answer can live in the profile: the path its mapping prints, or the column it picks by
+    by_path = {
+        f["field_id"]: paths.get(f["field_id"])
+        or next(((column,) for column, _value in choices.get(f["field_id"], {}).values()), None)
         for f in group["fields"]
-        if values.get(f["var"]) is not None
-        and kinds.get(f["var"]) in ("text", "date", "amount", "number")
-        and columns.get(f["field_id"]) in _USER_FIELD_NAMES
     }
+    written: dict[tuple, Any] = {}
+    for f in group["fields"]:
+        value = values.get(f["var"])
+        if (
+            value is not None
+            and kinds.get(f["var"]) in ("text", "date", "amount", "number")
+            and paths.get(f["field_id"])
+        ):
+            written[paths[f["field_id"]]] = value
     # a chosen option is stored as the column value its mapping turns into that option
     for field_id, value in answer.items():
         column, column_value = choices.get(field_id, {}).get(value, (None, None))
-        if column in _USER_FIELD_NAMES:
-            profile.setdefault(column, column_value)
-    try:
-        payload = UserProfileValidationSchema.model_validate(profile)
-    except ValidationError:
-        # a value the column rejects still fills the form
-        payload = None
-    if payload is not None:
-        try:
-            write_profile_payload(db, user_row, payload)
-        except ProfileWriteError:
-            db.rollback()
-            payload = None
-    stored = set(profile) if payload is not None else set()
-    by_column = {
-        f["field_id"]: columns.get(f["field_id"])
-        or next((column for column, _value in choices.get(f["field_id"], {}).values()), None)
-        for f in group["fields"]
-    }
+        if column is not None:
+            written.setdefault((column,), column_value)
+    stored = _write_profile_answers(db, user_row, written)
     # every field of the card is recorded, so one left empty on purpose counts as answered
     unanswered = {f["field_id"]: False if f["type"] == "bool" else "" for f in group["fields"]}
     rest = {
-        field_id: value for field_id, value in {**unanswered, **answer}.items() if by_column.get(field_id) not in stored
+        field_id: value for field_id, value in {**unanswered, **answer}.items() if by_path.get(field_id) not in stored
     }
 
     application = form_service.find_application(form_id, user_row, strict=True)
@@ -330,6 +373,83 @@ async def _save_form_card_answer(
     pdf_fields[form_id] = {**(pdf_fields.get(form_id) or {}), **rest}
     # reassigned rather than mutated, so SQLAlchemy sees the JSONB change
     application.form_data = {**form_data, "pdf_fields": pdf_fields}
+
+
+def _column_accepts(column: str, value: Any) -> bool:
+    """Whether a profile column takes this value as it is: one the chat may write, within the column's length
+    and enum, and valid for the write schema. Anything else stays beside the mapping instead."""
+    if column not in _PROFILE_COLUMNS:
+        return False
+    column_type = DbUser.__table__.columns[column].type if column in DbUser.__table__.columns else None
+    enums = getattr(column_type, "enums", None)
+    if enums and value not in enums:
+        return False
+    length = getattr(column_type, "length", None)
+    if isinstance(value, str) and length and len(value) > length:
+        return False
+    try:
+        UserProfileValidationSchema.model_validate({column: value})
+    except ValidationError:
+        return False
+    return True
+
+
+def _amount(value: Any) -> Optional[decimal.Decimal]:
+    try:
+        amount = decimal.Decimal(str(value).replace(",", "."))
+    except decimal.InvalidOperation:
+        return None
+    return amount if amount.is_finite() and amount >= 0 else None
+
+
+def _money_rows(user_row: DbUser, grid: str, amounts: dict[str, decimal.Decimal]) -> list[dict]:
+    """The grid's rows with the applicant's lines for these types set, the rest kept as they are."""
+    attr, type_field, amount_field, row_schema = _MONEY_GRIDS[grid]
+    schema_fields = row_schema.model_fields
+    rows = []
+    for row in getattr(user_row, attr):
+        item = {
+            name: (value.value if isinstance(value, enum.Enum) else value)
+            for name in schema_fields
+            if name != "person_sort_order" and (value := getattr(row, name, None)) is not None
+        }
+        item["person_sort_order"] = row.person.sort_order if row.person is not None else None
+        if item["person_sort_order"] is None and item.get(type_field) in amounts:
+            continue
+        rows.append(item)
+    return rows + [{type_field: kind, amount_field: amount} for kind, amount in amounts.items()]
+
+
+def _write_profile_answers(db: Session, user_row: DbUser, written: dict[tuple, Any]) -> set[tuple]:
+    """Writes the answers a profile column or a money line takes, each checked on its own so one value the
+    profile rejects doesn't hold back the others, and returns the paths it stored."""
+    columns = {path: value for path, value in written.items() if len(path) == 1 and _column_accepts(path[0], value)}
+    payload: dict[str, Any] = {path[0]: value for path, value in columns.items()}
+    stored = set(columns)
+    for grid, (attr, *_) in _MONEY_GRIDS.items():
+        # `Pension` is the sum of the pension lines, not a line of its own
+        amounts = {
+            path[1]: amount
+            for path, value in written.items()
+            if len(path) == 2 and path[0] == grid and path[1] != "Pension" and (amount := _amount(value)) is not None
+        }
+        if not amounts:
+            continue
+        rows = _money_rows(user_row, grid, amounts)
+        try:
+            UserProfileValidationSchema.model_validate({attr: rows})
+        except ValidationError:
+            continue
+        payload[attr] = rows
+        stored |= {(grid, kind) for kind in amounts}
+    if not payload:
+        return set()
+    try:
+        write_profile_payload(db, user_row, UserProfileValidationSchema.model_validate(payload))
+    except ProfileWriteError:
+        db.rollback()
+        return set()
+    return stored
 
 
 def _field_lines(model: type[BaseModel], indent: str = "  ") -> list[str]:

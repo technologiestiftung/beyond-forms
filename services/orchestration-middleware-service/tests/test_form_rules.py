@@ -202,7 +202,7 @@ async def test_a_form_card_answer_goes_to_plain_columns_and_beside_the_mapping()
     db, user_row = MagicMock(), MagicMock(id=uuid.uuid4())
     with (
         patch("src.routes.llm._open_form_groups", return_value=[("test_form", group)]),
-        patch.object(FormService, "plain_profile_columns", return_value={"p1_city": "city"}),
+        patch.object(FormService, "plain_profile_paths", return_value={"p1_city": ("city",)}),
         patch.object(FormService, "choice_profile_columns", return_value={}),
         patch.object(FormService, "find_application", return_value=application),
         patch("src.routes.llm.attachment_parents", return_value={}),
@@ -336,7 +336,7 @@ async def test_a_chosen_option_is_stored_in_the_column_its_mapping_reads():
     application = MagicMock(spec=UserApplications, form_type="test_form", form_data={})
     with (
         patch("src.routes.llm._open_form_groups", return_value=[("test_form", MARITAL)]),
-        patch.object(FormService, "plain_profile_columns", return_value={}),
+        patch.object(FormService, "plain_profile_paths", return_value={}),
         patch.object(
             FormService,
             "choice_profile_columns",
@@ -415,3 +415,89 @@ async def test_a_question_with_options_is_not_answered_in_the_chat():
                 {ANSWER_KEY: "2"},
                 in_chat=True,
             )
+
+
+def _save_patches(group: dict, paths: dict, application: MagicMock, choices: dict | None = None):
+    return (
+        patch("src.routes.llm._open_form_groups", return_value=[("test_form", group)]),
+        patch.object(FormService, "plain_profile_paths", return_value=paths),
+        patch.object(FormService, "choice_profile_columns", return_value=choices or {}),
+        patch.object(FormService, "find_application", return_value=application),
+        patch("src.routes.llm.write_profile_payload"),
+    )
+
+
+@pytest.mark.asyncio
+async def test_a_value_its_column_does_not_take_stays_beside_the_mapping_and_the_others_are_still_written():
+    group = _group(
+        "p3_bank",
+        "text",
+        [_field("p3_city", meaning="Ort"), _field("p3_bic", meaning="BIC"), _field("p3_phone", meaning="Telefon")],
+    )
+    application = MagicMock(spec=UserApplications, form_type="test_form", form_data={})
+    paths = {"p3_city": ("city",), "p3_bic": ("bic",), "p3_phone": ("phone_number",)}
+    first, second, third, fourth, fifth = _save_patches(group, paths, application)
+    with first, second, third, fourth, fifth as write_profile:
+        await _save_form_card_answer(
+            MagicMock(),
+            MagicMock(id=uuid.uuid4()),
+            MagicMock(),
+            card_id("test_form", "p3_bank"),
+            # a BIC is at most 11 characters, and the chat may not write the phone number
+            {"p3_city": "Berlin", "p3_bic": "DEUTDEFF500XXX", "p3_phone": "030 123"},
+        )
+    assert write_profile.call_args.args[2].model_dump(exclude_unset=True) == {"city": "Berlin"}
+    assert application.form_data == {"pdf_fields": {"test_form": {"p3_bic": "DEUTDEFF500XXX", "p3_phone": "030 123"}}}
+
+
+@pytest.mark.asyncio
+async def test_an_amount_for_an_income_line_becomes_an_income_row():
+    group = _group("p4_employment", "money", [_field("p4_employment", meaning="Erwerbseinkommen")])
+    application = MagicMock(spec=UserApplications, form_type="test_form", form_data={})
+    user_row = Users(id=uuid.uuid4())
+    first, second, third, fourth, fifth = _save_patches(group, {"p4_employment": ("income", "Employment")}, application)
+    with first, second, third, fourth, fifth as write_profile:
+        await _save_form_card_answer(
+            MagicMock(), user_row, MagicMock(), card_id("test_form", "p4_employment"), {"p4_employment": 450}
+        )
+    rows = write_profile.call_args.args[2].model_dump(exclude_unset=True)["income_entries"]
+    assert [(row["income_type"], row["monthly_amount"]) for row in rows] == [("Employment", 450)]
+    assert application.form_data == {"pdf_fields": {"test_form": {}}}
+
+
+@pytest.mark.parametrize(
+    "mapping, path",
+    [
+        ("{{ street }}", ("street",)),
+        ("{{ street ? street : '' }}", ("street",)),
+        (
+            "{{ income['Agriculture and Forestry'] ? income['Agriculture and Forestry'] : '' }}",
+            ("income", "Agriculture and Forestry"),
+        ),
+        ("{{ street ? house_number : '' }}", None),
+        ("{{ last_name }}, {{ first_name }}", None),
+    ],
+)
+def test_the_path_a_mapping_prints_unchanged(mapping, path):
+    from src.services.form_service import _plain_path
+
+    assert _plain_path(mapping) == path
+
+
+def test_a_text_that_looks_like_a_date_is_not_reformatted():
+    group = _group("p1_reference", "text", [_field("p1_reference", meaning="Geschäftszeichen")])
+    assert group_answer(group, {"p1_reference": "20231215"}) == {"p1_reference": "20231215"}
+
+
+def test_an_unreadable_rule_file_does_not_break_the_attachment_lookup(tmp_path):
+    from src.services import form_rules
+
+    (tmp_path / "broken.rules.json").write_text("{", encoding="utf-8")
+    linked = {**RULES, "groups": [MARITAL]}
+    (tmp_path / "test_form.rules.json").write_text(json.dumps(linked), encoding="utf-8")
+    form_rules.attachment_parents.cache_clear()
+    try:
+        with patch.object(form_rules, "RULES_DIR", tmp_path):
+            assert form_rules.attachment_parents() == {"anlage_1": "test_form"}
+    finally:
+        form_rules.attachment_parents.cache_clear()
