@@ -5,7 +5,7 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 from src.data.berlin_zip_code_to_district import BERLIN_ZIP_CODE_TO_DISTRICT
-from src.models import BerlinAddress
+from src.models import BerlinAddresses
 
 logger = logging.getLogger(__name__)
 
@@ -71,8 +71,8 @@ def _lookup_via_local_db(
     nested = db.begin_nested()
     try:
         exact_match = (
-            db.query(BerlinAddress.bez_name)
-            .filter(BerlinAddress.plz == zip_code, BerlinAddress.street == street_norm, BerlinAddress.hnr == hnr_norm)
+            db.query(BerlinAddresses.bez_name)
+            .filter(BerlinAddresses.plz == zip_code, BerlinAddresses.street == street_norm, BerlinAddresses.hnr == hnr_norm)
             .limit(1)
             .scalar()
         )

@@ -5,7 +5,7 @@ import pytest
 from unittest.mock import MagicMock
 
 from src.chat_cards import build_card_view, card_inputs, card_prompt, validate_card_answer
-from src.models import AccomodationType, IncomeEntries, IncomeTypeType, Users
+from src.models import AccomodationType, IncomeEntries, IncomeType, Users
 from src.schemas import UserProfileValidationSchema
 from src.services.user_service import write_profile_payload
 from src.services.wizard_rules import RULES_PATH, application_start_step, evaluation_payload, rules_steps
@@ -37,7 +37,7 @@ def _args(step_id: str) -> dict:
 def test_columns_name_profile_columns_or_income_types():
     columns = set(Users.__table__.columns.keys())
     accepted = set(UserProfileValidationSchema.model_fields)
-    income_types = {t.value for t in IncomeTypeType}
+    income_types = {t.value for t in IncomeType}
     unknown = [
         (step_id, entry)
         for step_id, step in _card_steps().items()
@@ -189,7 +189,7 @@ def test_validate_card_answer_stores_empty_income_lines_as_zero():
 
 def test_a_card_amount_keeps_the_stored_office_and_reference():
     stored = IncomeEntries(
-        income_type=IncomeTypeType.OLD_AGE_PENSION,
+        income_type=IncomeType.OLD_AGE_PENSION,
         monthly_amount=decimal.Decimal("500"),
         awarding_office="DRV Bund",
         reference_no="12 345678 K 001",
@@ -199,7 +199,7 @@ def test_a_card_amount_keeps_the_stored_office_and_reference():
 
     write_profile_payload(MagicMock(), user, payload)
 
-    old_age = next(row for row in user.income_entries if row.income_type == IncomeTypeType.OLD_AGE_PENSION)
+    old_age = next(row for row in user.income_entries if row.income_type == IncomeType.OLD_AGE_PENSION)
     assert (old_age.monthly_amount, old_age.awarding_office, old_age.reference_no) == (
         650,
         "DRV Bund",
@@ -227,9 +227,9 @@ def test_evaluation_payload_holds_the_stored_values_at_the_rule_fields():
 def test_evaluation_payload_adds_up_income_rows_and_keeps_unanswered_lines_missing():
     user = Users(
         income_entries=[
-            IncomeEntries(income_type=IncomeTypeType.OLD_AGE_PENSION, monthly_amount=decimal.Decimal("400")),
-            IncomeEntries(income_type=IncomeTypeType.SURVIVOR_PENSION, monthly_amount=decimal.Decimal("200")),
-            IncomeEntries(income_type=IncomeTypeType.ALIMONY, monthly_amount=decimal.Decimal("0")),
+            IncomeEntries(income_type=IncomeType.OLD_AGE_PENSION, monthly_amount=decimal.Decimal("400")),
+            IncomeEntries(income_type=IncomeType.SURVIVOR_PENSION, monthly_amount=decimal.Decimal("200")),
+            IncomeEntries(income_type=IncomeType.ALIMONY, monthly_amount=decimal.Decimal("0")),
         ]
     )
 

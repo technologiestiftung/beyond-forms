@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from src.db import get_db
 from src.main import app
-from src.models import IncomeEntries, UploadedFiles, UserDocuments, Users as DbUser, IncomeTypeType, AssetTypeType
+from src.models import IncomeEntries, UploadedFiles, UserDocuments, Users as DbUser, IncomeType, AssetType
 from src.services.user_service import UserService, get_user_service
 
 client = TestClient(app)
@@ -53,7 +53,7 @@ def test_get_profile_success(mock_cleanup, mock_db):
     mock_user = DbUser(
         id=mock_user_id,
         phone_number="1234567890",
-        income_entries=[IncomeEntries(income_type=IncomeTypeType.OLD_AGE_PENSION, monthly_amount=650)],
+        income_entries=[IncomeEntries(income_type=IncomeType.OLD_AGE_PENSION, monthly_amount=650)],
     )
     # Mock chain: db.query(User).filter(...).first()
     mock_db.query.return_value.filter.return_value.first.return_value = mock_user
@@ -186,10 +186,10 @@ def test_update_profile_all_fields_success(mock_post, mock_db):
     assert mock_user.has_assets is True
     assert mock_user.assets_description == "Some valuable items"
     assert len(mock_user.income_entries) == 1
-    assert mock_user.income_entries[0].income_type == IncomeTypeType.PENSION
+    assert mock_user.income_entries[0].income_type == IncomeType.PENSION
     assert mock_user.income_entries[0].person is None
     assert len(mock_user.asset_entries) == 1
-    assert mock_user.asset_entries[0].asset_type == AssetTypeType.SAVINGS_AND_CASH
+    assert mock_user.asset_entries[0].asset_type == AssetType.SAVINGS_AND_CASH
     assert mock_user.has_disability_id is True
     assert mock_user.has_costly_medical_nutrition is False
     mock_db.commit.assert_called_once()

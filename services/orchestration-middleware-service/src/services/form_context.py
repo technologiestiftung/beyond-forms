@@ -9,7 +9,7 @@ from src.models import (
     PENSION_INCOME_KEYS,
     AssociatedPersons,
     AssociationType,
-    BenefitClaimKindType,
+    BenefitClaimKind,
 )
 
 PARTNER_TYPES = frozenset(
@@ -158,7 +158,7 @@ def _entries_by_type(entries: Iterable[Any], type_field: str, value_field: str) 
     return out
 
 
-def _claim_rows(claims: Iterable[Any], kind: BenefitClaimKindType) -> List[Dict[str, Any]]:
+def _claim_rows(claims: Iterable[Any], kind: BenefitClaimKind) -> List[Dict[str, Any]]:
     rows = [claim for claim in claims if claim.claim_kind == kind]
     return [row_to_dict(row) for row in sorted(rows, key=lambda claim: claim.sort_order)]
 
@@ -211,8 +211,8 @@ def money_context(entries: Iterable[Any], person_id: Any) -> Dict[str, Any]:
             }
             for row in sorted(income, key=lambda entry: str(entry.income_type))
         ],
-        "pending_benefit_claims": _claim_rows(claims, BenefitClaimKindType.PENDING_APPLICATION),
-        "expected_one_time_payments": _claim_rows(claims, BenefitClaimKindType.EXPECTED_ONE_TIME_PAYMENT),
+        "pending_benefit_claims": _claim_rows(claims, BenefitClaimKind.PENDING_APPLICATION),
+        "expected_one_time_payments": _claim_rows(claims, BenefitClaimKind.EXPECTED_ONE_TIME_PAYMENT),
     }
 
 

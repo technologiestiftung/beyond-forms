@@ -356,13 +356,13 @@ _DERIVED_DESCRIPTIONS = {
 _PERSON_VALUED_TYPES = ("Person or null", "List[Person]")
 
 _MONEY_KEY_ENUMS = {
-    "income": "IncomeTypeType",
-    "income_office": "IncomeTypeType",
-    "income_reference": "IncomeTypeType",
-    "expenses": "ExpenseTypeType",
-    "expense_notes": "ExpenseTypeType",
-    "assets": "AssetTypeType",
-    "asset_descriptions": "AssetTypeType",
+    "income": "IncomeType",
+    "income_office": "IncomeType",
+    "income_reference": "IncomeType",
+    "expenses": "ExpenseType",
+    "expense_notes": "ExpenseType",
+    "assets": "AssetType",
+    "asset_descriptions": "AssetType",
 }
 _MONEY_KEYS = (
     *_MONEY_KEY_ENUMS,
@@ -479,7 +479,7 @@ def _money_rows_for_person(models, person_id: Any, data: Dict[str, Any]) -> list
         rows.append(
             models.IncomeEntries(
                 person_id=person_id,
-                income_type=models.IncomeTypeType(entry["income_type"]),
+                income_type=models.IncomeType(entry["income_type"]),
                 monthly_amount=_decimal_or_none(entry.get("monthly_amount")),
                 awarding_office=entry.get("awarding_office"),
                 reference_no=entry.get("reference_no"),
@@ -491,7 +491,7 @@ def _money_rows_for_person(models, person_id: Any, data: Dict[str, Any]) -> list
             rows.append(
                 models.IncomeEntries(
                     person_id=person_id,
-                    income_type=models.IncomeTypeType.PENSION,
+                    income_type=models.IncomeType.PENSION,
                     monthly_amount=_decimal_or_none(scalar),
                 )
             )
@@ -500,7 +500,7 @@ def _money_rows_for_person(models, person_id: Any, data: Dict[str, Any]) -> list
         rows.append(
             models.ExpenseEntries(
                 person_id=person_id,
-                expense_type=models.ExpenseTypeType(entry["expense_type"]),
+                expense_type=models.ExpenseType(entry["expense_type"]),
                 monthly_amount=_decimal_or_none(entry.get("monthly_amount")),
                 note=entry.get("note"),
             )
@@ -510,7 +510,7 @@ def _money_rows_for_person(models, person_id: Any, data: Dict[str, Any]) -> list
         rows.append(
             models.AssetEntries(
                 person_id=person_id,
-                asset_type=models.AssetTypeType(entry["asset_type"]),
+                asset_type=models.AssetType(entry["asset_type"]),
                 amount=_decimal_or_none(entry.get("amount")),
                 description=entry.get("description"),
             )
@@ -520,7 +520,7 @@ def _money_rows_for_person(models, person_id: Any, data: Dict[str, Any]) -> list
         rows.append(
             models.BenefitClaimEntries(
                 person_id=person_id,
-                claim_kind=models.BenefitClaimKindType(entry["claim_kind"]),
+                claim_kind=models.BenefitClaimKind(entry["claim_kind"]),
                 sort_order=entry.get("sort_order", index),
                 benefit_type=entry.get("benefit_type"),
                 event_date=datetime.date.fromisoformat(entry["event_date"]) if entry.get("event_date") else None,

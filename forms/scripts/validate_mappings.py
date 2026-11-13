@@ -91,7 +91,7 @@ def _stand_in_money_entries(models, person) -> List[Any]:
     new income line needs no change here."""
     entries: List[Any] = []
     for owner in (None, person.id):
-        for member in models.IncomeTypeType:
+        for member in models.IncomeType:
             entries.append(
                 models.IncomeEntries(
                     person_id=owner,
@@ -101,19 +101,19 @@ def _stand_in_money_entries(models, person) -> List[Any]:
                     reference_no="dummy",
                 )
             )
-        for member in models.ExpenseTypeType:
+        for member in models.ExpenseType:
             entries.append(
                 models.ExpenseEntries(
                     person_id=owner, expense_type=member, monthly_amount=decimal.Decimal("1"), note="dummy"
                 )
             )
-        for member in models.AssetTypeType:
+        for member in models.AssetType:
             entries.append(
                 models.AssetEntries(
                     person_id=owner, asset_type=member, amount=decimal.Decimal("1"), description="dummy"
                 )
             )
-        for member in models.BenefitClaimKindType:
+        for member in models.BenefitClaimKind:
             entries.append(
                 models.BenefitClaimEntries(
                     person_id=owner,
