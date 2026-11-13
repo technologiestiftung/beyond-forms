@@ -8,6 +8,9 @@ from sqlalchemy import BigInteger, Boolean, CHAR, CheckConstraint, Column, Date,
 from sqlalchemy.dialects.postgresql import DOMAIN, JSONB
 from sqlmodel import Field, Relationship, SQLModel
 
+ISO_COUNTRY = DOMAIN('iso_country', CHAR(2), constraint_name='iso_country_check', check="VALUE ~ '^[A-Z]{2}$'", create_type=False)
+MONEY_NONNEG = DOMAIN('money_nonneg', NUMERIC(10, 2), constraint_name='money_nonneg_check', check='VALUE >= 0', create_type=False)
+
 class AbilityToWorkType(str, enum.Enum):
     FULLY_ABLE = 'Fully able'
     TEMPORARILY_DISABLED = 'Temporarily disabled'
@@ -398,7 +401,7 @@ class Users(SQLModel, table=True):
     resident_in_district_since: Optional[datetime.date] = Field(default=None, sa_column=Column('resident_in_district_since', Date))
     previous_address: Optional[str] = Field(default=None, sa_column=Column('previous_address', String(255)))
     rent_arrears_period: Optional[str] = Field(default=None, sa_column=Column('rent_arrears_period', String(255)))
-    rent_arrears_amount: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('rent_arrears_amount', DOMAIN('money_nonneg', NUMERIC(), constraint_name='money_nonneg_check', not_null=False, check=text('VALUE >= 0::numeric'), create_type=False, schema=None, metadata=MetaData())))
+    rent_arrears_amount: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('rent_arrears_amount', MONEY_NONNEG))
     tenancy_terminated_on: Optional[datetime.date] = Field(default=None, sa_column=Column('tenancy_terminated_on', Date))
     sublet_unrentable_reason: Optional[str] = Field(default=None, sa_column=Column('sublet_unrentable_reason', String(255)))
     inpatient_facility_assigned_until: Optional[datetime.date] = Field(default=None, sa_column=Column('inpatient_facility_assigned_until', Date))
@@ -411,7 +414,7 @@ class Users(SQLModel, table=True):
     commute_distance_km: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('commute_distance_km', Numeric(10, 2)))
     has_child_with_substantial_income: Optional[bool] = Field(default=None, sa_column=Column('has_child_with_substantial_income', Boolean))
     have_parents_substantial_joint_income: Optional[bool] = Field(default=None, sa_column=Column('have_parents_substantial_joint_income', Boolean))
-    monthly_expenses_total: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('monthly_expenses_total', DOMAIN('money_nonneg', NUMERIC(), constraint_name='money_nonneg_check', not_null=False, check=text('VALUE >= 0::numeric'), create_type=False, schema=None, metadata=MetaData())))
+    monthly_expenses_total: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('monthly_expenses_total', MONEY_NONNEG))
     landlord_address: Optional[str] = Field(default=None, sa_column=Column('landlord_address', String(255)))
     main_tenant_name: Optional[str] = Field(default=None, sa_column=Column('main_tenant_name', String(255)))
     vehicle_make: Optional[str] = Field(default=None, sa_column=Column('vehicle_make', String(255)))
@@ -459,12 +462,12 @@ class AssociatedPersons(SQLModel, table=True):
     place_of_birth: Optional[str] = Field(default=None, sa_column=Column('place_of_birth', String(255)))
     legal_gender: Optional[GenderType] = Field(default=None, sa_column=Column('legal_gender', Enum(GenderType, values_callable=lambda cls: [member.value for member in cls], name='gender_type')))
     marital_status: Optional[MaritalStatusType] = Field(default=None, sa_column=Column('marital_status', Enum(MaritalStatusType, values_callable=lambda cls: [member.value for member in cls], name='marital_status_type')))
-    nationality: Optional[str] = Field(default=None, sa_column=Column('nationality', DOMAIN('iso_country', CHAR(collation='default'), 'default', constraint_name='iso_country_check', not_null=False, check=text("VALUE ~ '^[A-Z]{2}$'::text"), create_type=False, schema=None, metadata=MetaData())))
-    second_nationality: Optional[str] = Field(default=None, sa_column=Column('second_nationality', DOMAIN('iso_country', CHAR(collation='default'), 'default', constraint_name='iso_country_check', not_null=False, check=text("VALUE ~ '^[A-Z]{2}$'::text"), create_type=False, schema=None, metadata=MetaData())))
+    nationality: Optional[str] = Field(default=None, sa_column=Column('nationality', ISO_COUNTRY))
+    second_nationality: Optional[str] = Field(default=None, sa_column=Column('second_nationality', ISO_COUNTRY))
     relationship_to_applicant: Optional[str] = Field(default=None, sa_column=Column('relationship_to_applicant', String(255)))
     employment_status: Optional[str] = Field(default=None, sa_column=Column('employment_status', String(255)))
-    monthly_income: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('monthly_income', DOMAIN('money_nonneg', NUMERIC(), constraint_name='money_nonneg_check', not_null=False, check=text('VALUE >= 0::numeric'), create_type=False, schema=None, metadata=MetaData())))
-    monthly_pension_income: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('monthly_pension_income', DOMAIN('money_nonneg', NUMERIC(), constraint_name='money_nonneg_check', not_null=False, check=text('VALUE >= 0::numeric'), create_type=False, schema=None, metadata=MetaData())))
+    monthly_income: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('monthly_income', MONEY_NONNEG))
+    monthly_pension_income: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('monthly_pension_income', MONEY_NONNEG))
     has_own_income: Optional[bool] = Field(default=None, sa_column=Column('has_own_income', Boolean))
     is_alimony_obligated: Optional[bool] = Field(default=None, sa_column=Column('is_alimony_obligated', Boolean))
     is_german_citizen: Optional[bool] = Field(default=None, sa_column=Column('is_german_citizen', Boolean))
@@ -510,7 +513,7 @@ class AssociatedPersons(SQLModel, table=True):
     has_applied_for_asylum_benefits: Optional[bool] = Field(default=None, sa_column=Column('has_applied_for_asylum_benefits', Boolean))
     has_child_with_substantial_income: Optional[bool] = Field(default=None, sa_column=Column('has_child_with_substantial_income', Boolean))
     have_parents_substantial_joint_income: Optional[bool] = Field(default=None, sa_column=Column('have_parents_substantial_joint_income', Boolean))
-    monthly_expenses_total: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('monthly_expenses_total', DOMAIN('money_nonneg', NUMERIC(), constraint_name='money_nonneg_check', not_null=False, check=text('VALUE >= 0::numeric'), create_type=False, schema=None, metadata=MetaData())))
+    monthly_expenses_total: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('monthly_expenses_total', MONEY_NONNEG))
 
     user: 'Users' = Relationship(back_populates='associated_persons')
     asset_entries: list['AssetEntries'] = Relationship(back_populates='person')
@@ -591,7 +594,7 @@ class AssetEntries(SQLModel, table=True):
     created_at: datetime.datetime = Field(sa_column=Column('created_at', DateTime(True), nullable=False, server_default=text('now()')))
     updated_at: datetime.datetime = Field(sa_column=Column('updated_at', DateTime(True), nullable=False, server_default=text('now()')))
     person_id: Optional[uuid.UUID] = Field(default=None, sa_column=Column('person_id', Uuid))
-    amount: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('amount', DOMAIN('money_nonneg', NUMERIC(), constraint_name='money_nonneg_check', not_null=False, check=text('VALUE >= 0::numeric'), create_type=False, schema=None, metadata=MetaData())))
+    amount: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('amount', MONEY_NONNEG))
     description: Optional[str] = Field(default=None, sa_column=Column('description', Text))
 
     person: Optional['AssociatedPersons'] = Relationship(back_populates='asset_entries')
@@ -616,7 +619,7 @@ class BenefitClaimEntries(SQLModel, table=True):
     person_id: Optional[uuid.UUID] = Field(default=None, sa_column=Column('person_id', Uuid))
     benefit_type: Optional[str] = Field(default=None, sa_column=Column('benefit_type', String(255)))
     event_date: Optional[datetime.date] = Field(default=None, sa_column=Column('event_date', Date))
-    amount: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('amount', DOMAIN('money_nonneg', NUMERIC(), constraint_name='money_nonneg_check', not_null=False, check=text('VALUE >= 0::numeric'), create_type=False, schema=None, metadata=MetaData())))
+    amount: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('amount', MONEY_NONNEG))
     office_reference: Optional[str] = Field(default=None, sa_column=Column('office_reference', String(255)))
 
     person: Optional['AssociatedPersons'] = Relationship(back_populates='benefit_claim_entries')
@@ -659,7 +662,7 @@ class ExpenseEntries(SQLModel, table=True):
     created_at: datetime.datetime = Field(sa_column=Column('created_at', DateTime(True), nullable=False, server_default=text('now()')))
     updated_at: datetime.datetime = Field(sa_column=Column('updated_at', DateTime(True), nullable=False, server_default=text('now()')))
     person_id: Optional[uuid.UUID] = Field(default=None, sa_column=Column('person_id', Uuid))
-    monthly_amount: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('monthly_amount', DOMAIN('money_nonneg', NUMERIC(), constraint_name='money_nonneg_check', not_null=False, check=text('VALUE >= 0::numeric'), create_type=False, schema=None, metadata=MetaData())))
+    monthly_amount: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('monthly_amount', MONEY_NONNEG))
     note: Optional[str] = Field(default=None, sa_column=Column('note', String(255)))
 
     person: Optional['AssociatedPersons'] = Relationship(back_populates='expense_entries')
@@ -683,7 +686,7 @@ class IncomeEntries(SQLModel, table=True):
     created_at: datetime.datetime = Field(sa_column=Column('created_at', DateTime(True), nullable=False, server_default=text('now()')))
     updated_at: datetime.datetime = Field(sa_column=Column('updated_at', DateTime(True), nullable=False, server_default=text('now()')))
     person_id: Optional[uuid.UUID] = Field(default=None, sa_column=Column('person_id', Uuid))
-    monthly_amount: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('monthly_amount', DOMAIN('money_nonneg', NUMERIC(), constraint_name='money_nonneg_check', not_null=False, check=text('VALUE >= 0::numeric'), create_type=False, schema=None, metadata=MetaData())))
+    monthly_amount: Optional[decimal.Decimal] = Field(default=None, sa_column=Column('monthly_amount', MONEY_NONNEG))
     awarding_office: Optional[str] = Field(default=None, sa_column=Column('awarding_office', String(255)))
     reference_no: Optional[str] = Field(default=None, sa_column=Column('reference_no', String(255)))
 
