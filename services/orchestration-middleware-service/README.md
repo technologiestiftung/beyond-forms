@@ -113,10 +113,9 @@ NOTE: This is kept in as a legacy tool before we switched from Database-First to
 
 Run from this directory. The connection is built from the same `POSTGRES_*` env vars as the app (`src/db.py`); set `POSTGRES_HOST=localhost` when running outside Docker.
 
-```bash
-# once, on a database that was built by /migrations/*.sql
-POSTGRES_HOST=localhost uv run alembic stamp head
+Migrations run automatically: in Docker Compose before the dev server starts, and on staging/prod as the `<service>-migrate` Cloud Run job that `infrastructure/cloudbuild.yaml` runs before each deploy. Databases built by the old `/migrations/*.sql` files are adopted by the baseline revision without changes.
 
+```bash
 # after changing src/models.py
 POSTGRES_HOST=localhost uv run alembic revision --autogenerate -m "describe the change"
 POSTGRES_HOST=localhost uv run alembic upgrade head

@@ -237,18 +237,6 @@ class CmsTutorials(SQLModel, table=True):
     user_tutorial_states: list['UserTutorialStates'] = Relationship(back_populates='tutorial')
 
 
-class Migrations(SQLModel, table=True):
-    __table_args__ = (
-        PrimaryKeyConstraint('id', name='migrations_pkey'),
-        UniqueConstraint('filename', name='migrations_filename_key')
-    )
-
-    id: int = Field(sa_column=Column('id', Integer, primary_key=True, autoincrement=True))
-    filename: str = Field(sa_column=Column('filename', String(255), nullable=False))
-    status: str = Field(sa_column=Column('status', String(50), nullable=False))
-    applied_at: Optional[datetime.datetime] = Field(default=None, sa_column=Column('applied_at', DateTime, server_default=text('CURRENT_TIMESTAMP')))
-
-
 class UploadedFiles(SQLModel, table=True):
     __tablename__ = 'uploaded_files'
     __table_args__ = (

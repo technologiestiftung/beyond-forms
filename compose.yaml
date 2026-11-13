@@ -21,27 +21,6 @@ services:
       timeout: 5s
       retries: 30
 
-  migration-service:
-    build:
-      context: .
-      dockerfile: ./services/migration-service/Dockerfile
-    image: migration-service:latest
-    container_name: migration-service
-    environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=devuser
-      - DB_PASSWORD=devpassword
-      - DB_NAME=devdb
-      - DB_SSLMODE=disable
-    volumes:
-      - ./migrations:/app/migrations
-    networks:
-      - app-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-
   document-intelligence-service:
     build:
       context: .
@@ -135,6 +114,7 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_DATABASE=devdb
+      - RUN_MIGRATIONS=true
       - CHAT_CONTEXT_WINDOW_SIZE=20
       - PUBSUB_EMULATOR_HOST=pubsub-emulator:8085
       - PUBSUB_PROJECT_ID=beyondforms-dev
@@ -150,8 +130,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      migration-service:
-        condition: service_completed_successfully
       gcs-emulator:
         condition: service_started
       forms-filling-service:
@@ -288,8 +266,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      migration-service:
-        condition: service_completed_successfully
       # authentik-server:
       #   condition: service_started
       # authentik-worker:

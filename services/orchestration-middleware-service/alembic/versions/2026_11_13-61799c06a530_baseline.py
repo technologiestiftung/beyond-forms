@@ -2,7 +2,7 @@
 
 Schema and tutorial seed data produced by the SQL files in /migrations
 (20260216 through 20261029), dumped with pg_dump. Databases that already ran
-those files are stamped with `alembic stamp head`, not upgraded.
+those files are adopted as-is: the DDL is skipped and only the revision is recorded.
 
 Revision ID: 61799c06a530
 Revises:
@@ -12,6 +12,7 @@ Create Date: 2026-11-13 16:03:57.145272
 from typing import Sequence, Union
 
 from alembic import op
+import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
@@ -823,6 +824,12 @@ INSERT INTO public.cms_tutorials (id, slug, sort_order, title, content, created_
 
 def upgrade() -> None:
     """Upgrade schema."""
+    if op.get_context().as_sql:
+        op.execute(SCHEMA)
+        op.execute(SEED)
+        return
+    if op.get_bind().execute(sa.text("SELECT to_regclass('public.users')")).scalar():
+        return
     op.execute(SCHEMA)
     op.execute(SEED)
 
