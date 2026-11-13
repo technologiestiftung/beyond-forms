@@ -87,6 +87,8 @@ def _load_form_context(project_root: str):
         pkg.__path__ = []
         sys.modules["src"] = pkg
     sys.modules["src"].models = _load_models(models_path)
+    constants_path = os.path.join(os.path.dirname(models_path), "constants.py")
+    sys.modules["src"].constants = _load_module_from_path(constants_path, "src.constants", constants_path)
     services_dir = os.path.join(os.path.dirname(models_path), "services")
     _load_module_from_path(
         os.path.join(services_dir, "__init__.py"), "src.services", os.path.join(services_dir, "__init__.py")

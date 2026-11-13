@@ -130,6 +130,7 @@ def _stand_in_money_entries(models, person) -> List[Any]:
 
 def build_context() -> Dict[str, Any]:
     models = _load("src.models", SERVICE_SRC / "models.py")
+    _load("src.constants", SERVICE_SRC / "constants.py")
     _load("src.services", SERVICE_SRC / "services/__init__.py")
     form_context = _load("src.services.form_context", SERVICE_SRC / "services/form_context.py")
 
@@ -183,6 +184,7 @@ def build_sparse_context() -> Dict[str, Any]:
     are exactly the guards the house style requires, so this second pass is what actually
     enforces them."""
     models = _load("src.models", SERVICE_SRC / "models.py")
+    _load("src.constants", SERVICE_SRC / "constants.py")
     _load("src.services", SERVICE_SRC / "services/__init__.py")
     form_context = _load("src.services.form_context", SERVICE_SRC / "services/form_context.py")
 
