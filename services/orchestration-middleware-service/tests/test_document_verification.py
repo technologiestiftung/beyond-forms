@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from beyondforms.auth import User as AuthUser, get_current_user, require_authenticated_user
 from src.db import get_db
 from src.main import app
-from src.models import Users as DbUser, UserDocuments as DbDocument, IncomeEntries, IncomeTypeType
+from src.models import Users as DbUser, UserDocuments as DbDocument, IncomeEntries, IncomeType
 from src.routes.files import pension_kind
 
 client = TestClient(app)
@@ -480,11 +480,11 @@ def test_verify_document_maps_tenancy_status_boolean(mock_post, mock_db):
 @pytest.mark.parametrize(
     "reason, kind",
     [
-        ("Regelaltersrente", IncomeTypeType.OLD_AGE_PENSION),
-        (None, IncomeTypeType.OLD_AGE_PENSION),
-        ("Rente wegen voller Erwerbsminderung", IncomeTypeType.REDUCED_EARNING_CAPACITY_PENSION),
-        ("disability", IncomeTypeType.REDUCED_EARNING_CAPACITY_PENSION),
-        ("Hinterbliebenenrente", IncomeTypeType.SURVIVOR_PENSION),
+        ("Regelaltersrente", IncomeType.OLD_AGE_PENSION),
+        (None, IncomeType.OLD_AGE_PENSION),
+        ("Rente wegen voller Erwerbsminderung", IncomeType.REDUCED_EARNING_CAPACITY_PENSION),
+        ("disability", IncomeType.REDUCED_EARNING_CAPACITY_PENSION),
+        ("Hinterbliebenenrente", IncomeType.SURVIVOR_PENSION),
     ],
 )
 def test_pension_kind_follows_the_reason_on_the_notice(reason, kind):
@@ -539,7 +539,7 @@ def test_verify_document_pension_notice_persists_verified_amount(mock_post, mock
     bound_values = insert_stmt.compile().params
     assert bound_values["user_id"] == mock_user.id
     assert bound_values["person_id"] is None
-    assert bound_values["income_type"] == IncomeTypeType.OLD_AGE_PENSION
+    assert bound_values["income_type"] == IncomeType.OLD_AGE_PENSION
     assert bound_values["monthly_amount"] == decimal.Decimal("650.00")
 
 
@@ -552,7 +552,7 @@ def test_verify_document_pension_notice_keeps_a_pension_named_by_kind(mock_post,
     mock_doc.document_id = document_id
     mock_doc.document_type = "pension_notice"
     mock_doc.raw_data = {"monthly_amount": "650.00"}
-    old_age = IncomeEntries(income_type=IncomeTypeType.OLD_AGE_PENSION)
+    old_age = IncomeEntries(income_type=IncomeType.OLD_AGE_PENSION)
 
     def db_query_side_effect(model):
         query_mock = MagicMock()
@@ -591,8 +591,8 @@ def test_verify_document_pension_notice_overrides_rows_that_said_no_pension(mock
     mock_doc.document_id = document_id
     mock_doc.document_type = "pension_notice"
     mock_doc.raw_data = {"monthly_amount": "650.00"}
-    old_age = IncomeEntries(income_type=IncomeTypeType.OLD_AGE_PENSION, monthly_amount=decimal.Decimal("0"))
-    survivor = IncomeEntries(income_type=IncomeTypeType.SURVIVOR_PENSION, monthly_amount=decimal.Decimal("0"))
+    old_age = IncomeEntries(income_type=IncomeType.OLD_AGE_PENSION, monthly_amount=decimal.Decimal("0"))
+    survivor = IncomeEntries(income_type=IncomeType.SURVIVOR_PENSION, monthly_amount=decimal.Decimal("0"))
     rows = [old_age, survivor] if notice_kind_has_row else [survivor]
 
     def db_query_side_effect(model):
@@ -624,7 +624,7 @@ def test_verify_document_pension_notice_overrides_rows_that_said_no_pension(mock
         assert old_age.monthly_amount == decimal.Decimal("650.00")
     else:
         bound_values = mock_db.execute.call_args[0][0].compile().params
-        assert bound_values["income_type"] == IncomeTypeType.OLD_AGE_PENSION
+        assert bound_values["income_type"] == IncomeType.OLD_AGE_PENSION
         assert bound_values["monthly_amount"] == decimal.Decimal("650.00")
 
 

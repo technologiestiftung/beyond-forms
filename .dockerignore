@@ -7,7 +7,6 @@ node_modules/
 prototypes/
 infrastructure/
 scripts/
-migrations/
 frontend_vanilla_backup/
 shared/
 verify_schema.py

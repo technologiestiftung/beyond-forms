@@ -26,7 +26,7 @@ from src.models import (
     AssociatedPersons,
     AssociationType,
     BenefitClaimEntries,
-    BenefitClaimKindType,
+    BenefitClaimKind,
     ExpenseEntries,
     IncomeEntries,
     MaritalStatusType,
@@ -908,7 +908,7 @@ def _money_rows(person_id=None):
         ),
         BenefitClaimEntries(
             person_id=person_id,
-            claim_kind=BenefitClaimKindType.PENDING_APPLICATION,
+            claim_kind=BenefitClaimKind.PENDING_APPLICATION,
             sort_order=0,
             benefit_type="Wohngeld",
             event_date=datetime.date(2026, 8, 1),

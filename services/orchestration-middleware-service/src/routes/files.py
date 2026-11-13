@@ -22,13 +22,12 @@ from pydantic import BaseModel, field_validator
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 from google.cloud import storage, exceptions as gcloud_exceptions
-from src.constants import SLOT_ID_TO_DIS_TYPE
+from src.constants import PENSION_INCOME_TYPES, SLOT_ID_TO_DIS_TYPE
 from src.db import SessionLocal, get_db
 from src.models import (
     DocumentStatusType,
     IncomeEntries,
-    IncomeTypeType,
-    PENSION_INCOME_TYPES,
+    IncomeType,
     UploadedFiles,
     UserApplications,
     UserDocuments,
@@ -76,12 +75,12 @@ class LazyStorageClient:
 
 
 _PENSION_REASON_WORDS = (
-    (IncomeTypeType.REDUCED_EARNING_CAPACITY_PENSION, ("erwerbsminderung", "disab", "reduced earning")),
-    (IncomeTypeType.SURVIVOR_PENSION, ("hinterblieben", "witwe", "witwer", "waise", "survivor", "widow", "orphan")),
+    (IncomeType.REDUCED_EARNING_CAPACITY_PENSION, ("erwerbsminderung", "disab", "reduced earning")),
+    (IncomeType.SURVIVOR_PENSION, ("hinterblieben", "witwe", "witwer", "waise", "survivor", "widow", "orphan")),
 )
 
 
-def pension_kind(reason: Optional[str]) -> IncomeTypeType:
+def pension_kind(reason: Optional[str]) -> IncomeType:
     """The kind of pension a Rentenbescheid grants, read from its stated reason. A notice
     that names no other reason counts as an old-age pension, the usual case for
     Grundsicherung im Alter."""
@@ -89,7 +88,7 @@ def pension_kind(reason: Optional[str]) -> IncomeTypeType:
     for kind, words in _PENSION_REASON_WORDS:
         if any(word in text for word in words):
             return kind
-    return IncomeTypeType.OLD_AGE_PENSION
+    return IncomeType.OLD_AGE_PENSION
 
 
 def get_storage_client() -> LazyStorageClient:

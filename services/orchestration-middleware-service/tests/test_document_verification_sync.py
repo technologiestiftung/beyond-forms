@@ -16,7 +16,7 @@ from src.models import (
     GenderType,
     HealthInsuranceStatusType,
     IncomeEntries,
-    IncomeTypeType,
+    IncomeType,
 )
 from unittest.mock import patch
 from src.mappers import map_flat_to_rules_engine_payload
@@ -250,7 +250,7 @@ def test_map_flat_to_rules_engine_payload_case_and_enum_alignment():
     db_user.heating_costs = decimal.Decimal("85.50")
     db_user.living_area = decimal.Decimal("45.5")
     db_user.number_of_rooms = 2
-    db_user.income_entries = [IncomeEntries(income_type=IncomeTypeType.PENSION)]
+    db_user.income_entries = [IncomeEntries(income_type=IncomeType.PENSION)]
     db_user.monthly_income = decimal.Decimal("650.00")
     db_user.health_insurance_status = HealthInsuranceStatusType.COMPULSORY_INSURANCE  # value = "Compulsory Insurance"
     db_user.health_insurance_provider = "AOK Berlin"
@@ -337,7 +337,7 @@ def test_map_flat_to_rules_engine_payload_null_monthly_income():
     db_user.heating_costs = None
     db_user.living_area = None
     db_user.number_of_rooms = None
-    db_user.income_entries = [IncomeEntries(income_type=IncomeTypeType.PENSION)]
+    db_user.income_entries = [IncomeEntries(income_type=IncomeType.PENSION)]
     db_user.monthly_income = None
     db_user.health_insurance_status = None
     db_user.health_insurance_provider = None
@@ -579,7 +579,7 @@ def test_verify_registration_rejects_unknown_gender_field(mock_post, mock_db):
 )
 def test_pension_row_with_amount_zero_means_no_pension(amount, receives_pension):
     db_user = MagicMock(spec=DbUser)
-    db_user.income_entries = [IncomeEntries(income_type=IncomeTypeType.PENSION, monthly_amount=amount)]
+    db_user.income_entries = [IncomeEntries(income_type=IncomeType.PENSION, monthly_amount=amount)]
     db_user.has_permanent_reduction_in_earning_capacity = False
 
     applicant = map_flat_to_rules_engine_payload(db_user)["form_content"]["applicant_information"]
@@ -590,9 +590,9 @@ def test_pension_row_with_amount_zero_means_no_pension(amount, receives_pension)
 def test_zero_pension_rows_do_not_take_monthly_income():
     db_user = MagicMock(spec=DbUser)
     db_user.income_entries = [
-        IncomeEntries(income_type=IncomeTypeType.EMPLOYMENT, monthly_amount=decimal.Decimal("900.00")),
-        IncomeEntries(income_type=IncomeTypeType.OLD_AGE_PENSION, monthly_amount=decimal.Decimal("0")),
-        IncomeEntries(income_type=IncomeTypeType.SURVIVOR_PENSION, monthly_amount=decimal.Decimal("0")),
+        IncomeEntries(income_type=IncomeType.EMPLOYMENT, monthly_amount=decimal.Decimal("900.00")),
+        IncomeEntries(income_type=IncomeType.OLD_AGE_PENSION, monthly_amount=decimal.Decimal("0")),
+        IncomeEntries(income_type=IncomeType.SURVIVOR_PENSION, monthly_amount=decimal.Decimal("0")),
     ]
     db_user.monthly_income = decimal.Decimal("900.00")
     db_user.has_permanent_reduction_in_earning_capacity = False

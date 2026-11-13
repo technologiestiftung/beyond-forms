@@ -16,11 +16,11 @@ from src.models import (
     TenancyStatusType,
     DisabilityMerkzeichenType,
     TutorialStatusType,
-    AssetTypeType,
-    BenefitClaimKindType,
+    AssetType,
+    BenefitClaimKind,
     CareLevelType,
-    ExpenseTypeType,
-    IncomeTypeType,
+    ExpenseType,
+    IncomeType,
 )
 
 
@@ -40,7 +40,7 @@ class _MoneyEntrySchema(BaseModel):
 
 
 class IncomeEntrySchema(_MoneyEntrySchema):
-    income_type: IncomeTypeType = Field(description="Which income line of the form this row fills")
+    income_type: IncomeType = Field(description="Which income line of the form this row fills")
     monthly_amount: Optional[decimal.Decimal] = Field(None, ge=0)
     awarding_office: Optional[str] = Field(
         None, max_length=255, description="Bewilligungsstelle - one per form row, shared by both person columns"
@@ -51,13 +51,13 @@ class IncomeEntrySchema(_MoneyEntrySchema):
 
 
 class ExpenseEntrySchema(_MoneyEntrySchema):
-    expense_type: ExpenseTypeType = Field(description="Which expense line of the form this row fills")
+    expense_type: ExpenseType = Field(description="Which expense line of the form this row fills")
     monthly_amount: Optional[decimal.Decimal] = Field(None, ge=0)
     note: Optional[str] = Field(None, max_length=255, description="Free text, e.g. 'Nähere Begründung zu Sonstiges'")
 
 
 class AssetEntrySchema(_MoneyEntrySchema):
-    asset_type: AssetTypeType = Field(description="Which asset line of the form this row fills")
+    asset_type: AssetType = Field(description="Which asset line of the form this row fills")
     amount: Optional[decimal.Decimal] = Field(None, ge=0)
     description: Optional[str] = Field(
         None, description="e.g. the kind of valuables, or the estimated value of a vehicle"
@@ -65,7 +65,7 @@ class AssetEntrySchema(_MoneyEntrySchema):
 
 
 class BenefitClaimEntrySchema(_MoneyEntrySchema):
-    claim_kind: BenefitClaimKindType = Field(
+    claim_kind: BenefitClaimKind = Field(
         description="Whether this benefit is still being decided or is an expected one-time payment"
     )
     benefit_type: Optional[str] = Field(None, max_length=255, description="Art der Leistung, as free text")

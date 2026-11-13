@@ -2,7 +2,8 @@ from typing import Any, Optional
 import datetime
 import logging
 import re
-from src.models import PENSION_INCOME_KEYS, Users as DbUser
+from src.constants import PENSION_INCOME_KEYS
+from src.models import Users as DbUser
 from unittest.mock import Mock
 
 logger = logging.getLogger(__name__)

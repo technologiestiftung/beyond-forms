@@ -5,7 +5,21 @@ export type Database = {
   
   "public": {
           Tables: {
-            "asset_entries": {
+            "alembic_version": {
+                  Row: {
+                    "version_num": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "version_num": string
+                  }
+                  Update: {
+                    "version_num"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"asset_entries": {
                   Row: {
                     "amount": number | null,"asset_type": Database["public"]['Enums']["asset_type"],"created_at": string,"description": string | null,"id": string,"person_id": string | null,"updated_at": string,"user_id": string
                   }
@@ -196,20 +210,6 @@ isOneToOne: false
       referencedRelation: "users"
       referencedColumns: ["id"]
     }
-                  ]
-                },"migrations": {
-                  Row: {
-                    "applied_at": string | null,"filename": string,"id": number,"status": string
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "applied_at"?: string | null,"filename": string,"id"?: number,"status": string
-                  }
-                  Update: {
-                    "applied_at"?: string | null,"filename"?: string,"id"?: number,"status"?: string
-                  }
-                  Relationships: [
-                    
                   ]
                 },"uploaded_files": {
                   Row: {
