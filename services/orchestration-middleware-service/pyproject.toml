@@ -28,6 +28,7 @@ dependencies = [
     "pillow-heif~=1.8",
     "ag-ui-protocol~=1.0",
     "json5~=0.17.3",
+    "sqlmodel~=0.0.48",
 ]
 
 [tool.uv.sources]
