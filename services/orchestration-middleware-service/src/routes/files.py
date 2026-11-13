@@ -22,13 +22,12 @@ from pydantic import BaseModel, field_validator
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 from google.cloud import storage, exceptions as gcloud_exceptions
-from src.constants import SLOT_ID_TO_DIS_TYPE
+from src.constants import PENSION_INCOME_TYPES, SLOT_ID_TO_DIS_TYPE
 from src.db import SessionLocal, get_db
 from src.models import (
     DocumentStatusType,
     IncomeEntries,
     IncomeType,
-    PENSION_INCOME_TYPES,
     UploadedFiles,
     UserApplications,
     UserDocuments,
