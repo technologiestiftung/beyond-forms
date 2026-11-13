@@ -35,7 +35,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
 	// The desktop side panel starts open; the mobile sheet has no room for it.
 	const [showChatHistory, setShowChatHistory] = useState(isDesktop);
 	const messagesRef = useRef<HTMLDivElement>(null);
-	const lastMessageCountRef = useRef(messages.length);
+	// Follows the conversation as it streams until the user scrolls up.
+	const followRef = useRef(true);
 
 	const submitUserMessage = useCallback(
 		(text: string) => {
@@ -44,27 +45,23 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
 		[sendMessage],
 	);
 
-	useLayoutEffect(() => {
-		if (showChatHistory) {
-			return;
-		}
-		const el = messagesRef.current;
-		if (!el) {
-			return;
-		}
-		const isNewMessage = messages.length > lastMessageCountRef.current;
-		lastMessageCountRef.current = messages.length;
-
-		const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 150;
-
-		if (isNewMessage || isNearBottom) {
-			el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-		}
-	}, [messages, isLoading, error, showChatHistory]);
-
 	// Desktop keeps the conversation in view and opens history beside it.
 	const showsSideHistory = isDesktop && showChatHistory;
 	const showsInlineHistory = !isDesktop && showChatHistory;
+
+	useLayoutEffect(() => {
+		// Sending a message or answering a card jumps back to the bottom.
+		if (isLoading) {
+			followRef.current = true;
+		}
+	}, [isLoading]);
+
+	useLayoutEffect(() => {
+		const el = messagesRef.current;
+		if (el && followRef.current) {
+			el.scrollTop = el.scrollHeight;
+		}
+	}, [messages, isLoading, error, showsInlineHistory]);
 
 	return (
 		<div data-testid="chat-panel" className="flex min-h-0 flex-1 gap-5">
@@ -119,6 +116,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
 					<>
 						<div
 							ref={messagesRef}
+							onScroll={(e) => {
+								const el = e.currentTarget;
+								followRef.current =
+									el.scrollHeight - el.scrollTop - el.clientHeight < 32;
+							}}
 							className="min-h-0 flex-1 overflow-y-auto px-5 py-6"
 							data-testid="chat-message-list"
 						>

@@ -69,6 +69,34 @@ It filled a boilerplate's blank `value` fields with LLM-drafted JEXL (see
 generated line was a guess, not a verified fact about the database, so its output always
 needed human review.
 
+### Deriving Form Rules
+
+Derive which PDF fields form one question, what they mean and when each question applies, as CEL over the fields' values. The result is written to `schemas/rules/<form>.rules.json`. `--attachments` names the Anlagen a form routes to. A routing condition such as "→ Bitte Anlage 2 ausfüllen" then links that Anlage's rule file, and its questions are asked whenever the condition holds.
+
+```bash
+# needs gcloud application-default credentials; rule files of the Anlagen first, then the form that links them
+uv run forms/scripts/extract_form_rules.py forms/pdfs/anlage_2_grusi.pdf
+uv run forms/scripts/extract_form_rules.py forms/pdfs/antrag_grundsicherung_im_alter.pdf \
+  --attachments forms/pdfs/anlage_1_grusi.pdf forms/pdfs/anlage_2_grusi.pdf forms/pdfs/anlage_3_grusi.pdf forms/pdfs/anlage_6_grusi.pdf \
+  --context forms/pdfs/merkblatt_grundsicherung_im_alter.pdf
+```
+
+Gemini sees each page with every field's number drawn onto its box. The AcroForm fields are the ground truth: every field must end up in a group or in `out_of_scope`. These problems go back to the model to fix:
+
+- a field the model names that the PDF lacks
+- a condition that doesn't type-check (checkboxes are `bool`, all other fields `string`)
+- a choice group holding text fields
+- a required group whose fields are all optional
+
+The script writes nothing if a page still fails.
+
+The mapping TOML stays the only link to the database. A field counts as filled when its mapping resolves non-empty (`FormService.resolve_field_values`). These rules alone decide what the chat asks next: the first open group of `antrag_grundsicherung_im_alter`, then of each Anlage it requires. A group with options to pick from is shown as a card; one of free inputs (text, dates, amounts) is asked in the chat and saved with `save_answer`. The model words the question and labels from the group's field meanings. A question that may stay empty is asked once and offers "none of these".
+
+Where a card answer is stored depends on the field's mapping:
+
+- If the mapping prints one profile column unchanged (`{{ city }}`), the answer goes to that column.
+- Otherwise it goes to the application's `form_data.pdf_fields.<form>`, which `fill_form` uses wherever the mapping resolves empty.
+
 ### Validating Mappings
 
 Ensure every `{{ }}` reference resolves — `users` columns and `associated_persons` attributes are derived live from `models.py`, the derived context keys (`today`, `age`, `household_members`, `partner`, …) from `schema_context.py`.

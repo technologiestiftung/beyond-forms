@@ -1,0 +1,1601 @@
+{
+  "form_id": "anlage_1_grusi",
+  "source": {
+    "pdf": "forms/pdfs/anlage_1_grusi.pdf",
+    "sha256": "fece9a449df16478210360527eeeb34fd7b7b30fb4e909d0b68ff3a8a84d81f6",
+    "model": "vertex_ai/gemini-3.8-flash",
+    "generated_at": "2026-11-11T13:34:15+00:00"
+  },
+  "groups": [
+    {
+      "id": "p1_antrag_zuordnung",
+      "page": 1,
+      "section": "Anlage 1 - Unterhalt",
+      "person": null,
+      "topic": "Angaben zum Antrag",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_name,_vorname",
+          "var": "p1_name_vorname",
+          "type": "string",
+          "meaning": "Name, Vorname der antragstellenden Person",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_zum_antrag_vom",
+          "var": "p1_zum_antrag_vom",
+          "type": "string",
+          "meaning": "Datum des Antrags (Zum Antrag vom)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p1_fuer_personenziffer",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Für Personenziffer",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_für_personenziffer_eins",
+          "var": "p1_fuer_personenziffer_eins",
+          "type": "bool",
+          "meaning": "Für Personenziffer 1",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_für_personenziffer_zwei",
+          "var": "p1_fuer_personenziffer_zwei",
+          "type": "bool",
+          "meaning": "Für Personenziffer 2",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_personendaten_ehegatte_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Personendaten des letzten Ehegatten",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_name_und_vorname_des_letzten_ehegatten",
+          "var": "p1_name_und_vorname_des_letzten_ehegatten",
+          "type": "string",
+          "meaning": "Name, Vorname des letzten Ehegatten",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_geburtsdatum_des_letzten_ehegatten",
+          "var": "p1_geburtsdatum_des_letzten_ehegatten",
+          "type": "string",
+          "meaning": "Geburtsdatum des letzten Ehegatten",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_anschrift_des_letzten_ehegatten",
+          "var": "p1_anschrift_des_letzten_ehegatten",
+          "type": "string",
+          "meaning": "Anschrift des letzten Ehegatten",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_personendaten_frueherer_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Personendaten eines früheren Ehegatten",
+      "hint": "Die Angaben zu früheren Ehen sind erforderlich, soweit daraus noch Unterhaltsansprüche bestehen. Ggf. auf gesondertem Blatt fortsetzen!",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_angaben_zur_letzten_bzw._wievielten_ehe",
+          "var": "p1_angaben_zur_letzten_bzw_wievielten_ehe",
+          "type": "string",
+          "meaning": "Wievielte Ehe",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_name_und_vorname_eines_früheren_ehegatten",
+          "var": "p1_name_und_vorname_eines_frueheren_ehegatten",
+          "type": "string",
+          "meaning": "Name, Vorname des früheren Ehegatten",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_geburtsdatum_eines_früheren_ehegatten",
+          "var": "p1_geburtsdatum_eines_frueheren_ehegatten",
+          "type": "string",
+          "meaning": "Geburtsdatum des früheren Ehegatten",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_anschrift_eines_früheren_ehegatten",
+          "var": "p1_anschrift_eines_frueheren_ehegatten",
+          "type": "string",
+          "meaning": "Anschrift des früheren Ehegatten",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_rentenversicherung_letzter_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Hat der letzte Ehegatte Beiträge zur Rentenversicherung gezahlt?",
+      "hint": null,
+      "answer_type": "single_choice",
+      "ask_if": "p1_name_und_vorname_des_letzten_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_ja",
+          "var": "p1_ja",
+          "type": "bool",
+          "meaning": "Ja",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_beiträge_des_letzten_ehegatten_zur_rentenversicherung",
+          "var": "p1_beitraege_des_letzten_ehegatten_zur_rentenversicherung",
+          "type": "bool",
+          "meaning": "Nein",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_rententraeger_letzter_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Rententräger des letzten Ehegatten",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_ja",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_rententräger_des_letzten_ehegatten",
+          "var": "p1_rententraeger_des_letzten_ehegatten",
+          "type": "string",
+          "meaning": "Rententräger",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_grund_keine_rv_letzter_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Grund, warum der letzte Ehegatte keine Rentenversicherungsbeiträge gezahlt hat",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_beitraege_des_letzten_ehegatten_zur_rentenversicherung",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_grund_des_letzten_ehegatten_für_keine_rentenversicherung",
+          "var": "p1_grund_des_letzten_ehegatten_fuer_keine_rentenversicherung",
+          "type": "string",
+          "meaning": "Grund",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_rentenversicherung_frueherer_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Hat der frühere Ehegatte Beiträge zur Rentenversicherung gezahlt?",
+      "hint": null,
+      "answer_type": "single_choice",
+      "ask_if": "p1_name_und_vorname_eines_frueheren_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_ja_2",
+          "var": "p1_ja_2",
+          "type": "bool",
+          "meaning": "Ja",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_nein_2",
+          "var": "p1_nein_2",
+          "type": "bool",
+          "meaning": "Nein",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_rententraeger_frueherer_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Rententräger des früheren Ehegatten",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_ja_2",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_rententräger_eines_früheren_ehegatten",
+          "var": "p1_rententraeger_eines_frueheren_ehegatten",
+          "type": "string",
+          "meaning": "Rententräger",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_grund_keine_rv_frueherer_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Grund, warum der frühere Ehegatte keine Rentenversicherungsbeiträge gezahlt hat",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_nein_2",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_grund_eines_früheren_ehegatten_für_keine_rentenversicherung",
+          "var": "p1_grund_eines_frueheren_ehegatten_fuer_keine_rentenversicherung",
+          "type": "string",
+          "meaning": "Grund",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_todestag_letzter_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Todestag des letzten Ehegatten",
+      "hint": "Falls verstorben",
+      "answer_type": "date",
+      "ask_if": "p1_name_und_vorname_des_letzten_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_todestag_des_letzten_ehegatten",
+          "var": "p1_todestag_des_letzten_ehegatten",
+          "type": "string",
+          "meaning": "Todestag",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_todestag_frueherer_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Todestag des früheren Ehegatten",
+      "hint": "Falls verstorben",
+      "answer_type": "date",
+      "ask_if": "p1_name_und_vorname_eines_frueheren_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_todestag_eines_früheren_ehegatten",
+          "var": "p1_todestag_eines_frueheren_ehegatten",
+          "type": "string",
+          "meaning": "Todestag",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_scheidung_letzter_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Angaben zur Scheidung vom letzten Ehegatten",
+      "hint": "Falls geschieden",
+      "answer_type": "text",
+      "ask_if": "p1_name_und_vorname_des_letzten_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_datum_der_scheidung_vom_letzten_ehegatten",
+          "var": "p1_datum_der_scheidung_vom_letzten_ehegatten",
+          "type": "string",
+          "meaning": "Datum der Scheidung",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_gericht_der_scheidung_vom_letzten_ehegatten",
+          "var": "p1_gericht_der_scheidung_vom_letzten_ehegatten",
+          "type": "string",
+          "meaning": "Gericht",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_aktenzeichen_zur_scheidung_vom_letzten_ehegatten",
+          "var": "p1_aktenzeichen_zur_scheidung_vom_letzten_ehegatten",
+          "type": "string",
+          "meaning": "Aktenzeichen",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_scheidung_frueherer_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Angaben zur Scheidung vom früheren Ehegatten",
+      "hint": "Falls geschieden",
+      "answer_type": "text",
+      "ask_if": "p1_name_und_vorname_eines_frueheren_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_datum_der_scheidung_vom_früheren_ehegatten",
+          "var": "p1_datum_der_scheidung_vom_frueheren_ehegatten",
+          "type": "string",
+          "meaning": "Datum der Scheidung",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_gericht_der_scheidung_vom_früheren_ehegatten",
+          "var": "p1_gericht_der_scheidung_vom_frueheren_ehegatten",
+          "type": "string",
+          "meaning": "Gericht",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_aktenzeichen_zur_scheidung_vom_früheren_ehegatten",
+          "var": "p1_aktenzeichen_zur_scheidung_vom_frueheren_ehegatten",
+          "type": "string",
+          "meaning": "Aktenzeichen",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_scheidung_vor_1977_letzter_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Verschulden bei Scheidung vom letzten Ehegatten vor dem 1.1.1977",
+      "hint": "Falls Scheidung vor dem 1.1.1977",
+      "answer_type": "text",
+      "ask_if": "p1_datum_der_scheidung_vom_letzten_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_schuldiger_teil_letzte_ehe",
+          "var": "p1_schuldiger_teil_letzte_ehe",
+          "type": "string",
+          "meaning": "Schuldiger Teil",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_überwiegend_schuldig_in_letzter_ehe",
+          "var": "p1_ueberwiegend_schuldig_in_letzter_ehe",
+          "type": "string",
+          "meaning": "bei beiderseitigem Verschulden: Überwiegend schuldig",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_scheidung_vor_1977_frueherer_ehegatte",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Verschulden bei Scheidung vom früheren Ehegatten vor dem 1.1.1977",
+      "hint": "Falls Scheidung vor dem 1.1.1977",
+      "answer_type": "text",
+      "ask_if": "p1_datum_der_scheidung_vom_frueheren_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_schuldiger_teil_frühere_ehe",
+          "var": "p1_schuldiger_teil_fruehere_ehe",
+          "type": "string",
+          "meaning": "Schuldiger Teil",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_überwiegend_schuldig_in_früherer_ehe",
+          "var": "p1_ueberwiegend_schuldig_in_frueherer_ehe",
+          "type": "string",
+          "meaning": "bei beiderseitigem Verschulden: Überwiegend schuldig",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhalt_verurteilt_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Zu Unterhalt verurteilt? (Letzte Ehe)",
+      "hint": "Ggf. bitte Urteil / Beschluss beifügen",
+      "answer_type": "yes_no",
+      "ask_if": "p1_name_und_vorname_des_letzten_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_zu_unterhalt_verurteilt_in_letzter_ehe",
+          "var": "p1_zu_unterhalt_verurteilt_in_letzter_ehe",
+          "type": "string",
+          "meaning": "Zu Unterhalt verurteilt",
+          "options": {
+            "Ja": "Ja",
+            "Nein": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsurteil_details_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Angaben zum Unterhaltsurteil (Letzte Ehe)",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_zu_unterhalt_verurteilt_in_letzter_ehe == 'Ja'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_gericht_und_aktenzeichen_zum_unterhaltsurteil_in_letzter_ehe",
+          "var": "p1_gericht_und_aktenzeichen_zum_unterhaltsurteil_in_letzter_ehe",
+          "type": "string",
+          "meaning": "Gericht, Aktenzeichen",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_höhe_des_unterhalts_für_letzte_ehe",
+          "var": "p1_hoehe_des_unterhalts_fuer_letzte_ehe",
+          "type": "string",
+          "meaning": "Höhe (EUR)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": [
+        {
+          "name": "Urteil / Beschluss",
+          "condition": "p1_zu_unterhalt_verurteilt_in_letzter_ehe == 'Ja'",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p1_unterhalt_verurteilt_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Zu Unterhalt verurteilt? (Frühere Ehe)",
+      "hint": "Ggf. bitte Urteil / Beschluss beifügen",
+      "answer_type": "yes_no",
+      "ask_if": "p1_name_und_vorname_eines_frueheren_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_zu_unterhalt_verurteilt_in_früherer_ehe",
+          "var": "p1_zu_unterhalt_verurteilt_in_frueherer_ehe",
+          "type": "string",
+          "meaning": "Zu Unterhalt verurteilt",
+          "options": {
+            "Ja": "Ja",
+            "Nein": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsurteil_details_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Angaben zum Unterhaltsurteil (Frühere Ehe)",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_zu_unterhalt_verurteilt_in_frueherer_ehe == 'Ja'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_gericht_und_aktenzeichen_zum_unterhaltsurteil_in_früherer_ehe",
+          "var": "p1_gericht_und_aktenzeichen_zum_unterhaltsurteil_in_frueherer_ehe",
+          "type": "string",
+          "meaning": "Gericht, Aktenzeichen",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_höhe_des_unterhalts_für_frühere_ehe",
+          "var": "p1_hoehe_des_unterhalts_fuer_fruehere_ehe",
+          "type": "string",
+          "meaning": "Höhe (EUR)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": [
+        {
+          "name": "Urteil / Beschluss",
+          "condition": "p1_zu_unterhalt_verurteilt_in_frueherer_ehe == 'Ja'",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p1_beitraege_zum_unterhalt_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Beiträge zum Unterhalt (Letzte Ehe)",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p1_name_und_vorname_des_letzten_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_unterhalts-beiträge_für_letzte_ehe_pro_monat",
+          "var": "p1_unterhalts_beitraege_fuer_letzte_ehe_pro_monat",
+          "type": "bool",
+          "meaning": "EUR monatlich",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_keine_unterhalt-beiträge_für_letzte_ehe",
+          "var": "p1_keine_unterhalt_beitraege_fuer_letzte_ehe",
+          "type": "bool",
+          "meaning": "keine",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_individuelle_angabe_zu_unterhalts-beiträge_für_letzte_ehe_pro_monat",
+          "var": "p1_individuelle_angabe_zu_unterhalts_beitraege_fuer_letzte_ehe_pro_monat",
+          "type": "bool",
+          "meaning": "Sonstige Art",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhalt_monatlich_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Monatlicher Unterhaltsbetrag (Letzte Ehe)",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "p1_unterhalts_beitraege_fuer_letzte_ehe_pro_monat",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_euro_monatlich",
+          "var": "p1_euro_monatlich",
+          "type": "string",
+          "meaning": "EUR monatlich",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhalt_letztmalig_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Letztmaliger Unterhalt (Letzte Ehe)",
+      "hint": "Letztmalig - Datum u. Betrag –",
+      "answer_type": "text",
+      "ask_if": "p1_keine_unterhalt_beitraege_fuer_letzte_ehe",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_datum_und_betrag_des_letztmaligen_unterhalts_für_frühere_ehe",
+          "var": "p1_datum_und_betrag_des_letztmaligen_unterhalts_fuer_fruehere_ehe",
+          "type": "string",
+          "meaning": "Letztmalig - Datum u. Betrag",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhalt_sonstige_art_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Sonstige Art der Unterhaltsbeiträge (Letzte Ehe)",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_individuelle_angabe_zu_unterhalts_beitraege_fuer_letzte_ehe_pro_monat",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_individuelle_angabe_zur_höhe_der_unterhalts-beiträge_für_letzte_ehe_pro_monat",
+          "var": "p1_individuelle_angabe_zur_hoehe_der_unterhalts_beitraege_fuer_letzte_ehe_pro_monat",
+          "type": "string",
+          "meaning": "Art und Betrag der Unterhaltsbeiträge",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_beitraege_zum_unterhalt_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Beiträge zum Unterhalt (Frühere Ehe)",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p1_name_und_vorname_eines_frueheren_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_unterhalts-beiträge_für_frühere_ehe_pro_monat",
+          "var": "p1_unterhalts_beitraege_fuer_fruehere_ehe_pro_monat",
+          "type": "bool",
+          "meaning": "EUR monatlich",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_keine_unterhalts-beiträge_für_frühere_ehe",
+          "var": "p1_keine_unterhalts_beitraege_fuer_fruehere_ehe",
+          "type": "bool",
+          "meaning": "keine",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_individuelle_angabe_zu_unterhalts-beiträge_für_frühere_ehe_pro_monat",
+          "var": "p1_individuelle_angabe_zu_unterhalts_beitraege_fuer_fruehere_ehe_pro_monat",
+          "type": "bool",
+          "meaning": "Sonstige Art",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhalt_monatlich_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Monatlicher Unterhaltsbetrag (Frühere Ehe)",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "p1_unterhalts_beitraege_fuer_fruehere_ehe_pro_monat",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_euro_monatlich_bei_früheren_ehegatten",
+          "var": "p1_euro_monatlich_bei_frueheren_ehegatten",
+          "type": "string",
+          "meaning": "EUR monatlich",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhalt_letztmalig_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Letztmaliger Unterhalt (Frühere Ehe)",
+      "hint": "Letztmalig - Datum u. Betrag –",
+      "answer_type": "text",
+      "ask_if": "p1_keine_unterhalts_beitraege_fuer_fruehere_ehe",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_datum_und_betrag_des_letztmaligen_unterhalts_für_frühere_ehe_2",
+          "var": "p1_datum_und_betrag_des_letztmaligen_unterhalts_fuer_fruehere_ehe_2",
+          "type": "string",
+          "meaning": "Letztmalig - Datum u. Betrag",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhalt_sonstige_art_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Sonstige Art der Unterhaltsbeiträge (Frühere Ehe)",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_individuelle_angabe_zu_unterhalts_beitraege_fuer_fruehere_ehe_pro_monat",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_individuelle_angabe_zur_höhe_der_unterhalts-beiträge_für_frühere_ehe_pro_monat",
+          "var": "p1_individuelle_angabe_zur_hoehe_der_unterhalts_beitraege_fuer_fruehere_ehe_pro_monat",
+          "type": "string",
+          "meaning": "Art und Betrag der Unterhaltsbeiträge",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_private_unterhaltsvereinbarung_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Private Unterhaltsvereinbarung? (Letzte Ehe)",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "p1_name_und_vorname_des_letzten_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_private_unterhaltsvereinbarung_für_letzte_ehe",
+          "var": "p1_private_unterhaltsvereinbarung_fuer_letzte_ehe",
+          "type": "string",
+          "meaning": "Private Unterhaltsvereinbarung",
+          "options": {
+            "Ja": "Ja",
+            "nein": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_details_private_unterhaltsvereinbarung_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Angaben zur privaten Unterhaltsvereinbarung (Letzte Ehe)",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_private_unterhaltsvereinbarung_fuer_letzte_ehe == 'Ja'",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_name_und_anschrift_des_rechtsanwaltes_für_letzte_ehe",
+          "var": "p1_name_und_anschrift_des_rechtsanwaltes_fuer_letzte_ehe",
+          "type": "string",
+          "meaning": "Ggf. Rechtsanwalt (Name, Anschrift)",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_höhe_der_privaten_unterhaltsvereinbarung_für_letzte_ehe",
+          "var": "p1_hoehe_der_privaten_unterhaltsvereinbarung_fuer_letzte_ehe",
+          "type": "string",
+          "meaning": "Höhe (EUR) bzw. Art",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_private_unterhaltsvereinbarung_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Private Unterhaltsvereinbarung? (Frühere Ehe)",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "p1_name_und_vorname_eines_frueheren_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_private_unterhaltsvereinbarung_für_frühere_ehe",
+          "var": "p1_private_unterhaltsvereinbarung_fuer_fruehere_ehe",
+          "type": "string",
+          "meaning": "Private Unterhaltsvereinbarung",
+          "options": {
+            "Ja": "Ja",
+            "nein": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_details_private_unterhaltsvereinbarung_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Angaben zur privaten Unterhaltsvereinbarung (Frühere Ehe)",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_private_unterhaltsvereinbarung_fuer_fruehere_ehe == 'Ja'",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_name_und_anschrift_des_rechtsanwaltes_für_frühere_ehe",
+          "var": "p1_name_und_anschrift_des_rechtsanwaltes_fuer_fruehere_ehe",
+          "type": "string",
+          "meaning": "Ggf. Rechtsanwalt (Name, Anschrift)",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_höhe_der_privaten_unterhaltsvereinbarung_für_frühere_ehe",
+          "var": "p1_hoehe_der_privaten_unterhaltsvereinbarung_fuer_fruehere_ehe",
+          "type": "string",
+          "meaning": "Höhe (EUR) bzw. Art",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsverfahren_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Ist ein Unterhaltsverfahren eingeleitet? (Letzte Ehe)",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "p1_name_und_vorname_des_letzten_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_unterhaltsverfahren_aus_letzter_ehe",
+          "var": "p1_unterhaltsverfahren_aus_letzter_ehe",
+          "type": "string",
+          "meaning": "Unterhaltsverfahren eingeleitet",
+          "options": {
+            "Ja": "Ja",
+            "nein": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsverfahren_art_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Art des Unterhaltsverfahrens (Letzte Ehe)",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p1_unterhaltsverfahren_aus_letzter_ehe == 'Ja'",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_antrag",
+          "var": "p1_antrag",
+          "type": "bool",
+          "meaning": "Antrag",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_antrag_auf_einstweilige_anordnung",
+          "var": "p1_antrag_auf_einstweilige_anordnung",
+          "type": "bool",
+          "meaning": "Antrag auf einstweilige Anordnung",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsverfahren_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Ist ein Unterhaltsverfahren eingeleitet? (Frühere Ehe)",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "p1_name_und_vorname_eines_frueheren_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_unterhaltsverfahren_aus_früherer_ehe",
+          "var": "p1_unterhaltsverfahren_aus_frueherer_ehe",
+          "type": "string",
+          "meaning": "Unterhaltsverfahren eingeleitet",
+          "options": {
+            "Ja": "Ja",
+            "Nein": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsverfahren_art_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Art des Unterhaltsverfahrens (Frühere Ehe)",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p1_unterhaltsverfahren_aus_frueherer_ehe == 'Ja'",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_antrag_zum_unterhaltsverfahren_aus_früherer_ehe",
+          "var": "p1_antrag_zum_unterhaltsverfahren_aus_frueherer_ehe",
+          "type": "bool",
+          "meaning": "Antrag",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_antrag_auf_einstweilige_anordnung_zu_unterhaltsverfahren_aus_früherer_ehe",
+          "var": "p1_antrag_auf_einstweilige_anordnung_zu_unterhaltsverfahren_aus_frueherer_ehe",
+          "type": "bool",
+          "meaning": "Antrag auf einstweilige Anordnung",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsverzicht_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Wurde auf Unterhalt verzichtet? (Letzte Ehe)",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "p1_name_und_vorname_des_letzten_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_unterhaltsverzicht_aus_letzter_ehe",
+          "var": "p1_unterhaltsverzicht_aus_letzter_ehe",
+          "type": "string",
+          "meaning": "Auf Unterhalt verzichtet",
+          "options": {
+            "Ja": "Ja",
+            "nein": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsverzicht_art_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Art des Unterhaltsverzichts (Letzte Ehe)",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p1_unterhaltsverzicht_aus_letzter_ehe == 'Ja'",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_unterhaltsverzicht_aus_letzter_ehe_durch_vergleich",
+          "var": "p1_unterhaltsverzicht_aus_letzter_ehe_durch_vergleich",
+          "type": "bool",
+          "meaning": "Vergleich",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_private_vereinbarung",
+          "var": "p1_private_vereinbarung",
+          "type": "bool",
+          "meaning": "Private Vereinbarung",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_unterhaltsverzicht_aus_erster_ehe",
+          "var": "p1_unterhaltsverzicht_aus_erster_ehe",
+          "type": "bool",
+          "meaning": "Sonstige Art",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsverzicht_sonstige_art_letzte_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Erläuterung der sonstigen Art des Unterhaltsverzichts (Letzte Ehe)",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_unterhaltsverzicht_aus_erster_ehe",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_art_des_unterhaltsverzichts_aus_früherer_ehe",
+          "var": "p1_art_des_unterhaltsverzichts_aus_frueherer_ehe",
+          "type": "string",
+          "meaning": "Sonstige Art des Verzichts",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsverzicht_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Wurde auf Unterhalt verzichtet? (Frühere Ehe)",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "p1_name_und_vorname_eines_frueheren_ehegatten != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_unterhaltsverzicht_aus_früherer_ehe",
+          "var": "p1_unterhaltsverzicht_aus_frueherer_ehe",
+          "type": "string",
+          "meaning": "Auf Unterhalt verzichtet",
+          "options": {
+            "Ja": "Ja",
+            "nein": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsverzicht_art_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Art des Unterhaltsverzichts (Frühere Ehe)",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p1_unterhaltsverzicht_aus_frueherer_ehe == 'Ja'",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_unterhaltsverzicht_aus_früherer_ehe_durch_vergleich",
+          "var": "p1_unterhaltsverzicht_aus_frueherer_ehe_durch_vergleich",
+          "type": "bool",
+          "meaning": "Vergleich",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_unterhaltsverzicht_aus_früherer_ehe_durch_private_vereinbarung",
+          "var": "p1_unterhaltsverzicht_aus_frueherer_ehe_durch_private_vereinbarung",
+          "type": "bool",
+          "meaning": "Private Vereinbarung",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_unterhaltsverzichts_aus_früherer_ehe_1",
+          "var": "p1_unterhaltsverzichts_aus_frueherer_ehe_1",
+          "type": "bool",
+          "meaning": "Sonstige Art",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsverzicht_sonstige_art_fruehere_ehe",
+      "page": 1,
+      "section": "A",
+      "person": null,
+      "topic": "Erläuterung der sonstigen Art des Unterhaltsverzichts (Frühere Ehe)",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_unterhaltsverzichts_aus_frueherer_ehe_1",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_art_des_unterhaltsverzichts_aus_früherer_ehe_2",
+          "var": "p1_art_des_unterhaltsverzichts_aus_frueherer_ehe_2",
+          "type": "string",
+          "meaning": "Sonstige Art des Verzichts",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_elternteil_vater_ausserhalb_des_haushalts",
+      "page": 1,
+      "section": "B Antragsteller minderjährig/volljährig",
+      "person": null,
+      "topic": "Vater außerhalb des Haushalts",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_vater_außerhalb_des_haushalts",
+          "var": "p1_vater_ausserhalb_des_haushalts",
+          "type": "bool",
+          "meaning": "Vater lebt außerhalb des Haushalts",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_name_und_vorname_des_vaters",
+          "var": "p1_name_und_vorname_des_vaters",
+          "type": "string",
+          "meaning": "Name, Vorname des Vaters",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_anschrift_des_vaters",
+          "var": "p1_anschrift_des_vaters",
+          "type": "string",
+          "meaning": "Anschrift des Vaters",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_beruf_des_vaters",
+          "var": "p1_beruf_des_vaters",
+          "type": "string",
+          "meaning": "Beruf des Vaters",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_arbeitgeber_des_vaters",
+          "var": "p1_arbeitgeber_des_vaters",
+          "type": "string",
+          "meaning": "Arbeitgeber des Vaters",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_elternteil_mutter_ausserhalb_des_haushalts",
+      "page": 1,
+      "section": "B Antragsteller minderjährig/volljährig",
+      "person": null,
+      "topic": "Mutter außerhalb des Haushalts",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_mutter_außerhalb_des_haushalts",
+          "var": "p1_mutter_ausserhalb_des_haushalts",
+          "type": "bool",
+          "meaning": "Mutter lebt außerhalb des Haushalts",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_name_und_vorname_der_mutter",
+          "var": "p1_name_und_vorname_der_mutter",
+          "type": "string",
+          "meaning": "Name, Vorname der Mutter",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_anschrift_der_mutter",
+          "var": "p1_anschrift_der_mutter",
+          "type": "string",
+          "meaning": "Anschrift der Mutter",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_beruf_der_mutter",
+          "var": "p1_beruf_der_mutter",
+          "type": "string",
+          "meaning": "Beruf der Mutter",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_arbeitgeber_der_mutter",
+          "var": "p1_arbeitgeber_der_mutter",
+          "type": "string",
+          "meaning": "Arbeitgeber der Mutter",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_vaterschaft_anerkannt",
+      "page": 2,
+      "section": "Unterhalt",
+      "person": null,
+      "topic": "Ist die Vaterschaft anerkannt oder gerichtlich festgestellt?",
+      "hint": "Falls nichtehelich",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_vaterschaft_anerkannt",
+          "var": "p2_vaterschaft_anerkannt",
+          "type": "string",
+          "meaning": "Vaterschaft anerkannt oder gerichtlich festgestellt",
+          "options": {
+            "On": "Ja",
+            "off": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_unterhalt_gezahlt",
+      "page": 2,
+      "section": "Unterhalt",
+      "person": null,
+      "topic": "Wird Unterhalt gezahlt?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_unterhalt",
+          "var": "p2_unterhalt",
+          "type": "string",
+          "meaning": "Wird Unterhalt gezahlt?",
+          "options": {
+            "On": "Ja",
+            "off": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_unterhalt_zahlung_details",
+      "page": 2,
+      "section": "Unterhalt",
+      "person": null,
+      "topic": "Angaben zur Unterhaltszahlung",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_unterhalt == \"On\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_unterhalt_in_höhe_von",
+          "var": "p2_unterhalt_in_hoehe_von",
+          "type": "string",
+          "meaning": "Betrag (EUR)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_unterhalt_in_höhe_von_letztmalig_am",
+          "var": "p2_unterhalt_in_hoehe_von_letztmalig_am",
+          "type": "string",
+          "meaning": "Letztmalig (Datum und Betrag)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_unterhalt_festgesetzt",
+      "page": 2,
+      "section": "Unterhalt",
+      "person": null,
+      "topic": "Wurde Unterhalt festgesetzt?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_unterhalt_festgesetzt",
+          "var": "p2_unterhalt_festgesetzt",
+          "type": "string",
+          "meaning": "Wurde Unterhalt festgesetzt?",
+          "options": {
+            "On": "Ja",
+            "off": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_unterhalt_festsetzung_art",
+      "page": 2,
+      "section": "Unterhalt",
+      "person": null,
+      "topic": "Art der Festsetzung des Unterhalts",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p2_unterhalt_festgesetzt == \"On\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_urteil",
+          "var": "p2_urteil",
+          "type": "bool",
+          "meaning": "Urteil / Beschluss",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_urkunde",
+          "var": "p2_urkunde",
+          "type": "bool",
+          "meaning": "Urkunde",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_unterhalt_festsetzung_details",
+      "page": 2,
+      "section": "Unterhalt",
+      "person": null,
+      "topic": "Angaben zur Festsetzung des Unterhalts",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_unterhalt_festgesetzt == \"On\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_behörde_bzw_gericht",
+          "var": "p2_behoerde_bzw_gericht",
+          "type": "string",
+          "meaning": "Behörde bzw. Gericht",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_aktenzeichen",
+          "var": "p2_aktenzeichen",
+          "type": "string",
+          "meaning": "Aktenzeichen",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_unterhalts_betrag",
+          "var": "p2_unterhalts_betrag",
+          "type": "string",
+          "meaning": "Betrag (EUR)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_schulbesuch",
+      "page": 2,
+      "section": "Unterhalt",
+      "person": null,
+      "topic": "Wird eine Schule besucht?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_schulbesuch",
+          "var": "p2_schulbesuch",
+          "type": "string",
+          "meaning": "Wird eine Schule besucht?",
+          "options": {
+            "On": "Ja",
+            "off": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_schulbesuch_details",
+      "page": 2,
+      "section": "Unterhalt",
+      "person": null,
+      "topic": "Angaben zur besuchten Schule",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_schulbesuch == \"On\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_bezeichnung_der_schule",
+          "var": "p2_bezeichnung_der_schule",
+          "type": "string",
+          "meaning": "Bezeichnung der Schule",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_anschrift_der_schule",
+          "var": "p2_anschrift_der_schule",
+          "type": "string",
+          "meaning": "Anschrift",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 94 SGB XII",
+      "documents": []
+    }
+  ],
+  "out_of_scope": [
+    {
+      "field_id": "px_angaben_zur_letzten_bzw",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "p1_geschäftszeichen",
+      "reason": "office_use"
+    }
+  ]
+}

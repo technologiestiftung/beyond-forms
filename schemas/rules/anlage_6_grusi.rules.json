@@ -1,0 +1,1017 @@
+{
+  "form_id": "anlage_6_grusi",
+  "source": {
+    "pdf": "forms/pdfs/anlage_6_grusi.pdf",
+    "sha256": "a3b7db7a570156ffaf22e324b73787ca1e2fcd5375c693e92a2bd3afcaa5e9fe",
+    "model": "vertex_ai/gemini-3.8-flash",
+    "generated_at": "2026-11-11T13:38:47+00:00"
+  },
+  "groups": [
+    {
+      "id": "p1_antragsteller_name",
+      "page": 1,
+      "section": "Anlage 6 – Mietschulden",
+      "person": null,
+      "topic": "Name, Vorname",
+      "hint": null,
+      "answer_type": "name",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_name_und_vorname",
+          "var": "p1_name_und_vorname",
+          "type": "string",
+          "meaning": "Name, Vorname",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_geschaeftszeichen",
+      "page": 1,
+      "section": "Anlage 6 – Mietschulden",
+      "person": null,
+      "topic": "Geschäftszeichen",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_geschäftszeichen",
+          "var": "p1_geschaeftszeichen",
+          "type": "string",
+          "meaning": "Geschäftszeichen",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_zum_antrag_vom",
+      "page": 1,
+      "section": "Anlage 6 – Mietschulden",
+      "person": null,
+      "topic": "Zum Antrag vom",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_zum_antrag_vom",
+          "var": "p1_zum_antrag_vom",
+          "type": "string",
+          "meaning": "Zum Antrag vom",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_umfang_des_antrages",
+      "page": 1,
+      "section": "A Umfang des Antrages",
+      "person": null,
+      "topic": "Umfang des Antrages",
+      "hint": "Ich beantrage die Übernahme meiner/unserer Mietschulen",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_umfang_des_antrages",
+          "var": "p1_umfang_des_antrages",
+          "type": "string",
+          "meaning": "Ich beantrage die Übernahme meiner/unserer Mietschulen",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_vorliegende_unterlagen",
+      "page": 1,
+      "section": "B Vorliegende Unterlagen zu Mietschulden",
+      "person": null,
+      "topic": "Aufgrund der vorgenannten Mietschulden vorliegende Unterlagen",
+      "hint": "Aufgrund der vorgenannten Mietschulden liegt mir/uns vor (vorhandene Unterlagen bitte beifügen)",
+      "answer_type": "multiple_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_mahnung",
+          "var": "p1_mahnung",
+          "type": "bool",
+          "meaning": "eine Mahnung des Vermieters",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_kündigung",
+          "var": "p1_kuendigung",
+          "type": "bool",
+          "meaning": "eine Kündigung des Vermieters",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_fristlose_kündigung",
+          "var": "p1_fristlose_kuendigung",
+          "type": "bool",
+          "meaning": "eine fristlose Kündigung des Vermieters",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_klage",
+          "var": "p1_klage",
+          "type": "bool",
+          "meaning": "eine Klage des Vermieters",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_räumungsaufforderung",
+          "var": "p1_raeumungsaufforderung",
+          "type": "bool",
+          "meaning": "eine Räumungsaufforderung des Gerichtsvollziehers",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_keine_der_genannten_unterlagen",
+          "var": "p1_keine_der_genannten_unterlagen",
+          "type": "string",
+          "meaning": "keine der o.g. Unterlagen",
+          "options": {
+            "Ja": "keine der o.g. Unterlagen"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": [
+        {
+          "name": "Mahnung des Vermieters",
+          "condition": "p1_mahnung",
+          "form_id": null
+        },
+        {
+          "name": "Kündigung des Vermieters",
+          "condition": "p1_kuendigung",
+          "form_id": null
+        },
+        {
+          "name": "Fristlose Kündigung des Vermieters",
+          "condition": "p1_fristlose_kuendigung",
+          "form_id": null
+        },
+        {
+          "name": "Klage des Vermieters",
+          "condition": "p1_klage",
+          "form_id": null
+        },
+        {
+          "name": "Räumungsaufforderung des Gerichtsvollziehers",
+          "condition": "p1_raeumungsaufforderung",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p1_kuendigung_datum",
+      "page": 1,
+      "section": "B Vorliegende Unterlagen zu Mietschulden",
+      "person": null,
+      "topic": "Datum der Kündigung des Vermieters",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "p1_kuendigung",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_kündigung_des_vermieters_zum",
+          "var": "p1_kuendigung_des_vermieters_zum",
+          "type": "string",
+          "meaning": "Kündigung des Vermieters zum",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_fristlose_kuendigung_datum",
+      "page": 1,
+      "section": "B Vorliegende Unterlagen zu Mietschulden",
+      "person": null,
+      "topic": "Datum der fristlosen Kündigung des Vermieters",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "p1_fristlose_kuendigung",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_fristlose_kündigung_des_vermieters_zum",
+          "var": "p1_fristlose_kuendigung_des_vermieters_zum",
+          "type": "string",
+          "meaning": "fristlose Kündigung des Vermieters zum",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_klage_datum",
+      "page": 1,
+      "section": "B Vorliegende Unterlagen zu Mietschulden",
+      "person": null,
+      "topic": "Datum der Klage des Vermieters",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "p1_klage",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_klage_des_vermieters_zum",
+          "var": "p1_klage_des_vermieters_zum",
+          "type": "string",
+          "meaning": "Klage des Vermieters vom",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_raeumungsaufforderung_datum",
+      "page": 1,
+      "section": "B Vorliegende Unterlagen zu Mietschulden",
+      "person": null,
+      "topic": "Datum der Räumungsaufforderung des Gerichtsvollziehers",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "p1_raeumungsaufforderung",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_räumungsaufforderung_des_gerichtsvollziehers_zum",
+          "var": "p1_raeumungsaufforderung_des_gerichtsvollziehers_zum",
+          "type": "string",
+          "meaning": "Räumungsaufforderung des Gerichtsvollziehers zum",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_gruende_fuer_mietrueckstaende",
+      "page": 1,
+      "section": "C Erklärung",
+      "person": null,
+      "topic": "Gründe für die Mietrückstände",
+      "hint": "Die rückständige Miete konnte ich/wir nicht zahlen, weil",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_erklärung_der_gründe_für_die_mietrückstände",
+          "var": "p1_erklaerung_der_gruende_fuer_die_mietrueckstaende",
+          "type": "string",
+          "meaning": "Erklärung der Gründe für die Mietrückstände",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_arbeitslosengeld",
+      "page": 1,
+      "section": "D Leistungen der Agentur für Arbeit",
+      "person": null,
+      "topic": "Erhalt von Arbeitslosengeld",
+      "hint": "Ich/wir erhalten von der Agentur für Arbeit Arbeitslosengeld",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_arbeitslosengeld",
+          "var": "p1_arbeitslosengeld",
+          "type": "string",
+          "meaning": "Arbeitslosengeld erhalten",
+          "options": {
+            "0": "Ja",
+            "1": "Nein",
+            "2": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_mietschuldenuebernahme_beantragt",
+      "page": 1,
+      "section": "D Leistungen der Agentur für Arbeit",
+      "person": null,
+      "topic": "Übernahme der Mietschulden bei der Agentur für Arbeit beantragt",
+      "hint": "Ich habe die Übernahme der Mietschulden bei der Agentur für Arbeit beantragt",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_mietschuldenübernahme_beantragt",
+          "var": "p1_mietschuldenuebernahme_beantragt",
+          "type": "string",
+          "meaning": "Mietschuldenübernahme bei der Agentur für Arbeit beantragt",
+          "options": {
+            "Ja": "Ja, mit Antrag vom",
+            "Nein": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_mietschuldenuebernahme_antragsdatum",
+      "page": 1,
+      "section": "D Leistungen der Agentur für Arbeit",
+      "person": null,
+      "topic": "Datum des Antrags auf Mietschuldenübernahme bei der Agentur für Arbeit",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "p1_mietschuldenuebernahme_beantragt == 'Ja'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_mietschuldenübernahme_mit_antrag_vom",
+          "var": "p1_mietschuldenuebernahme_mit_antrag_vom",
+          "type": "string",
+          "meaning": "Mietschuldenübernahme mit Antrag vom",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_arbeitslosengeld_ii",
+      "page": 1,
+      "section": "D Leistungen der Agentur für Arbeit",
+      "person": null,
+      "topic": "Erhalt von Arbeitslosengeld II",
+      "hint": "Ich/wir erhalten von der Agentur für Arbeit Arbeitslosengeld II",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_arbeitslosengeld_ii",
+          "var": "p1_arbeitslosengeld_ii",
+          "type": "string",
+          "meaning": "Arbeitslosengeld II erhalten",
+          "options": {
+            "Ja": "Ja",
+            "Nein": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_unterhaltsgeld",
+      "page": 1,
+      "section": "D Leistungen der Agentur für Arbeit",
+      "person": null,
+      "topic": "Erhalt von Unterhaltsgeld",
+      "hint": "Ich/wir erhalten von der Agentur für Arbeit Unterhaltsgeld",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_unterhaltsgeld",
+          "var": "p1_unterhaltsgeld",
+          "type": "string",
+          "meaning": "Unterhaltsgeld erhalten",
+          "options": {
+            "Ja": "Ja",
+            "Nein": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_eingliederungshilfe",
+      "page": 1,
+      "section": "D Leistungen der Agentur für Arbeit",
+      "person": null,
+      "topic": "Erhalt von Eingliederungshilfe",
+      "hint": "Ich/wir erhalten von der Agentur für Arbeit Eingliederungshilfe",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_eingliederungshilfe",
+          "var": "p1_eingliederungshilfe",
+          "type": "string",
+          "meaning": "Eingliederungshilfe erhalten",
+          "options": {
+            "Ja": "Ja",
+            "Nein": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_status_antrag_agentur_fuer_arbeit",
+      "page": 1,
+      "section": "D Leistungen der Agentur für Arbeit",
+      "person": null,
+      "topic": "Status des Antrags bei der Agentur für Arbeit",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_leistung_abgelehnt",
+          "var": "p1_leistung_abgelehnt",
+          "type": "bool",
+          "meaning": "die beantragte Leistung wurde abgelehnt (Bescheid beifügen)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_noch_nicht_entschieden",
+          "var": "p1_noch_nicht_entschieden",
+          "type": "bool",
+          "meaning": "über meinen Antrag wurde noch nicht entschieden",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": [
+        {
+          "name": "Ablehnungsbescheid der Agentur für Arbeit",
+          "condition": "p1_leistung_abgelehnt",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p1_ratenzahlung_nicht_moeglich_gruende",
+      "page": 1,
+      "section": "E Erklärung",
+      "person": null,
+      "topic": "Gründe, warum Ratenzahlung der rückständigen Miete nicht möglich ist",
+      "hint": "Die rückständige Miete in Raten zu zahlen ist mir/uns nicht möglich weil,",
+      "answer_type": "multiple_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_keine_mittel",
+          "var": "p1_keine_mittel",
+          "type": "bool",
+          "meaning": "kein ausreichendes Einkommen und Vermögen vorhanden ist",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_keine_ratenzahlung",
+          "var": "p1_keine_ratenzahlung",
+          "type": "bool",
+          "meaning": "der Vermieter eine Ratenzahlung ablehnt",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_keine_zeit",
+          "var": "p1_keine_zeit",
+          "type": "bool",
+          "meaning": "die Zeit nicht mehr ausreicht, da die Klage bereits anhängig ist bzw. ein Beschluss zur Räumung vorliegt",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_sonstige_gründe",
+          "var": "p1_sonstige_gruende",
+          "type": "bool",
+          "meaning": "sonstige Gründe",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_ratenzahlung_sonstige_gruende_angabe",
+      "page": 1,
+      "section": "E Erklärung",
+      "person": null,
+      "topic": "Sonstige Gründe für die Unmöglichkeit der Ratenzahlung",
+      "hint": "sonstige Gründe, welche",
+      "answer_type": "text",
+      "ask_if": "p1_sonstige_gruende",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_erklärung_ratenzahlung",
+          "var": "p1_erklaerung_ratenzahlung",
+          "type": "string",
+          "meaning": "Erklärung Ratenzahlung",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_andere_kuendigungsgruende_vorhanden",
+      "page": 1,
+      "section": "F Andere Kündigungsgründe",
+      "person": null,
+      "topic": "Andere Gründe zur Kündigung der Wohnung",
+      "hint": "Zusätzlich zu den Mietrückständen liegen noch andere Gründe zur Kündigung der Wohnung vor:",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_weitere_kündigungsgründe",
+          "var": "p1_weitere_kuendigungsgruende",
+          "type": "string",
+          "meaning": "weitere Kündigungsgründe liegen vor",
+          "options": {
+            "Nein": "Nein",
+            "Ja": "Ja"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_andere_kuendigungsgruende_bezeichnung",
+      "page": 1,
+      "section": "F Andere Kündigungsgründe",
+      "person": null,
+      "topic": "Gründe zur Kündigung der Wohnung",
+      "hint": "Bei Beantwortung mit „Ja“ die Gründe nennen (z.B. unerlaubte Tierhaltung, ruhestörender Lärm, sonst. Verstöße gegen die Hausordnung",
+      "answer_type": "text",
+      "ask_if": "p1_weitere_kuendigungsgruende == 'Ja'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_gründe",
+          "var": "p1_gruende",
+          "type": "string",
+          "meaning": "Gründe zur Kündigung nennen",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_mietschulden_vergangenheit",
+      "page": 2,
+      "section": "G",
+      "person": null,
+      "topic": "Für meine/unsere jetzige Wohnung bestanden bereits in der Vergangenheit Mietschulden",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_mietschulden",
+          "var": "p2_mietschulden",
+          "type": "string",
+          "meaning": "Für meine/unsere jetzige Wohnung bestanden bereits in der Vergangenheit Mietschulden",
+          "options": {
+            "Nein": "Nein",
+            "Ja": "Ja  Bei Beantwortung mit „Ja“ (ggf. auch Mehrfachnennungen)"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_angaben_fruehere_mietschulden",
+      "page": 2,
+      "section": "G",
+      "person": null,
+      "topic": "Angaben zu früheren Mietschulden",
+      "hint": "Bei Beantwortung mit „Ja“ (ggf. auch Mehrfachnennungen)",
+      "answer_type": "multiple_choice",
+      "ask_if": "p2_mietschulden == \"Ja\"",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_mietschulden_wann",
+          "var": "p2_mietschulden_wann",
+          "type": "bool",
+          "meaning": "Wann",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_mietschuldenhöhe",
+          "var": "p2_mietschuldenhoehe",
+          "type": "bool",
+          "meaning": "In welcher/n Höhe/Höhen",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_mietschuldenübernahme",
+          "var": "p2_mietschuldenuebernahme",
+          "type": "bool",
+          "meaning": "Wer hat die Rückstände übernommen",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_zeitraum_fruehere_mietschulden",
+      "page": 2,
+      "section": "G",
+      "person": null,
+      "topic": "Wann bestanden die früheren Mietschulden",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_mietschulden_wann",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_zeitraum_der_mietschulden",
+          "var": "p2_zeitraum_der_mietschulden",
+          "type": "string",
+          "meaning": "Wann",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_hoehe_fruehere_mietschulden",
+      "page": 2,
+      "section": "G",
+      "person": null,
+      "topic": "Höhe der früheren Mietschulden",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_mietschuldenhoehe",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_angabe_zur_mietschuldenhöhe",
+          "var": "p2_angabe_zur_mietschuldenhoehe",
+          "type": "string",
+          "meaning": "In welcher/n Höhe/Höhen",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_uebernahme_fruehere_mietschulden",
+      "page": 2,
+      "section": "G",
+      "person": null,
+      "topic": "Übernahme der früheren Mietschulden",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_mietschuldenuebernahme",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_mietschuldenübernahme_durch",
+          "var": "p2_mietschuldenuebernahme_durch",
+          "type": "string",
+          "meaning": "Wer hat die Rückstände übernommen",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_wohnungsverlust",
+      "page": 2,
+      "section": "H",
+      "person": null,
+      "topic": "Ich/wir habe/n aufgrund von Mietschulden bereits eine Wohnung verloren",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_wohnungsverlust",
+          "var": "p2_wohnungsverlust",
+          "type": "string",
+          "meaning": "Ich/wir habe/n aufgrund von Mietschulden bereits eine Wohnung verloren",
+          "options": {
+            "Nein": "Nein",
+            "Ja": "Ja  Bei Beantwortung mit „Ja“"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_angaben_wohnungsverlust",
+      "page": 2,
+      "section": "H",
+      "person": null,
+      "topic": "Angaben zum Wohnungsverlust",
+      "hint": "Bei Beantwortung mit „Ja“",
+      "answer_type": "multiple_choice",
+      "ask_if": "p2_wohnungsverlust == \"Ja\"",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_wohnungsverlust_wann",
+          "var": "p2_wohnungsverlust_wann",
+          "type": "bool",
+          "meaning": "Wann",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_wohnungsverlust_wo",
+          "var": "p2_wohnungsverlust_wo",
+          "type": "bool",
+          "meaning": "Wo",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_zeitraum_wohnungsverlust",
+      "page": 2,
+      "section": "H",
+      "person": null,
+      "topic": "Wann wurde die Wohnung verloren",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_wohnungsverlust_wann",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_zeitraum_des_wohnungsverlustes",
+          "var": "p2_zeitraum_des_wohnungsverlustes",
+          "type": "string",
+          "meaning": "Wann",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_ort_wohnungsverlust",
+      "page": 2,
+      "section": "H",
+      "person": null,
+      "topic": "Wo wurde die Wohnung verloren",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_wohnungsverlust_wo",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_ort_des_wohnungsverlustes",
+          "var": "p2_ort_des_wohnungsverlustes",
+          "type": "string",
+          "meaning": "Wo",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_fortsetzung_des_mietverhaeltnisses",
+      "page": 2,
+      "section": "I",
+      "person": null,
+      "topic": "Ist Ihnen bekannt, ob der Vermieter bereit ist das Mietsverhältnis mit Ihnen fortzusetzen?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_fortsetzung_des_mietverhältnisses",
+          "var": "p2_fortsetzung_des_mietverhaeltnisses",
+          "type": "string",
+          "meaning": "Ist Ihnen bekannt, ob der Vermieter bereit ist das Mietsverhältnis mit Ihnen fortzusetzen?",
+          "options": {
+            "Ja": "Ja",
+            "Nein": "Nein  Gründe nennen"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_gruende_gegen_fortsetzung_des_mietverhaeltnisses",
+      "page": 2,
+      "section": "I",
+      "person": null,
+      "topic": "Gründe gegen Fortsetzung des Mietverhältnisses",
+      "hint": "Gründe nennen",
+      "answer_type": "text",
+      "ask_if": "p2_fortsetzung_des_mietverhaeltnisses == \"Nein\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_gründe_gegen_fortsetzung_des_mietverhältnisses",
+          "var": "p2_gruende_gegen_fortsetzung_des_mietverhaeltnisses",
+          "type": "string",
+          "meaning": "Gründe nennen",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_zahlungsrueckstaende",
+      "page": 2,
+      "section": "J",
+      "person": null,
+      "topic": "Liegen Zahlungsrückstände für Strom, Gas u.ä. vor?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_zahlungsrückstände",
+          "var": "p2_zahlungsrueckstaende",
+          "type": "string",
+          "meaning": "Liegen Zahlungsrückstände für Strom, Gas u.ä. vor?",
+          "options": {
+            "Nein": "Nein",
+            "Ja": "Ja  Welche (Unterlagen beifügen)"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": [
+        {
+          "name": "Unterlagen zu Zahlungsrückständen (Strom, Gas u.ä.)",
+          "condition": "p2_zahlungsrueckstaende == \"Ja\"",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p2_art_der_zahlungsrueckstaende",
+      "page": 2,
+      "section": "J",
+      "person": null,
+      "topic": "Art der Zahlungsrückstände",
+      "hint": "Welche (Unterlagen beifügen)",
+      "answer_type": "text",
+      "ask_if": "p2_zahlungsrueckstaende == \"Ja\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_art_der_zahlungsrückstände",
+          "var": "p2_art_der_zahlungsrueckstaende",
+          "type": "string",
+          "meaning": "Welche (Unterlagen beifügen)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 36 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_persoenliche_bemerkungen",
+      "page": 2,
+      "section": "Persönliche Bemerkungen",
+      "person": null,
+      "topic": "Persönliche Bemerkungen",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_persönliche_bemerkungen",
+          "var": "p2_persoenliche_bemerkungen",
+          "type": "string",
+          "meaning": "Persönliche Bemerkungen",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    }
+  ],
+  "out_of_scope": [
+    {
+      "field_id": "p2_sgb_ii",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p2_rücksprache",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p2_bestätigung",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p2_angemessener_wohnraum",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p2_finanzielle_lage_antragsteller",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p2_stellungnahme_sozialdienst",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p2_hilfeangebote",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p2_unterbringung",
+      "reason": "office_use"
+    }
+  ]
+}

@@ -11,6 +11,11 @@ import {
 
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
 
+// The desktop navigation has an h1 of its own, so the page's heading is looked up in <main>
+function pageHeading(page: Page) {
+	return page.getByRole("main").getByRole("heading", { level: 1 });
+}
+
 async function assertNoViolations(page: Page) {
 	await waitForPageReady(page);
 	const results = await new AxeBuilder({ page })
@@ -110,7 +115,7 @@ testWithAuthenticatedUser.describe(
 			"Dashboard",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -119,7 +124,9 @@ testWithAuthenticatedUser.describe(
 			"Application overview",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard/application/overview");
-				await expect(page.getByTestId("questionnaire-status-list")).toBeVisible();
+				await expect(
+					page.getByTestId("questionnaire-status-list"),
+				).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -128,7 +135,7 @@ testWithAuthenticatedUser.describe(
 			"Application about-me intro",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard/application/about-me");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -137,7 +144,7 @@ testWithAuthenticatedUser.describe(
 			"Application about-me questions",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard/application/about-me/questions");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -146,7 +153,7 @@ testWithAuthenticatedUser.describe(
 			"Application household questions",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard/application/household");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -155,7 +162,7 @@ testWithAuthenticatedUser.describe(
 			"Application housing intro",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard/application/housing");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -164,7 +171,7 @@ testWithAuthenticatedUser.describe(
 			"Application housing questions",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard/application/housing/questions");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -173,7 +180,7 @@ testWithAuthenticatedUser.describe(
 			"Application income-assets intro",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard/application/income-assets");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -182,7 +189,7 @@ testWithAuthenticatedUser.describe(
 			"Application income-assets questions",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard/application/income-assets/questions");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -191,7 +198,7 @@ testWithAuthenticatedUser.describe(
 			"Application health intro",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard/application/health");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -200,7 +207,7 @@ testWithAuthenticatedUser.describe(
 			"Application health questions",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard/application/health/questions");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -209,7 +216,7 @@ testWithAuthenticatedUser.describe(
 			"Application upload options",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/dashboard/application/upload-options");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -236,7 +243,7 @@ testWithAuthenticatedUser.describe(
 			"Profile documents (empty state)",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/profile/documents");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);
@@ -245,7 +252,7 @@ testWithAuthenticatedUser.describe(
 			"Profile settings",
 			async ({ authenticatedPage: page }) => {
 				await page.goto("/profile/settings");
-				await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+				await expect(pageHeading(page)).toBeVisible();
 				await assertNoViolations(page);
 			},
 		);

@@ -1,0 +1,461 @@
+{
+  "form_id": "antrag_bewohnerparkausweis",
+  "source": {
+    "pdf": "forms/pdfs/antrag_bewohnerparkausweis.pdf",
+    "sha256": "eb7781e531a6f04231e20616a8d44d86de549e0914a48aff9376e99fb92f6a5b",
+    "model": "vertex_ai/gemini-3.8-flash",
+    "generated_at": "2026-11-11T13:07:34+00:00"
+  },
+  "groups": [
+    {
+      "id": "p1_bezirk",
+      "page": 1,
+      "section": "An das Bezirksamt",
+      "person": null,
+      "topic": "Bitte Bezirk auswählen:",
+      "hint": "Bitte wählen Sie den Bezirk aus, in dem die Parkzone des zu beantragenden Bewohnerparkausweises liegt.",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_bezirk",
+          "var": "p1_bezirk",
+          "type": "string",
+          "meaning": "Bezirk",
+          "options": {
+            "bitte wählen": "bitte wählen",
+            "Charlottenburg-Wilmersdorf": "Charlottenburg-Wilmersdorf",
+            "Friedrichshain-Kreuzberg": "Friedrichshain-Kreuzberg",
+            "Mitte": "Mitte",
+            "Pankow": "Pankow",
+            "Steglitz-Zehlendorf": "Steglitz-Zehlendorf",
+            "Spandau": "Spandau",
+            "Tempelhof-Schöneberg": "Tempelhof-Schöneberg"
+          },
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p1_auswahl_bewohnerparkausweis",
+      "page": 1,
+      "section": "Bewohnerparkausweis | Antrag",
+      "person": null,
+      "topic": "Ich beantrage einen Bewohnerparkausweis nach § 45 Straßenverkehrs-Ordnung (StVO)",
+      "hint": "nur eine Antwort möglich – bitte ankreuzen",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_auswahl_bewohnerparkausweis",
+          "var": "p1_auswahl_bewohnerparkausweis",
+          "type": "string",
+          "meaning": "Antragsgrund",
+          "options": {
+            "Auswahl1": "I. für die Bewohnerparkzone an meinem Wohnort.",
+            "Auswahl2": "II. wegen Wechsel des Kraftfahrzeuges.",
+            "Auswahl3": "III. wegen Wechsel des Kennzeichens.",
+            "Auswahl4": "IV. wegen Wechsel der Wohnung bzw. Parkzone."
+          },
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p1_kraftfahrzeug",
+      "page": 1,
+      "section": "Kraftfahrzeug",
+      "person": null,
+      "topic": "Kennzeichen",
+      "hint": "Es können in besonderen Einzelfällen auch mehrere Kraftfahrzeuge eingetragen werden; der Grund bzw. die Dringlichkeit dieser Eintragung ist im Feld „Anmerkungen“ (siehe Seite 2), sofern nicht Saison- oder Wechselkennzeichen, zu benennen. Bei Car-Sharing-Fahrzeugen etc. ist der Name des Anbieters einzutragen.",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_kennzeichen",
+          "var": "p1_kennzeichen",
+          "type": "string",
+          "meaning": "Kennzeichen",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p1_antragsteller_name",
+      "page": 1,
+      "section": "Antragsteller",
+      "person": null,
+      "topic": "Name, Vorname",
+      "hint": null,
+      "answer_type": "name",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_name_vorname_antragsteller",
+          "var": "p1_name_vorname_antragsteller",
+          "type": "string",
+          "meaning": "Name, Vorname",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p1_antragsteller_anschrift",
+      "page": 1,
+      "section": "Antragsteller",
+      "person": null,
+      "topic": "Anschrift",
+      "hint": null,
+      "answer_type": "address",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_straße_hausnr_antragsteller",
+          "var": "p1_strasse_hausnr_antragsteller",
+          "type": "string",
+          "meaning": "Straße, Haus-Nr.",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_plz_wohnort_antragsteller",
+          "var": "p1_plz_wohnort_antragsteller",
+          "type": "string",
+          "meaning": "PLZ, Wohnort",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p1_antragsteller_telefon",
+      "page": 1,
+      "section": "Antragsteller",
+      "person": null,
+      "topic": "Telefon tagsüber",
+      "hint": "Die Angabe ist freiwillig. Bitte geben Sie Ihre Telefonnummer für eventuelle Rückfragen an.",
+      "answer_type": "phone_number",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_telefon_tagsüber_antragsteller",
+          "var": "p1_telefon_tagsueber_antragsteller",
+          "type": "string",
+          "meaning": "Telefon tagsüber",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p1_antragsteller_email",
+      "page": 1,
+      "section": "Antragsteller",
+      "person": null,
+      "topic": "E-Mail-Adresse",
+      "hint": "Diese Angabe ist freiwillig. Bitte geben Sie Ihre E-Mail-Adresse für eventuelle Rückfragen an.",
+      "answer_type": "email",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_e-mail_adresse_antragsteller",
+          "var": "p1_e_mail_adresse_antragsteller",
+          "type": "string",
+          "meaning": "E-Mail-Adresse",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p1_besondere_angaben_wechsel_kfz_kennzeichen",
+      "page": 1,
+      "section": "Besondere Angaben gemäß II. und III.",
+      "person": null,
+      "topic": "Kennzeichen (alt)",
+      "hint": "Der bisherige Bewohnerparkausweis ist bei einem Wechsel des Kraftfahrzeuges zurückzugeben!",
+      "answer_type": "text",
+      "ask_if": "p1_auswahl_bewohnerparkausweis == \"Auswahl2\" || p1_auswahl_bewohnerparkausweis == \"Auswahl3\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_kennzeichen_alt",
+          "var": "p1_kennzeichen_alt",
+          "type": "string",
+          "meaning": "Kennzeichen (alt)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p1_bisherige_anschrift",
+      "page": 1,
+      "section": "Besondere Angaben gemäß IV.",
+      "person": null,
+      "topic": "Bisherige Anschrift",
+      "hint": null,
+      "answer_type": "address",
+      "ask_if": "p1_auswahl_bewohnerparkausweis == \"Auswahl4\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_straße_hausnr_bisherige_anschrift",
+          "var": "p1_strasse_hausnr_bisherige_anschrift",
+          "type": "string",
+          "meaning": "Straße, Haus-Nr.",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_plz_wohnort_bisherige_anschrift",
+          "var": "p1_plz_wohnort_bisherige_anschrift",
+          "type": "string",
+          "meaning": "PLZ, Wohnort",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p1_parkzone_wechsel",
+      "page": 1,
+      "section": "Besondere Angaben gemäß IV.",
+      "person": null,
+      "topic": "Parkzone",
+      "hint": "Der bisherige Bewohnerparkausweis ist zurückzugeben!",
+      "answer_type": "text",
+      "ask_if": "p1_auswahl_bewohnerparkausweis == \"Auswahl4\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_parkzone_neu__alt",
+          "var": "p1_parkzone_neu_alt",
+          "type": "string",
+          "meaning": "neu / alt",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_zulassungsinhaber",
+      "page": 2,
+      "section": "Zulassungsinhaber / in",
+      "person": null,
+      "topic": "Zulassungsinhaber / in",
+      "hint": "nur eine Antwort möglich – bitte ankreuzen",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_auswahl_zulassungsinhaber",
+          "var": "p2_auswahl_zulassungsinhaber",
+          "type": "string",
+          "meaning": "Zulassungsinhaber / in",
+          "options": {
+            "Auswahl1": "Das Fahrzeug mit dem oben genannten Kfz-Kennzeichen ist auf meinen Namen zugelassen.",
+            "Auswahl2": "Ich bin Zulassungsinhaber / inhaberin der oben genannten Kraftfahrzeuge. Es handelt sich um Saison- oder Wechselkennzeichen. Die Kraftfahrzeuge werden nicht gleichzeitig genutzt.",
+            "Auswahl3": "Ich bin nicht Zulassungsinhaber / inhaberin des oben genannten Kraftfahrzeuges, es wird jedoch dauerhaft von mir genutzt. Zulassungsinhaber / inhaberin des oben genannten Kraftfahrzeuges ist:"
+          },
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_angaben_zulassungsinhaber",
+      "page": 2,
+      "section": "Zulassungsinhaber / in",
+      "person": null,
+      "topic": "Zulassungsinhaber / inhaberin des oben genannten Kraftfahrzeuges ist",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_auswahl_zulassungsinhaber == 'Auswahl3'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_name_vorname_zulassungsinhaber",
+          "var": "p2_name_vorname_zulassungsinhaber",
+          "type": "string",
+          "meaning": "Name, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_straße_hausnr_zulassungsinhaber",
+          "var": "p2_strasse_hausnr_zulassungsinhaber",
+          "type": "string",
+          "meaning": "Straße, Haus-Nr.",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_plz_wohnort_zulassungsinhaber",
+          "var": "p2_plz_wohnort_zulassungsinhaber",
+          "type": "string",
+          "meaning": "PLZ, Wohnort",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_carsharing",
+      "page": 2,
+      "section": "Zulassungsinhaber / in",
+      "person": null,
+      "topic": "Mitgliedschaft CarSharing-Organisation",
+      "hint": "Ein CarSharing-Vertrag oder vergleichbare Unterlage ist in Kopie beizufügen.",
+      "answer_type": "multiple_choice",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_auswahl_carsharing",
+          "var": "p2_auswahl_carsharing",
+          "type": "bool",
+          "meaning": "Ich bin Mitglied einer CarSharing-Organisation oder vergleichbaren Einrichtung.",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": [
+        {
+          "name": "CarSharing-Vertrag oder vergleichbare Unterlage in Kopie",
+          "condition": "p2_auswahl_carsharing",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p2_einverstaendnis_melderegister",
+      "page": 2,
+      "section": "Einverständnis Melderegister",
+      "person": null,
+      "topic": "Einverständnis Melderegister",
+      "hint": "Diese Einsichtnahme ersetzt die Vorlage einer aktuellen Meldebescheinigung bei einem Identitätsnachweis durch Reisepass oder / und Vorlage einer Nebenwohnung.",
+      "answer_type": "multiple_choice",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_auswahl_einverständnis_melderegister",
+          "var": "p2_auswahl_einverstaendnis_melderegister",
+          "type": "bool",
+          "meaning": "Einverständnis zur Einsichtnahme in das Berliner Melderegister",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_anmerkungen",
+      "page": 2,
+      "section": "Anmerkungen",
+      "person": null,
+      "topic": "Anmerkungen",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_freitext",
+          "var": "p2_freitext",
+          "type": "string",
+          "meaning": "Anmerkungen",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_datum",
+      "page": 2,
+      "section": "Datum und Unterschrift",
+      "person": null,
+      "topic": "Datum",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_datum",
+          "var": "p2_datum",
+          "type": "string",
+          "meaning": "Datum",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    }
+  ],
+  "out_of_scope": [
+    {
+      "field_id": "p1_auswahl_bezirk",
+      "reason": "static_text"
+    },
+    {
+      "field_id": "p1_anschrift_bezirk_zeile_1",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p1_fax",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p1_anschrift_bezirk_zeile_2",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p1_anschrift_bezirk_zeile_3",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p1_anschrift_bezirk_zeile_4",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p1_e-mail",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p1_anschrift_bezirk_zeile_5",
+      "reason": "office_use"
+    },
+    {
+      "field_id": "p2_drucken",
+      "reason": "other"
+    },
+    {
+      "field_id": "p2_löschen",
+      "reason": "other"
+    }
+  ]
+}

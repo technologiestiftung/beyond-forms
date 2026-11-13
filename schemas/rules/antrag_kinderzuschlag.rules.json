@@ -1,0 +1,1119 @@
+{
+  "form_id": "antrag_kinderzuschlag",
+  "source": {
+    "pdf": "forms/pdfs/antrag_kinderzuschlag.pdf",
+    "sha256": "a429a7b9992c05206ac02eea711e530993d283913a878e9046cf591b141a8e0b",
+    "model": "vertex_ai/gemini-3.8-flash",
+    "generated_at": "2026-11-11T13:12:38+00:00"
+  },
+  "groups": [
+    {
+      "id": "p2_kindergeld_berechtigter",
+      "page": 2,
+      "section": "Kopfzeile",
+      "person": null,
+      "topic": "Kindergeldbeziehende Person",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].kopfzeile[0].#area[2].name_vorname_kgb[0]",
+          "var": "p2_formular1_0_seite_1_0_kopfzeile_0_area_2_name_vorname_kgb_0",
+          "type": "string",
+          "meaning": "Familienname und Vorname der kindergeldbeziehenden Person",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].kopfzeile[0].#area[2].kg-nr[0]",
+          "var": "p2_formular1_0_seite_1_0_kopfzeile_0_area_2_kg_nr_0",
+          "type": "string",
+          "meaning": "Kindergeld-Nr.",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_antragsteller_personalien",
+      "page": 2,
+      "section": "1. Angaben zu meiner Person",
+      "person": null,
+      "topic": "Angaben zu meiner Person",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].name-kgb[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_name_kgb_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].geburtsdatum-kgb[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_geburtsdatum_kgb_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].abweichendergeburtsname[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_abweichendergeburtsname_0",
+          "type": "string",
+          "meaning": "Ggf. abweichender Geburtsname und/oder Familienname aus früherer Ehe/Lebenspartnerschaft",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].titel-kgb[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_titel_kgb_0",
+          "type": "string",
+          "meaning": "Titel",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_antragsteller_anschrift",
+      "page": 2,
+      "section": "1. Angaben zu meiner Person",
+      "person": null,
+      "topic": "Anschrift",
+      "hint": null,
+      "answer_type": "address",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].anschrift[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_anschrift_0",
+          "type": "string",
+          "meaning": "Anschrift (Straße/Platz, Hausnummer, Postleitzahl, Wohnort)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_antragsteller_weitere_angaben",
+      "page": 2,
+      "section": "1. Angaben zu meiner Person",
+      "person": null,
+      "topic": "Geschlecht, Staatsangehörigkeit und Telefonnummer",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].geschlecht[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_geschlecht_0",
+          "type": "string",
+          "meaning": "Geschlecht",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].staatsangeh-kgb[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_staatsangeh_kgb_0",
+          "type": "string",
+          "meaning": "Staatsangehörigkeit",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].telefonnr[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_telefonnr_0",
+          "type": "string",
+          "meaning": "Telefonnummer für Rückfragen tagsüber",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_antragsteller_familienstand",
+      "page": 2,
+      "section": "1. Angaben zu meiner Person",
+      "person": null,
+      "topic": "Familienstand",
+      "hint": null,
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].ledig[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_ledig_0",
+          "type": "bool",
+          "meaning": "ledig",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].verheiratet[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_verheiratet_0",
+          "type": "bool",
+          "meaning": "verheiratet/verpartnert",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].geschieden[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_geschieden_0",
+          "type": "bool",
+          "meaning": "geschieden/Partnerschaft aufgehoben",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].getrennt-lebend[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_getrennt_lebend_0",
+          "type": "bool",
+          "meaning": "getrennt lebend",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].verwitwet[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_verwitwet_0",
+          "type": "bool",
+          "meaning": "verwitwet",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_antragsteller_familienstand_seit",
+      "page": 2,
+      "section": "1. Angaben zu meiner Person",
+      "person": null,
+      "topic": "Familienstand gültig seit",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "!p2_formular1_0_seite_1_0_frage_1_0_ledig_0 && (p2_formular1_0_seite_1_0_frage_1_0_verheiratet_0 || p2_formular1_0_seite_1_0_frage_1_0_geschieden_0 || p2_formular1_0_seite_1_0_frage_1_0_getrennt_lebend_0 || p2_formular1_0_seite_1_0_frage_1_0_verwitwet_0)",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-1[0].fam-stand-seit[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_1_0_fam_stand_seit_0",
+          "type": "string",
+          "meaning": "Familienstand seit",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_partner_angaben",
+      "page": 2,
+      "section": "2. Angaben zu meinem/meiner im Haushalt lebenden Partner(in)",
+      "person": null,
+      "topic": "Angaben zu meinem/meiner im Haushalt lebenden Partner(in)",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-2[0].name-partner[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_2_0_name_partner_0",
+          "type": "string",
+          "meaning": "Familienname, ggf. abweichender Geburtsname, Vorname",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-2[0].staatsangeh-partner[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_2_0_staatsangeh_partner_0",
+          "type": "string",
+          "meaning": "Staatsangehörigkeit",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-2[0].geburtsdatum-partner[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_2_0_geburtsdatum_partner_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_kontoverbindung",
+      "page": 2,
+      "section": "3. Angaben zu meiner Kontoverbindung",
+      "person": null,
+      "topic": "Angaben zu meiner Kontoverbindung",
+      "hint": null,
+      "answer_type": "iban",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-3[0].iban[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_3_0_iban_0",
+          "type": "string",
+          "meaning": "IBAN",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-3[0].bic[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_3_0_bic_0",
+          "type": "string",
+          "meaning": "BIC",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-3[0].kontoinhaber[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_3_0_kontoinhaber_0",
+          "type": "string",
+          "meaning": "Kontoinhaber(in)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_kind_1",
+      "page": 2,
+      "section": "4. Für folgende Kinder im Haushalt beantrage ich Kinderzuschlag",
+      "person": "Kind 1",
+      "topic": "Kind 1",
+      "hint": "Hinweis: Die Kinder müssen unter 25 Jahre alt und unverheiratet sein. Sie oder Ihr(e) Partner(in) müssen für dieses Kind Kindergeld beziehen. Bitte beachten Sie, dass es sich zudem um ein leibliches bzw. adoptiertes Kind von Ihnen oder Ihrem/Ihrer Partner(in) handeln muss.",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile1[0].zelle1[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile1_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile1[0].zelle2[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile1_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_kind_2",
+      "page": 2,
+      "section": "4. Für folgende Kinder im Haushalt beantrage ich Kinderzuschlag",
+      "person": "Kind 2",
+      "topic": "Kind 2",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile1_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile2[0].zelle1[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile2_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile2[0].zelle2[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile2_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_kind_3",
+      "page": 2,
+      "section": "4. Für folgende Kinder im Haushalt beantrage ich Kinderzuschlag",
+      "person": "Kind 3",
+      "topic": "Kind 3",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile2_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile3[0].zelle1[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile3_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile3[0].zelle2[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile3_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_kind_4",
+      "page": 2,
+      "section": "4. Für folgende Kinder im Haushalt beantrage ich Kinderzuschlag",
+      "person": "Kind 4",
+      "topic": "Kind 4",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile3_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile4[0].zelle1[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile4_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile4[0].zelle2[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile4_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_kind_5",
+      "page": 2,
+      "section": "4. Für folgende Kinder im Haushalt beantrage ich Kinderzuschlag",
+      "person": "Kind 5",
+      "topic": "Kind 5",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile4_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile5[0].zelle1[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile5_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile5[0].zelle2[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile5_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p2_kind_6",
+      "page": 2,
+      "section": "4. Für folgende Kinder im Haushalt beantrage ich Kinderzuschlag",
+      "person": "Kind 6",
+      "topic": "Kind 6",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile5_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile6[0].zelle1[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile6_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile6[0].zelle2[0]",
+          "var": "p2_formular1_0_seite_1_0_frage_4_0_kindertabelle_p_4_0_zeile6_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_frage_5_kind_1",
+      "page": 3,
+      "section": "5. Folgende unter Punkt 4 genannten Kinder halten sich nicht ständig in meinem Haushalt auf",
+      "person": null,
+      "topic": "1. Kind",
+      "hint": "(z. B. Aufenthalt beim anderen Elternteil - hier genügt die pauschale Angabe, ob sich das Kind regelmäßig 1-12 oder 13-17 Tage beim anderen Elternteil aufhält - oder Aufenthalt im Internat/Wohnheim)",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile1[0].zelle1[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_5_0_kindertabelle_p_5_0_zeile1_0_zelle1_0",
+          "type": "string",
+          "meaning": "Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile1[0].zelle3[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_5_0_kindertabelle_p_5_0_zeile1_0_zelle3_0",
+          "type": "string",
+          "meaning": "Grund und Dauer der Abwesenheit",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_frage_5_kind_2",
+      "page": 3,
+      "section": "5. Folgende unter Punkt 4 genannten Kinder halten sich nicht ständig in meinem Haushalt auf",
+      "person": null,
+      "topic": "2. Kind",
+      "hint": "(z. B. Aufenthalt beim anderen Elternteil - hier genügt die pauschale Angabe, ob sich das Kind regelmäßig 1-12 oder 13-17 Tage beim anderen Elternteil aufhält - oder Aufenthalt im Internat/Wohnheim)",
+      "answer_type": "text",
+      "ask_if": "p3_formular1_0_seite_2_0_frage_5_0_kindertabelle_p_5_0_zeile1_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile2[0].zelle1[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_5_0_kindertabelle_p_5_0_zeile2_0_zelle1_0",
+          "type": "string",
+          "meaning": "Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile2[0].zelle1[1]",
+          "var": "p3_formular1_0_seite_2_0_frage_5_0_kindertabelle_p_5_0_zeile2_0_zelle1_1",
+          "type": "string",
+          "meaning": "Grund und Dauer der Abwesenheit",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_frage_5_kind_3",
+      "page": 3,
+      "section": "5. Folgende unter Punkt 4 genannten Kinder halten sich nicht ständig in meinem Haushalt auf",
+      "person": null,
+      "topic": "3. Kind",
+      "hint": "(z. B. Aufenthalt beim anderen Elternteil - hier genügt die pauschale Angabe, ob sich das Kind regelmäßig 1-12 oder 13-17 Tage beim anderen Elternteil aufhält - oder Aufenthalt im Internat/Wohnheim)",
+      "answer_type": "text",
+      "ask_if": "p3_formular1_0_seite_2_0_frage_5_0_kindertabelle_p_5_0_zeile2_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile3[0].zelle1[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_5_0_kindertabelle_p_5_0_zeile3_0_zelle1_0",
+          "type": "string",
+          "meaning": "Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile3[0].zelle3[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_5_0_kindertabelle_p_5_0_zeile3_0_zelle3_0",
+          "type": "string",
+          "meaning": "Grund und Dauer der Abwesenheit",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_frage_6_kind_1",
+      "page": 3,
+      "section": "6. Neben den unter Punkt 4 genannten Kindern halten sich folgende Kinder unter 25 Jahren, für die ich und mein(e) Partner(in) kein Kindergeld erhalten, nicht ständig in meinen Haushalt auf",
+      "person": null,
+      "topic": "1. Kind",
+      "hint": "Hält sich das Kind bei Ihnen und etwa zu gleichen Teilen beim anderen Elternteil auf, genügt die pauschale Angabe, dass sich das Kind regelmäßig 13-17 Tage bei Ihnen aufhält. Hält sich das Kind regelmäßig zu 1-12 Tagen bei Ihnen auf, ist die Angabe der genauen Anzahl dieser Tage erforderlich. Ein Tag wird immer bei dem Elternteil berücksichtigt, bei dem sich das Kind im Verlauf des Tages zuerst aufhält. Dies gilt auch, wenn das Kind z. B. im Heim untergebracht ist.",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile1[0].zelle1[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_6_0_kindertabelle_p_6_0_zeile1_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile1[0].zelle2[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_6_0_kindertabelle_p_6_0_zeile1_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile1[0].zelle3[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_6_0_kindertabelle_p_6_0_zeile1_0_zelle3_0",
+          "type": "string",
+          "meaning": "Grund und Dauer der Anwesenheit",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_frage_6_kind_2",
+      "page": 3,
+      "section": "6. Neben den unter Punkt 4 genannten Kindern halten sich folgende Kinder unter 25 Jahren, für die ich und mein(e) Partner(in) kein Kindergeld erhalten, nicht ständig in meinen Haushalt auf",
+      "person": null,
+      "topic": "2. Kind",
+      "hint": "Hält sich das Kind bei Ihnen und etwa zu gleichen Teilen beim anderen Elternteil auf, genügt die pauschale Angabe, dass sich das Kind regelmäßig 13-17 Tage bei Ihnen aufhält. Hält sich das Kind regelmäßig zu 1-12 Tagen bei Ihnen auf, ist die Angabe der genauen Anzahl dieser Tage erforderlich. Ein Tag wird immer bei dem Elternteil berücksichtigt, bei dem sich das Kind im Verlauf des Tages zuerst aufhält. Dies gilt auch, wenn das Kind z. B. im Heim untergebracht ist.",
+      "answer_type": "text",
+      "ask_if": "p3_formular1_0_seite_2_0_frage_6_0_kindertabelle_p_6_0_zeile1_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile2[0].zelle1[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_6_0_kindertabelle_p_6_0_zeile2_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile2[0].zelle2[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_6_0_kindertabelle_p_6_0_zeile2_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile2[0].zelle3[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_6_0_kindertabelle_p_6_0_zeile2_0_zelle3_0",
+          "type": "string",
+          "meaning": "Grund und Dauer der Anwesenheit",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_frage_6_kind_3",
+      "page": 3,
+      "section": "6. Neben den unter Punkt 4 genannten Kindern halten sich folgende Kinder unter 25 Jahren, für die ich und mein(e) Partner(in) kein Kindergeld erhalten, nicht ständig in meinen Haushalt auf",
+      "person": null,
+      "topic": "3. Kind",
+      "hint": "Hält sich das Kind bei Ihnen und etwa zu gleichen Teilen beim anderen Elternteil auf, genügt die pauschale Angabe, dass sich das Kind regelmäßig 13-17 Tage bei Ihnen aufhält. Hält sich das Kind regelmäßig zu 1-12 Tagen bei Ihnen auf, ist die Angabe der genauen Anzahl dieser Tage erforderlich. Ein Tag wird immer bei dem Elternteil berücksichtigt, bei dem sich das Kind im Verlauf des Tages zuerst aufhält. Dies gilt auch, wenn das Kind z. B. im Heim untergebracht ist.",
+      "answer_type": "text",
+      "ask_if": "p3_formular1_0_seite_2_0_frage_6_0_kindertabelle_p_6_0_zeile2_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile3[0].zelle1[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_6_0_kindertabelle_p_6_0_zeile3_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile3[0].zelle2[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_6_0_kindertabelle_p_6_0_zeile3_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile3[0].zelle3[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_6_0_kindertabelle_p_6_0_zeile3_0_zelle3_0",
+          "type": "string",
+          "meaning": "Grund und Dauer der Anwesenheit",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_frage_7_person_1",
+      "page": 3,
+      "section": "7. Folgende Personen wohnen neben mir, meinem/meiner Partner(in) und den unter Punkt 4 eingetragenen Kindern ständig in meinem Haushalt",
+      "person": null,
+      "topic": "1. Person",
+      "hint": "(z. B. eigene unter 25 Jahre alte unverheiratete Kinder ohne Kindergeldanspruch, eigene über 25 Jahre alte verheiratete Kinder, Stief-, Pflege- oder Enkelkinder, Eltern, Geschwister usw.)",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile1[0].zelle1[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile1_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile1[0].zelle2[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile1_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile1[0].zelle3[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile1_0_zelle3_0",
+          "type": "string",
+          "meaning": "Verwandtschaftsverhältnis zu mir",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile1[0].zelle4[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile1_0_zelle4_0",
+          "type": "string",
+          "meaning": "Verwandtschaftsverhältnis zum/zur Partner(in)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_frage_7_person_2",
+      "page": 3,
+      "section": "7. Folgende Personen wohnen neben mir, meinem/meiner Partner(in) und den unter Punkt 4 eingetragenen Kindern ständig in meinem Haushalt",
+      "person": null,
+      "topic": "2. Person",
+      "hint": "(z. B. eigene unter 25 Jahre alte unverheiratete Kinder ohne Kindergeldanspruch, eigene über 25 Jahre alte verheiratete Kinder, Stief-, Pflege- oder Enkelkinder, Eltern, Geschwister usw.)",
+      "answer_type": "text",
+      "ask_if": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile1_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile2[0].zelle1[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile2_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile2[0].zelle2[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile2_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile2[0].zelle3[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile2_0_zelle3_0",
+          "type": "string",
+          "meaning": "Verwandtschaftsverhältnis zu mir",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile2[0].zelle4[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile2_0_zelle4_0",
+          "type": "string",
+          "meaning": "Verwandtschaftsverhältnis zum/zur Partner(in)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_frage_7_person_3",
+      "page": 3,
+      "section": "7. Folgende Personen wohnen neben mir, meinem/meiner Partner(in) und den unter Punkt 4 eingetragenen Kindern ständig in meinem Haushalt",
+      "person": null,
+      "topic": "3. Person",
+      "hint": "(z. B. eigene unter 25 Jahre alte unverheiratete Kinder ohne Kindergeldanspruch, eigene über 25 Jahre alte verheiratete Kinder, Stief-, Pflege- oder Enkelkinder, Eltern, Geschwister usw.)",
+      "answer_type": "text",
+      "ask_if": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile2_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile3[0].zelle1[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile3_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile3[0].zelle2[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile3_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile3[0].#field[2]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile3_0_field_2",
+          "type": "string",
+          "meaning": "Verwandtschaftsverhältnis zu mir",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile3[0].zelle4[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile3_0_zelle4_0",
+          "type": "string",
+          "meaning": "Verwandtschaftsverhältnis zum/zur Partner(in)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_frage_7_person_4",
+      "page": 3,
+      "section": "7. Folgende Personen wohnen neben mir, meinem/meiner Partner(in) und den unter Punkt 4 eingetragenen Kindern ständig in meinem Haushalt",
+      "person": null,
+      "topic": "4. Person",
+      "hint": "(z. B. eigene unter 25 Jahre alte unverheiratete Kinder ohne Kindergeldanspruch, eigene über 25 Jahre alte verheiratete Kinder, Stief-, Pflege- oder Enkelkinder, Eltern, Geschwister usw.)",
+      "answer_type": "text",
+      "ask_if": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile3_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile4[0].zelle1[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile4_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile4[0].zelle2[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile4_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile4[0].zelle3[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile4_0_zelle3_0",
+          "type": "string",
+          "meaning": "Verwandtschaftsverhältnis zu mir",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile4[0].zelle4[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile4_0_zelle4_0",
+          "type": "string",
+          "meaning": "Verwandtschaftsverhältnis zum/zur Partner(in)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_frage_7_person_5",
+      "page": 3,
+      "section": "7. Folgende Personen wohnen neben mir, meinem/meiner Partner(in) und den unter Punkt 4 eingetragenen Kindern ständig in meinem Haushalt",
+      "person": null,
+      "topic": "5. Person",
+      "hint": "(z. B. eigene unter 25 Jahre alte unverheiratete Kinder ohne Kindergeldanspruch, eigene über 25 Jahre alte verheiratete Kinder, Stief-, Pflege- oder Enkelkinder, Eltern, Geschwister usw.)",
+      "answer_type": "text",
+      "ask_if": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile4_0_zelle1_0 != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile5[0].zelle1[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile5_0_zelle1_0",
+          "type": "string",
+          "meaning": "Familienname, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile5[0].zelle2[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile5_0_zelle2_0",
+          "type": "string",
+          "meaning": "Geburtsdatum",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile5[0].zelle3[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile5_0_zelle3_0",
+          "type": "string",
+          "meaning": "Verwandtschaftsverhältnis zu mir",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile5[0].zelle4[0]",
+          "var": "p3_formular1_0_seite_2_0_frage_7_0_tabelle_p_7_0_zeile5_0_zelle4_0",
+          "type": "string",
+          "meaning": "Verwandtschaftsverhältnis zum/zur Partner(in)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_datum_antragstellung",
+      "page": 3,
+      "section": "ERKLÄRUNG",
+      "person": null,
+      "topic": "Datum",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].#area[3].datum\\.antrag\\.0[0]",
+          "var": "p3_formular1_0_seite_2_0_area_3_datum_antrag_0_0",
+          "type": "string",
+          "meaning": "Datum",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "p3_kindergeldnummer_zweite_person",
+      "page": 3,
+      "section": "ERKLÄRUNG",
+      "person": null,
+      "topic": "Kindergeldnummer der zweiten antragstellenden Person",
+      "hint": "Eine Unterschrift als zweite antragstellende Person ist dann notwendig, wenn das Kindergeld für die im Antrag genannten Kinder teils an die erste und teils an die zweite antragstellende Person gezahlt wird. In diesen Fällen ist von der zweiten antragstellenden Person die untenstehende Erklärung ebenfalls zu unterschreiben.",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_formular1[0].seite-2[0].#area[3].kg-nr-zweiter-antragsteller[0]",
+          "var": "p3_formular1_0_seite_2_0_area_3_kg_nr_zweiter_antragsteller_0",
+          "type": "string",
+          "meaning": "Kindergeldnummer der zweiten antragstellenden Person",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "documents": []
+    }
+  ],
+  "out_of_scope": [
+    {
+      "field_id": "px_formular1[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].kopfzeile[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].kopfzeile[0].#area[2]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].frage-1[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].frage-2[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].frage-3[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].frage-4[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile1[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile2[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile3[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile4[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile5[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-1[0].frage-4[0].kindertabelle-p-4[0].zeile6[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-5[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile1[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile2[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-5[0].kindertabelle-p-5[0].zeile3[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-6[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile1[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile2[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-6[0].kindertabelle-p-6[0].zeile3[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-7[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile1[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile2[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile3[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile4[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].frage-7[0].tabelle-p-7[0].zeile5[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].#area[3]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].#area[3].datum\\",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].#area[3].datum\\.antrag\\",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_formular1[0].seite-2[0].actionbuttons[0]",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "p3_formular1[0].seite-2[0].actionbuttons[0].alle_eingaben_löschen[0]",
+      "reason": "other"
+    },
+    {
+      "field_id": "p3_formular1[0].seite-2[0].actionbuttons[0].drucken[0]",
+      "reason": "other"
+    },
+    {
+      "field_id": "p3_formular1[0].seite-2[0].actionbuttons[0].speichern[0]",
+      "reason": "other"
+    }
+  ]
+}

@@ -1,22 +1,24 @@
 import asyncio
+import decimal
 import enum
 import json
 import typing
+from contextlib import contextmanager
 from functools import partial
-from typing import Optional
+from typing import Any, Optional
 import os
 import uuid
 
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from sqlalchemy.orm import Session
 from litellm import acompletion
 import logging
 
-from src.db import get_db
-from src.models import Users as DbUser, ChatMessageRoleType
+from src.db import SessionLocal, get_db
+from src.models import Users as DbUser, ChatMessageRoleType, UserApplications
 from src.prompts import SYSTEM_PROMPT, generate_tool_usage_prompt
 from src.services.user_service import (
     ProfileWriteError,
@@ -29,16 +31,48 @@ from src.services.user_service import (
 from src.services.conversation_service import ConversationService, get_conversation_service
 from src.services.rag_service import search_knowledge_base
 from beyondforms.auth import User as AuthUser, get_current_user, require_authenticated_user
-from src.schemas import AssociatedPersonSchema, UserInformationUpdateSchema
-from src.tools import AVAILABLE_TOOLS, SHOW_CARD_TOOL_NAME
-from src.chat_cards import APPLICATION_DONE_PROMPT, build_card_view, card_prompt, validate_card_answer
-from src.services.wizard_rules import evaluate, evaluation_payload, rules_steps
+from src.schemas import (
+    AssetEntrySchema,
+    AssociatedPersonSchema,
+    ExpenseEntrySchema,
+    IncomeEntrySchema,
+    UserInformationUpdateSchema,
+    UserProfileValidationSchema,
+)
+from src.tools import AVAILABLE_TOOLS, SAVE_ANSWER_TOOL_NAME, SHOW_CARD_TOOL_NAME
+from src.chat_cards import (
+    APPLICATION_DONE_PROMPT,
+    CardInput,
+    asked_in_chat,
+    build_inputs_view,
+    input_errors,
+    inputs_prompt,
+)
+from src.services.form_rules import (
+    attachment_parents,
+    card_id as form_card_id,
+    group_answer,
+    group_card_about,
+    group_inputs,
+    load_form_rules,
+    parse_card_id as parse_form_card_id,
+)
+from src.services.form_service import FormService, _get_form_assets
 from ag_ui.core import RunStartedEvent, RunFinishedEvent, RunErrorEvent, TextMessageChunkEvent, ToolCallChunkEvent
 from ag_ui.encoder import EventEncoder
 from ag_ui.core.types import RunAgentInput
 
 
 _USER_FIELD_NAMES: frozenset[str] = frozenset(UserInformationUpdateSchema.model_fields)
+_MONEY_GRIDS = {
+    "income": ("income_entries", "income_type", "monthly_amount", IncomeEntrySchema),
+    "expenses": ("expense_entries", "expense_type", "monthly_amount", ExpenseEntrySchema),
+    "assets": ("asset_entries", "asset_type", "amount", AssetEntrySchema),
+}
+# the columns a chat answer can be written to: profile columns the write schema knows, not the money grids
+_PROFILE_COLUMNS = (_USER_FIELD_NAMES & frozenset(UserProfileValidationSchema.model_fields)) - {
+    attr for attr, *_ in _MONEY_GRIDS.values()
+}
 
 
 def _unwrap_annotation(annotation):
@@ -68,9 +102,13 @@ _ENUM_ALLOWED_VALUES: dict[str, str] = {
 MAX_TOOL_CALL_ROUNDS = 5
 CHAT_CONTEXT_WINDOW_SIZE = int(os.getenv("CHAT_CONTEXT_WINDOW_SIZE", "20"))
 MAX_CARD_ANSWER_LENGTH = 4000
-# the rules engine answers from a local decision tree in milliseconds; past this the reply
-# goes out without a card instead of keeping the user waiting
-CARD_EVALUATION_TIMEOUT_SECONDS = 3
+# the PDF form whose rules (`schemas/rules/<form>.rules.json`) pick every next question
+FORM_RULES_FORM_ID = "antrag_grundsicherung_im_alter"
+# past this the reply goes out without a question instead of keeping the user waiting
+FORM_EVALUATION_TIMEOUT_SECONDS = 3
+ANSWERED_AGAIN_PROMPT = (
+    "\nThe user already answered this card, but it is not complete yet: show it again and say what is missing."
+)
 
 router = APIRouter(tags=["llm"])
 logger = logging.getLogger(__name__)
@@ -184,6 +222,239 @@ async def get_user_data(current_user: AuthUser, db: Session, user_service: UserS
     return await asyncio.to_thread(_get_user_data_sync, current_user, db, user_service)
 
 
+async def _form_state(form_service: FormService, user_row: DbUser, form_id: str) -> tuple[dict, set[str]]:
+    """The form's field values, and the fields answered in the profile or in a chat card."""
+    values, answered, _pdf_bytes = await form_service.resolve_field_state(form_id, user_row)
+    if user_row.demo_seed_fixture_hash:
+        # a demo persona lists only what it has; whatever it leaves out is zero or empty
+        return values, set(values)
+    return values, answered
+
+
+async def _open_form_groups(db: Session, user_row: DbUser) -> Optional[list[tuple[str, dict]]]:
+    """The open groups of the application form, or once it has none, of each attachment form (Anlage) its
+    answers require: the chat asks the application form first, so the attachments wait until then.
+    None if there are no rules to evaluate."""
+    main_rules = load_form_rules(FORM_RULES_FORM_ID)
+    if main_rules is None:
+        return None
+    form_service = FormService(db=db)
+    main_values, main_answered = await _form_state(form_service, user_row, FORM_RULES_FORM_ID)
+    if main_open := main_rules.open_groups(main_values, main_answered):
+        return [(FORM_RULES_FORM_ID, group) for group in main_open]
+    open_groups = []
+    for form_id in main_rules.required_attachments(main_values):
+        if rules := load_form_rules(form_id):
+            open_groups += [
+                (form_id, group) for group in rules.open_groups(*await _form_state(form_service, user_row, form_id))
+            ]
+    return open_groups
+
+
+@contextmanager
+def _worker_session(user_id):
+    """A session of its own for a worker thread, which must not touch the request's session, and the user in it."""
+    db = SessionLocal()
+    try:
+        yield db, db.get(DbUser, user_id)
+    finally:
+        db.close()
+
+
+def _open_form_groups_in_worker(user_id) -> Optional[list[tuple[str, dict]]]:
+    with _worker_session(user_id) as (db, user_row):
+        return asyncio.run(_open_form_groups(db, user_row)) if user_row is not None else None
+
+
+async def _warm_form_assets(db: Session) -> None:
+    """Loads the mappings into the shared cache on the event loop, so the worker thread only reads them."""
+    main_rules = load_form_rules(FORM_RULES_FORM_ID)
+    form_service = FormService(db=db)
+    for form_id in [FORM_RULES_FORM_ID, *(main_rules.attachments if main_rules else [])]:
+        await _get_form_assets(form_id, form_service.mapping_path, form_service.pdfs_path)
+
+
+async def _next_form_card(
+    db: Session, user_row: Optional[DbUser], answered_card_ids: set[str]
+) -> tuple[Optional[str], str, list[CardInput]]:
+    """The first open group of the form rules as a card, what the model is told about it, and its inputs."""
+    if user_row is None:
+        return None, "", []
+    try:
+        await _warm_form_assets(db)
+        # the evaluation queries and evaluates hundreds of mappings, so it runs off the event loop and may
+        # not hold up the reply
+        open_groups = await asyncio.wait_for(
+            asyncio.to_thread(_open_form_groups_in_worker, user_row.id), FORM_EVALUATION_TIMEOUT_SECONDS
+        )
+    except Exception:
+        logger.warning("Could not resolve the fields of %s", FORM_RULES_FORM_ID, exc_info=True)
+        return None, "", []
+    if open_groups is None:
+        return None, "", []
+    if not open_groups:
+        return None, APPLICATION_DONE_PROMPT, []
+    form_id, group = open_groups[0]
+    offered = form_card_id(form_id, group["id"])
+    inputs = group_inputs(group)
+    prompt = inputs_prompt(offered, f"form {form_id}, page {group['page']}: {group_card_about(group)}", inputs)
+    if offered in answered_card_ids:
+        prompt += ANSWERED_AGAIN_PROMPT
+    return offered, prompt, inputs
+
+
+async def _save_form_card_answer(
+    db: Session, user_row: DbUser, user_service: UserService, offered: str, values: object, in_chat: bool = False
+) -> None:
+    """Stores the answer to an open question, from its card or (`in_chat`) asked in the chat: in the profile
+    column a field's mapping prints unchanged or picks by, otherwise in the application's `form_data`, which
+    `fill_form` reads for the fields the mapping leaves empty."""
+    open_groups = {(f, g["id"]): g for f, g in await _open_form_groups(db, user_row) or []}
+    form_id, group_id = parse_form_card_id(offered) or (None, None)
+    group = open_groups.get((form_id, group_id))
+    if group is None:
+        raise HTTPException(status_code=409, detail="This question has already been answered")
+    inputs = group_inputs(group)
+    if in_chat and not asked_in_chat(inputs):
+        raise HTTPException(
+            status_code=422, detail=f"{offered} is not a question to answer in the chat; show its card instead"
+        )
+    values, errors = input_errors(inputs, values)
+    if errors:
+        raise HTTPException(status_code=422, detail="; ".join(errors))
+    if (
+        group["answer_type"] == "multiple_choice"
+        and group["required"]
+        and not group["partial"]
+        and not any(values.get(i.key) is True for i in inputs)
+    ):
+        raise HTTPException(status_code=422, detail="At least one of the options must apply")
+    answer = group_answer(group, values)
+
+    form_service = FormService(db=db)
+    paths = await form_service.plain_profile_paths(form_id)
+    choices = await form_service.choice_profile_columns(form_id)
+    kinds = {i.key: i.kind for i in inputs}
+    # where each field's answer can live in the profile: the path its mapping prints, or the column it picks by
+    by_path = {
+        f["field_id"]: paths.get(f["field_id"])
+        or next(((column,) for column, _value in choices.get(f["field_id"], {}).values()), None)
+        for f in group["fields"]
+    }
+    written: dict[tuple, Any] = {}
+    for f in group["fields"]:
+        value = values.get(f["var"])
+        if (
+            value is not None
+            and kinds.get(f["var"]) in ("text", "date", "amount", "number")
+            and paths.get(f["field_id"])
+        ):
+            written[paths[f["field_id"]]] = value
+    not_amounts = [path[-1] for path, value in written.items() if path[0] in _MONEY_GRIDS and _amount(value) is None]
+    if not_amounts:
+        raise HTTPException(status_code=422, detail=f"Not an amount for {', '.join(not_amounts)}")
+    # a chosen option is stored as the column value its mapping turns into that option
+    for field_id, value in answer.items():
+        column, column_value = choices.get(field_id, {}).get(value, (None, None))
+        if column is not None:
+            written.setdefault((column,), column_value)
+    stored = _write_profile_answers(db, user_row, written)
+    # every field of the card is recorded, so one left empty on purpose counts as answered
+    unanswered = {f["field_id"]: False if f["type"] == "bool" else "" for f in group["fields"]}
+    rest = {
+        field_id: value for field_id, value in {**unanswered, **answer}.items() if by_path.get(field_id) not in stored
+    }
+
+    application = form_service.find_application(form_id, user_row, strict=True)
+    if application is None:
+        _, application_id = user_service.get_or_create_user_application(
+            user_row.id, attachment_parents().get(form_id, form_id)
+        )
+        application = db.get(UserApplications, application_id)
+    form_data = dict(application.form_data or {})
+    pdf_fields = dict(form_data.get("pdf_fields") or {})
+    pdf_fields[form_id] = {**(pdf_fields.get(form_id) or {}), **rest}
+    # reassigned rather than mutated, so SQLAlchemy sees the JSONB change
+    application.form_data = {**form_data, "pdf_fields": pdf_fields}
+
+
+def _column_accepts(column: str, value: Any) -> bool:
+    """Whether a profile column takes this value as it is: one the chat may write, within the column's length
+    and enum, and valid for the write schema. Anything else stays beside the mapping instead."""
+    if column not in _PROFILE_COLUMNS:
+        return False
+    column_type = DbUser.__table__.columns[column].type if column in DbUser.__table__.columns else None
+    enums = getattr(column_type, "enums", None)
+    if enums and value not in enums:
+        return False
+    length = getattr(column_type, "length", None)
+    if isinstance(value, str) and length and len(value) > length:
+        return False
+    try:
+        UserProfileValidationSchema.model_validate({column: value})
+    except ValidationError:
+        return False
+    return True
+
+
+def _amount(value: Any) -> Optional[decimal.Decimal]:
+    try:
+        amount = decimal.Decimal(str(value).replace(",", "."))
+    except decimal.InvalidOperation:
+        return None
+    return amount if amount.is_finite() and amount >= 0 else None
+
+
+def _money_rows(user_row: DbUser, grid: str, amounts: dict[str, decimal.Decimal]) -> list[dict]:
+    """The grid's rows with the applicant's lines for these types set, the rest kept as they are."""
+    attr, type_field, amount_field, row_schema = _MONEY_GRIDS[grid]
+    schema_fields = row_schema.model_fields
+    rows = []
+    for row in getattr(user_row, attr):
+        item = {
+            name: (value.value if isinstance(value, enum.Enum) else value)
+            for name in schema_fields
+            if name != "person_sort_order" and (value := getattr(row, name, None)) is not None
+        }
+        item["person_sort_order"] = row.person.sort_order if row.person is not None else None
+        if item["person_sort_order"] is None and item.get(type_field) in amounts:
+            continue
+        rows.append(item)
+    return rows + [{type_field: kind, amount_field: amount} for kind, amount in amounts.items()]
+
+
+def _write_profile_answers(db: Session, user_row: DbUser, written: dict[tuple, Any]) -> set[tuple]:
+    """Writes the answers a profile column or a money line takes, each checked on its own so one value the
+    profile rejects doesn't hold back the others, and returns the paths it stored."""
+    columns = {path: value for path, value in written.items() if len(path) == 1 and _column_accepts(path[0], value)}
+    payload: dict[str, Any] = {path[0]: value for path, value in columns.items()}
+    stored = set(columns)
+    for grid, (attr, *_) in _MONEY_GRIDS.items():
+        # `Pension` is asked only while no pension line carries an amount, so its own line becomes the sum
+        amounts = {
+            path[1]: amount
+            for path, value in written.items()
+            if len(path) == 2 and path[0] == grid and (amount := _amount(value)) is not None
+        }
+        if not amounts:
+            continue
+        rows = _money_rows(user_row, grid, amounts)
+        try:
+            UserProfileValidationSchema.model_validate({attr: rows})
+        except ValidationError:
+            continue
+        payload[attr] = rows
+        stored |= {(grid, kind) for kind in amounts}
+    if not payload:
+        return set()
+    try:
+        write_profile_payload(db, user_row, UserProfileValidationSchema.model_validate(payload))
+    except ProfileWriteError:
+        db.rollback()
+        return set()
+    return stored
+
+
 def _field_lines(model: type[BaseModel], indent: str = "  ") -> list[str]:
     """One `name: type` line per field, with enum values and descriptions spelled out.
     A field the model rejects unless it is present is marked required, so a caller told
@@ -285,7 +556,7 @@ def _tool_args(tool_call: dict) -> dict:
 def _answered_card_ids(context_messages: list[dict]) -> set[str]:
     answered = set()
     for message in context_messages:
-        if message["role"] != "tool" or message.get("name") != SHOW_CARD_TOOL_NAME:
+        if message["role"] != "tool" or message.get("name") not in (SHOW_CARD_TOOL_NAME, SAVE_ANSWER_TOOL_NAME):
             continue
         try:
             result = json.loads(message.get("content") or "{}")
@@ -303,34 +574,17 @@ def _load_user_row(db: Session, user_service: UserService, current_user: AuthUse
         return None
 
 
-async def _next_card(form_content: Optional[dict], answered_card_ids: set[str]) -> tuple[Optional[str], str]:
-    """The step the rules engine stops at, if it is a card, and what the model is told about it."""
-    if form_content is None:
-        return None, ""
-    evaluation = await asyncio.to_thread(evaluate, form_content, CARD_EVALUATION_TIMEOUT_SECONDS)
-    step_id = (evaluation or {}).get("next_step")
-    if step_id == "END":
-        return None, APPLICATION_DONE_PROMPT
-    step = rules_steps().get(step_id, {})
-    if not step.get("columns"):
-        return None, ""
-    prompt = card_prompt(step_id, step)
-    if step_id in answered_card_ids:
-        prompt += (
-            "\nThe user already answered this card, but it is not complete yet: show it again and say what is missing."
-        )
-    return step_id, prompt
-
-
 def _card_view(
-    tool_call: dict, offered_card: Optional[str], already_shown: bool
+    tool_call: dict, offered_card: Optional[str], offered_inputs: list[CardInput], already_shown: bool
 ) -> tuple[Optional[dict], Optional[str]]:
     if already_shown:
         return None, "Only one card can be shown per answer."
     args = _tool_args(tool_call)
     if offered_card is None or args.get("card_id") != offered_card:
         return None, f"Unknown card_id: {args.get('card_id')}"
-    view, errors = build_card_view(offered_card, rules_steps()[offered_card], args)
+    if asked_in_chat(offered_inputs):
+        return None, "Ask this question in the chat instead and save the reply with save_answer."
+    view, errors = build_inputs_view(offered_card, offered_inputs, args)
     if errors:
         return None, "Fix the card texts and call show_card again: " + "; ".join(errors)
     return view, None
@@ -349,24 +603,31 @@ async def _run_server_tool(tool_name_to_function_dict: dict, tool_call: dict):
         return {"error": f"Error executing tool {function_name}: {fn_err}"}
 
 
-def _save_card_answer(db: Session, user_row: Optional[DbUser], card_call: dict, content: str) -> str:
+async def save_answer(
+    card_id: str, values: dict, db: Session, user_row: Optional[DbUser], user_service: UserService
+) -> dict:
+    """Saves the reply to a question asked in the chat, the same way as a card answer."""
+    if user_row is None:
+        return {"error": "There is no profile to save the answer to"}
+    try:
+        await _save_form_card_answer(db, user_row, user_service, card_id, values, in_chat=True)
+    except HTTPException as exc:
+        return {"error": exc.detail}
+    return {"card_id": card_id, "saved": values}
+
+
+async def _save_card_answer(
+    db: Session, user_row: Optional[DbUser], user_service: UserService, card_call: dict, content: str
+) -> str:
     """Validates and saves the values a card submitted; returns the tool result for the model."""
     card_id = _tool_args(card_call).get("card_id")
-    step = rules_steps().get(card_id)
     try:
         values = json.loads(content).get("values")
     except (json.JSONDecodeError, AttributeError):
         values = None
-    if not step or user_row is None:
+    if not parse_form_card_id(card_id) or user_row is None:
         raise HTTPException(status_code=422, detail="This card can't be saved")
-    payload, errors = validate_card_answer(step, values)
-    if errors:
-        raise HTTPException(status_code=422, detail="; ".join(errors))
-    try:
-        write_profile_payload(db, user_row, payload)
-    except ProfileWriteError as exc:
-        db.rollback()
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    await _save_form_card_answer(db, user_row, user_service, card_id, values)
     return json.dumps({"card_id": card_id, "saved": values}, default=str)
 
 
@@ -401,7 +662,7 @@ async def handle_chat_stream(
         )
         if answered_card is None:
             raise HTTPException(status_code=409, detail="This card has already been answered")
-        content = _save_card_answer(db, user_row, answered_card, content)
+        content = await _save_card_answer(db, user_row, user_service, answered_card, content)
 
     # The user typed instead of answering a card; Gemini rejects a tool call without a result
     for open_call in open_calls:
@@ -431,9 +692,6 @@ async def handle_chat_stream(
 
     context_messages = conv_service.get_conversation_context(conversation_id, limit=CHAT_CONTEXT_WINDOW_SIZE)
 
-    # evaluation_payload may lazy-load income rows on `db`, which the worker thread in
-    # _next_card must not touch, so only the finished dict is handed over
-    form_content = evaluation_payload(user_row) if user_row is not None else None
     answered_card_ids = _answered_card_ids(context_messages)
     available_tools = AVAILABLE_TOOLS
 
@@ -443,6 +701,7 @@ async def handle_chat_stream(
         "get_user_data": partial(get_user_data, current_user=current_user, db=db, user_service=user_service),
         "check_progress_status": partial(check_progress_status, current_user=current_user),
         "berlin_social_services_knowledge_base": berlin_social_services_knowledge_base,
+        SAVE_ANSWER_TOOL_NAME: partial(save_answer, db=db, user_row=user_row, user_service=user_service),
     }
 
     async def event_generator():
@@ -453,7 +712,7 @@ async def handle_chat_stream(
 
         yield encoder.encode(RunStartedEvent(thread_id=thread_id, run_id=run_id))
 
-        offered_card, card_instructions = await _next_card(form_content, answered_card_ids)
+        offered_card, card_instructions, offered_inputs = await _next_form_card(db, user_row, answered_card_ids)
         messages = _prepare_chat_messages(context_messages, card_instructions)
 
         for round_num in range(1, MAX_TOOL_CALL_ROUNDS + 1):
@@ -517,10 +776,13 @@ async def handle_chat_stream(
 
                 card_call = None
                 card_view = None
+                answered_in_chat = False
                 for tool_call in tool_calls_list:
                     function_name = tool_call["function"]["name"]
                     if function_name == SHOW_CARD_TOOL_NAME:
-                        view, card_error = _card_view(tool_call, offered_card, already_shown=card_call is not None)
+                        view, card_error = _card_view(
+                            tool_call, offered_card, offered_inputs, already_shown=card_call is not None
+                        )
                         if view is not None:
                             # answered by the user's click, so it gets no result here
                             card_call, card_view = tool_call, view
@@ -528,6 +790,9 @@ async def handle_chat_stream(
                         result = {"error": card_error}
                     else:
                         result = await _run_server_tool(tool_name_to_function_dict, tool_call)
+                        if function_name == SAVE_ANSWER_TOOL_NAME and isinstance(result, dict) and "saved" in result:
+                            answered_card_ids.add(result.get("card_id"))
+                            answered_in_chat = True
 
                     tool_content = json.dumps(result, default=str)
                     conv_service.add_message(
@@ -556,6 +821,12 @@ async def handle_chat_stream(
                         )
                     )
                     break
+                if answered_in_chat:
+                    # the reply answered the question asked in the chat, so the model moves on to the next one
+                    offered_card, card_instructions, offered_inputs = await _next_form_card(
+                        db, user_row, answered_card_ids
+                    )
+                    messages[0] = _prepare_chat_messages([], card_instructions)[0]
                 continue
 
             if accumulated_content:

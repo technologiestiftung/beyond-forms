@@ -1,0 +1,2203 @@
+{
+  "form_id": "antrag_grundsicherungsgeld",
+  "source": {
+    "pdf": "forms/pdfs/antrag_grundsicherungsgeld.pdf",
+    "sha256": "5901f5fb3ab2d3d1be882326b5f016183bde902f5baa0d9dc4caf907f1707282",
+    "model": "vertex_ai/gemini-3.8-flash",
+    "generated_at": "2026-11-11T13:43:58+00:00"
+  },
+  "groups": [
+    {
+      "id": "p1_name",
+      "page": 1,
+      "section": "A. Persönliche Daten der antragstellenden Person",
+      "person": null,
+      "topic": "Name",
+      "hint": null,
+      "answer_type": "name",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_txtfpersonvorname",
+          "var": "p1_txtfpersonvorname",
+          "type": "string",
+          "meaning": "Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_txtfpersonnachname",
+          "var": "p1_txtfpersonnachname",
+          "type": "string",
+          "meaning": "Nachname",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p1_geburtsdatum",
+      "page": 1,
+      "section": "A. Persönliche Daten der antragstellenden Person",
+      "person": null,
+      "topic": "Geburtsdatum",
+      "hint": "TT.MM.JJJJ",
+      "answer_type": "date",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_datepersongebdatum",
+          "var": "p1_datepersongebdatum",
+          "type": "string",
+          "meaning": "Geburtsdatum (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p1_geburtsname",
+      "page": 1,
+      "section": "A. Persönliche Daten der antragstellenden Person",
+      "person": null,
+      "topic": "Geburtsname/früherer Name",
+      "hint": null,
+      "answer_type": "name",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_txtfpersongebname",
+          "var": "p1_txtfpersongebname",
+          "type": "string",
+          "meaning": "Geburtsname/früherer Name",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p1_geburtsort",
+      "page": 1,
+      "section": "A. Persönliche Daten der antragstellenden Person",
+      "person": null,
+      "topic": "Geburtsort",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_txtfpersongebort",
+          "var": "p1_txtfpersongebort",
+          "type": "string",
+          "meaning": "Geburtsort",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p1_geburtsland",
+      "page": 1,
+      "section": "A. Persönliche Daten der antragstellenden Person",
+      "person": null,
+      "topic": "Geburtsland",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_txtfpersongebland",
+          "var": "p1_txtfpersongebland",
+          "type": "string",
+          "meaning": "Geburtsland",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p1_staatsangehoerigkeit",
+      "page": 1,
+      "section": "A. Persönliche Daten der antragstellenden Person",
+      "person": null,
+      "topic": "Staatsangehörigkeit",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_txtfpersonstaat",
+          "var": "p1_txtfpersonstaat",
+          "type": "string",
+          "meaning": "Staatsangehörigkeit",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p1_geschlecht",
+      "page": 1,
+      "section": "A. Persönliche Daten der antragstellenden Person",
+      "person": null,
+      "topic": "Geschlecht",
+      "hint": null,
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_chbxmaennlich",
+          "var": "p1_chbxmaennlich",
+          "type": "bool",
+          "meaning": "männlich",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_chbxweiblich",
+          "var": "p1_chbxweiblich",
+          "type": "bool",
+          "meaning": "weiblich",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_chbxdivers",
+          "var": "p1_chbxdivers",
+          "type": "bool",
+          "meaning": "divers",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_chbxkeineangabe",
+          "var": "p1_chbxkeineangabe",
+          "type": "bool",
+          "meaning": "keine Angabe",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p1_wohnanschrift",
+      "page": 1,
+      "section": "A. Persönliche Daten der antragstellenden Person",
+      "person": null,
+      "topic": "Wohnanschrift",
+      "hint": null,
+      "answer_type": "address",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_txtfpersonstr",
+          "var": "p1_txtfpersonstr",
+          "type": "string",
+          "meaning": "Straße",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_txtfpersonhausnr",
+          "var": "p1_txtfpersonhausnr",
+          "type": "string",
+          "meaning": "Hausnummer",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_txtfpersonplz",
+          "var": "p1_txtfpersonplz",
+          "type": "string",
+          "meaning": "Postleitzahl",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_txtfpersonort",
+          "var": "p1_txtfpersonort",
+          "type": "string",
+          "meaning": "Wohnort",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p1_postfachanschrift",
+      "page": 1,
+      "section": "A. Persönliche Daten der antragstellenden Person",
+      "person": null,
+      "topic": "Postfachanschrift",
+      "hint": null,
+      "answer_type": "address",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_txtfpersonpostfach",
+          "var": "p1_txtfpersonpostfach",
+          "type": "string",
+          "meaning": "Postfachanschrift",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p1_telefon",
+      "page": 1,
+      "section": "A. Persönliche Daten der antragstellenden Person",
+      "person": null,
+      "topic": "Telefon",
+      "hint": "freiwillige Angabe für Rückfragen, Hinweis Telefonnummer im Abschnitt I",
+      "answer_type": "phone_number",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_txtfpersontel",
+          "var": "p1_txtfpersontel",
+          "type": "string",
+          "meaning": "Telefon (freiwillige Angabe für Rückfragen, Hinweis Telefonnummer im Abschnitt I)",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p1_kein_fester_wohnsitz",
+      "page": 1,
+      "section": "A. Persönliche Daten der antragstellenden Person",
+      "person": null,
+      "topic": "Haben Sie keinen festen Wohnsitz?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_rbtnwohnsitz",
+          "var": "p1_rbtnwohnsitz",
+          "type": "string",
+          "meaning": "Haben Sie keinen festen Wohnsitz?",
+          "options": {
+            "0": "Ja",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p1_wohnhaft_bei",
+      "page": 1,
+      "section": "A. Persönliche Daten der antragstellenden Person",
+      "person": null,
+      "topic": "Gegebenenfalls wohnhaft bei (Name und Anschrift Person/Einrichtung)",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_txtareawohnhaft",
+          "var": "p1_txtareawohnhaft",
+          "type": "string",
+          "meaning": "Gegebenenfalls wohnhaft bei (Name und Anschrift Person/Einrichtung)",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p2_bankverbindung",
+      "page": 2,
+      "section": "A. Persönliche Daten",
+      "person": null,
+      "topic": "Geben Sie bitte Ihre Bankverbindung an.",
+      "hint": "Hinweis 1 Konto",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_txtfkonto",
+          "var": "p2_txtfkonto",
+          "type": "string",
+          "meaning": "Kontoinhaberin/Kontoinhaber",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_txtfkontoiban",
+          "var": "p2_txtfkontoiban",
+          "type": "string",
+          "meaning": "IBAN (22-stellig)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p2_keine_bankverbindung_grund",
+      "page": 2,
+      "section": "A. Persönliche Daten",
+      "person": null,
+      "topic": "Wenn Sie keine Bankverbindung angeben können, teilen Sie dem Jobcenter mit, weshalb Sie kein Basiskonto eröffnen können.",
+      "hint": "Hinweis 1 Konto",
+      "answer_type": "text",
+      "ask_if": "p2_txtfkontoiban == ''",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_txtareakontogrund",
+          "var": "p2_txtareakontogrund",
+          "type": "string",
+          "meaning": "Grund, weshalb kein Basiskonto eröffnet werden kann",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p2_rv_nummer_status",
+      "page": 2,
+      "section": "A. Persönliche Daten",
+      "person": null,
+      "topic": "Bitte machen Sie Angaben zu Ihrer Rentenversicherungsnummer/Sozialversicherungsnummer.",
+      "hint": "Hinweis 2 Persönliche Identifikationsnummern",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_chbxrvnrvorhanden",
+          "var": "p2_chbxrvnrvorhanden",
+          "type": "bool",
+          "meaning": "Diese ist vorhanden und lautet:",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_chbxrvnrkeine",
+          "var": "p2_chbxrvnrkeine",
+          "type": "bool",
+          "meaning": "Diese ist nicht vorhanden.",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_chbxrvnrbeantragt",
+          "var": "p2_chbxrvnrbeantragt",
+          "type": "bool",
+          "meaning": "Diese wurde beantragt.",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "Die Zeit des Bezuges von Grundsicherungsgeld für erwerbsfähige Leistungsberechtigte wird durch Ihr Jobcenter an die Rentenversicherung gemeldet, die dann prüft, ob eine Anrechnungszeit vorliegt.",
+      "documents": []
+    },
+    {
+      "id": "p2_rv_nummer_wert",
+      "page": 2,
+      "section": "A. Persönliche Daten",
+      "person": null,
+      "topic": "Rentenversicherungsnummer/Sozialversicherungsnummer",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_chbxrvnrvorhanden",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_txtfrvnr",
+          "var": "p2_txtfrvnr",
+          "type": "string",
+          "meaning": "Rentenversicherungsnummer/Sozialversicherungsnummer",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "Die Zeit des Bezuges von Grundsicherungsgeld für erwerbsfähige Leistungsberechtigte wird durch Ihr Jobcenter an die Rentenversicherung gemeldet, die dann prüft, ob eine Anrechnungszeit vorliegt.",
+      "documents": []
+    },
+    {
+      "id": "p2_steuerliche_identifikationsnummer",
+      "page": 2,
+      "section": "A. Persönliche Daten",
+      "person": null,
+      "topic": "Bitte geben Sie Ihre (steuerliche) Identifikationsnummer an.",
+      "hint": "Hinweis 2 Persönliche Identifikationsnummern",
+      "answer_type": "number",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_numfstidnr",
+          "var": "p2_numfstidnr",
+          "type": "string",
+          "meaning": "(steuerliche) Identifikationsnummer",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p2_betreuer_bevollmaechtigter_vormund",
+      "page": 2,
+      "section": "A. Persönliche Daten",
+      "person": null,
+      "topic": "Haben Sie eine gesetzlich bestellte Betreuerin/einen gesetzlich bestellten Betreuer, eine Bevollmächtigte/einen Bevollmächtigten oder Vormund?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_rbtnbetreuer",
+          "var": "p2_rbtnbetreuer",
+          "type": "string",
+          "meaning": "gesetzlich bestellte Betreuerin/gesetzlich bestellter Betreuer, Bevollmächtigte/Bevollmächtigter oder Vormund vorhanden",
+          "options": {
+            "0": "Ja (bitte fügen Sie die Bestellungsurkunde, die Vollmacht oder den Betreuerausweis bei)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": [
+        {
+          "name": "Bestellungsurkunde, die Vollmacht oder den Betreuerausweis",
+          "condition": "p2_rbtnbetreuer == '0'",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p2_aufenthaltstitel",
+      "page": 2,
+      "section": "B. Weitere Angaben zur Nationalität",
+      "person": null,
+      "topic": "Haben Sie einen gültigen Aufenthaltstitel?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_rbtnaufenthalt",
+          "var": "p2_rbtnaufenthalt",
+          "type": "string",
+          "meaning": "Gültiger Aufenthaltstitel vorhanden",
+          "options": {
+            "0": "Ja (bitte fügen Sie den Aufenthaltstitel bei)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Leistungen zur Sicherung des Lebensunterhalts können Sie nur dann erhalten, wenn Sie sich rechtmäßig in Deutschland aufhalten. Bitte legen Sie dem Jobcenter Ihren Aufenthaltstitel vor.",
+      "documents": [
+        {
+          "name": "Aufenthaltstitel",
+          "condition": "p2_rbtnaufenthalt == '0'",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p2_asylbewerberleistungsgesetz",
+      "page": 2,
+      "section": "B. Weitere Angaben zur Nationalität",
+      "person": null,
+      "topic": "Erhalten Sie Leistungen nach dem Asylbewerberleistungsgesetz?",
+      "hint": "Hinweis 9 Berechtigte nach dem Asylbewerberleistungsgesetz",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_rbtnasylblg",
+          "var": "p2_rbtnasylblg",
+          "type": "string",
+          "meaning": "Erhalt von Leistungen nach dem Asylbewerberleistungsgesetz",
+          "options": {
+            "0": "Ja (bitte fügen Sie einen Nachweis über den aufenthaltsrechtlichen Status und den Bescheid bei)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Leistungen zur Sicherung des Lebensunterhalts können Sie nur dann erhalten, wenn Sie keinen Anspruch auf Leistungen nach dem Asylbewerberleistungsgesetz haben.",
+      "documents": [
+        {
+          "name": "Nachweis über den aufenthaltsrechtlichen Status und den Bescheid",
+          "condition": "p2_rbtnasylblg == '0'",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p2_asylbewerberleistungen_ende",
+      "page": 2,
+      "section": "B. Weitere Angaben zur Nationalität",
+      "person": null,
+      "topic": "Bis wann erhalten Sie Asylbewerberleistungen?",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "p2_rbtnasylblg == '0'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_dateasylblg",
+          "var": "p2_dateasylblg",
+          "type": "string",
+          "meaning": "bis (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p2_auslaenderzentralregistriernummer",
+      "page": 2,
+      "section": "B. Weitere Angaben zur Nationalität",
+      "person": null,
+      "topic": "Bitte geben Sie Ihre Ausländerzentralregistriernummer an, falls vorhanden.",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_txtfazrnr",
+          "var": "p2_txtfazrnr",
+          "type": "string",
+          "meaning": "Ausländerzentralregistriernummer",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p2_verpflichtungserklaerung",
+      "page": 2,
+      "section": "B. Weitere Angaben zur Nationalität",
+      "person": null,
+      "topic": "Hat jemand gegenüber der Ausländerbehörde oder der Auslandsvertretung zugesagt, alle Kosten während Ihres Aufenthalts in Deutschland zu übernehmen (Verpflichtungserklärung)?",
+      "hint": "Hinweis 3 Verpflichtungserklärung",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_rbtnkostenuebernahme",
+          "var": "p2_rbtnkostenuebernahme",
+          "type": "string",
+          "meaning": "Kostenübernahme zugesagt (Verpflichtungserklärung)",
+          "options": {
+            "0": "Ja (bitte fügen Sie die Verpflichtungserklärung oder einen anderen Nachweis bei)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": [
+        {
+          "name": "Verpflichtungserklärung oder einen anderen Nachweis",
+          "condition": "p2_rbtnkostenuebernahme == '0'",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p2_nationale_personenidentifikationsnummer",
+      "page": 2,
+      "section": "B. Weitere Angaben zur Nationalität",
+      "person": null,
+      "topic": "Bitte geben Sie Ihre nationale Personenidentifikationsnummer Ihres Herkunftslandes an, falls vorhanden.",
+      "hint": "Hinweis 2 Persönliche Identifikationsnummern",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_txtfnatidnr",
+          "var": "p2_txtfnatidnr",
+          "type": "string",
+          "meaning": "nationale Personenidentifikationsnummer des Herkunftslandes",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p3_zeitpunkt_antragstellung",
+      "page": 3,
+      "section": "C. Antragstellung",
+      "person": null,
+      "topic": "Ab welchem Zeitpunkt möchten Sie Bürgergeld beantragen?",
+      "hint": "Hinweis 4 Antragstellung",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p3_chbxbuegsofort",
+          "var": "p3_chbxbuegsofort",
+          "type": "bool",
+          "meaning": "ab sofort",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_chbxbuegspaeter",
+          "var": "p3_chbxbuegspaeter",
+          "type": "bool",
+          "meaning": "ab einem späteren Zeitpunkt",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "Grundsätzlich gilt, dass für Tage vor der Antragstellung keine Leistungen erbracht werden. Der Antrag auf Leistungen zur Sicherung des Lebensunterhalts wirkt auf den ersten Tag des Monats der Antragstellung zurück.",
+      "documents": []
+    },
+    {
+      "id": "p3_spaeterer_zeitpunkt_datum",
+      "page": 3,
+      "section": "C. Antragstellung",
+      "person": null,
+      "topic": "Späterer Zeitpunkt der Beantragung",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "p3_chbxbuegspaeter",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p3_datebuegspaeter",
+          "var": "p3_datebuegspaeter",
+          "type": "string",
+          "meaning": "späterer Zeitpunkt (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p3_datum_einreise",
+      "page": 3,
+      "section": "C. Antragstellung",
+      "person": null,
+      "topic": "Datum der Einreise nach Deutschland",
+      "hint": "Wenn Sie zuvor im Ausland gelebt haben, geben Sie bitte das Datum Ihrer Einreise nach Deutschland an (TT.MM.JJJJ).",
+      "answer_type": "date",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p3_dateeinreise",
+          "var": "p3_dateeinreise",
+          "type": "string",
+          "meaning": "Datum der Einreise nach Deutschland (TT.MM.JJJJ)",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "Leistungen zur Sicherung des Lebensunterhalts können Sie nur dann erhalten, wenn Sie Ihren gewöhnlichen Aufenthalt in Deutschland haben und dieser nicht nur kurzfristig ist.",
+      "documents": []
+    },
+    {
+      "id": "p3_familienstand",
+      "page": 3,
+      "section": "D. Angaben zur aktuellen Lebenssituation",
+      "person": null,
+      "topic": "Aktueller Familienstand",
+      "hint": null,
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p3_chbxfamstandledig",
+          "var": "p3_chbxfamstandledig",
+          "type": "bool",
+          "meaning": "ledig",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_chbxfamstandverheiratet",
+          "var": "p3_chbxfamstandverheiratet",
+          "type": "bool",
+          "meaning": "verheiratet",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_chbxfamstandverwitwet",
+          "var": "p3_chbxfamstandverwitwet",
+          "type": "bool",
+          "meaning": "verwitwet",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_chbxfamstandeingetragen",
+          "var": "p3_chbxfamstandeingetragen",
+          "type": "bool",
+          "meaning": "eingetragene Lebenspartnerschaft",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_chbxfamstandgetrennt",
+          "var": "p3_chbxfamstandgetrennt",
+          "type": "bool",
+          "meaning": "dauernd getrennt lebend",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_chbxfamstandgeschieden",
+          "var": "p3_chbxfamstandgeschieden",
+          "type": "bool",
+          "meaning": "geschieden",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p3_chbxfamstandaufgehoben",
+          "var": "p3_chbxfamstandaufgehoben",
+          "type": "bool",
+          "meaning": "aufgehobene Lebenspartnerschaft",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "Unterhaltsansprüche kommen in Betracht, wenn Sie sich von Ihrer Ehegattin/Ihrem Ehegatten oder Ihrer Lebenspartnerin/Ihrem Lebenspartner getrennt haben, Sie geschieden sind oder Ihre Lebenspartnerschaft aufgehoben wurde. Zivilrechtliche Unterhaltsansprüche können bis zur Höhe der erbrachten Leistungen auf die Träger übergehen.",
+      "documents": [
+        {
+          "name": "Anlage UH1",
+          "condition": "p3_chbxfamstandgetrennt || p3_chbxfamstandgeschieden || p3_chbxfamstandaufgehoben",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p3_datum_trennung_scheidung",
+      "page": 3,
+      "section": "D. Angaben zur aktuellen Lebenssituation",
+      "person": null,
+      "topic": "Zeitpunkt der Trennung, Scheidung oder Aufhebung der Lebenspartnerschaft",
+      "hint": "Seit wann sind Sie dauernd getrennt lebend, geschieden oder wann wurde Ihre Lebenspartnerschaft aufgehoben?",
+      "answer_type": "date",
+      "ask_if": "p3_chbxfamstandgetrennt || p3_chbxfamstandgeschieden || p3_chbxfamstandaufgehoben",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p3_dategetrennt",
+          "var": "p3_dategetrennt",
+          "type": "string",
+          "meaning": "am/seit (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p3_erwerbsfaehigkeit",
+      "page": 3,
+      "section": "D. Angaben zur aktuellen Lebenssituation",
+      "person": null,
+      "topic": "Erwerbsfähigkeit",
+      "hint": "Dies bedeutet, Sie sind grundsätzlich gesundheitlich in der Lage, regelmäßig eine Tätigkeit von mindestens drei Stunden täglich auszuüben. (Hinweis 5 Erwerbsfähigkeit)",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p3_rtbnerwerbsfaehig",
+          "var": "p3_rtbnerwerbsfaehig",
+          "type": "string",
+          "meaning": "Erwerbsfähigkeit",
+          "options": {
+            "0": "Ja",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Anspruch auf Grundsicherungsgeld nach § 19 Absatz 1 Satz 1 SGB II haben Sie, wenn Sie erwerbsfähig sind. Erwerbsfähig sind Sie, wenn Sie mindestens 3 Stunden täglich arbeiten können und nicht wegen Krankheit oder Behinderung auf absehbare Zeit daran gehindert sind.",
+      "documents": []
+    },
+    {
+      "id": "p3_alleinerziehend",
+      "page": 3,
+      "section": "D. Angaben zur aktuellen Lebenssituation",
+      "person": null,
+      "topic": "Alleinerziehend",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p3_rbtnalleinerziehend",
+          "var": "p3_rbtnalleinerziehend",
+          "type": "string",
+          "meaning": "alleinerziehend",
+          "options": {
+            "0": "Ja",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Für Bedarfe, die nicht durch den Regelbedarf abgedeckt werden, kann für Alleinerziehende von Minderjährigen ein Mehrbedarf berücksichtigt werden.",
+      "documents": []
+    },
+    {
+      "id": "p3_schwangerschaft",
+      "page": 3,
+      "section": "D. Angaben zur aktuellen Lebenssituation",
+      "person": null,
+      "topic": "Schwangerschaft",
+      "hint": "Hinweis 11 Mehrbedarf für Schwangere",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p3_rbtnschwanger",
+          "var": "p3_rbtnschwanger",
+          "type": "string",
+          "meaning": "schwanger",
+          "options": {
+            "0": "Ja",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Werdende Mütter erhalten ab der 13. Schwangerschaftswoche bis zum Ende des Monats, in welchen die Entbindung fällt, einen Mehrbedarf zum Regelbedarf.",
+      "documents": []
+    },
+    {
+      "id": "p3_entbindungstermin",
+      "page": 3,
+      "section": "D. Angaben zur aktuellen Lebenssituation",
+      "person": null,
+      "topic": "Voraussichtlicher Entbindungstermin",
+      "hint": "Falls Sie nicht verheiratet sind, füllen Sie bitte auch die Anlage UH2 aus.",
+      "answer_type": "date",
+      "ask_if": "p3_rbtnschwanger == '0'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p3_dateentbindung",
+          "var": "p3_dateentbindung",
+          "type": "string",
+          "meaning": "voraussichtlicher Entbindungstermin am (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "Unterhaltsansprüche aus Anlass der Geburt (Betreuungsunterhalt) können auf den Träger der Grundsicherung übergehen.",
+      "documents": [
+        {
+          "name": "Anlage UH2",
+          "condition": "!p3_chbxfamstandverheiratet",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p3_eltern_ausserhalb_bg",
+      "page": 3,
+      "section": "D. Angaben zur aktuellen Lebenssituation",
+      "person": null,
+      "topic": "Unter 25 Jahre alt und Elternteil außerhalb der Bedarfsgemeinschaft",
+      "hint": "Hinweis 8 Bedarfsgemeinschaft",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p3_rbtnelternausserhalb",
+          "var": "p3_rbtnelternausserhalb",
+          "type": "string",
+          "meaning": "unter 25 Jahre alt und mindestens ein Elternteil lebt außerhalb der Bedarfsgemeinschaft",
+          "options": {
+            "0": "Ja (bitte füllen Sie die Anlage UH3 aus)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Unterhaltsansprüche volljähriger Kinder bis zum Abschluss einer Erstausbildung können bis zur Höhe der erbrachten Leistungen auf die Träger übergehen.",
+      "documents": [
+        {
+          "name": "Anlage UH3",
+          "condition": "p3_rbtnelternausserhalb == '0'",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p3_schueler_student_auszubildender",
+      "page": 3,
+      "section": "D. Angaben zur aktuellen Lebenssituation",
+      "person": null,
+      "topic": "Schülerin/Schüler, Studentin/Student oder Auszubildende/Auszubildender",
+      "hint": "Hinweis 6 Schule/Studium/Ausbildung",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p3_rbtnschueler",
+          "var": "p3_rbtnschueler",
+          "type": "string",
+          "meaning": "Schülerin/Schüler, Studentin/Student oder Auszubildende/Auszubildender",
+          "options": {
+            "0": "Ja (bitte fügen Sie Nachweise bei)",
+            "1": "Nein (weiter mit 42)"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Auszubildende sind während einer beruflichen Ausbildung oder der Teilnahme an berufsvorbereitenden Maßnahmen grundsätzlich leistungsberechtigt. Studierende, die außerhalb des Elternhaushalts leben, und internatsmäßig untergebrachte Personen in einer Berufsausbildung oder einer berufsvorbereitenden Bildungsmaßnahme haben hingegen grundsätzlich keinen Anspruch auf Grundsicherungsgeld.",
+      "documents": []
+    },
+    {
+      "id": "p3_kosten_schulbuecher",
+      "page": 3,
+      "section": "D. Angaben zur aktuellen Lebenssituation",
+      "person": null,
+      "topic": "Kosten für Schulbücher/Arbeitshefte",
+      "hint": "Hinweis 7 Schulbücher/Arbeitshefte",
+      "answer_type": "yes_no",
+      "ask_if": "p3_rbtnschueler == '0'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p3_rbtnkostenbuecher",
+          "var": "p3_rbtnkostenbuecher",
+          "type": "string",
+          "meaning": "Kosten für Schulbücher/Arbeitshefte",
+          "options": {
+            "0": "Ja (bitte fügen Sie Nachweise bei)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Soweit eine Schülerin oder ein Schüler aufgrund der jeweiligen schulrechtlichen Bestimmungen oder schulischen Vorgaben Aufwendungen zur Anschaffung oder Ausleihe von Schulbüchern oder gleichgestellten Arbeitsheften hat, können diese als Mehrbedarf berücksichtigt werden.",
+      "documents": []
+    },
+    {
+      "id": "p4_ausbildung_unterkunft",
+      "page": 4,
+      "section": "",
+      "person": null,
+      "topic": "Sind Sie während der Ausbildung auswärts untergebracht?",
+      "hint": "Hinweis 6 Schule/Studium/Ausbildung",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p4_rbtnausbildunguneterkunft",
+          "var": "p4_rbtnausbildunguneterkunft",
+          "type": "string",
+          "meaning": "während der Ausbildung auswärts untergebracht",
+          "options": {
+            "0": "Ja",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Studierende, die außerhalb des Elternhaushalts leben, und internatsmäßig untergebrachte Personen in einer Berufsausbildung oder einer berufsvorbereitenden Bildungsmaßnahme haben keinen Anspruch auf Grundsicherungsgeld.",
+      "documents": []
+    },
+    {
+      "id": "p4_andere_leistungen",
+      "page": 4,
+      "section": "",
+      "person": null,
+      "topic": "Haben Sie schon andere Leistungen beantragt oder beabsichtigen Sie, Leistungen zu beantragen?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p4_rbtnleistungandere",
+          "var": "p4_rbtnleistungandere",
+          "type": "string",
+          "meaning": "andere Leistungen beantragt oder beabsichtigt zu beantragen",
+          "options": {
+            "0": "Ja",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Haben Sie Anspruch auf andere (Sozial-)Leistungen, sind Sie grundsätzlich verpflichtet, diese zu beantragen, da Sie damit Ihre Hilfebedürftigkeit und die Hilfebedürftigkeit Ihrer Bedarfsgemeinschaft verringern oder beseitigen können.",
+      "documents": []
+    },
+    {
+      "id": "p4_art_andere_leistungen",
+      "page": 4,
+      "section": "",
+      "person": null,
+      "topic": "Bitte geben Sie an, welche Leistungen Sie beantragt haben oder beantragen möchten.",
+      "hint": "Bitte fügen Sie soweit möglich Nachweise bei.",
+      "answer_type": "multiple_choice",
+      "ask_if": "p4_rbtnleistungandere == \"0\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p4_chbxleistungbafoeg",
+          "var": "p4_chbxleistungbafoeg",
+          "type": "bool",
+          "meaning": "BAföG (Leistungen nach dem Bundesausbildungsförderungsgesetz)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p4_chbxleistungbab",
+          "var": "p4_chbxleistungbab",
+          "type": "bool",
+          "meaning": "BAB (Berufsausbildungsbeihilfe)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p4_chbxleistungwohngeld",
+          "var": "p4_chbxleistungwohngeld",
+          "type": "bool",
+          "meaning": "Wohngeld",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p4_chbxleistungarbeitslosengeld",
+          "var": "p4_chbxleistungarbeitslosengeld",
+          "type": "bool",
+          "meaning": "Arbeitslosengeld",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p4_chbxleistungrente",
+          "var": "p4_chbxleistungrente",
+          "type": "bool",
+          "meaning": "Rente",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p4_chbxleistungkrg",
+          "var": "p4_chbxleistungkrg",
+          "type": "bool",
+          "meaning": "Krankengeld",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p4_chbxleistungkg",
+          "var": "p4_chbxleistungkg",
+          "type": "bool",
+          "meaning": "Kindergeld",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p4_chbxleistungkiz",
+          "var": "p4_chbxleistungkiz",
+          "type": "bool",
+          "meaning": "Kinderzuschlag",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p4_chbxleistungsonstiges",
+          "var": "p4_chbxleistungsonstiges",
+          "type": "bool",
+          "meaning": "Sonstiges",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "Haben Sie Anspruch auf andere (Sozial-)Leistungen, sind Sie grundsätzlich verpflichtet, diese zu beantragen, da Sie damit Ihre Hilfebedürftigkeit und die Hilfebedürftigkeit Ihrer Bedarfsgemeinschaft verringern oder beseitigen können.",
+      "documents": []
+    },
+    {
+      "id": "p4_art_andere_leistungen_sonstiges",
+      "page": 4,
+      "section": "",
+      "person": null,
+      "topic": "Sonstige Leistung(en)",
+      "hint": "Bitte fügen Sie soweit möglich Nachweise bei.",
+      "answer_type": "text",
+      "ask_if": "p4_rbtnleistungandere == \"0\" && p4_chbxleistungsonstiges",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p4_txtfleistungsonstiges",
+          "var": "p4_txtfleistungsonstiges",
+          "type": "string",
+          "meaning": "sonstige Leistung(en)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p4_kostenaufwaendige_ernaehrung",
+      "page": 4,
+      "section": "",
+      "person": null,
+      "topic": "Benötigen Sie aus medizinischen Gründen eine kostenaufwändige Ernährung?",
+      "hint": "Hinweis 12 Mehrbedarf für kostenaufwändige Ernährung",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p4_rbtnmeb",
+          "var": "p4_rbtnmeb",
+          "type": "string",
+          "meaning": "kostenaufwändige Ernährung aus medizinischen Gründen",
+          "options": {
+            "0": "Ja (bitte füllen Sie auch die Anlage MEB aus)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Mehrbedarfe zum Regelbedarf erhalten Leistungsberechtigte, die aus medizinischen Gründen kostenaufwändigere Ernährung benötigen (wenn diese nachweislich erforderlich ist).",
+      "documents": [
+        {
+          "name": "Anlage MEB",
+          "condition": "p4_rbtnmeb == \"0\"",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p4_behinderung",
+      "page": 4,
+      "section": "",
+      "person": null,
+      "topic": "Haben Sie eine Behinderung?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p4_rbtnbehinderung",
+          "var": "p4_rbtnbehinderung",
+          "type": "string",
+          "meaning": "Behinderung vorhanden",
+          "options": {
+            "0": "Ja",
+            "1": "Nein (weiter mit 47)"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Menschen mit Behinderungen, die bestimmte Leistungen nach dem SGB IX erhalten, können einen Mehrbedarf erhalten.",
+      "documents": []
+    },
+    {
+      "id": "p4_leistungen_teilhabe_arbeitsleben",
+      "page": 4,
+      "section": "",
+      "person": null,
+      "topic": "Erhalten Sie Leistungen zur Teilhabe am Arbeitsleben nach § 49 Neuntes Buch Sozialgesetzbuch (SGB IX) oder sonstige Hilfen zur Erlangung eines geeigneten Arbeitsplatzes oder Eingliederungshilfen nach § 112 SGB IX?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "p4_rbtnbehinderung == \"0\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p4_rbtnleistungteilhabe",
+          "var": "p4_rbtnleistungteilhabe",
+          "type": "string",
+          "meaning": "Leistungen zur Teilhabe am Arbeitsleben nach § 49 SGB IX oder sonstige Hilfen oder Eingliederungshilfen nach § 112 SGB IX",
+          "options": {
+            "0": "Ja (bitte fügen Sie den Bescheid bei)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Mehrbedarfe zum Regelbedarf erhalten Menschen mit Behinderungen, die bestimmte Leistungen nach dem SGB IX erhalten.",
+      "documents": [
+        {
+          "name": "Bescheid",
+          "condition": "p4_rbtnleistungteilhabe == \"0\"",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p4_unabweisbarer_besonderer_bedarf",
+      "page": 4,
+      "section": "",
+      "person": null,
+      "topic": "Haben Sie einen unabweisbaren besonderen Bedarf, den Sie nicht durch Einsparungen oder auf andere Weise abdecken können, zum Beispiel Kosten zur Wahrnehmung des Umgangsrechts bei getrenntlebenden Eltern?",
+      "hint": "Hinweis 13 Unabweisbarer besonderer Bedarf",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p4_rbtnbb",
+          "var": "p4_rbtnbb",
+          "type": "string",
+          "meaning": "unabweisbarer besonderer Bedarf",
+          "options": {
+            "0": "Ja (bitte füllen Sie auch die Anlage BB aus)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Unter bestimmten Voraussetzungen können weitere Bedarfe, die aufgrund besonderer Lebensumstände entstehen und nicht vermeidbar sind, berücksichtigt werden.",
+      "documents": [
+        {
+          "name": "Anlage BB",
+          "condition": "p4_rbtnbb == \"0\"",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p4_stationaere_einrichtung",
+      "page": 4,
+      "section": "",
+      "person": null,
+      "topic": "Befinden Sie sich derzeit oder demnächst in einer stationären Einrichtung, zum Beispiel Krankenhaus, Altenheim, Justizvollzugsanstalt?",
+      "hint": "Hinweis 14 Stationäre Einrichtung",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p4_rbtnstationaer",
+          "var": "p4_rbtnstationaer",
+          "type": "string",
+          "meaning": "Aufenthalt in einer stationären Einrichtung",
+          "options": {
+            "0": "Ja",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Sie müssen insbesondere so früh wie möglich mitteilen, wenn Sie stationär untergebracht werden.",
+      "documents": []
+    },
+    {
+      "id": "p4_stationaere_einrichtung_art",
+      "page": 4,
+      "section": "",
+      "person": null,
+      "topic": "Bitte geben Sie die Art der stationären Einrichtung an.",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p4_rbtnstationaer == \"0\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p4_txtfstationaerart",
+          "var": "p4_txtfstationaerart",
+          "type": "string",
+          "meaning": "Art der stationären Einrichtung",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p4_stationaere_einrichtung_dauer",
+      "page": 4,
+      "section": "",
+      "person": null,
+      "topic": "Bitte geben Sie die (voraussichtliche) Dauer des Aufenthalts an.",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "p4_rbtnstationaer == \"0\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p4_datestationaervon",
+          "var": "p4_datestationaervon",
+          "type": "string",
+          "meaning": "von (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p4_datestationaerbis",
+          "var": "p4_datestationaerbis",
+          "type": "string",
+          "meaning": "bis (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p5_buergergeld_sozialhilfe_bisher",
+      "page": 5,
+      "section": "E. Angaben zur bisherigen Lebenssituation",
+      "person": null,
+      "topic": "Haben Sie innerhalb der letzten drei Jahre bereits Bürgergeld oder Sozialhilfe beantragt oder bezogen?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p5_rbtnbueg",
+          "var": "p5_rbtnbueg",
+          "type": "string",
+          "meaning": "Bürgergeld oder Sozialhilfe innerhalb der letzten drei Jahre beantragt oder bezogen",
+          "options": {
+            "0": "Ja",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p5_buergergeld_sozialhilfe_art",
+      "page": 5,
+      "section": "E. Angaben zur bisherigen Lebenssituation",
+      "person": null,
+      "topic": "Bitte geben Sie die Art der Leistung an.",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p5_rbtnbueg == '0'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p5_txtfleistungart",
+          "var": "p5_txtfleistungart",
+          "type": "string",
+          "meaning": "Art der Leistung",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p5_buergergeld_sozialhilfe_zeitraum",
+      "page": 5,
+      "section": "E. Angaben zur bisherigen Lebenssituation",
+      "person": null,
+      "topic": "Bitte geben Sie den Zeitraum an, in dem Sie Leistungen erhalten haben.",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "p5_rbtnbueg == '0'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p5_dateleistungvon",
+          "var": "p5_dateleistungvon",
+          "type": "string",
+          "meaning": "von (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p5_dateleistungbis",
+          "var": "p5_dateleistungbis",
+          "type": "string",
+          "meaning": "bis (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p5_buergergeld_sozialhilfe_leistungstraeger",
+      "page": 5,
+      "section": "E. Angaben zur bisherigen Lebenssituation",
+      "person": null,
+      "topic": "Bitte geben Sie Name und Anschrift des Leistungsträgers an.",
+      "hint": null,
+      "answer_type": "address",
+      "ask_if": "p5_rbtnbueg == '0'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p5_txtftraegername",
+          "var": "p5_txtftraegername",
+          "type": "string",
+          "meaning": "Name des Leistungsträgers",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p5_txtftraegerstr",
+          "var": "p5_txtftraegerstr",
+          "type": "string",
+          "meaning": "Straße des Leistungsträgers",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p5_txtftraegerhausnr",
+          "var": "p5_txtftraegerhausnr",
+          "type": "string",
+          "meaning": "Hausnummer des Leistungsträgers",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p5_txtftraegerplz",
+          "var": "p5_txtftraegerplz",
+          "type": "string",
+          "meaning": "Postleitzahl des Leistungsträgers",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p5_txtftraegerort",
+          "var": "p5_txtftraegerort",
+          "type": "string",
+          "meaning": "Ort des Leistungsträgers",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p5_beschaeftigung_letzte_fuenf_jahre",
+      "page": 5,
+      "section": "E. Angaben zur bisherigen Lebenssituation",
+      "person": null,
+      "topic": "Waren Sie bei einer Arbeitgeberin/einem Arbeitgeber angestellt beziehungsweise beschäftigt?",
+      "hint": "Bitte geben Sie an, welche der nachfolgenden Aussagen für Sie innerhalb der letzten fünf Jahre zutreffen und fügen Sie Nachweise bei.",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p5_rbtnangestellt",
+          "var": "p5_rbtnangestellt",
+          "type": "string",
+          "meaning": "Bei einer Arbeitgeberin/einem Arbeitgeber angestellt beziehungsweise beschäftigt",
+          "options": {
+            "0": "Ja",
+            "1": "Nein (weiter mit 67)"
+          },
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p5_beschaeftigung_zeitraum",
+      "page": 5,
+      "section": "E. Angaben zur bisherigen Lebenssituation",
+      "person": null,
+      "topic": "Bitte geben Sie den Zeitraum der Beschäftigungen an.",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "p5_rbtnangestellt == '0'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p5_datebeschaeftigtvon",
+          "var": "p5_datebeschaeftigtvon",
+          "type": "string",
+          "meaning": "Erster Zeitraum von (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p5_datebeschaeftigtbis",
+          "var": "p5_datebeschaeftigtbis",
+          "type": "string",
+          "meaning": "Erster Zeitraum bis (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p5_datebeschaeftigt2von",
+          "var": "p5_datebeschaeftigt2von",
+          "type": "string",
+          "meaning": "Zweiter Zeitraum von (TT.MM.JJJJ)",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p5_datebeschaeftigt2bis",
+          "var": "p5_datebeschaeftigt2bis",
+          "type": "string",
+          "meaning": "Zweiter Zeitraum bis (TT.MM.JJJJ)",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p5_ausstehende_lohnansprueche",
+      "page": 5,
+      "section": "E. Angaben zur bisherigen Lebenssituation",
+      "person": null,
+      "topic": "Haben Sie ausstehende Lohnansprüche gegen eine (ehemalige) Arbeitgeberin/einen (ehemaligen) Arbeitgeber?",
+      "hint": "Hinweis 10 Ansprüche gegenüber Dritten",
+      "answer_type": "yes_no",
+      "ask_if": "p5_rbtnangestellt == '0'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p5_rbtnlohnanspruch",
+          "var": "p5_rbtnlohnanspruch",
+          "type": "string",
+          "meaning": "Ausstehende Lohnansprüche gegen eine (ehemalige) Arbeitgeberin/einen (ehemaligen) Arbeitgeber",
+          "options": {
+            "0": "Ja",
+            "1": "Nein (weiter mit 67)"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Schuldet Ihnen Ihr Arbeitgeber noch Lohn, können diese Lohnansprüche auf die Träger der Grundsicherung für Arbeitsuchende übergehen und durch das Jobcenter verfolgt werden.",
+      "documents": []
+    },
+    {
+      "id": "p5_arbeitgeber_anschrift",
+      "page": 5,
+      "section": "E. Angaben zur bisherigen Lebenssituation",
+      "person": null,
+      "topic": "Bitte geben Sie Name und Anschrift der Arbeitgeberin/des Arbeitgebers an.",
+      "hint": null,
+      "answer_type": "address",
+      "ask_if": "p5_rbtnlohnanspruch == '0'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p5_txtfagname",
+          "var": "p5_txtfagname",
+          "type": "string",
+          "meaning": "Name (ehemalige) Arbeitgeberin/(ehemaliger) Arbeitgeber",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p5_txtfagstr",
+          "var": "p5_txtfagstr",
+          "type": "string",
+          "meaning": "Straße",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p5_txtfaghausnr",
+          "var": "p5_txtfaghausnr",
+          "type": "string",
+          "meaning": "Hausnummer",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p5_txtfagplz",
+          "var": "p5_txtfagplz",
+          "type": "string",
+          "meaning": "Postleitzahl",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p5_txtfagort",
+          "var": "p5_txtfagort",
+          "type": "string",
+          "meaning": "Ort",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p5_selbstaendige_freiberufliche_taetigkeit",
+      "page": 5,
+      "section": "E. Angaben zur bisherigen Lebenssituation",
+      "person": null,
+      "topic": "Waren Sie selbständig/freiberuflich tätig?",
+      "hint": "Bitte geben Sie an, welche der nachfolgenden Aussagen für Sie innerhalb der letzten fünf Jahre zutreffen und fügen Sie Nachweise bei.",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p5_rbtnselbstaendig",
+          "var": "p5_rbtnselbstaendig",
+          "type": "string",
+          "meaning": "Selbständig/freiberuflich tätig",
+          "options": {
+            "0": "Ja",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p5_entgeltersatzleistungen_bezug",
+      "page": 5,
+      "section": "E. Angaben zur bisherigen Lebenssituation",
+      "person": null,
+      "topic": "Haben Sie Entgeltersatzleistungen erhalten, zum Beispiel Krankengeld, Arbeitslosengeld, Übergangsgeld, Elterngeld?",
+      "hint": "Bitte geben Sie an, welche der nachfolgenden Aussagen für Sie innerhalb der letzten fünf Jahre zutreffen und fügen Sie Nachweise bei.",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p5_rbtnentgeltersatz",
+          "var": "p5_rbtnentgeltersatz",
+          "type": "string",
+          "meaning": "Entgeltersatzleistungen erhalten",
+          "options": {
+            "0": "Ja",
+            "1": "Nein (weiter mit 71)"
+          },
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p5_entgeltersatzleistung_art",
+      "page": 5,
+      "section": "E. Angaben zur bisherigen Lebenssituation",
+      "person": null,
+      "topic": "Bitte geben Sie die Entgeltersatzleistung an.",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p5_rbtnentgeltersatz == '0'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p5_txtfentgeltersatz",
+          "var": "p5_txtfentgeltersatz",
+          "type": "string",
+          "meaning": "Entgeltersatzleistung",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p5_entgeltersatzleistung_zeitraum",
+      "page": 5,
+      "section": "E. Angaben zur bisherigen Lebenssituation",
+      "person": null,
+      "topic": "Bitte geben Sie den Zeitraum an, in dem Sie die Entgeltersatzleistung erhalten haben.",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "p5_rbtnentgeltersatz == '0'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p5_dateentgeltersatzvon",
+          "var": "p5_dateentgeltersatzvon",
+          "type": "string",
+          "meaning": "von (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p5_dateentgeltersatzbis",
+          "var": "p5_dateentgeltersatzbis",
+          "type": "string",
+          "meaning": "bis (TT.MM.JJJJ)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p6_q71_wehrdienst",
+      "page": 6,
+      "section": "E. Bisherige Erwerbsbiografie",
+      "person": null,
+      "topic": "71 Haben Sie Wehrdienst oder einen freiwilligen Dienst geleistet, zum Beispiel Freiwilliges Soziales Jahr, Bundesfreiwilligendienst?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p6_rbtnwehrdienst",
+          "var": "p6_rbtnwehrdienst",
+          "type": "string",
+          "meaning": "Wehrdienst oder freiwilligen Dienst geleistet",
+          "options": {
+            "0": "Ja",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p6_q72_pflege",
+      "page": 6,
+      "section": "E. Bisherige Erwerbsbiografie",
+      "person": null,
+      "topic": "72 Haben Sie Angehörige gepflegt (Pflege nach dem Elften Buch Sozialgesetzbuch)?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p6_rbtnpflege",
+          "var": "p6_rbtnpflege",
+          "type": "string",
+          "meaning": "Angehörige gepflegt",
+          "options": {
+            "0": "Ja",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p6_q73_lebensunterhalt",
+      "page": 6,
+      "section": "E. Bisherige Erwerbsbiografie",
+      "person": null,
+      "topic": "73 Wenn keine der obigen Aussagen innerhalb der letzten 5 Jahre auf Sie zutrifft, geben Sie bitte an, wie Sie Ihren Lebensunterhalt bestritten haben, zum Beispiel finanzielle Unterstützung durch Verwandte/Bekannte, Ersparnisse, Erbschaft.",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p5_rbtnangestellt == \"1\" && p5_rbtnselbstaendig == \"1\" && p5_rbtnentgeltersatz == \"1\" && p6_rbtnwehrdienst == \"1\" && p6_rbtnpflege == \"1\"",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p6_txtarealebensunterhalt",
+          "var": "p6_txtarealebensunterhalt",
+          "type": "string",
+          "meaning": "Angabe, wie der Lebensunterhalt bestritten wurde",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": null,
+      "documents": []
+    },
+    {
+      "id": "p6_q74_anspruch_dritte",
+      "page": 6,
+      "section": "E. Bisherige Erwerbsbiografie",
+      "person": null,
+      "topic": "74 Haben Sie einen Anspruch gegenüber Dritten, zum Beispiel Schadensersatz, Erbschaft?",
+      "hint": "Hinweis 10 Ansprüche gegenüber Dritten",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p6_rbtnanspruchdritte",
+          "var": "p6_rbtnanspruchdritte",
+          "type": "string",
+          "meaning": "Anspruch gegenüber Dritten",
+          "options": {
+            "0": "Ja (bitte fügen Sie einen Nachweis über den Anspruch bei)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Haben Sie oder andere Mitglieder Ihrer Bedarfsgemeinschaft einen Anspruch gegen einen Dritten, geht der Anspruch für die Zeit, für die das Jobcenter Leistungen gewährt hat, kraft Gesetzes auf das Jobcenter über.",
+      "documents": [
+        {
+          "name": "Nachweis über den Anspruch",
+          "condition": "p6_rbtnanspruchdritte == \"0\"",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p6_q75_schaden_dritte",
+      "page": 6,
+      "section": "E. Bisherige Erwerbsbiografie",
+      "person": null,
+      "topic": "75 Haben Sie einen Unfall oder einen gesundheitlichen Schaden durch einen Dritten erlitten (zum Beispiel Arbeits-, Verkehrs-, Spiel- oder Sportunfall, ärztlicher Behandlungsfehler oder tätliche Auseinandersetzung)?",
+      "hint": null,
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p6_rbtnschadendritte",
+          "var": "p6_rbtnschadendritte",
+          "type": "string",
+          "meaning": "Unfall oder gesundheitlicher Schaden durch einen Dritten erlitten",
+          "options": {
+            "0": "Ja (bitte füllen Sie auch die Anlage UF aus)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Soweit Sie aufgrund einer Verletzung durch ein Schadensereignis Leistungen nach dem SGB II in Anspruch nehmen, ist Ihr Jobcenter verpflichtet, mögliche Regressansprüche gegen die Person, die das Schadensereignis verursacht hat, zu prüfen. Im Regressfall geht Ihr Anspruch gegen die schädigende Person bzw. deren Haftpflichtversicherung kraft Gesetzes auf das Jobcenter über.",
+      "documents": [
+        {
+          "name": "Anlage UF",
+          "condition": "p6_rbtnschadendritte == \"0\"",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p6_q76_kv_pv",
+      "page": 6,
+      "section": "F. Kranken- und Pflegeversicherung",
+      "person": null,
+      "topic": "76 Sind Sie oder waren Sie zuletzt in der gesetzlichen Kranken- und Pflegeversicherung familien- oder pflichtversichert?",
+      "hint": "Hinweis 15 Kranken- und Pflegeversicherung",
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p6_rbtnkvpv",
+          "var": "p6_rbtnkvpv",
+          "type": "string",
+          "meaning": "in der gesetzlichen Kranken- und Pflegeversicherung familien- oder pflichtversichert",
+          "options": {
+            "0": "Ja",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Aufgrund des Bezuges von Grundsicherungsgeld für erwerbsfähige Leistungsberechtigte sind Sie grundsätzlich versicherungspflichtig in der gesetzlichen Kranken- und Pflegeversicherung.",
+      "documents": []
+    },
+    {
+      "id": "p6_q77_krankenkasse",
+      "page": 6,
+      "section": "F. Kranken- und Pflegeversicherung",
+      "person": null,
+      "topic": "77 Bei welcher Krankenkasse sind oder möchten Sie versichert werden?",
+      "hint": "Bitte geben Sie den Namen der Krankenkasse an und fügen Sie einen aktuellen Nachweis über die Versicherung bei.",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p6_txtfkv",
+          "var": "p6_txtfkv",
+          "type": "string",
+          "meaning": "Name der Krankenkasse",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "Aufgrund des Bezugs von Grundsicherungsgeld für erwerbsfähige Leistungsberechtigte haben Sie grundsätzlich ein Krankenkassenwahlrecht. Dabei können Sie zwischen den verschiedenen gesetzlichen Krankenkassen wählen.",
+      "documents": [
+        {
+          "name": "aktueller Nachweis über die Versicherung",
+          "condition": "true",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p6_q78_pkv",
+      "page": 6,
+      "section": "F. Kranken- und Pflegeversicherung",
+      "person": null,
+      "topic": "78 Sind Sie privat versichert, freiwillig gesetzlich versichert oder nicht versichert?",
+      "hint": null,
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p6_rbtnpkv",
+          "var": "p6_rbtnpkv",
+          "type": "string",
+          "meaning": "privat versichert, freiwillig gesetzlich versichert oder nicht versichert",
+          "options": {
+            "0": "Ja (bitte füllen Sie auch die Anlage SV aus)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Sind Sie entweder freiwillig gesetzlich oder privat versichert, wird unter bestimmten Voraussetzungen ein Zuschuss zu Ihren Versicherungsbeiträgen gezahlt.",
+      "documents": [
+        {
+          "name": "Anlage SV",
+          "condition": "p6_rbtnpkv == \"0\"",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p6_q79_wohnen_allein",
+      "page": 6,
+      "section": "G. Wohnsituation",
+      "person": null,
+      "topic": "79 Wohnen Sie allein?",
+      "hint": "Hinweis 8 Bedarfsgemeinschaft, Hinweis 16 Haushaltsgemeinschaft, Hinweis 17 Verantwortungs- und Einstehensgemeinschaft",
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p6_rbtnwohnsituation",
+          "var": "p6_rbtnwohnsituation",
+          "type": "string",
+          "meaning": "Wohnen Sie allein",
+          "options": {
+            "0": "Ja (weiter mit 81)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Grundsicherungsgeld wird für eine Bedarfsgemeinschaft berechnet. Auch, wenn Sie alleine leben, bilden Sie eine Bedarfsgemeinschaft. Leben Sie mit mehreren Personen im gleichen Haushalt zusammen und betreiben den Haushalt wirtschaftlich gemeinsam, werden Sie möglicherweise alle zusammen als eine Bedarfsgemeinschaft behandelt.",
+      "documents": []
+    },
+    {
+      "id": "p6_q80_wohnen_personen",
+      "page": 6,
+      "section": "G. Wohnsituation",
+      "person": null,
+      "topic": "80 Bitte geben Sie an, mit welchen Personen Sie zusammen wohnen.",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p6_rbtnwohnsituation == \"1\"",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p6_chbxwohnenehegatte",
+          "var": "p6_chbxwohnenehegatte",
+          "type": "bool",
+          "meaning": "Ehegattin/Ehegatte, eingetragene Lebenspartnerin/eingetragener Lebenspartner, Partnerin/Partner („eheähnliche Gemeinschaft“)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p6_chbxwohnenkind",
+          "var": "p6_chbxwohnenkind",
+          "type": "bool",
+          "meaning": "unverheiratete Kind(er) zwischen 15 Jahren und 24 Jahren",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p6_chbxwohnenkindu15",
+          "var": "p6_chbxwohnenkindu15",
+          "type": "bool",
+          "meaning": "Kind(er) unter 15 Jahren",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "Zu einer Bedarfsgemeinschaft gehören neben der erwerbsfähigen leistungsberechtigten Person die Partnerin/der Partner sowie unverheiratete Kinder unter 25 Jahren. Bei einer solchen Bedarfsgemeinschaft werden alle ihr angehörenden Personen mit ihren persönlichen Verhältnissen in eine gemeinsame Berechnung einbezogen.",
+      "documents": [
+        {
+          "name": "Anlage WEP",
+          "condition": "p6_chbxwohnenehegatte || p6_chbxwohnenkind",
+          "form_id": null
+        },
+        {
+          "name": "Anlage KI",
+          "condition": "p6_chbxwohnenkindu15",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p7_wohnsituation_weitere_personen",
+      "page": 7,
+      "section": "G. Wohnsituation",
+      "person": null,
+      "topic": "Geben Sie an, mit welchen Personen Sie zusammen wohnen",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p6_rbtnwohnsituation == \"Nein\" || p6_rbtnwohnsituation == \"1\"",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p7_chbxwohneneltern",
+          "var": "p7_chbxwohneneltern",
+          "type": "bool",
+          "meaning": "Eltern oder einem Elternteil",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p7_chbxwohnenverwandte",
+          "var": "p7_chbxwohnenverwandte",
+          "type": "bool",
+          "meaning": "sonstige Verwandte oder Verschwägerte (zum Beispiel Großeltern, Geschwister über 25 Jahre, verheiratete Kinder, Tanten oder Onkel)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p7_chbxwohnensonstige",
+          "var": "p7_chbxwohnensonstige",
+          "type": "bool",
+          "meaning": "sonstige Personen (zum Beispiel andere Personen in einer Wohngemeinschaft)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "Grundsicherungsgeld wird für eine Bedarfsgemeinschaft berechnet. Bei einer solchen Bedarfsgemeinschaft werden alle ihr angehörenden Personen mit ihren persönlichen Verhältnissen in eine gemeinsame Berechnung einbezogen.",
+      "documents": [
+        {
+          "name": "Anlage WEP",
+          "condition": "p7_chbxwohneneltern",
+          "form_id": null
+        },
+        {
+          "name": "Anlage HG",
+          "condition": "p7_chbxwohneneltern || p7_chbxwohnenverwandte",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p7_bedarfe_unterkunft_und_heizung",
+      "page": 7,
+      "section": "G. Wohnsituation",
+      "person": null,
+      "topic": "Entstehen Ihnen Bedarfe für Unterkunft und Heizung?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p7_rbtnbedarfunterkunft",
+          "var": "p7_rbtnbedarfunterkunft",
+          "type": "string",
+          "meaning": "Entstehen Ihnen Bedarfe für Unterkunft und Heizung?",
+          "options": {
+            "0": "Ja (bitte füllen Sie auch die Anlage KDU aus)",
+            "1": "Nein"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "Bedarfe für Unterkunft und Heizung (Miete) werden in Höhe Ihrer tatsächlichen Aufwendungen berücksichtigt, soweit diese angemessen sind.",
+      "documents": [
+        {
+          "name": "Anlage KDU",
+          "condition": "p7_rbtnbedarfunterkunft == \"0\"",
+          "form_id": null
+        }
+      ]
+    }
+  ],
+  "out_of_scope": [
+    {
+      "field_id": "p8_dateunterschriftperson",
+      "reason": "signature"
+    },
+    {
+      "field_id": "p8_dateunterschriftbetreuer",
+      "reason": "signature"
+    }
+  ]
+}

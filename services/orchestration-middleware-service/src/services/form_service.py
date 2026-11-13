@@ -14,7 +14,8 @@ import aiofiles
 import httpx
 from fastapi import Depends, Request
 from pyjexl import JEXL
-from pyjexl.parser import Identifier, Literal
+from pyjexl.evaluator import Context, Evaluator
+from pyjexl.parser import BinaryExpression, ConditionalExpression, FilterExpression, Identifier, Literal
 from sqlalchemy.exc import DatabaseError, DisconnectionError
 from sqlalchemy.orm import Session
 
@@ -22,6 +23,7 @@ from src.constants import SLOT_ID_TO_DIS_TYPE
 from src.db import get_db
 from src.models import DocumentStatusType, UserApplications, UserDocuments, Users
 from src.services.form_context import derived_context, row_to_dict
+from src.services.form_rules import attachment_parents
 from src.services.berlin_districts import resolve_berlin_district
 from src.utils import get_google_id_token
 
@@ -30,6 +32,14 @@ logger = logging.getLogger(__name__)
 FORM_NAME_PATTERN = re.compile(r"^[a-zA-Z0-9_-]+$")
 _DOCUMENT_REF_RE = re.compile(r"documents\.([a-zA-Z_][a-zA-Z0-9_]*)(?:\.([a-zA-Z_][a-zA-Z0-9_]*))?")
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_TEMPLATE_RE = re.compile(r"\{\{\s*(.*?)\s*\}\}", flags=re.DOTALL)
+_JEXL = JEXL()
+# pyjexl parses an expression on every evaluation; a mapping's expressions are the same on every call
+_parse = functools.lru_cache(maxsize=None)(_JEXL.parse)
+
+
+def _evaluate(expression: str, context: Dict[str, Any]) -> Any:
+    return Evaluator(_JEXL.config).evaluate(_parse(expression), Context(context))
 
 
 def _parse_iso_dates(raw_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -67,28 +77,6 @@ def _extract_document_refs(mapping: Dict[str, Any]) -> Dict[str, set[str] | None
             elif refs[doc_type] is not None:
                 refs[doc_type].add(key)
     return refs
-
-
-def _collect_identifier_roots(node: Any, out: set[str]) -> None:
-    """Walks a pyjexl AST node, collecting the root context key of every identifier
-    chain (e.g. `documents.wage_slips.gross_amount` contributes only `documents`)."""
-    if node is None or isinstance(node, Literal):
-        return
-    if isinstance(node, Identifier):
-        if node.subject is None and node.value != "null":
-            out.add(node.value)
-        else:
-            _collect_identifier_roots(node.subject, out)
-        return
-    for field_name in getattr(node, "fields", []):
-        if field_name == "parent":
-            continue
-        value = getattr(node, field_name, None)
-        if isinstance(value, list):
-            for item in value:
-                _collect_identifier_roots(item, out)
-        else:
-            _collect_identifier_roots(value, out)
 
 
 # Derived keys that carry a money grid's optional free-text extras, plus optional contact
@@ -150,7 +138,127 @@ def _count_unmapped_required_fields_at(mapping_file: str, _mtime_ns: int) -> int
     )
 
 
-def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set[str]:
+def _identifier_path(node: Any) -> Optional[tuple]:
+    """`partner.nationality` -> ("partner", "nationality"), `expenses['Rent']` -> ("expenses", "Rent");
+    None for anything that is not a plain chain from the context."""
+    if isinstance(node, Identifier) and not node.relative:
+        if node.subject is None and node.value == "null":
+            return None
+        base = _identifier_path(node.subject) if node.subject is not None else ()
+        return None if base is None else (*base, node.value)
+    if isinstance(node, FilterExpression) and isinstance(node.expression, Literal) and not node.relative:
+        base = _identifier_path(node.subject)
+        return None if base is None else (*base, node.expression.value)
+    return None
+
+
+def _collect_identifier_paths(node: Any, out: set[tuple]) -> None:
+    if node is None or isinstance(node, Literal):
+        return
+    path = _identifier_path(node)
+    if path is not None:
+        out.add(path)
+        return
+    for field_name in getattr(node, "fields", []):
+        if field_name == "parent":
+            continue
+        value = getattr(node, field_name, None)
+        for item in value if isinstance(value, list) else [value]:
+            _collect_identifier_paths(item, out)
+
+
+@functools.lru_cache(maxsize=None)
+def _mapping_paths(value: str) -> tuple[tuple, ...]:
+    """The context paths a mapping value's JEXL expressions read."""
+    paths: set[tuple] = set()
+    for match in _TEMPLATE_RE.finditer(value):
+        try:
+            _collect_identifier_paths(_parse(match.group(1)), paths)
+        except Exception:
+            return ()
+    return tuple(sorted(paths, key=str))
+
+
+def _single_expression(value: str) -> Optional[Any]:
+    """The parsed expression of a mapping value that is exactly one `{{ }}`, or None."""
+    match = re.fullmatch(r"\{\{(.*)\}\}", value.strip(), flags=re.DOTALL)
+    if not match or "{{" in match.group(1):
+        return None
+    try:
+        return _parse(match.group(1))
+    except Exception:
+        return None
+
+
+@functools.lru_cache(maxsize=None)
+def _plain_path(value: str) -> Optional[tuple]:
+    """The context path a mapping prints unchanged: `{{ street }}`, `{{ street ? street : '' }}` or
+    `{{ income.Employment ? income.Employment : '' }}`."""
+    node = _single_expression(value)
+    if isinstance(node, ConditionalExpression) and isinstance(node.alternate, Literal) and node.alternate.value == "":
+        path = _identifier_path(node.test)
+        return path if path is not None and path == _identifier_path(node.consequent) else None
+    return _identifier_path(node) if node is not None else None
+
+
+def _column_test(node: Any) -> Optional[tuple[str, Any]]:
+    """`marital_status == 'Married'` -> ("marital_status", "Married")."""
+    if (
+        isinstance(node, BinaryExpression)
+        and node.operator.symbol == "=="
+        and isinstance(node.left, Identifier)
+        and node.left.subject is None
+        and not node.left.relative
+        and isinstance(node.right, Literal)
+    ):
+        return node.left.value, node.right.value
+    return None
+
+
+@functools.lru_cache(maxsize=None)
+def _choice_writes(value: str) -> tuple[tuple[Any, str, Any], ...]:
+    """For a mapping that picks the PDF value by comparing one column, which column value each PDF value
+    stands for: `{{ legal_gender == 'Male' ? 'Ja' : '' }}` -> (("Ja", "legal_gender", "Male"),)."""
+    node = _single_expression(value)
+    if node is None:
+        return ()
+    if test := _column_test(node):
+        column, literal = test
+        # a checkbox `{{ has_guardian == true }}` left unticked says the column is false
+        return ((True, column, literal),) + (((False, column, False),) if literal is True else ())
+    writes = []
+    while isinstance(node, ConditionalExpression) and isinstance(node.consequent, Literal):
+        test = _column_test(node.test)
+        if test is None:
+            break
+        writes.append((node.consequent.value, *test))
+        node = node.alternate
+    return tuple(writes)
+
+
+def _context_value(context: Dict[str, Any], path: tuple) -> Any:
+    node: Any = context
+    for step in path:
+        if isinstance(node, dict):
+            node = node.get(step)
+        elif isinstance(node, list) and isinstance(step, int) and 0 <= step < len(node):
+            node = node[step]
+        else:
+            return None
+    return node
+
+
+def _answered_by(context: Dict[str, Any], expression: str, value: Any) -> bool:
+    """Whether a value comes from data or is fixed, rather than being a default the mapping filled in
+    while its data is empty: every path it reads is set (an explicit "no" counts), it has a value and
+    at least one of its paths is set (a fallback chain), or it is a fixed value that reads no data."""
+    paths = _mapping_paths(expression)
+    known = [_is_context_value_filled(_context_value(context, path)) for path in paths]
+    has_value = value is not None and value is not False and value != ""
+    return bool((paths and all(known)) or (has_value and (any(known) or not paths)))
+
+
+def _extract_required_context_fields(mapping: Dict[str, Any]) -> set[str]:
     """
     Collects the top-level context keys a mapping's JEXL expressions read from,
     used to judge whether a user's profile carries enough data to fill this form.
@@ -158,16 +266,7 @@ def _extract_required_context_fields(mapping: Dict[str, Any], jexl: JEXL) -> set
     verified uploads rather than the profile, and the money grids' free-text extras are
     optional even for a fully answered profile - neither is required to check readiness.
     """
-    fields: set[str] = set()
-    for val in mapping.values():
-        if not isinstance(val, str):
-            continue
-        for match in re.finditer(r"\{\{\s*(.*?)\s*\}\}", val, flags=re.DOTALL):
-            try:
-                tree = jexl.parse(match.group(1))
-            except Exception:
-                continue
-            _collect_identifier_roots(tree, fields)
+    fields = {path[0] for val in mapping.values() if isinstance(val, str) for path in _mapping_paths(val)}
     return fields - _OPTIONAL_CONTEXT_FIELDS
 
 
@@ -318,35 +417,20 @@ class FormService:
         )
         self.db = db
         self.http_client = http_client
-        self.jexl = JEXL()
 
-    def _build_base_context(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], Optional[UserApplications]]:
+    def find_application(self, form_type: str, user: Users, strict: bool = False) -> Optional[UserApplications]:
         """
-        Builds the JEXL context from `Users` columns merged with the matching
-        application's `form_data`. When no row has this exact `form_type`:
-        for "antrag_grundsicherung_im_alter" specifically, first checks the legacy
-        form_type="grundsicherung" (older accounts were written under that name)
-        before falling back further, so a newer, unrelated application can't shadow
-        the legacy Grundsicherung data. Otherwise (or if that legacy lookup also
-        misses), falls back to the user's most recently updated application of any
-        form_type.
+        The application whose `form_data` a form is filled from. When no row has this
+        exact `form_type`: for "antrag_grundsicherung_im_alter" specifically, first checks
+        the legacy form_type="grundsicherung" (older accounts were written under that name)
+        before falling back further, so a newer, unrelated application can't shadow the
+        legacy Grundsicherung data. Otherwise (or if that legacy lookup also misses), falls
+        back to the user's most recently updated application of any form_type.
 
-        Does not include the `documents` namespace; `fill_form` layers that on top
-        using the returned application, since it's the only caller that needs it.
+        An attachment form (Anlage) is filled from the application of the form that links it.
+        `strict` skips the fallback to an unrelated form's application, for writing answers.
         """
-        user_dict = row_to_dict(user)
-
-        if not user_dict.get("district") and user_dict.get("zip_code"):
-            city = user_dict.get("city", "")
-            if city and city.strip().lower() == "berlin":
-                user_dict["district"] = resolve_berlin_district(
-                    db=self.db,
-                    street=user_dict.get("street"),
-                    house_number=user_dict.get("house_number"),
-                    zip_code=user_dict.get("zip_code"),
-                )
-
-        form_data: Dict[str, Any] = {}
+        form_type = attachment_parents().get(form_type, form_type)
         application: Optional[UserApplications] = None
         try:
             application = (
@@ -374,7 +458,7 @@ class FormService:
                         form_type,
                         application.application_id,
                     )
-            if application is None:
+            if application is None and not strict:
                 application = (
                     self.db.query(UserApplications)
                     .filter(UserApplications.fk_user_id == user.id)
@@ -388,12 +472,34 @@ class FormService:
                         application.application_id,
                         application.form_type,
                     )
-            if application and application.form_data:
-                form_data = application.form_data
         except DatabaseError:
             logger.warning("Internal database error")
         except DisconnectionError:
             logger.warning("Database is currently not reachable")
+        return application
+
+    def _build_base_context(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], Optional[UserApplications]]:
+        """
+        Builds the JEXL context from `Users` columns merged with the `form_data` of the
+        application `find_application` picks.
+
+        Does not include the `documents` namespace; `fill_form` layers that on top
+        using the returned application, since it's the only caller that needs it.
+        """
+        user_dict = row_to_dict(user)
+
+        if not user_dict.get("district") and user_dict.get("zip_code"):
+            city = user_dict.get("city", "")
+            if city and city.strip().lower() == "berlin":
+                user_dict["district"] = resolve_berlin_district(
+                    db=self.db,
+                    street=user_dict.get("street"),
+                    house_number=user_dict.get("house_number"),
+                    zip_code=user_dict.get("zip_code"),
+                )
+
+        application = self.find_application(form_type, user)
+        form_data: Dict[str, Any] = (application.form_data if application else None) or {}
 
         context = user_dict.copy()
         money_entries = [
@@ -421,7 +527,7 @@ class FormService:
         these simpler (non-Grundsicherung) forms today.
         """
         mapping, _field_types, _pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
-        required_fields = _extract_required_context_fields(mapping, self.jexl)
+        required_fields = _extract_required_context_fields(mapping)
         unmapped_required = _count_unmapped_required_fields(os.path.join(self.mapping_path, f"{form_type}.toml"))
         if not required_fields and not unmapped_required:
             return 0, 0
@@ -437,9 +543,66 @@ class FormService:
 
     async def fill_form(self, form_type: str, user: Users) -> bytes:
         """
-        Fills a PDF form using a merged JEXL context built from the user profile
-        and the user's most recently updated `user_applications` row for the given
-        `form_type`. The application contributes two namespaces:
+        Fills a PDF form with the values `resolve_field_values` resolves.
+        """
+        filled_values, pdf_bytes = await self.resolve_field_values(form_type, user)
+
+        payload = {
+            "pdf_base64": base64.b64encode(pdf_bytes).decode("utf-8"),
+            "field_values": filled_values,
+            "ignore_read_only": True,
+        }
+
+        headers = {}
+        token = get_google_id_token(self.filler_url)
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+
+        url = f"{self.filler_url}/api/fill"
+        logger.info(f"Calling forms-filling-service at {url}")
+
+        if self.http_client:
+            response = await self.http_client.post(url, json=payload, timeout=60.0, headers=headers)
+        else:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload, timeout=60.0)
+
+        if response.status_code != 200:
+            try:
+                error_data = response.json()
+                detail = error_data.get("detail", str(error_data))
+            except Exception:
+                detail = response.text
+            logger.error(f"Forms filler error: {detail}")
+            raise Exception(f"Forms filler error: {detail}")
+        return response.content
+
+    async def plain_profile_paths(self, form_type: str) -> Dict[str, tuple]:
+        """The PDF fields whose mapping prints one context path unchanged, and that path, e.g. ("street",)
+        or ("income", "Employment"). An answer to such a field can be stored there instead of beside the mapping."""
+        mapping, _field_types, _pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
+        paths = {field_id: _plain_path(val) if isinstance(val, str) else None for field_id, val in mapping.items()}
+        return {field_id: path for field_id, path in paths.items() if path}
+
+    async def choice_profile_columns(self, form_type: str) -> Dict[str, Dict[Any, Tuple[str, Any]]]:
+        """The PDF fields whose mapping picks the PDF value by comparing one column, and for each PDF
+        value the column value it stands for, so a chosen option can be stored in that column."""
+        mapping, _field_types, _pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
+        columns: Dict[str, Dict[Any, Tuple[str, Any]]] = {}
+        for field_id, val in mapping.items():
+            for pdf_value, column, column_value in _choice_writes(val) if isinstance(val, str) else ():
+                columns.setdefault(field_id, {}).setdefault(pdf_value, (column, column_value))
+        return columns
+
+    async def resolve_field_values(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], bytes]:
+        filled_values, _answered, pdf_bytes = await self.resolve_field_state(form_type, user)
+        return filled_values, pdf_bytes
+
+    async def resolve_field_state(self, form_type: str, user: Users) -> Tuple[Dict[str, Any], set[str], bytes]:
+        """
+        Resolves every PDF field of a form from a merged JEXL context built from the
+        user profile and the user's most recently updated `user_applications` row for
+        the given `form_type`. The application contributes two namespaces:
 
         * `form_data` (JSONB) — form-specific data collected via the LLM
         * `documents` — a map of `document_type` to the most recently verified
@@ -448,7 +611,15 @@ class FormService:
 
         On top-level key collision, `Users` columns take precedence over
         `form_data`. The `documents` namespace is isolated from `Users` columns
-        to avoid name collisions.
+        to avoid name collisions. A field the mapping leaves empty takes the answer
+        the chat saved for it in `form_data["pdf_fields"][form_type]`.
+
+        Checkboxes resolve to a bool, every other field to a string. Also returns the fields the
+        profile has answered: those whose mapping reads only values that are set, so an unticked box
+        whose column says "no" counts as answered while one whose column is empty does not; those with
+        a value from at least one set value, e.g. a fallback chain; fixed values; and every field the
+        chat stored an answer for, even an empty one. A default the mapping fills in while its data is
+        empty, such as Familienstand `'0'`, does not count.
         """
         mapping, field_types, pdf_bytes = await _get_form_assets(form_type, self.mapping_path, self.pdfs_path)
         needed_refs = _extract_document_refs(mapping)
@@ -497,12 +668,17 @@ class FormService:
                 logger.warning("Database is currently not reachable")
 
         context["documents"] = documents_ctx
+        form_data = (application.form_data if application else None) or {}
+        chat_answers = (form_data.get("pdf_fields") or {}).get(form_type) or {}
 
         filled_values = {}
+        answered: set[str] = set()
         for field_id, default_value in mapping.items():
             # Check if the field is a checkbox by checking parsed field types
             is_checkbox = field_types.get(field_id) == "checkbox"
 
+            # a template of several {{ }} needs every one of them answered, e.g. a landlord's name and address
+            segments_answered: list[bool] = []
             if isinstance(default_value, str):
                 stripped_val = default_value.strip()
                 # If the string is a pure JEXL expression, evaluate it first
@@ -513,24 +689,35 @@ class FormService:
                         and stripped_val.count("{{") == 1
                         and stripped_val.count("}}") == 1
                     ):
-                        res = self.jexl.evaluate(stripped_val[2:-2].strip(), context)
+                        res = _evaluate(stripped_val[2:-2].strip(), context)
                     else:
 
                         def _eval(m):
-                            val_res = self.jexl.evaluate(m.group(1), context)
+                            val_res = _evaluate(m.group(1), context)
+                            segments_answered.append(_answered_by(context, m.group(0), val_res))
                             if isinstance(val_res, bool):
                                 return "Ja" if val_res else ""
                             if isinstance(val_res, (datetime.date, datetime.datetime)):
                                 return val_res.strftime("%d.%m.%Y")
                             return str(val_res) if val_res is not None else ""
 
-                        res = re.sub(r"\{\{\s*(.*?)\s*\}\}", _eval, stripped_val, flags=re.DOTALL)
+                        res = _TEMPLATE_RE.sub(_eval, stripped_val)
                 except Exception as e:
                     # One unevaluable mapping entry must not fail the whole export.
                     logger.warning(f"Mapping field {field_id!r} could not be evaluated: {e}")
                     res = None
             else:
                 res = default_value
+
+            if segments_answered:
+                is_answered = all(segments_answered)
+            else:
+                is_answered = _answered_by(context, default_value if isinstance(default_value, str) else "", res)
+            if is_answered:
+                answered.add(field_id)
+
+            if field_id in chat_answers and field_id not in answered:
+                res = chat_answers[field_id]
 
             # Coerce values depending on whether the field is a checkbox
             if is_checkbox:
@@ -549,35 +736,7 @@ class FormService:
 
             filled_values[field_id] = res
 
-        payload = {
-            "pdf_base64": base64.b64encode(pdf_bytes).decode("utf-8"),
-            "field_values": filled_values,
-            "ignore_read_only": True,
-        }
-
-        headers = {}
-        token = get_google_id_token(self.filler_url)
-        if token:
-            headers["Authorization"] = f"Bearer {token}"
-
-        url = f"{self.filler_url}/api/fill"
-        logger.info(f"Calling forms-filling-service at {url}")
-
-        if self.http_client:
-            response = await self.http_client.post(url, json=payload, timeout=60.0, headers=headers)
-        else:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(url, json=payload, timeout=60.0)
-
-        if response.status_code != 200:
-            try:
-                error_data = response.json()
-                detail = error_data.get("detail", str(error_data))
-            except Exception:
-                detail = response.text
-            logger.error(f"Forms filler error: {detail}")
-            raise Exception(f"Forms filler error: {detail}")
-        return response.content
+        return filled_values, answered | set(chat_answers), pdf_bytes
 
 
 def get_form_service(request: Request, db: Session = Depends(get_db)) -> FormService:

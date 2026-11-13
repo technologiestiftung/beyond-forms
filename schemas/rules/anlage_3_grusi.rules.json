@@ -1,0 +1,924 @@
+{
+  "form_id": "anlage_3_grusi",
+  "source": {
+    "pdf": "forms/pdfs/anlage_3_grusi.pdf",
+    "sha256": "cd83594664c23b2383d6f9d9e40c43db746fa59fd19c4a3a9db286515a914493",
+    "model": "vertex_ai/gemini-3.8-flash",
+    "generated_at": "2026-11-11T13:36:23+00:00"
+  },
+  "groups": [
+    {
+      "id": "p1_antragsteller_basisdaten",
+      "page": 1,
+      "section": "Anlage 3 - Grundvermögen",
+      "person": null,
+      "topic": "Angaben zum Antragsteller und Antrag",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_name_und_vorname",
+          "var": "p1_name_und_vorname",
+          "type": "string",
+          "meaning": "Name, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_geschäftszeichen",
+          "var": "p1_geschaeftszeichen",
+          "type": "string",
+          "meaning": "Geschäftszeichen",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_zum_antrag_vom",
+          "var": "p1_zum_antrag_vom",
+          "type": "string",
+          "meaning": "Zum Antrag vom",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_grundvermoegen_allgemein",
+      "page": 1,
+      "section": "Anlage 3 - Grundvermögen",
+      "person": null,
+      "topic": "Angaben zum Grundstück bzw. zur Wohnung",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_anschrift_des_grundvermögens",
+          "var": "p1_anschrift_des_grundvermoegens",
+          "type": "string",
+          "meaning": "Anschrift/Lage des Grundstücks bzw. der Wohnung",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_name_und_anschrift_des_miteigentümers",
+          "var": "p1_name_und_anschrift_des_miteigentuemers",
+          "type": "string",
+          "meaning": "Miteigentümer (Name und Anschrift)",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_grundvermoegen_merkmale",
+      "page": 1,
+      "section": "Anlage 3 - Grundvermögen",
+      "person": null,
+      "topic": "Größe und Wert des Grundvermögens",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_grundstücksgröße_in_quadratmetern",
+          "var": "p1_grundstuecksgroesse_in_quadratmetern",
+          "type": "string",
+          "meaning": "Grundstücksgröße (m²)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_wohnungsgröße_in_quadratmetern",
+          "var": "p1_wohnungsgroesse_in_quadratmetern",
+          "type": "string",
+          "meaning": "Größe der Wohnfläche (m²)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_zahl_der_zimmer",
+          "var": "p1_zahl_der_zimmer",
+          "type": "string",
+          "meaning": "Zahl der Zimmer",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_einheitswert",
+          "var": "p1_einheitswert",
+          "type": "string",
+          "meaning": "Einheitswert",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_verkehrswert",
+          "var": "p1_verkehrswert",
+          "type": "string",
+          "meaning": "Verkehrswert",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_schuldzinsen_hypotheken_1",
+      "page": 1,
+      "section": "A Schuldzinsen/Hypothekenbelastung",
+      "person": null,
+      "topic": "Schuldzinsen und Hypothekenbelastung (1. Gläubiger)",
+      "hint": "Bitte Nachweise beifügen",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_gläubiger",
+          "var": "p1_glaeubiger",
+          "type": "string",
+          "meaning": "Gläubiger",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_hypothek",
+          "var": "p1_hypothek",
+          "type": "string",
+          "meaning": "Hypothek (EUR)",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_zinssatz",
+          "var": "p1_zinssatz",
+          "type": "string",
+          "meaning": "Zinssatz",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_euro_vierteljährlich",
+          "var": "p1_euro_vierteljaehrlich",
+          "type": "string",
+          "meaning": "EUR vierteljährl.",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_euro_monatlich",
+          "var": "p1_euro_monatlich",
+          "type": "string",
+          "meaning": "EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": [
+        {
+          "name": "Nachweise zur Hypothekenbelastung/Schuldzinsen",
+          "condition": "p1_glaeubiger != ''",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p1_schuldzinsen_hypotheken_2",
+      "page": 1,
+      "section": "A Schuldzinsen/Hypothekenbelastung",
+      "person": null,
+      "topic": "Schuldzinsen und Hypothekenbelastung (2. Gläubiger)",
+      "hint": "Bitte Nachweise beifügen",
+      "answer_type": "text",
+      "ask_if": "p1_glaeubiger != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_zweiter_gläubiger",
+          "var": "p1_zweiter_glaeubiger",
+          "type": "string",
+          "meaning": "Gläubiger (2)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_zweite_hypothek",
+          "var": "p1_zweite_hypothek",
+          "type": "string",
+          "meaning": "Hypothek (EUR) (2)",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_zinssatz_zwei",
+          "var": "p1_zinssatz_zwei",
+          "type": "string",
+          "meaning": "Zinssatz (2)",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_zweiter_eurobetrag_vierteljährlich",
+          "var": "p1_zweiter_eurobetrag_vierteljaehrlich",
+          "type": "string",
+          "meaning": "EUR vierteljährl. (2)",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_zweiter_eurobetrag_monatlich",
+          "var": "p1_zweiter_eurobetrag_monatlich",
+          "type": "string",
+          "meaning": "EUR mtl. (2)",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": [
+        {
+          "name": "Nachweise zur Hypothekenbelastung/Schuldzinsen",
+          "condition": "p1_zweiter_glaeubiger != ''",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p1_schuldzinsen_hypotheken_3",
+      "page": 1,
+      "section": "A Schuldzinsen/Hypothekenbelastung",
+      "person": null,
+      "topic": "Schuldzinsen und Hypothekenbelastung (3. Gläubiger)",
+      "hint": "Bitte Nachweise beifügen",
+      "answer_type": "text",
+      "ask_if": "p1_zweiter_glaeubiger != ''",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_dritter_gläubiger",
+          "var": "p1_dritter_glaeubiger",
+          "type": "string",
+          "meaning": "Gläubiger (3)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_dritte_hypothek",
+          "var": "p1_dritte_hypothek",
+          "type": "string",
+          "meaning": "Hypothek (EUR) (3)",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_zinssatz_drei",
+          "var": "p1_zinssatz_drei",
+          "type": "string",
+          "meaning": "Zinssatz (3)",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_dritter_eurobetrag_vierteljährlich",
+          "var": "p1_dritter_eurobetrag_vierteljaehrlich",
+          "type": "string",
+          "meaning": "EUR vierteljährl. (3)",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_dritter_eurobetrag_monatlich",
+          "var": "p1_dritter_eurobetrag_monatlich",
+          "type": "string",
+          "meaning": "EUR mtl. (3)",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": [
+        {
+          "name": "Nachweise zur Hypothekenbelastung/Schuldzinsen",
+          "condition": "p1_dritter_glaeubiger != ''",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p1_verwaltungskostenzuschlaege",
+      "page": 1,
+      "section": "A Schuldzinsen/Hypothekenbelastung",
+      "person": null,
+      "topic": "Verwaltungskostenzuschläge",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_verwaltungskostenzuschläge",
+          "var": "p1_verwaltungskostenzuschlaege",
+          "type": "string",
+          "meaning": "Verwaltungskostenzuschläge Bezeichnung",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_verwaltungskostenzuschläge_jährlich",
+          "var": "p1_verwaltungskostenzuschlaege_jaehrlich",
+          "type": "string",
+          "meaning": "Verwaltungskostenzuschläge EUR jährlich",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_verwaltungskostenzuschläge_monatlich",
+          "var": "p1_verwaltungskostenzuschlaege_monatlich",
+          "type": "string",
+          "meaning": "Verwaltungskostenzuschläge EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_tilgungsbetraege",
+      "page": 1,
+      "section": "B Tilgungsbeträge (Amortisationsraten)",
+      "person": null,
+      "topic": "Tilgungsbeträge (Amortisationsraten)",
+      "hint": "Bitte Nachweise beifügen",
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_tilgungsbetrag_eins",
+          "var": "p1_tilgungsbetrag_eins",
+          "type": "string",
+          "meaning": "Tilgungsbetrag (1) Bezeichnung",
+          "options": {},
+          "optional": true,
+          "input": "text"
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_tilgungsbetrag_eins",
+          "var": "p1_euro_monatlich_fuer_tilgungsbetrag_eins",
+          "type": "string",
+          "meaning": "Tilgungsbetrag (1) EUR mtl.",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_tilgungsbetrag_zwei",
+          "var": "p1_tilgungsbetrag_zwei",
+          "type": "string",
+          "meaning": "Tilgungsbetrag (2) Bezeichnung",
+          "options": {},
+          "optional": true,
+          "input": "text"
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_tilgungsbetrag_zwei",
+          "var": "p1_euro_monatlich_fuer_tilgungsbetrag_zwei",
+          "type": "string",
+          "meaning": "Tilgungsbetrag (2) EUR mtl.",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_tilgungsbetrag_drei",
+          "var": "p1_tilgungsbetrag_drei",
+          "type": "string",
+          "meaning": "Tilgungsbetrag (3) Bezeichnung",
+          "options": {},
+          "optional": true,
+          "input": "text"
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_tilgungsbetrag_drei",
+          "var": "p1_euro_monatlich_fuer_tilgungsbetrag_drei",
+          "type": "string",
+          "meaning": "Tilgungsbetrag (3) EUR mtl.",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_tilgungsbetrag_vier",
+          "var": "p1_tilgungsbetrag_vier",
+          "type": "string",
+          "meaning": "Tilgungsbetrag (4) Bezeichnung",
+          "options": {},
+          "optional": true,
+          "input": "text"
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_tilgungsbetrag_vier",
+          "var": "p1_euro_monatlich_fuer_tilgungsbetrag_vier",
+          "type": "string",
+          "meaning": "Tilgungsbetrag (4) EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": [
+        {
+          "name": "Nachweise zu Tilgungsbeträgen (Amortisationsraten)",
+          "condition": "p1_euro_monatlich_fuer_tilgungsbetrag_eins != '' || p1_tilgungsbetrag_eins != ''",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p1_belastungen_schornsteinfeger",
+      "page": 1,
+      "section": "C Belastungen",
+      "person": null,
+      "topic": "Schornsteinfeger",
+      "hint": "Bitte Nachweise beifügen",
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_euro_jährlich_für_schornsteinfeger",
+          "var": "p1_euro_jaehrlich_fuer_schornsteinfeger",
+          "type": "string",
+          "meaning": "Schornsteinfeger EUR jährlich",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_schornsteinfeger",
+          "var": "p1_euro_monatlich_fuer_schornsteinfeger",
+          "type": "string",
+          "meaning": "Schornsteinfeger EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": [
+        {
+          "name": "Nachweise zu Belastungen (Schornsteinfeger)",
+          "condition": "p1_euro_jaehrlich_fuer_schornsteinfeger != '' || p1_euro_monatlich_fuer_schornsteinfeger != ''",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p1_belastungen_bewaesserung",
+      "page": 1,
+      "section": "C Belastungen",
+      "person": null,
+      "topic": "Bewässerung",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_euro_jährlich_für_bewässerung",
+          "var": "p1_euro_jaehrlich_fuer_bewaesserung",
+          "type": "string",
+          "meaning": "Bewässerung EUR jährlich",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_bewässerung",
+          "var": "p1_euro_monatlich_fuer_bewaesserung",
+          "type": "string",
+          "meaning": "Bewässerung EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_belastungen_entwaesserung",
+      "page": 1,
+      "section": "C Belastungen",
+      "person": null,
+      "topic": "Entwässerung",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_euro_jährlich_für_entwässerung",
+          "var": "p1_euro_jaehrlich_fuer_entwaesserung",
+          "type": "string",
+          "meaning": "Entwässerung EUR jährlich",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_entwässerung",
+          "var": "p1_euro_monatlich_fuer_entwaesserung",
+          "type": "string",
+          "meaning": "Entwässerung EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_belastungen_muellabfuhr",
+      "page": 1,
+      "section": "C Belastungen",
+      "person": null,
+      "topic": "Müllabfuhr",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_euro_jährlich_für_müllabfuhr",
+          "var": "p1_euro_jaehrlich_fuer_muellabfuhr",
+          "type": "string",
+          "meaning": "Müllabfuhr EUR jährlich",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_müllabfuhr",
+          "var": "p1_euro_monatlich_fuer_muellabfuhr",
+          "type": "string",
+          "meaning": "Müllabfuhr EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_belastungen_strassenreinigung",
+      "page": 1,
+      "section": "C Belastungen",
+      "person": null,
+      "topic": "Straßenreinigung",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_euro_jährlich_für_straßenreinigung",
+          "var": "p1_euro_jaehrlich_fuer_strassenreinigung",
+          "type": "string",
+          "meaning": "Straßenreinigung EUR jährlich",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_straßenreinigung",
+          "var": "p1_euro_monatlich_fuer_strassenreinigung",
+          "type": "string",
+          "meaning": "Straßenreinigung EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_belastungen_grundsteuer",
+      "page": 1,
+      "section": "C Belastungen",
+      "person": null,
+      "topic": "Grundsteuer",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_euro_jährlich_für_grundsteuer",
+          "var": "p1_euro_jaehrlich_fuer_grundsteuer",
+          "type": "string",
+          "meaning": "Grundsteuer EUR jährlich",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_grundsteuer",
+          "var": "p1_euro_monatlich_fuer_grundsteuer",
+          "type": "string",
+          "meaning": "Grundsteuer EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_belastungen_feuerversicherung",
+      "page": 1,
+      "section": "C Belastungen",
+      "person": null,
+      "topic": "Feuerversicherung",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_euro_jährlich_für_feuerversicherung",
+          "var": "p1_euro_jaehrlich_fuer_feuerversicherung",
+          "type": "string",
+          "meaning": "Feuerversicherung EUR jährlich",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_feuerversicherung",
+          "var": "p1_euro_monatlich_fuer_feuerversicherung",
+          "type": "string",
+          "meaning": "Feuerversicherung EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_belastungen_haftpflichtversicherung",
+      "page": 1,
+      "section": "C Belastungen",
+      "person": null,
+      "topic": "Haftpflichtversicherung",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_euro_jährlich_für_haftpflichtversicherung",
+          "var": "p1_euro_jaehrlich_fuer_haftpflichtversicherung",
+          "type": "string",
+          "meaning": "Haftpflichtversicherung EUR jährlich",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_haftpflichtversicherung",
+          "var": "p1_euro_monatlich_fuer_haftpflichtversicherung",
+          "type": "string",
+          "meaning": "Haftpflichtversicherung EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_belastungen_hypothekengewinnabgabe",
+      "page": 1,
+      "section": "C Belastungen",
+      "person": null,
+      "topic": "Hypothekengewinnabgabe",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_euro_jährlich_für_hypothekengewinnabgabe",
+          "var": "p1_euro_jaehrlich_fuer_hypothekengewinnabgabe",
+          "type": "string",
+          "meaning": "Hypothekengewinnabgabe EUR jährlich",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_hypothekengewinnabgabe",
+          "var": "p1_euro_monatlich_fuer_hypothekengewinnabgabe",
+          "type": "string",
+          "meaning": "Hypothekengewinnabgabe EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_belastungen_vermoegensabgabe",
+      "page": 1,
+      "section": "C Belastungen",
+      "person": null,
+      "topic": "Vermögensabgabe",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_euro_jährlich_für_vermögensabgabe",
+          "var": "p1_euro_jaehrlich_fuer_vermoegensabgabe",
+          "type": "string",
+          "meaning": "Vermögensabgabe EUR jährlich",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_euro_monatlich_für_vermögensabgabe",
+          "var": "p1_euro_monatlich_fuer_vermoegensabgabe",
+          "type": "string",
+          "meaning": "Vermögensabgabe EUR mtl.",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_belastungen_kapitalisierte_grundrente",
+      "page": 1,
+      "section": "C Belastungen",
+      "person": null,
+      "topic": "Kapitalisierte Grundrente nach dem Bundesversorgungsgesetz (BVG)",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_euro_monatlich_für_kapitalisierte_grundrente",
+          "var": "p1_euro_monatlich_fuer_kapitalisierte_grundrente",
+          "type": "string",
+          "meaning": "EUR mtl.",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_zehn_prozent_der_monatlichen_summe_für_kapitalisierte_grundrente",
+          "var": "p1_zehn_prozent_der_monatlichen_summe_fuer_kapitalisierte_grundrente",
+          "type": "string",
+          "meaning": "davon 10 %",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_belastungen_summe",
+      "page": 1,
+      "section": "C Belastungen",
+      "person": null,
+      "topic": "Summe",
+      "hint": null,
+      "answer_type": "money",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_summe",
+          "var": "p1_summe",
+          "type": "string",
+          "meaning": "Summe monatliche Belastungen",
+          "options": {},
+          "optional": true
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_foerderung_wohnung_haus",
+      "page": 2,
+      "section": "D",
+      "person": null,
+      "topic": "Ist die Wohnung/das Haus gefördert?",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_förderung_für_wohnung_bzw._haus",
+          "var": "p2_foerderung_fuer_wohnung_bzw_haus",
+          "type": "string",
+          "meaning": "Förderung für Wohnung bzw. Haus",
+          "options": {
+            "0": "Nein",
+            "1": "Ja"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": [
+        {
+          "name": "Bescheid",
+          "condition": "p2_foerderung_fuer_wohnung_bzw_haus == '1'",
+          "form_id": null
+        }
+      ]
+    },
+    {
+      "id": "p2_vermietung_verpachtung",
+      "page": 2,
+      "section": "E",
+      "person": null,
+      "topic": "Vermietung/Verpachtung",
+      "hint": "Bitte Nachweise beifügen",
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_erster_mieter_bzw._pächter",
+          "var": "p2_erster_mieter_bzw_paechter",
+          "type": "string",
+          "meaning": "Erster Mieter bzw. Pächter",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_einnahmen_von_erstem_mieter_bzw._pächter",
+          "var": "p2_einnahmen_von_erstem_mieter_bzw_paechter",
+          "type": "string",
+          "meaning": "Einnahmen von erstem Mieter bzw. Pächter (EUR mtl.)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_zweiter_mieter_bzw._pächter",
+          "var": "p2_zweiter_mieter_bzw_paechter",
+          "type": "string",
+          "meaning": "Zweiter Mieter bzw. Pächter",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p2_einnahmen_von_zweitem_mieter_bzw._pächter",
+          "var": "p2_einnahmen_von_zweitem_mieter_bzw_paechter",
+          "type": "string",
+          "meaning": "Einnahmen von zweitem Mieter bzw. Pächter (EUR mtl.)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§§ 90/91 und DVO § 90 SGB XII",
+      "documents": [
+        {
+          "name": "Nachweise",
+          "condition": "p2_erster_mieter_bzw_paechter != '' || p2_einnahmen_von_erstem_mieter_bzw_paechter != '' || p2_zweiter_mieter_bzw_paechter != '' || p2_einnahmen_von_zweitem_mieter_bzw_paechter != ''",
+          "form_id": null
+        }
+      ]
+    }
+  ],
+  "out_of_scope": [
+    {
+      "field_id": "px_förderung_für_wohnung_bzw",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_erster_mieter_bzw",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_einnahmen_von_erstem_mieter_bzw",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_zweiter_mieter_bzw",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_einnahmen_von_zweitem_mieter_bzw",
+      "reason": "no_widget"
+    }
+  ]
+}

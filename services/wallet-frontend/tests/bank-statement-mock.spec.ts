@@ -188,7 +188,7 @@ test.describe("Bank Statement Mock Auto-Verification", () => {
 		await expect(
 			page.getByRole("heading", { name: /Beziehst Du eine Rente/i }),
 		).toBeVisible();
-		await expect(page.locator("#pension-amount")).toHaveCount(0); // not visible because no pension selected
+		await expect(page.locator('[id^="pension-amount-"]')).toHaveCount(0); // not visible because no pension selected
 
 		// Go to Documents page via Dashboard
 		await page.goto("/profile/documents");
@@ -251,7 +251,7 @@ test.describe("Bank Statement Mock Auto-Verification", () => {
 		).toBeVisible();
 
 		// Assert pension amount is pre-filled with 650
-		await expect(page.locator("#pension-amount")).toHaveValue("650");
+		await expect(page.locator("#pension-amount-retirement")).toHaveValue("650");
 
 		// Go directly to Step 7 (Bank details) by navigating
 		await page.getByRole("button", { name: "Weiter", exact: true }).click(); // Page 3 -> Page 4

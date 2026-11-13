@@ -1,0 +1,1231 @@
+{
+  "form_id": "anlage_2_grusi",
+  "source": {
+    "pdf": "forms/pdfs/anlage_2_grusi.pdf",
+    "sha256": "165b0f365f82c0c8ca99e91d7c0049c190d2a1135aa3b97059b0aa30deead185",
+    "model": "vertex_ai/gemini-3.8-flash",
+    "generated_at": "2026-11-11T13:36:21+00:00"
+  },
+  "groups": [
+    {
+      "id": "p1_kopfdaten",
+      "page": 1,
+      "section": "Anlage 2 - Ausländer -",
+      "person": null,
+      "topic": "Angaben zum Antragsteller",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_name_und_vorname",
+          "var": "p1_name_und_vorname",
+          "type": "string",
+          "meaning": "Name, Vorname",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_geschäftszeichen",
+          "var": "p1_geschaeftszeichen",
+          "type": "string",
+          "meaning": "Geschäftszeichen",
+          "options": {},
+          "optional": true
+        },
+        {
+          "field_id": "p1_zum_antrag_vom",
+          "var": "p1_zum_antrag_vom",
+          "type": "string",
+          "meaning": "Zum Antrag vom",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_pass",
+      "page": 1,
+      "section": "Anlage 2 - Ausländer -",
+      "person": null,
+      "topic": "Pass",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_pass",
+          "var": "p1_pass",
+          "type": "bool",
+          "meaning": "Pass vorhanden",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_pass_details",
+      "page": 1,
+      "section": "Anlage 2 - Ausländer -",
+      "person": null,
+      "topic": "Angaben zum Pass",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_pass",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_pass-nummer",
+          "var": "p1_pass_nummer",
+          "type": "string",
+          "meaning": "Pass-Nr.",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_ausgestellt_am",
+          "var": "p1_ausgestellt_am",
+          "type": "string",
+          "meaning": "ausgestellt am",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_gültig_bis",
+          "var": "p1_gueltig_bis",
+          "type": "string",
+          "meaning": "gültig bis",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_pass_von_dienststelle",
+          "var": "p1_pass_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_passeinzugsbescheinigung",
+      "page": 1,
+      "section": "Anlage 2 - Ausländer -",
+      "person": null,
+      "topic": "Passeinzugsbescheinigung",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_passeinzugsbescheinigung",
+          "var": "p1_passeinzugsbescheinigung",
+          "type": "bool",
+          "meaning": "Passeinzugsbescheinigung vorhanden",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_passeinzugsbescheinigung_details",
+      "page": 1,
+      "section": "Anlage 2 - Ausländer -",
+      "person": null,
+      "topic": "Angaben zur Passeinzugsbescheinigung",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_passeinzugsbescheinigung",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_passeinzugsbescheinigung_ausgestellt_am",
+          "var": "p1_passeinzugsbescheinigung_ausgestellt_am",
+          "type": "string",
+          "meaning": "ausgestellt am",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_passeinzugsbescheinigung_gültig_bis",
+          "var": "p1_passeinzugsbescheinigung_gueltig_bis",
+          "type": "string",
+          "meaning": "gültig bis",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_passeinzugsbescheinigung_von_dienststelle",
+          "var": "p1_passeinzugsbescheinigung_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_grenzuebertrittsbescheinigung",
+      "page": 1,
+      "section": "Anlage 2 - Ausländer -",
+      "person": null,
+      "topic": "Grenzübertrittsbescheinigung",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_grenzübertrittsbescheinigung",
+          "var": "p1_grenzuebertrittsbescheinigung",
+          "type": "bool",
+          "meaning": "Grenzübertrittsbescheinigung vorhanden",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_grenzuebertrittsbescheinigung_details",
+      "page": 1,
+      "section": "Anlage 2 - Ausländer -",
+      "person": null,
+      "topic": "Angaben zur Grenzübertrittsbescheinigung",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_grenzuebertrittsbescheinigung",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_ausreisefrist_bis_zum",
+          "var": "p1_ausreisefrist_bis_zum",
+          "type": "string",
+          "meaning": "mit Ausreisefrist bis zum",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_grenzübertrittsbescheinigung_von_dienststelle",
+          "var": "p1_grenzuebertrittsbescheinigung_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_aufenthaltsdokumente",
+      "page": 1,
+      "section": "A Aufenthaltsdokumente",
+      "person": null,
+      "topic": "Art des Aufenthaltsdokuments",
+      "hint": "Zutreffendes bitte ankreuzen",
+      "answer_type": "multiple_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_niederlassungserlaubnis",
+          "var": "p1_niederlassungserlaubnis",
+          "type": "bool",
+          "meaning": "Niederlassungserlaubnis - unbefristet -",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_visum",
+          "var": "p1_visum",
+          "type": "bool",
+          "meaning": "Visum",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_aufenthaltserlaubnis",
+          "var": "p1_aufenthaltserlaubnis",
+          "type": "bool",
+          "meaning": "Aufenthaltserlaubnis wg. des Krieges im Heimatland nach § 23 Abs. 1 oder § 24 oder nach § 25 Abs. 4 Satz 1, Abs. 4 a, 4 b oder Abs. 5 AufenthG",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_andere_aufenthaltserlaubnis",
+          "var": "p1_andere_aufenthaltserlaubnis",
+          "type": "bool",
+          "meaning": "Andere Aufenthaltserlaubnis i.S. des AufenthG",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_aufenthaltsgestattung",
+          "var": "p1_aufenthaltsgestattung",
+          "type": "bool",
+          "meaning": "Aufenthaltsgestattung zur Durchführung eines Asylverfahrens",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_duldung",
+          "var": "p1_duldung",
+          "type": "bool",
+          "meaning": "Aussetzung der Abschiebung (Duldung)",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_fiktionsbescheinigung/ausgesetzt",
+          "var": "p1_fiktionsbescheinigung_ausgesetzt",
+          "type": "bool",
+          "meaning": "Fiktionsbescheinigung „gilt Abschiebung als ausgesetzt“",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_fiktionsbescheinigung/fortbestehend",
+          "var": "p1_fiktionsbescheinigung_fortbestehend",
+          "type": "bool",
+          "meaning": "Fiktionsbescheinigung „gilt Aufenthalt als erlaubt“ oder „gilt Aufenthaltstitel als fortbestehend“",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_nicht_erhalten",
+          "var": "p1_nicht_erhalten",
+          "type": "bool",
+          "meaning": "nicht erhalten",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_niederlassungserlaubnis_details",
+      "page": 1,
+      "section": "A Aufenthaltsdokumente",
+      "person": null,
+      "topic": "Angaben zur Niederlassungserlaubnis",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_niederlassungserlaubnis",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_niederlassungserlaubnis_von_dienststelle",
+          "var": "p1_niederlassungserlaubnis_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_visum_details",
+      "page": 1,
+      "section": "A Aufenthaltsdokumente",
+      "person": null,
+      "topic": "Angaben zum Visum",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_visum",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_visum_auf_einladung_von",
+          "var": "p1_visum_auf_einladung_von",
+          "type": "string",
+          "meaning": "Visum auf Einladung von",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_visum_befristet_bis",
+          "var": "p1_visum_befristet_bis",
+          "type": "string",
+          "meaning": "befristet bis",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_visum_von_dienststelle",
+          "var": "p1_visum_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_aufenthaltserlaubnis_details",
+      "page": 1,
+      "section": "A Aufenthaltsdokumente",
+      "person": null,
+      "topic": "Angaben zur Aufenthaltserlaubnis wg. des Krieges im Heimatland",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_aufenthaltserlaubnis",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_aufenthaltserlaubnis_befristet_bis",
+          "var": "p1_aufenthaltserlaubnis_befristet_bis",
+          "type": "string",
+          "meaning": "befristet bis",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_aufenthaltserlaubnis_von_dienststelle",
+          "var": "p1_aufenthaltserlaubnis_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_andere_aufenthaltserlaubnis_details",
+      "page": 1,
+      "section": "A Aufenthaltsdokumente",
+      "person": null,
+      "topic": "Angaben zur anderen Aufenthaltserlaubnis",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_andere_aufenthaltserlaubnis",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_andere_aufenthaltserlaubnis_befristet_bis",
+          "var": "p1_andere_aufenthaltserlaubnis_befristet_bis",
+          "type": "string",
+          "meaning": "befristet bis",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_andere_aufenthaltserlaubnis_von_dienststelle",
+          "var": "p1_andere_aufenthaltserlaubnis_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_aufenthaltsgestattung_details",
+      "page": 1,
+      "section": "A Aufenthaltsdokumente",
+      "person": null,
+      "topic": "Angaben zur Aufenthaltsgestattung",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_aufenthaltsgestattung",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_aufenthaltsgestattung_befristet_bis",
+          "var": "p1_aufenthaltsgestattung_befristet_bis",
+          "type": "string",
+          "meaning": "befristet bis",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_aufenthaltsgestattung_von_dienststelle",
+          "var": "p1_aufenthaltsgestattung_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_duldung_details",
+      "page": 1,
+      "section": "A Aufenthaltsdokumente",
+      "person": null,
+      "topic": "Angaben zur Duldung",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_duldung",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_duldung_befristet_bis",
+          "var": "p1_duldung_befristet_bis",
+          "type": "string",
+          "meaning": "befristet bis",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_duldung_von_dienststelle",
+          "var": "p1_duldung_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_fiktionsbescheinigung_ausgesetzt_details",
+      "page": 1,
+      "section": "A Aufenthaltsdokumente",
+      "person": null,
+      "topic": "Angaben zur Fiktionsbescheinigung „gilt Abschiebung als ausgesetzt“",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_fiktionsbescheinigung_ausgesetzt",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_fiktionsbescheinigung/ausgesetzt_befristet_bis",
+          "var": "p1_fiktionsbescheinigung_ausgesetzt_befristet_bis",
+          "type": "string",
+          "meaning": "befristet bis",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_fiktionsbescheinigung/ausgesetzt_von_dienststelle",
+          "var": "p1_fiktionsbescheinigung_ausgesetzt_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_fiktionsbescheinigung_fortbestehend_details",
+      "page": 1,
+      "section": "A Aufenthaltsdokumente",
+      "person": null,
+      "topic": "Angaben zur Fiktionsbescheinigung „gilt Aufenthalt als erlaubt / fortbestehend“",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_fiktionsbescheinigung_fortbestehend",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_fiktionsbescheinigung/fortbestehend_befristet_bis",
+          "var": "p1_fiktionsbescheinigung_fortbestehend_befristet_bis",
+          "type": "string",
+          "meaning": "befristet bis",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_fiktionsbescheinigung/fortbestehend_von_dienststelle",
+          "var": "p1_fiktionsbescheinigung_fortbestehend_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_nicht_erhalten_details",
+      "page": 1,
+      "section": "A Aufenthaltsdokumente",
+      "person": null,
+      "topic": "Angaben zur Klageerhebung",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_nicht_erhalten",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_aufenthalts-klage_eingereicht_am",
+          "var": "p1_aufenthalts_klage_eingereicht_am",
+          "type": "string",
+          "meaning": "Klage eingereicht am",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_name_und_anschrift_des_rechtsanwaltes",
+          "var": "p1_name_und_anschrift_des_rechtsanwaltes",
+          "type": "string",
+          "meaning": "bevollmächtigter Rechtsanwalt (Name und Anschrift)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_vorlage_einer_verpflichtungserklaerung",
+      "page": 1,
+      "section": "A Aufenthaltsdokumente",
+      "person": null,
+      "topic": "Vorlage einer Verpflichtungserklärung",
+      "hint": null,
+      "answer_type": "yes_no",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_vorlage_einer_verpflichtungserklärung",
+          "var": "p1_vorlage_einer_verpflichtungserklaerung",
+          "type": "string",
+          "meaning": "Vorlage einer Verpflichtungserklärung",
+          "options": {
+            "0": "Nein",
+            "1": "Ja"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_verpflichtungserklaerung_details",
+      "page": 1,
+      "section": "A Aufenthaltsdokumente",
+      "person": null,
+      "topic": "Angaben zur Verpflichtungserklärung",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_vorlage_einer_verpflichtungserklaerung == '1'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_name_und_anschrift_der_person,_die_sich_zur_gewährung_des_lebensunterhalts_verpflichtet_hat",
+          "var": "p1_name_und_anschrift_der_person_die_sich_zur_gewaehrung_des_lebensunterhalts_verpflichtet_hat",
+          "type": "string",
+          "meaning": "Name, Anschrift",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_zeitraum,_für_den_sich_die_person_zur_gewährung_des_lebensunterhalts_verpflichtet_hat",
+          "var": "p1_zeitraum_fuer_den_sich_die_person_zur_gewaehrung_des_lebensunterhalts_verpflichtet_hat",
+          "type": "string",
+          "meaning": "Zeitraum",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_ausuebung_einer_erwerbstaetigkeit",
+      "page": 1,
+      "section": "B Ausübung einer Erwerbstätigkeit",
+      "person": null,
+      "topic": "Ausübung einer Erwerbstätigkeit",
+      "hint": null,
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_erwerbstätigkeit",
+          "var": "p1_erwerbstaetigkeit",
+          "type": "string",
+          "meaning": "Erwerbstätigkeit",
+          "options": {
+            "0": "nicht erlaubt",
+            "1": "erlaubt"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 2 in Verbindung mit § 21 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_erwerbstaetigkeit_befristung",
+      "page": 1,
+      "section": "B Ausübung einer Erwerbstätigkeit",
+      "person": null,
+      "topic": "Befristung der Erlaubnis zur Erwerbstätigkeit",
+      "hint": null,
+      "answer_type": "single_choice",
+      "ask_if": "p1_erwerbstaetigkeit == '1'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_frist_der_erwerbstätigkeit",
+          "var": "p1_frist_der_erwerbstaetigkeit",
+          "type": "string",
+          "meaning": "Frist der Erwerbstätigkeit",
+          "options": {
+            "0": "unbefristet",
+            "1": "befristet bis"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 2 in Verbindung mit § 21 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_erwerbstaetigkeit_frist_datum",
+      "page": 1,
+      "section": "B Ausübung einer Erwerbstätigkeit",
+      "person": null,
+      "topic": "Datum der Befristung der Erwerbstätigkeit",
+      "hint": null,
+      "answer_type": "date",
+      "ask_if": "p1_erwerbstaetigkeit == '1' && p1_frist_der_erwerbstaetigkeit == '1'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_datum_der_frist",
+          "var": "p1_datum_der_frist",
+          "type": "string",
+          "meaning": "befristet bis",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 2 in Verbindung mit § 21 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_erwerbstaetigkeit_ba_fuer_arbeit",
+      "page": 1,
+      "section": "B Ausübung einer Erwerbstätigkeit",
+      "person": null,
+      "topic": "Erlaubnis von der Bundesagentur für Arbeit",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p1_erwerbstaetigkeit == '1'",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_erlaubnis_von_ba_für_arbeit",
+          "var": "p1_erlaubnis_von_ba_fuer_arbeit",
+          "type": "bool",
+          "meaning": "von (Bundesagentur) für Arbeit",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 2 in Verbindung mit § 21 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_asylantrag_status",
+      "page": 1,
+      "section": "C Asyl",
+      "person": null,
+      "topic": "Asyl",
+      "hint": null,
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_asylantrag",
+          "var": "p1_asylantrag",
+          "type": "string",
+          "meaning": "Status des Asylantrags",
+          "options": {
+            "0": "nicht beantragt",
+            "1": "beantragt",
+            "2": "Folgeantrag",
+            "3": "Zweitantrag",
+            "4": "Klage eingereicht"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_asylantrag_erstantrag_details",
+      "page": 1,
+      "section": "C Asyl",
+      "person": null,
+      "topic": "Angaben zum Asylantrag",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_asylantrag == '1'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_asyl_beantragt_am",
+          "var": "p1_asyl_beantragt_am",
+          "type": "string",
+          "meaning": "beantragt am",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_asylantrag_erstantrag_ablehnung",
+      "page": 1,
+      "section": "C Asyl",
+      "person": null,
+      "topic": "Ablehnung des Asylantrags",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p1_asylantrag == '1'",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_asyl_abgelehnt",
+          "var": "p1_asyl_abgelehnt",
+          "type": "bool",
+          "meaning": "abgelehnt",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_asylantrag_erstantrag_ablehnung_details",
+      "page": 1,
+      "section": "C Asyl",
+      "person": null,
+      "topic": "Angaben zur Ablehnung des Asylantrags",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_asylantrag == '1' && p1_asyl_abgelehnt",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_asyl_abgelehnt_am",
+          "var": "p1_asyl_abgelehnt_am",
+          "type": "string",
+          "meaning": "abgelehnt am",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_asyl_abgelehnt_von_dienststelle",
+          "var": "p1_asyl_abgelehnt_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_asyl_folgeantrag_details",
+      "page": 1,
+      "section": "C Asyl",
+      "person": null,
+      "topic": "Angaben zum Folgeantrag",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_asylantrag == '2'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_folgeantrag_asyl_beantragt_am",
+          "var": "p1_folgeantrag_asyl_beantragt_am",
+          "type": "string",
+          "meaning": "Folgeantrag am",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_asyl_folgeantrag_ablehnung",
+      "page": 1,
+      "section": "C Asyl",
+      "person": null,
+      "topic": "Ablehnung des Folgeantrags",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p1_asylantrag == '2'",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_folgeantrag_asyl_abgelehnt",
+          "var": "p1_folgeantrag_asyl_abgelehnt",
+          "type": "bool",
+          "meaning": "abgelehnt",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_asyl_folgeantrag_ablehnung_details",
+      "page": 1,
+      "section": "C Asyl",
+      "person": null,
+      "topic": "Angaben zur Ablehnung des Folgeantrags",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_asylantrag == '2' && p1_folgeantrag_asyl_abgelehnt",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_folgeantrag_asyl_abgelehnt_am",
+          "var": "p1_folgeantrag_asyl_abgelehnt_am",
+          "type": "string",
+          "meaning": "abgelehnt am",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_folgeantrag_asyl_abgelehnt_von_dienststelle",
+          "var": "p1_folgeantrag_asyl_abgelehnt_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_asyl_zweitantrag_details",
+      "page": 1,
+      "section": "C Asyl",
+      "person": null,
+      "topic": "Angaben zum Zweitantrag",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_asylantrag == '3'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_zweitantrag_asyl_beantragt_am",
+          "var": "p1_zweitantrag_asyl_beantragt_am",
+          "type": "string",
+          "meaning": "Zweitantrag am",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_asyl_zweitantrag_ablehnung",
+      "page": 1,
+      "section": "C Asyl",
+      "person": null,
+      "topic": "Ablehnung des Zweitantrags",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "p1_asylantrag == '3'",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p1_zweitantrag_asyl_abgelehnt",
+          "var": "p1_zweitantrag_asyl_abgelehnt",
+          "type": "bool",
+          "meaning": "abgelehnt",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_asyl_zweitantrag_ablehnung_details",
+      "page": 1,
+      "section": "C Asyl",
+      "person": null,
+      "topic": "Angaben zur Ablehnung des Zweitantrags",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_asylantrag == '3' && p1_zweitantrag_asyl_abgelehnt",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_zweitantrag_asyl_abgelehnt_am",
+          "var": "p1_zweitantrag_asyl_abgelehnt_am",
+          "type": "string",
+          "meaning": "abgelehnt am",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_zweitantrag_asyl_abgelehnt_von_dienststelle",
+          "var": "p1_zweitantrag_asyl_abgelehnt_von_dienststelle",
+          "type": "string",
+          "meaning": "von (Dienststelle)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p1_asyl_klage_details",
+      "page": 1,
+      "section": "C Asyl",
+      "person": null,
+      "topic": "Angaben zur Klageerhebung im Asylverfahren",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p1_asylantrag == '4'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p1_klage_eingereicht_am",
+          "var": "p1_klage_eingereicht_am",
+          "type": "string",
+          "meaning": "Klage eingereicht am",
+          "options": {},
+          "optional": false
+        },
+        {
+          "field_id": "p1_name_und_anschrift_des_bevollmächtigten_rechtsanwalts",
+          "var": "p1_name_und_anschrift_des_bevollmaechtigten_rechtsanwalts",
+          "type": "string",
+          "meaning": "bevollmächtigter Rechtsanwalt (Name und Anschrift)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_zeitpunkt_der_letzten_einreise",
+      "page": 2,
+      "section": "D Einreise",
+      "person": null,
+      "topic": "Zeitpunkt der letzten Einreise in die BRD",
+      "hint": null,
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_zeitpunkt_der_letzten_einreise",
+          "var": "p2_zeitpunkt_der_letzten_einreise",
+          "type": "string",
+          "meaning": "Zeitpunkt der letzten Einreise in die BRD",
+          "options": {
+            "Ja": "Zeitpunkt der letzten Einreise in die BRD Datum"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_datum_der_letzten_einreise",
+      "page": 2,
+      "section": "D Einreise",
+      "person": null,
+      "topic": "Zeitpunkt der letzten Einreise in die BRD",
+      "hint": "Datum",
+      "answer_type": "date",
+      "ask_if": "p2_zeitpunkt_der_letzten_einreise == 'Ja'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_datum_der_letzten_einreise",
+          "var": "p2_datum_der_letzten_einreise",
+          "type": "string",
+          "meaning": "Datum der letzten Einreise",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_fruehere_aufenthalte",
+      "page": 2,
+      "section": "D Einreise",
+      "person": null,
+      "topic": "Frühere Aufenthalte in der BRD",
+      "hint": null,
+      "answer_type": "single_choice",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_frühere_aufenthalte",
+          "var": "p2_fruehere_aufenthalte",
+          "type": "string",
+          "meaning": "frühere Aufenthalte in der BRD",
+          "options": {
+            "Ja": "frühere Aufenthalte in der BRD Zeitraum"
+          },
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_zeitraum_frueherer_aufenthalte",
+      "page": 2,
+      "section": "D Einreise",
+      "person": null,
+      "topic": "Frühere Aufenthalte in der BRD",
+      "hint": "Zeitraum",
+      "answer_type": "text",
+      "ask_if": "p2_fruehere_aufenthalte == 'Ja'",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_zeitraum_früherer_aufenthalte",
+          "var": "p2_zeitraum_frueherer_aufenthalte",
+          "type": "string",
+          "meaning": "Zeitraum früherer Aufenthalte",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_letzter_gewoehnlicher_aufenthalt",
+      "page": 2,
+      "section": "D Einreise",
+      "person": null,
+      "topic": "Letzter gewöhnlicher Aufenthalt im Ausland (Ort/Land)",
+      "hint": null,
+      "answer_type": "multiple_choice",
+      "ask_if": "true",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "p2_letzter_gewöhnlicher_aufenthalt",
+          "var": "p2_letzter_gewoehnlicher_aufenthalt",
+          "type": "bool",
+          "meaning": "letzter gewöhnlicher Aufenthalt im Ausland (Ort/Land)",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_ort_land_des_letzten_gewoehnlichen_aufenthalts",
+      "page": 2,
+      "section": "D Einreise",
+      "person": null,
+      "topic": "Letzter gewöhnlicher Aufenthalt im Ausland (Ort/Land)",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "p2_letzter_gewoehnlicher_aufenthalt",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_ort/land_des_letzten_gewöhnlichen_aufenthalts",
+          "var": "p2_ort_land_des_letzten_gewoehnlichen_aufenthalts",
+          "type": "string",
+          "meaning": "Ort/Land des letzten gewöhnlichen Aufenthalts",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    },
+    {
+      "id": "p2_gruende_fuer_den_jetzigen_aufenthalt",
+      "page": 2,
+      "section": "D Einreise",
+      "person": null,
+      "topic": "Gründe für den jetzigen Aufenthalt; ggf. Gründe, weshalb ich nicht in mein Heimatland zurückkehren kann",
+      "hint": null,
+      "answer_type": "text",
+      "ask_if": "true",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "p2_gründe_für_den_jetzigen_aufenthalt",
+          "var": "p2_gruende_fuer_den_jetzigen_aufenthalt",
+          "type": "string",
+          "meaning": "Gründe für den jetzigen Aufenthalt; ggf. Gründe, weshalb ich nicht in mein Heimatland zurückkehren kann",
+          "options": {},
+          "optional": false
+        }
+      ],
+      "reason": "§ 23 SGB XII",
+      "documents": []
+    }
+  ],
+  "out_of_scope": [
+    {
+      "field_id": "px_kontrollkästchen19",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "px_kontrollkästchen19.14",
+      "reason": "no_widget"
+    },
+    {
+      "field_id": "p1_kontrollkästchen19.14.11",
+      "reason": "other"
+    },
+    {
+      "field_id": "p1_kontrollkästchen19.14.10",
+      "reason": "other"
+    }
+  ]
+}

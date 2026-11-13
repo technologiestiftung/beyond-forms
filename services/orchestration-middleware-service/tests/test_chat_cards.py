@@ -1,29 +1,21 @@
-import datetime
-import decimal
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from unittest.mock import MagicMock
+from fastapi import HTTPException
 
-from src.chat_cards import build_card_view, card_inputs, card_prompt, validate_card_answer
-from src.models import AccomodationType, IncomeEntries, IncomeTypeType, Users
-from src.schemas import UserProfileValidationSchema
-from src.services.user_service import write_profile_payload
-from src.services.wizard_rules import RULES_PATH, application_start_step, evaluation_payload, rules_steps
+from src.chat_cards import CardInput, asked_in_chat, build_inputs_view, input_errors, inputs_prompt
+from src.routes.llm import _card_view, save_answer
 
-pytestmark = pytest.mark.skipif(not RULES_PATH.exists(), reason="rules file is not part of this checkout")
-
-# The rules engine skips these on its own (`is_field_required`).
-OPTIONAL_FIELDS = (".birth_name", ".applicant_last_resided_address")
+GUARDIAN = CardInput("p1_guardian", "choice", (True, False), about="es besteht eine Betreuung")
+STATUS = CardInput("answer", "choice", ("0", "2"), about="Familienstand", option_about=("ledig", "verheiratet"))
+STREET = CardInput("p1_street", "text", about="Straße")
+SINCE = CardInput("p1_since", "date", optional=True, about="verheiratet seit")
+RENT = CardInput("p1_rent", "amount", about="Miete")
 
 
-def _card_steps() -> dict:
-    return {step_id: step for step_id, step in rules_steps().items() if step.get("columns")}
-
-
-def _args(step_id: str) -> dict:
-    inputs = card_inputs(rules_steps()[step_id])
-    return {
-        "card_id": step_id,
+def _args(inputs: list[CardInput], **overrides) -> dict:
+    args = {
+        "card_id": "form:test_form:p1_group",
         "question": "Frage?",
         "labels": {i.key: f"Label {i.key}" for i in inputs},
         "option_labels": {
@@ -32,209 +24,100 @@ def _args(step_id: str) -> dict:
             if i.options
         },
     }
+    return {**args, **overrides}
 
 
-def test_columns_name_profile_columns_or_income_types():
-    columns = set(Users.__table__.columns.keys())
-    accepted = set(UserProfileValidationSchema.model_fields)
-    income_types = {t.value for t in IncomeTypeType}
-    unknown = [
-        (step_id, entry)
-        for step_id, step in _card_steps().items()
-        for entry in step["columns"]
-        if ("column" in entry and not (entry["column"] in columns and entry["column"] in accepted))
-        or ("income_type" in entry and entry["income_type"] not in income_types)
-    ]
-    assert unknown == []
+def test_a_card_is_used_where_there_are_options_to_pick():
+    assert not asked_in_chat([GUARDIAN])
+    assert not asked_in_chat([STREET, STATUS])
+    assert asked_in_chat([STREET, SINCE, RENT])
 
 
-def test_every_required_field_of_a_card_step_is_answered_by_a_column():
-    unanswered = [
-        (step_id, field)
-        for step_id, step in _card_steps().items()
-        for field in step["fields"]
-        if not field.endswith(OPTIONAL_FIELDS) and field not in {e.get("field") for e in step["columns"]}
-    ]
-    assert unanswered == []
+def test_the_card_prompt_names_the_card_and_its_option_keys():
+    prompt = inputs_prompt("form:test_form:p1_status", "Familienstand", [STATUS])
+    assert 'Next card: card_id "form:test_form:p1_status"' in prompt and "show_card" in prompt
+    assert '"answer": choice; option_labels keys: 0 (ledig), 2 (verheiratet)' in prompt
 
 
-def test_the_application_starts_after_the_eligibility_check():
-    assert application_start_step() == "step_applicant_name"
+def test_free_inputs_are_asked_in_the_chat_with_the_format_per_key():
+    prompt = inputs_prompt("form:test_form:p1_married", "Ehe", [STREET, SINCE, RENT])
+    assert 'Next question: card_id "form:test_form:p1_married"' in prompt
+    assert "save_answer" in prompt and "show_card" not in prompt
+    assert '- "p1_since": a date as YYYY-MM-DD (optional) - verheiratet seit' in prompt
+    assert '- "p1_rent": a number - Miete' in prompt
 
 
-def test_inputs_follow_the_column_types_and_the_rules_overrides():
-    kinds = {
-        step_id: {i.key: (i.kind, i.options, i.options_source) for i in card_inputs(rules_steps()[step_id])}
-        for step_id in (
-            "step_applicant_accommodation_costs",
-            "step_applicant_legal_support",
-            "step_applicant_nationality",
-            "step_applicant_heating",
-            "step_applicant_gender",
-        )
-    }
-    assert kinds["step_applicant_accommodation_costs"]["rent_total"] == ("amount", (), None)
-    assert kinds["step_applicant_legal_support"]["has_custodian"] == ("choice", (True, False), None)
-    assert kinds["step_applicant_nationality"]["nationality"] == ("select", (), "countries")
-    assert kinds["step_applicant_heating"]["heating_type"][1][0] == "Sammelheizung"
-    assert kinds["step_applicant_gender"]["legal_gender"][1] == ("Male", "Female", "Diverse")
-
-
-def test_income_lines_become_optional_amounts():
-    inputs = card_inputs(rules_steps()["step_applicant_pension"])
-    assert [(i.key, i.kind, i.optional, i.income_type) for i in inputs] == [
-        ("old_age_pension", "amount", True, "Old-Age Pension"),
-        ("reduced_earning_capacity_pension", "amount", True, "Reduced Earning Capacity Pension"),
-        ("survivor_pension", "amount", True, "Survivor Pension"),
-    ]
-
-
-def test_card_prompt_names_the_card_and_its_input_keys():
-    prompt = card_prompt("step_applicant_legal_support", rules_steps()["step_applicant_legal_support"])
-    assert 'card_id "step_applicant_legal_support"' in prompt
-    assert '"has_custodian": choice; option_labels keys: true, false' in prompt
-
-
-def test_build_card_view_puts_the_texts_on_the_fixed_inputs():
-    view, errors = build_card_view(
-        "step_applicant_legal_support",
-        rules_steps()["step_applicant_legal_support"],
-        _args("step_applicant_legal_support"),
-    )
+def test_build_inputs_view_puts_the_texts_on_the_inputs():
+    view, errors = build_inputs_view("form:test_form:p1_group", [GUARDIAN, SINCE], _args([GUARDIAN, SINCE]))
 
     assert errors == []
-    assert view["card_id"] == "step_applicant_legal_support"
-    assert view["inputs"][0] == {
-        "field": "has_custodian",
-        "kind": "choice",
-        "label": "Label has_custodian",
-        "options": [{"value": True, "label": "Option True"}, {"value": False, "label": "Option False"}],
-    }
+    assert view["inputs"] == [
+        {
+            "field": "p1_guardian",
+            "kind": "choice",
+            "label": "Label p1_guardian",
+            "options": [{"value": True, "label": "Option True"}, {"value": False, "label": "Option False"}],
+        },
+        {"field": "p1_since", "kind": "date", "label": "Label p1_since", "optional": True},
+    ]
 
 
-def test_build_card_view_reports_missing_texts():
-    args = _args("step_applicant_legal_support")
-    del args["labels"]["has_guardian"]
-    del args["option_labels"]["has_custodian"]["false"]
+def test_build_inputs_view_reports_missing_texts():
+    args = _args([GUARDIAN, STATUS])
+    del args["labels"]["p1_guardian"]
+    del args["option_labels"]["answer"]["2"]
 
-    view, errors = build_card_view("step_applicant_legal_support", rules_steps()["step_applicant_legal_support"], args)
+    view, errors = build_inputs_view("form:test_form:p1_group", [GUARDIAN, STATUS], args)
 
     assert view is None
-    assert "labels.has_guardian must be a text of 1 to 255 characters" in errors
-    assert "option_labels.has_custodian.false must be a text of 1 to 255 characters" in errors
-
-
-def test_a_country_select_needs_no_option_labels():
-    view, errors = build_card_view(
-        "step_applicant_nationality", rules_steps()["step_applicant_nationality"], _args("step_applicant_nationality")
-    )
-    assert errors == []
-    nationality = next(i for i in view["inputs"] if i["field"] == "nationality")
-    assert nationality == {
-        "field": "nationality",
-        "kind": "select",
-        "label": "Label nationality",
-        "options_source": "countries",
-    }
-
-
-def test_validate_card_answer_accepts_the_card_values():
-    payload, errors = validate_card_answer(
-        rules_steps()["step_applicant_accommodation_costs"],
-        {"rent_total": 520, "heating_costs": 80.5, "hot_water_costs": 20, "cable_tv_costs": 0},
-    )
-    assert errors == []
-    assert payload.model_dump(exclude_unset=True)["rent_total"] == 520
+    assert "labels.p1_guardian must be a text of 1 to 255 characters" in errors
+    assert "option_labels.answer.2 must be a text of 1 to 255 characters" in errors
 
 
 @pytest.mark.parametrize(
     "values, error",
     [
-        ({"rent_total": 520, "heating_costs": 80, "hot_water_costs": 20}, "cable_tv_costs is missing"),
-        ({"iban": "DE00"}, "iban is not part of this card"),
-        ({"rent_total": -5}, "invalid value for rent_total"),
-        ({"rent_total": "viel"}, "invalid value for rent_total"),
-        ("520", "values must be an object"),
+        ({"p1_rent": 500}, "p1_street is missing"),
+        ({"p1_street": "Hauptstr.", "p1_rent": 500, "p1_iban": "DE00"}, "p1_iban is not part of this card"),
+        ({"p1_street": "Hauptstr.", "p1_rent": "500"}, "invalid value for p1_rent"),
+        ({"p1_street": "Hauptstr.", "p1_rent": 500, "p1_since": "31.01.2000"}, "invalid value for p1_since"),
+        ({"p1_street": "   ", "p1_rent": 500}, "invalid value for p1_street"),
+        ("Hauptstr.", "values must be an object"),
     ],
 )
-def test_validate_card_answer_rejects_missing_foreign_or_malformed_values(values, error):
-    payload, errors = validate_card_answer(rules_steps()["step_applicant_accommodation_costs"], values)
-    assert payload is None
+def test_input_errors_reject_missing_foreign_and_malformed_values(values, error):
+    _values, errors = input_errors([STREET, SINCE, RENT], values)
     assert error in errors
 
 
-def test_validate_card_answer_only_accepts_offered_options():
-    step = rules_steps()["step_applicant_gender"]
-    assert validate_card_answer(step, {"legal_gender": "Female"})[1] == []
-    assert validate_card_answer(step, {"legal_gender": "Other"})[1] == ["invalid value for legal_gender"]
-
-
-def test_validate_card_answer_caps_text_at_the_column_length():
-    step = {"columns": [{"column": "house_number", "field": "a.house_number"}]}
-    assert validate_card_answer(step, {"house_number": "1" * 20})[1] == []
-    assert validate_card_answer(step, {"house_number": "1" * 21})[1] == ["invalid value for house_number"]
-    payload, errors = validate_card_answer(step, {"house_number": " " + "1" * 20 + " "})
+def test_input_errors_trim_text_and_skip_a_left_out_or_blank_optional_value():
+    values, errors = input_errors([STREET, SINCE, RENT], {"p1_street": " Hauptstr. 4 ", "p1_rent": 430.87})
     assert errors == []
-    assert payload.house_number == "1" * 20
-    assert validate_card_answer(step, {"house_number": "   "})[1] == ["invalid value for house_number"]
+    assert values == {"p1_street": "Hauptstr. 4", "p1_rent": 430.87}
+    values, errors = input_errors([STREET, SINCE, RENT], {"p1_street": "Hauptstr. 4", "p1_rent": 1, "p1_since": " "})
+    assert errors == [] and values["p1_since"] is None
 
 
-def test_validate_card_answer_stores_empty_income_lines_as_zero():
-    payload, errors = validate_card_answer(rules_steps()["step_applicant_pension"], {"old_age_pension": 650})
-
-    assert errors == []
-    rows = {row.income_type.value: row.monthly_amount for row in payload.income_entries}
-    assert rows == {"Old-Age Pension": 650, "Reduced Earning Capacity Pension": 0, "Survivor Pension": 0}
+def test_a_card_for_a_question_asked_in_the_chat_is_refused():
+    call = {"function": {"arguments": '{"card_id": "form:test_form:p1_street", "question": "Wo?", "labels": {}}'}}
+    view, error = _card_view(call, "form:test_form:p1_street", [STREET], already_shown=False)
+    assert view is None and "save_answer" in error
 
 
-def test_a_card_amount_keeps_the_stored_office_and_reference():
-    stored = IncomeEntries(
-        income_type=IncomeTypeType.OLD_AGE_PENSION,
-        monthly_amount=decimal.Decimal("500"),
-        awarding_office="DRV Bund",
-        reference_no="12 345678 K 001",
-    )
-    user = Users(income_entries=[stored])
-    payload, _ = validate_card_answer(rules_steps()["step_applicant_pension"], {"old_age_pension": 650})
-
-    write_profile_payload(MagicMock(), user, payload)
-
-    old_age = next(row for row in user.income_entries if row.income_type == IncomeTypeType.OLD_AGE_PENSION)
-    assert (old_age.monthly_amount, old_age.awarding_office, old_age.reference_no) == (
-        650,
-        "DRV Bund",
-        "12 345678 K 001",
-    )
+@pytest.mark.asyncio
+async def test_save_answer_saves_through_the_card_path_as_a_chat_question():
+    with patch("src.routes.llm._save_form_card_answer", AsyncMock()) as save:
+        result = await save_answer(
+            "form:test_form:p1_street", {"p1_street": "Hauptstr. 4"}, MagicMock(), MagicMock(), None
+        )
+    assert result == {"card_id": "form:test_form:p1_street", "saved": {"p1_street": "Hauptstr. 4"}}
+    assert save.call_args.args[3:] == ("form:test_form:p1_street", {"p1_street": "Hauptstr. 4"})
+    assert save.call_args.kwargs == {"in_chat": True}
 
 
-def test_evaluation_payload_holds_the_stored_values_at_the_rule_fields():
-    user = Users(
-        first_name="Helmut",
-        date_of_birth=datetime.date(1947, 2, 14),
-        accomodation_type=AccomodationType.RENTAL_APARTMENT,
-        rent_total=decimal.Decimal("520.00"),
-    )
-
-    payload = evaluation_payload(user)
-
-    assert payload["applicant_information"]["applicant_personal_details"]["first_name"] == "Helmut"
-    assert payload["applicant_information"]["applicant_personal_details"]["date_of_birth"] == "1947-02-14"
-    assert payload["applicant_accommodation"]["applicant_accommodation_type"] == "Rental Apartment"
-    assert payload["applicant_accommodation"]["applicant_rent_total"] == 520.0
-    assert "applicant_landlord_name" not in payload["applicant_accommodation"]
-
-
-def test_evaluation_payload_adds_up_income_rows_and_keeps_unanswered_lines_missing():
-    user = Users(
-        income_entries=[
-            IncomeEntries(income_type=IncomeTypeType.OLD_AGE_PENSION, monthly_amount=decimal.Decimal("400")),
-            IncomeEntries(income_type=IncomeTypeType.SURVIVOR_PENSION, monthly_amount=decimal.Decimal("200")),
-            IncomeEntries(income_type=IncomeTypeType.ALIMONY, monthly_amount=decimal.Decimal("0")),
-        ]
-    )
-
-    income = evaluation_payload(user)["income_information"]["income_information_applicant"]["income_applicant_details"]
-
-    assert income["income_pension"] == 600.0
-    assert income["income_alimony"] == 0.0
-    assert "income_rental_income" not in income
+@pytest.mark.asyncio
+async def test_save_answer_hands_a_refusal_back_to_the_model():
+    refused = HTTPException(status_code=422, detail="show its card instead")
+    with patch("src.routes.llm._save_form_card_answer", AsyncMock(side_effect=refused)):
+        result = await save_answer("form:test_form:p1_guardian", {"p1_guardian": True}, MagicMock(), MagicMock(), None)
+    assert result == {"error": "show its card instead"}
