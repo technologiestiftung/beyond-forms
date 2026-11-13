@@ -105,6 +105,17 @@ def test_a_question_that_may_stay_empty_is_asked_once():
     assert "p1_displaced" not in _open_ids({}, {"p1_expellee", "p1_resettler"})
 
 
+def test_an_optional_text_group_keeps_asking_what_the_profile_leaves_empty():
+    pension = _group(
+        "p5_pension", "text", [_field("p5_office", meaning="Bewilligungsstelle"), _field("p5_amount")], required=False
+    )
+    rules = FormRules({"form_id": "test_form", "groups": [pension], "out_of_scope": []})
+    open_groups = rules.open_groups({"p5_office": "DRV"}, {"p5_office"})
+    assert [f["field_id"] for f in open_groups[0]["fields"]] == ["p5_amount"]
+    # skipped in the chat: every field of the card is recorded
+    assert rules.open_groups({}, {"p5_office", "p5_amount"}) == []
+
+
 def test_attachments_follow_their_condition():
     rules = FormRules(RULES)
     assert rules.required_attachments({"p1_status": "2"}) == ["anlage_1"]
@@ -451,18 +462,31 @@ async def test_a_value_its_column_does_not_take_stays_beside_the_mapping_and_the
 
 
 @pytest.mark.asyncio
-async def test_an_amount_for_an_income_line_becomes_an_income_row():
-    group = _group("p4_employment", "money", [_field("p4_employment", meaning="Erwerbseinkommen")])
+@pytest.mark.parametrize("income_type", ["Employment", "Pension"])
+async def test_an_amount_for_an_income_line_becomes_an_income_row(income_type):
+    group = _group("p4_income", "money", [_field("p4_income", meaning="Einkommen")])
     application = MagicMock(spec=UserApplications, form_type="test_form", form_data={})
     user_row = Users(id=uuid.uuid4())
-    first, second, third, fourth, fifth = _save_patches(group, {"p4_employment": ("income", "Employment")}, application)
+    first, second, third, fourth, fifth = _save_patches(group, {"p4_income": ("income", income_type)}, application)
     with first, second, third, fourth, fifth as write_profile:
         await _save_form_card_answer(
-            MagicMock(), user_row, MagicMock(), card_id("test_form", "p4_employment"), {"p4_employment": 450}
+            MagicMock(), user_row, MagicMock(), card_id("test_form", "p4_income"), {"p4_income": 450}
         )
     rows = write_profile.call_args.args[2].model_dump(exclude_unset=True)["income_entries"]
-    assert [(row["income_type"], row["monthly_amount"]) for row in rows] == [("Employment", 450)]
+    assert [(row["income_type"], row["monthly_amount"]) for row in rows] == [(income_type, 450)]
     assert application.form_data == {"pdf_fields": {"test_form": {}}}
+
+
+@pytest.mark.asyncio
+async def test_a_text_for_an_income_line_must_be_an_amount():
+    group = _group("p5_pension", "text", [_field("p5_amount", meaning="Renten/Pensionen")])
+    application = MagicMock(spec=UserApplications, form_type="test_form", form_data={})
+    first, second, third, fourth, fifth = _save_patches(group, {"p5_amount": ("income", "Pension")}, application)
+    with first, second, third, fourth, fifth, pytest.raises(HTTPException) as refused:
+        await _save_form_card_answer(
+            MagicMock(), Users(id=uuid.uuid4()), MagicMock(), card_id("test_form", "p5_pension"), {"p5_amount": "abc"}
+        )
+    assert refused.value.status_code == 422 and application.form_data == {}
 
 
 @pytest.mark.parametrize(

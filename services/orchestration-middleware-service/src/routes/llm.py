@@ -350,6 +350,9 @@ async def _save_form_card_answer(
             and paths.get(f["field_id"])
         ):
             written[paths[f["field_id"]]] = value
+    not_amounts = [path[-1] for path, value in written.items() if path[0] in _MONEY_GRIDS and _amount(value) is None]
+    if not_amounts:
+        raise HTTPException(status_code=422, detail=f"Not an amount for {', '.join(not_amounts)}")
     # a chosen option is stored as the column value its mapping turns into that option
     for field_id, value in answer.items():
         column, column_value = choices.get(field_id, {}).get(value, (None, None))
@@ -427,11 +430,11 @@ def _write_profile_answers(db: Session, user_row: DbUser, written: dict[tuple, A
     payload: dict[str, Any] = {path[0]: value for path, value in columns.items()}
     stored = set(columns)
     for grid, (attr, *_) in _MONEY_GRIDS.items():
-        # `Pension` is the sum of the pension lines, not a line of its own
+        # `Pension` is asked only while no pension line carries an amount, so its own line becomes the sum
         amounts = {
             path[1]: amount
             for path, value in written.items()
-            if len(path) == 2 and path[0] == grid and path[1] != "Pension" and (amount := _amount(value)) is not None
+            if len(path) == 2 and path[0] == grid and (amount := _amount(value)) is not None
         }
         if not amounts:
             continue

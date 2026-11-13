@@ -65,9 +65,7 @@ class FormRules:
             filled = [f["field_id"] in answered_field_ids for f in group["fields"]]
             if not any(filled):
                 missing = group["fields"]
-            elif group["answer_type"] != "multiple_choice" and (
-                group["answer_type"] in CHOICE_TYPES or not group["required"]
-            ):
+            elif group["answer_type"] in CHOICE_TYPES and group["answer_type"] != "multiple_choice":
                 missing = []
             else:
                 missing = [f for f, is_filled in zip(group["fields"], filled) if not is_filled and not f["optional"]]
