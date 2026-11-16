@@ -40,8 +40,13 @@ WORKDIR /app/services/orchestration-middleware-service
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHONPATH="/app/services/orchestration-middleware-service"
 
+# Outside the service directory so the Compose bind-mount does not shadow it.
+COPY services/orchestration-middleware-service/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 USER app
 
 EXPOSE 8080
-# Run the application
+ENTRYPOINT ["/entrypoint.sh"]
+
 CMD ["fastapi", "run", "src/main.py", "--host", "0.0.0.0", "--port", "8080"]

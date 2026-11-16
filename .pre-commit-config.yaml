@@ -46,5 +46,5 @@ repos:
         name: Regenerate libs/db-schema/index.ts
         entry: scripts/dump_db_schema.sh
         language: system
-        files: ^migrations/.*\.sql$
+        files: ^services/orchestration-middleware-service/alembic/versions/.*\.py$
         pass_filenames: false

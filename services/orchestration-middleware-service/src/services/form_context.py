@@ -2,21 +2,67 @@ import datetime
 import re
 from typing import Any, Callable, Dict, Iterable, List
 
-from src.models import (
-    INCOME_TYPE_DE,
-    MARITAL_STATUS_DE,
-    NATIONALITY_DE,
-    PENSION_INCOME_KEYS,
-    AssociatedPersons,
-    AssociationType,
-    BenefitClaimKindType,
-)
+from src.constants import PENSION_INCOME_KEYS
+from src.models import AssociatedPersons, AssociationType, BenefitClaimKind, IncomeType, MaritalStatusType
 
 PARTNER_TYPES = frozenset(
     {AssociationType.SPOUSE, AssociationType.REGISTERED_PARTNER, AssociationType.COHABITING_PARTNER}
 )
 
 RETIREMENT_AGE = 67
+
+INCOME_TYPE_DE = {
+    IncomeType.EMPLOYMENT: "Nichtselbstständige Tätigkeit",
+    IncomeType.HEALTH_INSURANCE_BENEFITS: "Leistungen der Krankenkasse",
+    IncomeType.BUSINESS: "Gewerbebetrieb",
+    IncomeType.AGRICULTURE_AND_FORESTRY: "Land- und Forstwirtschaft",
+    IncomeType.OTHER_SELF_EMPLOYMENT: "Sonstige selbstständige Tätigkeit",
+    IncomeType.RENTAL_AND_LEASING: "Vermietung und Verpachtung",
+    IncomeType.HOUSING_BENEFIT: "Wohngeld/Lastenzuschuss",
+    IncomeType.PENSION: "Rente/Pension",
+    IncomeType.OLD_AGE_PENSION: "Altersrente",
+    IncomeType.REDUCED_EARNING_CAPACITY_PENSION: "Rente wegen Erwerbsminderung",
+    IncomeType.SURVIVOR_PENSION: "Hinterbliebenenrente",
+    IncomeType.SOCIAL_ASSISTANCE: "Sozialhilfeleistungen",
+    IncomeType.BASIC_SECURITY_BENEFITS: "Grundsicherungsleistungen",
+    IncomeType.ASYLUM_SEEKER_BENEFITS: "Asylbewerberleistungen",
+    IncomeType.FEDERAL_WAR_VICTIMS_RELIEF: "Leistungen nach dem Bundesversorgungsgesetz",
+    IncomeType.EQUALISATION_OF_BURDENS: "Leistungen des Lastenausgleichsamtes",
+    IncomeType.EMPLOYMENT_AGENCY_BENEFITS: "Leistungen der Agentur für Arbeit",
+    IncomeType.CHILD_BENEFIT: "Kindergeld",
+    IncomeType.CHILD_BENEFIT_SUPPLEMENT: "Kinderzuschlag",
+    IncomeType.PARENTAL_ALLOWANCE: "Elterngeld",
+    IncomeType.EDUCATION_GRANT: "Ausbildungsförderung",
+    IncomeType.ALIMONY: "Unterhalt",
+    IncomeType.ALIMONY_ADVANCE: "Unterhaltsvorschuss",
+    IncomeType.PRIVATE_MONETARY_CLAIMS: "Privatrechtliche geldwerte Ansprüche",
+    IncomeType.TAX_REFUND: "Steuererstattung",
+    IncomeType.CAPITAL_INCOME: "Kapitalerträge",
+    IncomeType.OTHER_INCOME: "Sonstige Einkünfte",
+}
+
+# German labels for enums that forms print as free text rather than a checkbox row.
+MARITAL_STATUS_DE = {
+    MaritalStatusType.SINGLE: "ledig",
+    MaritalStatusType.MARRIED: "verheiratet",
+    MaritalStatusType.COHABITING: "in eheähnlicher Gemeinschaft",
+    MaritalStatusType.PERMANENTLY_SEPARATED: "dauernd getrennt lebend",
+    MaritalStatusType.REGISTERED_CIVIL_PARTNERSHIP: "eingetragene Lebenspartnerschaft",
+    MaritalStatusType.DIVORCED: "geschieden",
+    MaritalStatusType.WIDOWED: "verwitwet",
+}
+
+# Only the codes the personas and forms have actually needed; anything else falls back to
+# the raw ISO code rather than a guessed adjective.
+NATIONALITY_DE = {
+    "DE": "deutsch",
+    "AT": "österreichisch",
+    "CH": "schweizerisch",
+    "FR": "französisch",
+    "IT": "italienisch",
+    "PL": "polnisch",
+    "TR": "türkisch",
+}
 
 
 def _blz_from_iban(iban: Any) -> Any:
@@ -158,7 +204,7 @@ def _entries_by_type(entries: Iterable[Any], type_field: str, value_field: str) 
     return out
 
 
-def _claim_rows(claims: Iterable[Any], kind: BenefitClaimKindType) -> List[Dict[str, Any]]:
+def _claim_rows(claims: Iterable[Any], kind: BenefitClaimKind) -> List[Dict[str, Any]]:
     rows = [claim for claim in claims if claim.claim_kind == kind]
     return [row_to_dict(row) for row in sorted(rows, key=lambda claim: claim.sort_order)]
 
@@ -211,8 +257,8 @@ def money_context(entries: Iterable[Any], person_id: Any) -> Dict[str, Any]:
             }
             for row in sorted(income, key=lambda entry: str(entry.income_type))
         ],
-        "pending_benefit_claims": _claim_rows(claims, BenefitClaimKindType.PENDING_APPLICATION),
-        "expected_one_time_payments": _claim_rows(claims, BenefitClaimKindType.EXPECTED_ONE_TIME_PAYMENT),
+        "pending_benefit_claims": _claim_rows(claims, BenefitClaimKind.PENDING_APPLICATION),
+        "expected_one_time_payments": _claim_rows(claims, BenefitClaimKind.EXPECTED_ONE_TIME_PAYMENT),
     }
 
 

@@ -20,6 +20,6 @@ fi
 mkdir -p "$OUT_DIR"
 
 echo "Generating TypeScript types..."
-npx -y supabase gen types typescript --db-url "$DB_URL" > "$OUT_DIR/index.ts"
+npx -y supabase gen types typescript --remote="$DB_URL" > "$OUT_DIR/index.ts"
 
 echo "Schema reference written to $OUT_DIR"
