@@ -1,7 +1,7 @@
 [project]
-name = "rules-engine"
+name = "validation-engine"
 version = "0.1.0"
-description = "This is the validation rules engine of the application."
+description = "This is the validation engine of the application."
 authors = [{ name = "Janina J. Renk", email = "jrenk@google.com" }]
 readme = "README.md"
 requires-python = ">=3.13"
@@ -13,6 +13,7 @@ dependencies = [
     "fastapi[standard]~=0.159.1",
     "loguru~=0.7.3",
     "json5~=0.17.3",
+    "phonenumbers>=9.0.42",
 ]
 
 

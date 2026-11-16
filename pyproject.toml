@@ -7,7 +7,7 @@ members = [
     "services/document-intelligence-service",
     "services/forms-filling-service",
     "services/orchestration-middleware-service",
-    "services/rules-engine",
+    "services/validation-engine",
     "tools/schema_utils",
 ]
 

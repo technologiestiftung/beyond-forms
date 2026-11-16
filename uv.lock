@@ -8,7 +8,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-10-27T13:40:14.500394Z"
+exclude-newer = "2026-11-02T14:58:38.250773Z"
 exclude-newer-span = "P14D"
 
 [manifest]
@@ -20,8 +20,8 @@ members = [
     "forms-filling-service",
     "llm-eval",
     "orchestration-middleware-service",
-    "rules-engine",
     "schema-utils",
+    "validation-engine",
 ]
 
 [[package]]
@@ -3179,6 +3179,15 @@ wheels = [
 ]
 
 [[package]]
+name = "phonenumbers"
+version = "9.0.42"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/e0/b6c30d6bb4255fc999f7fe3b7f7821dbe7a92272768f3b57b6939f4eedcf/phonenumbers-9.0.42.tar.gz", hash = "sha256:83ddc20edea93814f5bb2ee8d365b3ef64fa274c8a4f6d06bd8b2c7996030564", size = 2312652, upload-time = "2026-10-27T07:49:34.218Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/92/517a82af51c58601d3e9c2e5757587f1d8201143ce98ac62f262d47f3355/phonenumbers-9.0.42-py2.py3-none-any.whl", hash = "sha256:321c92d9734bfb4adc64575f940da26463f09fc79ac692b43a35f9306e4ecc7d", size = 2595813, upload-time = "2026-10-27T07:49:32.576Z" },
+]
+
+[[package]]
 name = "pillow"
 version = "13.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4298,51 +4307,6 @@ wheels = [
 ]
 
 [[package]]
-name = "rules-engine"
-version = "0.1.0"
-source = { editable = "services/rules-engine" }
-dependencies = [
-    { name = "beyondforms-document-schemas" },
-    { name = "fastapi", extra = ["standard"] },
-    { name = "json5" },
-    { name = "loguru" },
-    { name = "pydantic" },
-    { name = "python-dotenv" },
-    { name = "uvicorn" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "httpx" },
-    { name = "mock" },
-    { name = "mypy" },
-    { name = "pre-commit" },
-    { name = "pytest" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "beyondforms-document-schemas", editable = "libs/document-schemas" },
-    { name = "fastapi", extras = ["standard"], specifier = "~=0.159.1" },
-    { name = "json5", specifier = "~=0.17.3" },
-    { name = "loguru", specifier = "~=0.7.3" },
-    { name = "pydantic", specifier = "~=2.14" },
-    { name = "python-dotenv", specifier = "~=1.2" },
-    { name = "uvicorn", specifier = "~=0.54.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "httpx", specifier = "~=0.28.1" },
-    { name = "mock", specifier = "~=5.2" },
-    { name = "mypy", specifier = "~=2.4" },
-    { name = "pre-commit", specifier = "~=4.7" },
-    { name = "pytest", specifier = "~=9.1" },
-    { name = "ruff", specifier = "~=0.17.1" },
-]
-
-[[package]]
 name = "s3transfer"
 version = "0.19.3"
 source = { registry = "https://pypi.org/simple" }
@@ -4748,6 +4712,53 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/9f/83/f421a077712c1e87603bfec62744c3cd3a2f4b47378025db3d740df9af0d/uvloop-0.23.0-cp315-cp315t-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:12634f15e6625f78b3f2922f91404c4d7173487eba11746764153f556e9852dc", size = 4661763, upload-time = "2026-10-01T03:16:38.719Z" },
     { url = "https://files.pythonhosted.org/packages/f5/62/25dcaa6b7e7b48f82ce633854ce96597ab768f9650931f4f86c572de392c/uvloop-0.23.0-cp315-cp315t-musllinux_1_2_aarch64.whl", hash = "sha256:378188efbb1524f2219d05246a3e1e5907217848d2882144dff59585f1b81d55", size = 4421324, upload-time = "2026-10-01T03:16:40.488Z" },
     { url = "https://files.pythonhosted.org/packages/05/46/04628239b43dcef703af314202a3307d6060918e2d76aa86c5b1188f5551/uvloop-0.23.0-cp315-cp315t-musllinux_1_2_x86_64.whl", hash = "sha256:4b8e207c67d207a8608fec57e116511030af3495dc0109b8c333cf9cb412b16f", size = 4462501, upload-time = "2026-10-01T03:16:42.359Z" },
+]
+
+[[package]]
+name = "validation-engine"
+version = "0.1.0"
+source = { editable = "services/validation-engine" }
+dependencies = [
+    { name = "beyondforms-document-schemas" },
+    { name = "fastapi", extra = ["standard"] },
+    { name = "json5" },
+    { name = "loguru" },
+    { name = "phonenumbers" },
+    { name = "pydantic" },
+    { name = "python-dotenv" },
+    { name = "uvicorn" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "httpx" },
+    { name = "mock" },
+    { name = "mypy" },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "beyondforms-document-schemas", editable = "libs/document-schemas" },
+    { name = "fastapi", extras = ["standard"], specifier = "~=0.159.1" },
+    { name = "json5", specifier = "~=0.17.3" },
+    { name = "loguru", specifier = "~=0.7.3" },
+    { name = "phonenumbers", specifier = ">=9.0.42" },
+    { name = "pydantic", specifier = "~=2.14" },
+    { name = "python-dotenv", specifier = "~=1.2" },
+    { name = "uvicorn", specifier = "~=0.54.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "httpx", specifier = "~=0.28.1" },
+    { name = "mock", specifier = "~=5.2" },
+    { name = "mypy", specifier = "~=2.4" },
+    { name = "pre-commit", specifier = "~=4.7" },
+    { name = "pytest", specifier = "~=9.1" },
+    { name = "ruff", specifier = "~=0.17.1" },
 ]
 
 [[package]]
