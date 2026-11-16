@@ -20,8 +20,7 @@ RETIREMENT_AGE = 67
 
 
 def _blz_from_iban(iban: Any) -> Any:
-    """The Bankleitzahl is positions 5-12 of a German IBAN - the form asks for it
-    separately even though it is fully implied by the IBAN the user already gave."""
+    """The Bankleitzahl is positions 5-12 of a German IBAN"""
     if not isinstance(iban, str):
         return None
     cleaned = iban.replace(" ", "")
