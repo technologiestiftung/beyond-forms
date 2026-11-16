@@ -92,7 +92,7 @@ def count_required_fields(model_class: type[BaseModel]) -> int:
 @app.post("/validate-form")
 async def validate(
     request: FormRequestBody = Body(...),
-    validate_entire_form: bool = Query(False, alias="validate_entire_form"),
+    validate_entire_form: bool = Query(False),
 ):
     form_class = form_registry.get_or_404(request.form_type)
 
@@ -120,22 +120,14 @@ async def validate(
             "is_submittable": False,
         }
 
-        if validate_entire_form:
-            return JSONResponse(
-                status_code=422,
-                content={
-                    "detail": "Validation failed.",
-                    "validation_errors": all_errors,
-                    **resp_metadata,
-                },
-            )
+        errors_to_report = all_errors if validate_entire_form else validation_errors
 
-        if validation_errors:
+        if errors_to_report:
             return JSONResponse(
                 status_code=422,
                 content={
                     "detail": "Validation failed.",
-                    "validation_errors": validation_errors,
+                    "validation_errors": errors_to_report,
                     **resp_metadata,
                 },
             )
