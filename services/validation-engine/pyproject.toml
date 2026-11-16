@@ -13,7 +13,7 @@ dependencies = [
     "fastapi[standard]~=0.159.1",
     "loguru~=0.7.3",
     "json5~=0.17.3",
-    "phonenumbers>=9.0.42",
+    "phonenumbers~=9.0.42",
 ]
 
 

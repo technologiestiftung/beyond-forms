@@ -8,7 +8,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-11-02T14:58:38.250773Z"
+exclude-newer = "2026-11-02T15:09:07.607991Z"
 exclude-newer-span = "P14D"
 
 [manifest]
@@ -4745,7 +4745,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = "~=0.159.1" },
     { name = "json5", specifier = "~=0.17.3" },
     { name = "loguru", specifier = "~=0.7.3" },
-    { name = "phonenumbers", specifier = ">=9.0.42" },
+    { name = "phonenumbers", specifier = "~=9.0.42" },
     { name = "pydantic", specifier = "~=2.14" },
     { name = "python-dotenv", specifier = "~=1.2" },
     { name = "uvicorn", specifier = "~=0.54.0" },
