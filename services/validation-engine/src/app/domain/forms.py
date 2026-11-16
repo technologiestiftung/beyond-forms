@@ -1,12 +1,10 @@
 from typing import Optional, List
 
 from pydantic import model_validator, BaseModel
+from pydantic_extra_types.country import CountryAlpha2
 
-from app.domain.field_types import NonEmptyString, PastDate, PositiveInteger, CareDependencyLevel, PostalAddress
+from app.domain.field_types import NonEmptyString, PastDate, PositiveInt, CareDependencyLevel, PostalAddress, CoercedGender, CoercedCountry
 from app.domain.global_enums import (
-    CoercedGender,
-    CoercedCountry,
-    CountryCode,
     HealthInsuranceStatus,
     SocialSecurityStatus,
     MaritalStatus,
@@ -84,8 +82,8 @@ class AccommodationDetails(BaseModel):
     total_monthly_rent: float
     heating_cost_advance: float
 
-    living_area_square_meters: PositiveInteger
-    number_of_rooms: PositiveInteger
+    living_area_square_meters: PositiveInt
+    number_of_rooms: PositiveInt
     has_central_heating: bool
 
     # ToDo: landlord name needed in specific format?
@@ -136,7 +134,7 @@ class ElderlyDisabledWelfareForm(BaseModel):
 # --- Sub-Models ---
 @register_form("eligibility_information")
 class EligibilityInformation(BaseModel):
-    applicant_primary_residence_country: CountryCode
+    applicant_primary_residence_country: CountryAlpha2
     applicant_age: int
     applicant_work_capacity_at_least_3h_daily: bool
 

@@ -5,8 +5,6 @@ import pytest
 from app.validators.ocr_preprocessors import (
     clean_decimal_string,
     parse_date_string,
-    parse_boolean,
-    normalize_nationality_string,
     normalize_gender_string,
 )
 from app.domain.field_types import PastDate
@@ -50,58 +48,6 @@ def test_clean_decimal_string(input_val, expected):
 )
 def test_parse_date_string(input_val, expected):
     assert parse_date_string(input_val) == expected
-
-
-@pytest.mark.parametrize(
-    "input_val, expected",
-    [
-        ("Ja", True),
-        ("ja", True),
-        ("Yes", True),
-        ("yes", True),
-        ("True", True),
-        ("1", True),
-        (True, True),
-        ("Nein", False),
-        ("nein", False),
-        ("No", False),
-        ("no", False),
-        ("False", False),
-        ("0", False),
-        (False, False),
-        (None, None),
-        ("unknown", None),
-    ],
-)
-def test_parse_boolean(input_val, expected):
-    assert parse_boolean(input_val) == expected
-
-
-@pytest.mark.parametrize(
-    "input_val, expected",
-    [
-        ("DEUTSCH", "DE"),
-        ("Deutsche", "DE"),
-        ("DEUTSCHLAND", "DE"),
-        ("german", "DE"),
-        ("germany", "DE"),
-        ("DE", "DE"),
-        ("POLNISCH", "PL"),
-        ("polish", "PL"),
-        ("poland", "PL"),
-        ("PL", "PL"),
-        ("UKRAINISCH", "UA"),
-        ("ukrainian", "UA"),
-        ("UA", "UA"),
-        ("ITALIENISCH", "IT"),
-        ("italian", "IT"),
-        ("IT", "IT"),
-        ("", None),
-        (None, None),
-    ],
-)
-def test_normalize_nationality_string(input_val, expected):
-    assert normalize_nationality_string(input_val) == expected
 
 
 # Test Pydantic integration and validation triggers

@@ -2,36 +2,31 @@ import decimal
 from datetime import date
 from typing import Annotated
 
-from pydantic import BaseModel, EmailStr, Field, AfterValidator, BeforeValidator
+from pydantic import BaseModel, EmailStr, Field, BeforeValidator, PastDate, FutureDate, PositiveInt, StringConstraints, PhoneNumberValidator
+from pydantic_extra_types.country import CountryAlpha2
 
 from app.domain.registry import field_registry
-from app.validators.field_type_validators import (
-    validate_phone_number_format,
-    validate_date_is_not_future,
-    validate_date_is_in_future,
-    validate_german_zip_code,
-    validate_non_empty_string,
-)
 from app.validators.ocr_preprocessors import (
     clean_decimal_string,
     parse_date_string,
-    parse_boolean,
+    parse_german_bool,
+    normalize_gender_string
 )
-from app.domain.global_enums import CoercedCountry, CoercedGender
+from app.domain.global_enums import Gender
 
 
-NonEmptyString = Annotated[str, AfterValidator(validate_non_empty_string)]
-PhoneNumber = Annotated[str, AfterValidator(validate_phone_number_format)]
-PastDate = Annotated[date, BeforeValidator(parse_date_string), AfterValidator(validate_date_is_not_future)]
-FutureDate = Annotated[date, BeforeValidator(parse_date_string), AfterValidator(validate_date_is_in_future)]
-PositiveInteger = Annotated[int, BeforeValidator(clean_decimal_string), Field(gt=0)]
+NonEmptyString = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+PhoneNumber = Annotated[str, PhoneNumberValidator(default_region="DE", number_format="E164")]
 Percentage = Annotated[float, Field(ge=0.0, le=100.0)]
 CareDependencyLevel = Annotated[int, Field(ge=1, le=5)]
-GermanZipCode = Annotated[str, AfterValidator(validate_german_zip_code)]
+GermanZipCode = Annotated[str, Field(pattern=r"^\d{5}$")]
 
 CoercedDecimal = Annotated[decimal.Decimal, BeforeValidator(clean_decimal_string)]
 CoercedDate = Annotated[date, BeforeValidator(parse_date_string)]
-CoercedBool = Annotated[bool, BeforeValidator(parse_boolean)]
+CoercedBool = Annotated[bool, BeforeValidator(parse_german_bool)]
+CoercedCountry = CountryAlpha2
+CoercedGender = Annotated[Gender, BeforeValidator(normalize_gender_string)]
+
 
 
 class PostalAddress(BaseModel):
@@ -46,7 +41,7 @@ field_registry.register("email_address", EmailStr)
 field_registry.register("international_phone_number", PhoneNumber)
 field_registry.register("past_or_present_date", PastDate)
 field_registry.register("future_date", FutureDate)
-field_registry.register("positive_integer", PositiveInteger)
+field_registry.register("positive_integer", PositiveInt)
 field_registry.register("percentage", Percentage)
 field_registry.register("postal_address", PostalAddress)
 field_registry.register("care_dependency_level", CareDependencyLevel)

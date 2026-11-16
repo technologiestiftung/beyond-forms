@@ -8,7 +8,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-11-02T15:09:07.607991Z"
+exclude-newer = "2026-11-02T15:53:20.095589Z"
 exclude-newer-span = "P14D"
 
 [manifest]
@@ -3179,15 +3179,6 @@ wheels = [
 ]
 
 [[package]]
-name = "phonenumbers"
-version = "9.0.42"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ea/e0/b6c30d6bb4255fc999f7fe3b7f7821dbe7a92272768f3b57b6939f4eedcf/phonenumbers-9.0.42.tar.gz", hash = "sha256:83ddc20edea93814f5bb2ee8d365b3ef64fa274c8a4f6d06bd8b2c7996030564", size = 2312652, upload-time = "2026-10-27T07:49:34.218Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/92/517a82af51c58601d3e9c2e5757587f1d8201143ce98ac62f262d47f3355/phonenumbers-9.0.42-py2.py3-none-any.whl", hash = "sha256:321c92d9734bfb4adc64575f940da26463f09fc79ac692b43a35f9306e4ecc7d", size = 2595813, upload-time = "2026-10-27T07:49:32.576Z" },
-]
-
-[[package]]
 name = "pillow"
 version = "13.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3543,6 +3534,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/e9/e6/78ebbb10a8c8e4b61a59249394a4a594c1a7af95593dc933a349c8d00964/pyasn1_modules-0.4.2.tar.gz", hash = "sha256:677091de870a80aae844b1ca6134f54652fa2c8c5a52aa396440ac3106e941e6", size = 307892, upload-time = "2025-03-28T02:41:22.17Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/47/8d/d529b5d697919ba8c11ad626e835d4039be708a35b0d22de83a269a6682c/pyasn1_modules-0.4.2-py3-none-any.whl", hash = "sha256:29253a9207ce32b64c3ac6600edc75368f98473906e8fd1043bd6b5b1de2c14a", size = 181259, upload-time = "2025-03-28T02:41:19.028Z" },
+]
+
+[[package]]
+name = "pycountry"
+version = "26.2.16"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/de/1d/061b9e7a48b85cfd69f33c33d2ef784a531c359399ad764243399673c8f5/pycountry-26.2.16.tar.gz", hash = "sha256:5b6027d453fcd6060112b951dd010f01f168b51b4bf8a1f1fc8c95c8d94a0801", size = 7711342, upload-time = "2026-02-17T03:42:52.367Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9c/42/7703bd45b62fecd44cd7d3495423097e2f7d28bc2e99e7c1af68892ab157/pycountry-26.2.16-py3-none-any.whl", hash = "sha256:115c4baf7cceaa30f59a4694d79483c9167dbce7a9de4d3d571c5f3ea77c305a", size = 8044600, upload-time = "2026-02-17T03:42:49.777Z" },
 ]
 
 [[package]]
@@ -4723,7 +4723,7 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "json5" },
     { name = "loguru" },
-    { name = "phonenumbers" },
+    { name = "pycountry" },
     { name = "pydantic" },
     { name = "python-dotenv" },
     { name = "uvicorn" },
@@ -4745,7 +4745,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = "~=0.159.1" },
     { name = "json5", specifier = "~=0.17.3" },
     { name = "loguru", specifier = "~=0.7.3" },
-    { name = "phonenumbers", specifier = "~=9.0.42" },
+    { name = "pycountry", specifier = "~=26.2.16" },
     { name = "pydantic", specifier = "~=2.14" },
     { name = "python-dotenv", specifier = "~=1.2" },
     { name = "uvicorn", specifier = "~=0.54.0" },

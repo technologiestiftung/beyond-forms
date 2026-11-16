@@ -77,7 +77,7 @@ def test_validate_form_returns_error_for_invalid_field_data(mock_form_registry: 
         "form_content": {
             "first_name": "Jane",
             "last_name": "Doe",
-            "birth_date": future_date,  # This triggers the AfterValidator(validate_date_is_not_future)
+            "birth_date": future_date,
             "gender": "FEMALE",
             "nationality": "US",
             "city_of_birth": "New York",
