@@ -1,5 +1,6 @@
 import re
 from datetime import date
+from phonenumbers import parse, is_possible_number, format_number, PhoneNumberFormat
 
 
 def validate_non_empty_string(string: str) -> str:
@@ -15,33 +16,11 @@ def validate_non_empty_string(string: str) -> str:
 def validate_phone_number_format(phone_number: str) -> str:
     """
     Validates that the string follows the E.164 international phone numbering plan.
-    Supports basic normalization for common German formats.
     """
-    # Count digits to prevent empty/insufficient inputs from normalizing to valid country codes
-    digit_count = sum(1 for c in phone_number if c.isdigit())
-    if digit_count < 2:
-        raise ValueError("Phone number must be in E.164 format (e.g., +1234567890).")
-
-    # Remove country code parenthetical zero, e.g. +49 (0) 151 -> +49 151
-    s = re.sub(r"\(\s*0\s*\)", "", phone_number)
-    # Remove spaces, dashes, and remaining parentheses
-    s = re.sub(r"[\s\-\(\)]", "", s)
-
-    # Normalize starts: 00 -> +, 0 -> +49
-    if s.startswith("00"):
-        s = "+" + s[2:]
-    elif s.startswith("0"):
-        s = "+49" + s[1:]
-    elif not s.startswith("+"):
-        if s.startswith("49"):
-            s = "+" + s
-        else:
-            s = "+49" + s
-
-    international_phone_regex = r"^\+[1-9]\d{1,14}$"
-    if not re.match(international_phone_regex, s):
-        raise ValueError("Phone number must be in E.164 format (e.g., +1234567890).")
-    return s
+    parsed_number = parse(phone_number)
+    if not is_possible_number(parsed_number):
+        raise ValueError("Phone number is impossible")
+    return format_number(parsed_number, PhoneNumberFormat.E164)
 
 
 def validate_german_zip_code(zip_code: str) -> str:
