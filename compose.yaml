@@ -147,6 +147,17 @@ services:
       - ./services/wallet-frontend/tests/fixtures:/app/services/wallet-frontend/tests/fixtures:ro
     command:
       ["fastapi", "dev", "src/main.py", "--host", "0.0.0.0", "--port", "8080"]
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')",
+        ]
+      interval: 2s
+      timeout: 5s
+      retries: 60
 
   orchestration-middleware-worker:
     image: orchestration-middleware-service:latest
@@ -265,6 +276,8 @@ services:
     restart: unless-stopped
     depends_on:
       postgres:
+        condition: service_healthy
+      orchestration-middleware-service:
         condition: service_healthy
       # authentik-server:
       #   condition: service_started
