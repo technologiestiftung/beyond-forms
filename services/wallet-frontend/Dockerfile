@@ -3,6 +3,10 @@ FROM node:24-slim AS builder
 
 WORKDIR /app
 
+# The eligibility engine is a local file: dependency, so its own dependencies are installed in its folder
+COPY libs/eligibility-engine/package.json libs/eligibility-engine/package-lock.json ./libs/eligibility-engine/
+RUN npm ci --prefix ./libs/eligibility-engine
+
 # Copy package files from the service directory
 COPY services/wallet-frontend/package.json services/wallet-frontend/package-lock.json ./services/wallet-frontend/
 
@@ -20,6 +24,9 @@ COPY libs/ /app/libs/
 
 # Copy demo directory (contains persona JSON fixtures)
 COPY demo/ /app/demo/
+
+# Copy the knowledge base the eligibility check runs on
+COPY knowledge/ /app/knowledge/
 
 # Build the app (mode can be passed as a build arg, defaults to production)
 ARG MODE=production

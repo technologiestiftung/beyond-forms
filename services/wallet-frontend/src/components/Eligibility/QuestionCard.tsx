@@ -9,6 +9,8 @@ interface QuestionCardProps {
 	category: string;
 	tip?: string;
 	options: readonly string[];
+	/** Labels that come with the question, e.g. from the knowledge base, instead of the translation files */
+	optionLabels?: Readonly<Record<string, string>>;
 	value?: string;
 	onChange: (value: string) => void;
 	onNext: () => void;
@@ -20,6 +22,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 	category,
 	tip,
 	options,
+	optionLabels,
 	value,
 	onChange,
 	onNext,
@@ -34,6 +37,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 	}, [id]);
 
 	const getLabel = (option: string): string => {
+		if (optionLabels?.[option]) {
+			return optionLabels[option];
+		}
 		const customLabel = t(`questions.${id}.options.${option}`, {
 			defaultValue: "",
 		});

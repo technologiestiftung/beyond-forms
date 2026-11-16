@@ -72,6 +72,16 @@ jobs:
       environment_prefix: ${{ needs.setup-env.outputs.prefix }}
     secrets: inherit
 
+  eligibility-service:
+    needs: setup-env
+    uses: ./.github/workflows/reusable-service-pipeline.yaml
+    with:
+      service_name: eligibility-service
+      service_path: services/eligibility-service
+      environment_name: ${{ needs.setup-env.outputs.env_name }}
+      environment_prefix: ${{ needs.setup-env.outputs.prefix }}
+    secrets: inherit
+
   wallet-frontend:
     needs: setup-env
     uses: ./.github/workflows/reusable-service-pipeline.yaml

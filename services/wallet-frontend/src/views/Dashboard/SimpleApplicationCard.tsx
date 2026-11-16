@@ -1,9 +1,11 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { PrimaryButton } from "../../components/ui/PrimaryButton";
 import { useGeneratedPdfModal } from "../../hooks/useGeneratedPdfModal";
 import { useFormCompleteness } from "../../hooks/useFormCompleteness";
+import { useKnowledgeCompleteness } from "../../hooks/useKnowledgeCompleteness";
 import { CompletenessIndicator } from "../../components/Application/CompletenessIndicator";
 
 interface SimpleApplicationCardProps {
@@ -11,6 +13,10 @@ interface SimpleApplicationCardProps {
 	description: string;
 	formType: string;
 	illustration?: string;
+	/** Where the guided questions for this form start, if the form has them */
+	fillRoute?: string;
+	/** Count completeness against this knowledge-base application instead of the PDF mapping */
+	knowledgeApplicationId?: string;
 }
 
 /**
@@ -26,11 +32,18 @@ export const SimpleApplicationCard: React.FC<SimpleApplicationCardProps> = ({
 	description,
 	formType,
 	illustration,
+	fillRoute,
+	knowledgeApplicationId,
 }) => {
 	const { t } = useTranslation("dashboard");
+	const navigate = useNavigate();
 	const { handleGenerate, isGenerating, error, modal } =
 		useGeneratedPdfModal(formType);
-	const { level } = useFormCompleteness(formType);
+	const mapping = useFormCompleteness(formType, {
+		enabled: knowledgeApplicationId === undefined,
+	});
+	const knowledge = useKnowledgeCompleteness(knowledgeApplicationId);
+	const level = knowledgeApplicationId ? knowledge.level : mapping.level;
 
 	return (
 		<div className="bg-white border border-brand-border-subtle rounded-2xl p-6 flex flex-col gap-6 shadow-sm">
@@ -59,6 +72,15 @@ export const SimpleApplicationCard: React.FC<SimpleApplicationCardProps> = ({
 				<p role="alert" className="text-sm text-rose-600 font-medium">
 					{error}
 				</p>
+			)}
+
+			{fillRoute && (
+				<PrimaryButton
+					onClick={() => navigate(fillRoute)}
+					data-testid={`fill-${formType}-button`}
+				>
+					{t("sections.applications.fill_button", "Angaben ergänzen")}
+				</PrimaryButton>
 			)}
 
 			<PrimaryButton

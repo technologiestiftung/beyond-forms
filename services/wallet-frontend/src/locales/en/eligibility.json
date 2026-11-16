@@ -1,6 +1,7 @@
 {
 	"progress": "Your Progress",
 	"progress_aria": "{{percent}}% done",
+	"country_placeholder": "Please choose",
 	"yes": "Yes",
 	"no": "No",
 	"next": "Next",

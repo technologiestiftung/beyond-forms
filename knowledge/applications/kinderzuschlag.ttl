@@ -1,0 +1,62 @@
+@prefix bf: <https://beyond-forms.example/ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+# The fields forms/mappings/antrag_kinderzuschlag.toml fills from the profile. Optional fields of the form
+# (birth name, BIC, phone) are left out; sh:message explains a format error to the applicant.
+
+bf:applicationKinderzuschlag a bf:ApplicationProfile ;
+    rdfs:label "Antrag auf Kinderzuschlag"@de , "Child supplement application"@en ;
+    bf:forBenefit bf:kinderzuschlag ;
+    bf:forForm "antrag_kinderzuschlag" ;
+    bf:hasShape bf:kizApplicantShape , bf:kizMarriedShape , bf:kizPartnerShape , bf:kizChildShape .
+
+bf:kizApplicantShape a sh:NodeShape ;
+    sh:targetClass bf:Citizen ;
+    sh:property [ sh:path bf:firstName ; sh:minCount 1 ] ;
+    sh:property [ sh:path bf:lastName ; sh:minCount 1 ] ;
+    sh:property [ sh:path bf:birthDate ; sh:minCount 1 ] ;
+    sh:property [ sh:path bf:legalGender ; sh:minCount 1 ] ;
+    sh:property [
+        sh:path bf:nationality ; sh:minCount 1 ; sh:pattern "^[A-Z]{2}$" ;
+        sh:message "Bitte wähle ein Land aus der Liste."@de , "Please choose a country from the list."@en
+    ] ;
+    sh:property [ sh:path bf:street ; sh:minCount 1 ] ;
+    sh:property [ sh:path bf:houseNumber ; sh:minCount 1 ] ;
+    sh:property [
+        sh:path bf:zipCode ; sh:minCount 1 ; sh:pattern "^[0-9]{5}$" ;
+        sh:message "Eine Postleitzahl hat fünf Ziffern."@de , "A postcode has five digits."@en
+    ] ;
+    sh:property [ sh:path bf:city ; sh:minCount 1 ] ;
+    sh:property [ sh:path bf:householdComposition ; sh:minCount 1 ] ;
+    sh:property [ sh:path bf:maritalStatus ; sh:minCount 1 ] ;
+    sh:property [ sh:path bf:hasChild ; sh:minCount 1 ] ;
+    sh:property [
+        sh:path bf:childBenefitNumber ; sh:minCount 1 ; sh:pattern "^[0-9]{3} ?[Ff][Kk] ?[0-9]{6}$" ;
+        sh:message "Die Kindergeldnummer besteht aus drei Ziffern, den Buchstaben FK und sechs Ziffern, zum Beispiel 123FK456789."@de ,
+            "The child benefit number consists of three digits, the letters FK and six digits, for example 123FK456789."@en
+    ] ;
+    sh:property [
+        sh:path bf:iban ; sh:minCount 1 ; sh:pattern "^[A-Z]{2}[0-9]{2} ?([A-Z0-9]{4} ?){2,7}[A-Z0-9]{1,4}$" ;
+        sh:message "Diese IBAN sieht nicht vollständig aus. Bitte prüfe sie noch einmal."@de , "This IBAN does not look complete. Please check it again."@en
+    ] ;
+    sh:property [ sh:path bf:accountHolder ; sh:minCount 1 ] .
+
+bf:kizMarriedShape a sh:NodeShape ;
+    sh:targetClass bf:MarriedApplicant ;
+    sh:property [ sh:path bf:marriedSince ; sh:minCount 1 ] .
+
+bf:kizPartnerShape a sh:NodeShape ;
+    sh:targetClass bf:Partner ;
+    sh:property [ sh:path bf:firstName ; sh:minCount 1 ] ;
+    sh:property [ sh:path bf:lastName ; sh:minCount 1 ] ;
+    sh:property [ sh:path bf:birthDate ; sh:minCount 1 ] ;
+    sh:property [
+        sh:path bf:nationality ; sh:minCount 1 ; sh:pattern "^[A-Z]{2}$" ;
+        sh:message "Bitte wähle ein Land aus der Liste."@de , "Please choose a country from the list."@en
+    ] .
+
+bf:kizChildShape a sh:NodeShape ;
+    sh:targetClass bf:Child ;
+    sh:property [ sh:path bf:firstName ; sh:minCount 1 ] ;
+    sh:property [ sh:path bf:lastName ; sh:minCount 1 ] .

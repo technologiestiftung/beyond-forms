@@ -13,8 +13,10 @@ export function generateRandomTestPhoneNumber(): string {
  * docker-composed real backend served on localhost:3000 — needs a real login;
  * a plain "localhost" substring check can't tell those apart from the mock server.
  */
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1"]);
+
 export function isRemoteEnvironment(baseURL: string | undefined): boolean {
-	return !!baseURL && !baseURL.includes(":5173");
+	return !!baseURL && !LOCAL_HOSTS.has(new URL(baseURL).hostname);
 }
 
 export async function registerAuthBypassRoute(page: Page) {

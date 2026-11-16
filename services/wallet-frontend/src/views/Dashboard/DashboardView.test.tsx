@@ -31,6 +31,14 @@ vi.mock("../../hooks/useFormCompleteness", () => ({
 	useFormCompleteness: () => ({ level: 0, isLoading: false }),
 }));
 
+vi.mock("../../hooks/useKnowledgeCompleteness", () => ({
+	useKnowledgeCompleteness: () => ({ level: 0, isLoading: false }),
+}));
+
+vi.mock("../../hooks/useDiscovery", () => ({
+	useDiscoveryMatch: () => ({ data: undefined }),
+}));
+
 vi.mock("../../services/cms", () => ({
 	cmsService: {
 		getMyTutorials: vi.fn().mockResolvedValue([
