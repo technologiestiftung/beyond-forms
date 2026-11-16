@@ -162,11 +162,6 @@ jobs:
           VAR_SUBNET: ${{ vars.GCP_VPC_SUBNET }}
           SECRET_RAG_ENGINE_CORPUS: ${{ secrets.RAG_ENGINE_CORPUS }}
         run: |
-          if [ "$INPUT_SERVICE_NAME" == "migration-service" ]; then
-            echo "Skipping deployment for migration-service as it is handled separately."
-            exit 0
-          fi
-
           # Install yq
           sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq

@@ -1,3 +1,5 @@
+from src.models import IncomeType
+
 SLOT_ID_TO_DIS_TYPE = {
     "id_card": "identity_document",
     "registration": "registration_certificate",
@@ -59,3 +61,13 @@ DIS_TO_SLOT_ID_MAP = {
     "household_declaration": "household",
     "cooperation_agreement": "cooperation_agreement",
 }
+
+PENSION_INCOME_TYPES = frozenset(
+    {
+        IncomeType.PENSION,
+        IncomeType.OLD_AGE_PENSION,
+        IncomeType.REDUCED_EARNING_CAPACITY_PENSION,
+        IncomeType.SURVIVOR_PENSION,
+    }
+)
+PENSION_INCOME_KEYS = frozenset(pension_type.value for pension_type in PENSION_INCOME_TYPES)

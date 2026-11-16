@@ -3,8 +3,8 @@ name: Check DB Schema Snapshot
 on:
   pull_request:
     paths:
-      - "migrations/**"
-      - "services/migration-service/**"
+      - "services/orchestration-middleware-service/alembic/**"
+      - "services/orchestration-middleware-service/src/models.py"
       - "libs/db-schema/index.ts"
       - "scripts/dump_db_schema.sh"
       - ".github/workflows/check-db-schema.yaml"
@@ -23,16 +23,19 @@ jobs:
           chmod +x scripts/bootstrap.sh
           ./scripts/bootstrap.sh
 
-      - name: Start postgres and apply migrations
-        run: docker compose up -d --build postgres migration-service
+      - name: Start postgres
+        run: docker compose up -d --wait postgres
 
-      - name: Wait for migrations to finish
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.0.0
+
+      - name: Apply migrations and check models are in sync
+        working-directory: services/orchestration-middleware-service
+        env:
+          POSTGRES_HOST: localhost
         run: |
-          timeout 60 docker wait migration-service > /tmp/migration-exit-code
-          test "$(cat /tmp/migration-exit-code)" = "0" || {
-            docker logs migration-service
-            exit 1
-          }
+          uv run alembic upgrade head
+          uv run alembic check
 
       - name: Regenerate the schema snapshot
         run: ./scripts/dump_db_schema.sh
@@ -40,6 +43,6 @@ jobs:
       - name: Fail if libs/db-schema/index.ts is out of date
         run: |
           if ! git diff --exit-code -- libs/db-schema/index.ts; then
-            echo "::error::libs/db-schema/index.ts is out of sync with migrations/. Run ./scripts/dump_db_schema.sh locally and commit the result."
+            echo "::error::libs/db-schema/index.ts is out of sync with the Alembic migrations. Run ./scripts/dump_db_schema.sh locally and commit the result."
             exit 1
           fi

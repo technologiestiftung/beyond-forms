@@ -1,4 +1,27 @@
 steps:
+  # Migrate first so a failed migration stops the rollout before the new code goes live.
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "gcloud"
+    args:
+      - "run"
+      - "jobs"
+      - "deploy"
+      - "${_SERVICE_NAME}-migrate"
+      - "--image=${_IMAGE_URI}"
+      - "--region=${_GCP_REGION}"
+      - "--command=alembic"
+      - "--args=upgrade,head"
+      - "--max-retries=0"
+      - "--set-env-vars"
+      - "POSTGRES_HOST=${_DB_HOST},POSTGRES_PORT=${_DB_PORT},POSTGRES_DATABASE=${_DB_NAME}"
+      - "--set-secrets"
+      - "POSTGRES_USER=${_DB_USER_SECRET}:latest,POSTGRES_PASSWORD=${_DB_PASSWORD_SECRET}:latest"
+      - "--network=${_NETWORK}"
+      - "--subnet=${_SUBNET}"
+      - "--vpc-egress=private-ranges-only"
+      - "--execute-now"
+      - "--wait"
+
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: "gcloud"
     args:
