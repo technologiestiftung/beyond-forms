@@ -212,7 +212,7 @@ async def evaluate_wizard(request: WizardEvaluationRequest = Body(...)):
         evaluator = DecisionTreeEvaluator()
         result = evaluator.evaluate(request.form_content, request.current_step_id)
         return {"evaluation": result}
-    except Exception as e:
+    except Exception:
         logger.exception("Failed to evaluate wizard rules:")
         return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 
