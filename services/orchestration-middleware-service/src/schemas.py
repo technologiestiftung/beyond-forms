@@ -606,32 +606,6 @@ class UserInformationUpdateSchema(BaseModel):
     vehicle_year: Optional[str] = Field(None, max_length=4, description="Vehicle year built (Baujahr)")
 
 
-class ChatMessageResponseSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: uuid.UUID
-    message_role: str
-    content: Optional[str] = None
-    message_metadata: Optional[Dict[str, Any]] = None
-
-
-class ConversationResponseSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: uuid.UUID
-    user_id: uuid.UUID
-    status: str
-
-
-class ConversationDetailResponseSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: uuid.UUID
-    user_id: uuid.UUID
-    status: str
-    messages: list[ChatMessageResponseSchema]
-
-
 class TutorialStepContent(BaseModel):
     title: str
     text: str
