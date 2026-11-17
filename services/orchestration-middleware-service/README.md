@@ -105,7 +105,9 @@ To execute the Locust load tests against the orchestration middleware service:
 ### Automatically generate data models from the database locally
 
 ```bash
-uv run sqlacodegen --generator sqlmodels postgresql+psycopg2://devuser:devpassword@localhost:5432/devdb > src/models.py
+uv run sqlacodegen --generator sqlmodels postgresql+psycopg2://devuser:devpassword@localhost:5432/devdb \
+| sed -e 's/^import enum$/from enum import StrEnum/' -e 's/(str, enum\.Enum)/(StrEnum)/' \
+> src/models.py
 ```
 NOTE: This is kept in as a legacy tool before we switched from Database-First to Code-First. From now on, the groundtruth concerning the database structure is stored in `src/models.py`.
 
