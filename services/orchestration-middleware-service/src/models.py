@@ -1,7 +1,7 @@
 from typing import Optional
 import datetime
 import decimal
-import enum
+from enum import StrEnum
 import uuid
 
 from sqlalchemy import BigInteger, Boolean, CHAR, CheckConstraint, Column, Date, DateTime, Enum, ForeignKeyConstraint, Index, Integer, NUMERIC, Numeric, PrimaryKeyConstraint, String, Text, UniqueConstraint, Uuid, text
@@ -11,13 +11,13 @@ from sqlmodel import Field, Relationship, SQLModel
 ISO_COUNTRY = DOMAIN('iso_country', CHAR(2), constraint_name='iso_country_check', check="VALUE ~ '^[A-Z]{2}$'", create_type=False)
 MONEY_NONNEG = DOMAIN('money_nonneg', NUMERIC(10, 2), constraint_name='money_nonneg_check', check='VALUE >= 0', create_type=False)
 
-class AbilityToWorkType(str, enum.Enum):
+class AbilityToWorkType(StrEnum):
     FULLY_ABLE = 'Fully able'
     TEMPORARILY_DISABLED = 'Temporarily disabled'
     PERMANENTLY_DISABLED = 'Permanently disabled'
 
 
-class AccomodationType(str, enum.Enum):
+class AccomodationType(StrEnum):
     RENTAL_APARTMENT = 'Rental Apartment'
     OWN_HOME = 'Own Home'
     CONDOMINIUM = 'Condominium'
@@ -25,7 +25,7 @@ class AccomodationType(str, enum.Enum):
     SHARED_HOUSEHOLD = 'Shared Household'
 
 
-class AssetType(str, enum.Enum):
+class AssetType(StrEnum):
     SAVINGS_AND_CASH = 'Savings and Cash'
     SECURITIES = 'Securities'
     VALUABLES = 'Valuables'
@@ -37,7 +37,7 @@ class AssetType(str, enum.Enum):
     OTHER_ASSETS = 'Other Assets'
 
 
-class AssociationType(str, enum.Enum):
+class AssociationType(StrEnum):
     SPOUSE = 'Spouse'
     REGISTERED_PARTNER = 'Registered Partner'
     COHABITING_PARTNER = 'Cohabiting Partner'
@@ -47,12 +47,12 @@ class AssociationType(str, enum.Enum):
     OTHER = 'Other'
 
 
-class BenefitClaimKind(str, enum.Enum):
+class BenefitClaimKind(StrEnum):
     PENDING_APPLICATION = 'Pending Application'
     EXPECTED_ONE_TIME_PAYMENT = 'Expected One-Time Payment'
 
 
-class CareLevelType(str, enum.Enum):
+class CareLevelType(StrEnum):
     PFLEGEGRAD_1 = 'Pflegegrad 1'
     PFLEGEGRAD_2 = 'Pflegegrad 2'
     PFLEGEGRAD_3 = 'Pflegegrad 3'
@@ -60,19 +60,19 @@ class CareLevelType(str, enum.Enum):
     PFLEGEGRAD_5 = 'Pflegegrad 5'
 
 
-class ChatMessageRoleType(str, enum.Enum):
+class ChatMessageRoleType(StrEnum):
     USER = 'user'
     ASSISTANT = 'assistant'
     SYSTEM = 'system'
     TOOL = 'tool'
 
 
-class ConversationStatusType(str, enum.Enum):
+class ConversationStatusType(StrEnum):
     IN_PROGRESS = 'in_progress'
     CLOSED = 'closed'
 
 
-class DisabilityMerkzeichenType(str, enum.Enum):
+class DisabilityMerkzeichenType(StrEnum):
     G = 'G'
     AG = 'aG'
     H = 'H'
@@ -87,7 +87,7 @@ class DisabilityMerkzeichenType(str, enum.Enum):
     T = 'T'
 
 
-class DisplacedStatusType(str, enum.Enum):
+class DisplacedStatusType(StrEnum):
     NONE = 'none'
     EXPELLEE__RESETTLER_ = 'Expellee (Resettler)'
     DISPLACED_PERSON__RESETTLER_ = 'Displaced Person (Resettler)'
@@ -96,7 +96,7 @@ class DisplacedStatusType(str, enum.Enum):
     SOVIET_ZONE_REFUGEE = 'Soviet Zone Refugee'
 
 
-class DocumentStatusType(str, enum.Enum):
+class DocumentStatusType(StrEnum):
     PROCESSING = 'processing'
     COMPLETED = 'completed'
     FAILED = 'failed'
@@ -104,7 +104,7 @@ class DocumentStatusType(str, enum.Enum):
     VERIFIED = 'verified'
 
 
-class ExpenseType(str, enum.Enum):
+class ExpenseType(StrEnum):
     INCOME_TAX = 'Income Tax'
     HEALTH_INSURANCE = 'Health Insurance'
     CARE_INSURANCE = 'Care Insurance'
@@ -128,13 +128,13 @@ class ExpenseType(str, enum.Enum):
     COMMUTE_OTHER = 'Commute Other'
 
 
-class GenderType(str, enum.Enum):
+class GenderType(StrEnum):
     MALE = 'Male'
     FEMALE = 'Female'
     DIVERSE = 'Diverse'
 
 
-class HealthInsuranceStatusType(str, enum.Enum):
+class HealthInsuranceStatusType(StrEnum):
     COMPULSORY_INSURANCE = 'Compulsory Insurance'
     VOLUNTARY_INSURANCE = 'Voluntary Insurance'
     FAMILY_INSURANCE = 'Family Insurance'
@@ -142,7 +142,7 @@ class HealthInsuranceStatusType(str, enum.Enum):
     CARE_BY_HEALTH_FUNDS_UNDER___264_SGB_V = 'Care by Health Funds under § 264 SGB V'
 
 
-class IncomeType(str, enum.Enum):
+class IncomeType(StrEnum):
     EMPLOYMENT = 'Employment'
     HEALTH_INSURANCE_BENEFITS = 'Health Insurance Benefits'
     BUSINESS = 'Business'
@@ -172,7 +172,7 @@ class IncomeType(str, enum.Enum):
     SURVIVOR_PENSION = 'Survivor Pension'
 
 
-class MaritalStatusType(str, enum.Enum):
+class MaritalStatusType(StrEnum):
     SINGLE = 'Single'
     MARRIED = 'Married'
     COHABITING = 'Cohabiting'
@@ -182,24 +182,24 @@ class MaritalStatusType(str, enum.Enum):
     WIDOWED = 'Widowed'
 
 
-class SocialSecurityTypeType(str, enum.Enum):
+class SocialSecurityTypeType(StrEnum):
     NONE = 'None'
     PENSION_INSURANCE = 'Pension Insurance'
     LONG_TERM_CARE_INSURANCE = 'Long-term Care Insurance'
 
 
-class StatusType(str, enum.Enum):
+class StatusType(StrEnum):
     IN_PROGRESS = 'in_progress'
     COMPLETED = 'completed'
     SUBMITTED = 'submitted'
 
 
-class TenancyStatusType(str, enum.Enum):
+class TenancyStatusType(StrEnum):
     MAIN_TENANT = 'Main Tenant'
     SUBTENANT = 'Subtenant'
 
 
-class TutorialStatusType(str, enum.Enum):
+class TutorialStatusType(StrEnum):
     IN_PROGRESS = 'in_progress'
     COMPLETED = 'completed'
 
