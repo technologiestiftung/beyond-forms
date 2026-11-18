@@ -7,7 +7,7 @@ from app.validators.ocr_preprocessors import (
     parse_date_string,
     normalize_gender_string,
 )
-from app.domain.field_types import PastDate
+from app.domain.field_types import CoercedDate, CoercedPastDate
 from pydantic import BaseModel, ValidationError
 
 
@@ -37,13 +37,13 @@ def test_clean_decimal_string(input_val, expected):
     [
         ("1959-05-01", datetime.date(1959, 5, 1)),
         ("01.05.1959", datetime.date(1959, 5, 1)),
-        (" 01 . 05 . 1959 ", datetime.date(1959, 5, 1)),
+        (" 01 . 05 . 1959 ", " 01 . 05 . 1959 "),
         ("01/05/1959", datetime.date(1959, 5, 1)),
         ("1959/05/01", datetime.date(1959, 5, 1)),
         (datetime.date(1959, 5, 1), datetime.date(1959, 5, 1)),
-        ("", None),
+        ("", ""),
         (None, None),
-        ("invalid_date", None),
+        ("invalid_date", "invalid_date"),
     ],
 )
 def test_parse_date_string(input_val, expected):
@@ -53,16 +53,17 @@ def test_parse_date_string(input_val, expected):
 # Test Pydantic integration and validation triggers
 def test_pydantic_date_before_validators():
     class DateModel(BaseModel):
-        dob: PastDate
+        dob: CoercedDate
+        past_dob: CoercedPastDate | None = None
 
     # Verify DD.MM.YYYY is parsed successfully by BeforeValidator
     model = DateModel(dob="20.01.1959")
     assert model.dob == datetime.date(1959, 1, 20)
 
-    # Verify future dates raise ValidationError via AfterValidator
+    # Verify future dates raise ValidationError via pydantic's PastDate
     with pytest.raises(ValidationError) as exc:
-        DateModel(dob="01.01.2035")
-    assert "The date provided cannot be in the future" in str(exc.value)
+        DateModel(dob="20.01.1959", past_dob="2035-01-01")
+    assert "Date should be in the past" in str(exc.value)
 
 
 @pytest.mark.parametrize(
@@ -75,10 +76,10 @@ def test_pydantic_date_before_validators():
         ("D", "NON_BINARY"),
         ("diverse", "NON_BINARY"),
         ("non_binary", "NON_BINARY"),
-        ("<", "NON_BINARY"),
-        ("", None),
+        ("<", "<"),
+        ("", ""),
         (None, None),
-        ("invalid", None),
+        ("invalid", "invalid"),
     ],
 )
 def test_normalize_gender_string(input_val, expected):

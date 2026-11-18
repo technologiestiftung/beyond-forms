@@ -24,6 +24,8 @@ GermanZipCode = Annotated[str, Field(pattern=r"^\d{5}$")]
 
 CoercedDecimal = Annotated[decimal.Decimal, BeforeValidator(clean_decimal_string)]
 CoercedDate = Annotated[date, BeforeValidator(parse_date_string)]
+CoercedPastDate = Annotated[PastDate, BeforeValidator(parse_date_string)]
+CoercedFutureDate = Annotated[FutureDate, BeforeValidator(parse_date_string)]
 CoercedBool = Annotated[bool, BeforeValidator(parse_german_bool)]
 CoercedCountry = CountryAlpha2
 CoercedGender = Annotated[Gender, BeforeValidator(normalize_gender_string)]
@@ -40,7 +42,7 @@ class PostalAddress(BaseModel):
 field_registry.register("non_empty_string", NonEmptyString)
 field_registry.register("email_address", EmailStr)
 field_registry.register("international_phone_number", PhoneNumber)
-field_registry.register("past_or_present_date", PastDate)
+field_registry.register("past_date", PastDate)
 field_registry.register("future_date", FutureDate)
 field_registry.register("positive_integer", PositiveInt)
 field_registry.register("percentage", Percentage)
@@ -49,9 +51,11 @@ field_registry.register("care_dependency_level", CareDependencyLevel)
 field_registry.register("german_zip_code", GermanZipCode)
 field_registry.register("coerced_decimal", CoercedDecimal)
 field_registry.register("coerced_date", CoercedDate)
+field_registry.register("coerced__past_date", CoercedPastDate)
+field_registry.register("coerced_future_date", CoercedFutureDate)
 field_registry.register("coerced_bool", CoercedBool)
-field_registry.register("CountryCode", CoercedCountry)
-field_registry.register("Gender", CoercedGender)
+field_registry.register("coerced_country", CoercedCountry)
+field_registry.register("coerced_gender", CoercedGender)
 
 # @add_new_field
 # MyNewField = Annotated[str, AfterValidator(some_validation_function)]

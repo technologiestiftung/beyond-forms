@@ -3,7 +3,7 @@ from typing import Optional, List
 from pydantic import model_validator, BaseModel
 from pydantic_extra_types.country import CountryAlpha2
 
-from app.domain.field_types import NonEmptyString, PastDate, PositiveInt, CareDependencyLevel, PostalAddress, CoercedGender, CoercedCountry
+from app.domain.field_types import NonEmptyString, PositiveInt, CareDependencyLevel, PostalAddress, CoercedGender, CoercedCountry, CoercedPastDate
 from app.domain.global_enums import (
     HealthInsuranceStatus,
     SocialSecurityStatus,
@@ -21,7 +21,7 @@ class UserInformation(BaseModel):
     first_name: NonEmptyString
     last_name: NonEmptyString
     middle_name: Optional[str] = None
-    birth_date: PastDate
+    birth_date: CoercedPastDate
     gender: CoercedGender
     nationality: CoercedCountry
     city_of_birth: NonEmptyString
@@ -111,7 +111,7 @@ class ElderlyDisabledWelfareForm(BaseModel):
 
     # Specific Benefit History Logic
     has_received_benefits_before: bool
-    previous_benefits_end_date: Optional[PastDate] = None
+    previous_benefits_end_date: Optional[CoercedPastDate] = None
     previous_benefits_authority: Optional[str] = None
 
     # Medical/Special Needs

@@ -35,6 +35,7 @@ def parse_date_string(val: Any) -> Any:
         return val.date()
     if isinstance(val, str):
         s = val.strip()
+        # parse date string with support for German format
         for fmt in ("%Y-%m-%d", "%d.%m.%Y", "%d/%m/%Y", "%Y/%m/%d"):
             try:
                 return datetime.datetime.strptime(s, fmt).date()

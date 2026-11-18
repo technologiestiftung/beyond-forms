@@ -8,7 +8,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-11-02T16:27:37.006745Z"
+exclude-newer = "2026-11-04T14:45:31.164334Z"
 exclude-newer-span = "P14D"
 
 [manifest]
@@ -3210,6 +3210,15 @@ wheels = [
 ]
 
 [[package]]
+name = "phonenumbers"
+version = "9.0.42"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/e0/b6c30d6bb4255fc999f7fe3b7f7821dbe7a92272768f3b57b6939f4eedcf/phonenumbers-9.0.42.tar.gz", hash = "sha256:83ddc20edea93814f5bb2ee8d365b3ef64fa274c8a4f6d06bd8b2c7996030564", size = 2312652, upload-time = "2026-10-27T07:49:34.218Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/92/517a82af51c58601d3e9c2e5757587f1d8201143ce98ac62f262d47f3355/phonenumbers-9.0.42-py2.py3-none-any.whl", hash = "sha256:321c92d9734bfb4adc64575f940da26463f09fc79ac692b43a35f9306e4ecc7d", size = 2595813, upload-time = "2026-10-27T07:49:32.576Z" },
+]
+
+[[package]]
 name = "pillow"
 version = "13.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4768,6 +4777,7 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "json5" },
     { name = "loguru" },
+    { name = "phonenumbers" },
     { name = "pycountry" },
     { name = "pydantic" },
     { name = "python-dotenv" },
@@ -4790,6 +4800,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = "~=0.159.1" },
     { name = "json5", specifier = "~=0.17.3" },
     { name = "loguru", specifier = "~=0.7.3" },
+    { name = "phonenumbers", specifier = "~=9.0.42" },
     { name = "pycountry", specifier = "~=26.2.16" },
     { name = "pydantic", specifier = "~=2.14" },
     { name = "python-dotenv", specifier = "~=1.2" },

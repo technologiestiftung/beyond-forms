@@ -90,4 +90,4 @@ def test_validate_form_returns_error_for_invalid_field_data(mock_form_registry: 
 
     assert response.status_code == 422
     assert any("date" in error["field_path"] for error in response_data["validation_errors"])
-    assert any("future" in error["message"].lower() for error in response_data["validation_errors"])
+    assert any("past" in error["message"].lower() for error in response_data["validation_errors"])
