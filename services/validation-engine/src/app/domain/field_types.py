@@ -2,8 +2,9 @@ import decimal
 from datetime import date
 from typing import Annotated
 
-from pydantic import BaseModel, EmailStr, Field, BeforeValidator, PastDate, FutureDate, PositiveInt, StringConstraints, PhoneNumberValidator
+from pydantic import BaseModel, EmailStr, Field, BeforeValidator, PastDate, FutureDate, PositiveInt, StringConstraints
 from pydantic_extra_types.country import CountryAlpha2
+from pydantic_extra_types.phone_numbers import PhoneNumberValidator
 
 from app.domain.registry import field_registry
 from app.validators.ocr_preprocessors import (
