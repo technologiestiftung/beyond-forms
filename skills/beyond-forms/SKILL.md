@@ -1,6 +1,6 @@
 ---
 name: beyond-forms
-description: "Use when working with BeyondForms / CityLAB Berlin social-benefits services — classifying or extracting German administrative documents (Rentenbescheid, Mietvertrag, Kontoauszug), validating form fields against the rules engine, filling AcroForm PDFs such as the Antrag auf Grundsicherung, or driving a demo citizen account over the hosted staging API. Staging is a live prototype environment rather than a fixture sandbox — profiles, uploaded documents and chat histories there can hold real personal data left by people testing the prototype, so treat everything retrieved from it as personal data rather than assuming it is synthetic."
+description: "Use when working with BeyondForms / CityLAB Berlin social-benefits services — classifying or extracting German administrative documents (Rentenbescheid, Mietvertrag, Kontoauszug), validating form fields against the validation engine, filling AcroForm PDFs such as the Antrag auf Grundsicherung, or driving a demo citizen account over the hosted staging API. Staging is a live prototype environment rather than a fixture sandbox — profiles, uploaded documents and chat histories there can hold real personal data left by people testing the prototype, so treat everything retrieved from it as personal data rather than assuming it is synthetic."
 version: 1.0.0
 author: Technologiestiftung Berlin
 license: MIT
@@ -21,7 +21,7 @@ Five services are callable with nothing but `curl` and `jq`. Everything here tar
 |---|---|---|
 | Middleware (user data) | `$API` — `https://staging.bf.citylab-berlin.org/api` | Bearer token |
 | Auth (issues the token) | `$AUTH` — `https://staging.bf.citylab-berlin.org/auth-proxy` | — |
-| Rules engine | `$RULES` — from your project | none |
+| Validation engine | `$RULES` — from your project | none |
 | Document intelligence | `$DOCS` — from your project | none |
 | Forms filling | `$PDF` — from your project | none |
 
@@ -116,7 +116,7 @@ curl -s --max-time 180 -X POST "$DOCS/api/v1/stateless/extract" \
 | POST | `/classify` | `file` or `gcs_uri`; add `-F 'entity-extraction=false'` to classify only |
 | POST | `/api/v1/stateless/extract` | `file` plus exactly one of `document_type` or `schema` (a JSON Schema string) |
 
-## Rules engine
+## Validation engine
 
 ```bash
 curl -s "$RULES/get-available-forms" | jq -r '."available-forms"[]'
@@ -241,7 +241,7 @@ This is the end-to-end job: work out what to ask, collect it, store it, get the 
 | | Shape | Where it is used |
 |---|---|---|
 | **Wallet profile** | flat keys — `first_name`, `rent_total`, `monthly_income` | `POST $API/profile`, persisted to the user's record, and what the PDF export reads |
-| **Form schema** | nested dotted paths — `applicant_information.applicant_personal_details.citizenship` | the rules engine's wizard definition and `/validate-form` |
+| **Form schema** | nested dotted paths — `applicant_information.applicant_personal_details.citizenship` | the validation engine's wizard definition and `/validate-form` |
 
 The interview logic is written in the form schema's vocabulary; what you save is in the wallet's. Translating between them is your job, and the names do not always correspond.
 

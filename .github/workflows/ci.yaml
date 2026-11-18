@@ -67,7 +67,7 @@ jobs:
     uses: ./.github/workflows/reusable-service-pipeline.yaml
     with:
       service_name: rules-engine
-      service_path: services/rules-engine
+      service_path: services/validation-engine
       environment_name: ${{ needs.setup-env.outputs.env_name }}
       environment_prefix: ${{ needs.setup-env.outputs.prefix }}
     secrets: inherit

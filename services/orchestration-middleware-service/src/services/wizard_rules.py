@@ -1,6 +1,6 @@
 """
 The Grundsicherung wizard rules (`schemas/rules/basic-welfare-rules.jsonc`): which step asks
-what, which `users` column or income row answers each field, and the payload the rules engine
+what, which `users` column or income row answers each field, and the payload the validation engine
 walks to find the next step. The payload holds the stored values as they are, so an empty
 column stays a missing field.
 """
@@ -26,7 +26,7 @@ RULES_PATH = Path(
     os.environ.get("WIZARD_RULES_PATH")
     or Path(__file__).resolve().parents[4] / "schemas" / "rules" / "basic-welfare-rules.jsonc"
 )
-ENDPOINT_RULES_ENGINE = os.environ.get("ENDPOINT_RULES_ENGINE", "http://rules-engine:8080")
+ENDPOINT_VALIDATION_ENGINE = os.environ.get("ENDPOINT_VALIDATION_ENGINE", "http://validation-engine:8080")
 
 
 @lru_cache(maxsize=1)
@@ -45,7 +45,7 @@ def application_start_step() -> str:
 
 
 def _path_parts(path: str) -> list[str]:
-    # the same normalisation as the rules engine's resolve_path: a['b'].c -> a.b.c
+    # the same normalisation as the validation engine's resolve_path: a['b'].c -> a.b.c
     normalized = path.replace("['", ".").replace("']", "").replace("[", ".").replace("]", "")
     return [part for part in normalized.split(".") if part]
 
@@ -69,7 +69,7 @@ def _json_value(value: Any) -> Any:
 
 
 def evaluation_payload(user: Users) -> dict:
-    """The form content the rules engine evaluates, built from the columns the rules name."""
+    """The form content the validation engine evaluates, built from the columns the rules name."""
     payload: dict = {}
     income_types_by_field: dict[str, set[str]] = {}
     for step in rules_steps().values():
@@ -97,16 +97,16 @@ def evaluation_payload(user: Users) -> dict:
 
 
 def evaluate(form_content: dict, timeout: float = 10) -> Optional[dict]:
-    """The rules engine's walk of an `evaluation_payload` from the start of the application, or
+    """The validation engine's walk of an `evaluation_payload` from the start of the application, or
     None if it can't be reached. Takes the built payload so a worker thread doesn't load the
     user's rows."""
     headers = {}
-    token = get_google_id_token(ENDPOINT_RULES_ENGINE)
+    token = get_google_id_token(ENDPOINT_VALIDATION_ENGINE)
     if token:
         headers["Authorization"] = f"Bearer {token}"
     try:
         response = requests.post(
-            f"{ENDPOINT_RULES_ENGINE}/wizard/evaluate",
+            f"{ENDPOINT_VALIDATION_ENGINE}/wizard/evaluate",
             json={"form_content": form_content, "current_step_id": application_start_step()},
             headers=headers,
             timeout=timeout,
@@ -114,5 +114,5 @@ def evaluate(form_content: dict, timeout: float = 10) -> Optional[dict]:
         response.raise_for_status()
         return response.json().get("evaluation") or {}
     except requests.exceptions.RequestException:
-        logger.warning("Rules engine /wizard/evaluate is unavailable", exc_info=True)
+        logger.warning("Validation engine /wizard/evaluate is unavailable", exc_info=True)
         return None

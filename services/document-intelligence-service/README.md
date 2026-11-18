@@ -104,7 +104,7 @@ Returns the JSON Schema for a specific document type.
 
 ## 🧪 Things to Consider for the Future
 
-- **Shared Resources:** The definition of `document_types` will have to be accessible for the rules-engine and the document intelligence service. However, in the document-intelligence service all fields need to be optional (to avoid failure if one field can not be extracted). In the rules engine, only fields that really are optional in terms of business logic should be marked as optional. We will need to think about a way to 1) share the definitions and 2) distinguish between business logic `Optionals` and the `Optional` required for extraction.
+- **Shared Resources:** The definition of `document_types` will have to be accessible for the validation-engine and the document intelligence service. However, in the document-intelligence service all fields need to be optional (to avoid failure if one field can not be extracted). In the validation engine, only fields that really are optional in terms of business logic should be marked as optional. We will need to think about a way to 1) share the definitions and 2) distinguish between business logic `Optionals` and the `Optional` required for extraction.
 - **Document Types:** still need to be updated to reflect the fields that we need to extract once the requirements are finalized.
 
 ---

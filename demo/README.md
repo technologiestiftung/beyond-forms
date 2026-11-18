@@ -117,7 +117,7 @@ drifted fixture fails the image build.
 - `documents[].document_type` — a **frontend slot id** (`id_card`, `rent`, `stmt3`), as
   `src/worker.py` writes. Not a document-intelligence registry name.
 - `documents[].raw_data` — validated against the registry schema for that slot with
-  `extra="forbid"`, i.e. the same check the rules engine applies when a real user
+  `extra="forbid"`, i.e. the same check the validation engine applies when a real user
   re-verifies a document. Computed fields such as `health_insurance_proof.is_private` must
   not appear.
 
@@ -162,7 +162,7 @@ though Helmut's User Story 9 is specifically about insurance being coverable), d
 hot-water supply, and duration of benefit receipt beyond free text. All filed as gaps.
 
 **Prior benefit receipt.** All three personas are prior recipients, which used to make every
-one of them un-submittable: the rules engine requires `previous_benefits_end_date` whenever
+one of them un-submittable: the validation engine requires `previous_benefits_end_date` whenever
 `has_received_benefits_before` is true, and `mappers.py` never emitted it. Now parsed from
 the free-text `previous_benefits_period` — a real date column is still the right fix.
 

@@ -33,7 +33,7 @@ from sqlalchemy import Date, DateTime, Enum, Numeric, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from src.mappers import map_flat_to_rules_engine_payload
+from src.mappers import map_flat_to_validation_engine_payload
 from src.models import (
     Conversations,
     DocumentStatusType,
@@ -55,7 +55,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_PERSONAS_DIR = Path("/app/demo/personas")
 GCS_BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME", "beyondforms-dev-bucket")
-ENDPOINT_RULES_ENGINE = os.environ.get("ENDPOINT_RULES_ENGINE", "http://rules-engine:8080")
+ENDPOINT_VALIDATION_ENGINE = os.environ.get("ENDPOINT_VALIDATION_ENGINE", "http://validation-engine:8080")
 
 # Session-level advisory lock so concurrent Cloud Run instances do not double-seed.
 _ENSURE_LOCK_KEY = 7350102
@@ -461,16 +461,16 @@ class DemoSeedService:
 
     def _check_submittability(self, db_user: Users) -> dict[str, Any]:
         """
-        Asks the rules engine whether the seeded profile would pass — and writes nothing.
+        Asks the validation engine whether the seeded profile would pass — and writes nothing.
 
         This is the same contract `POST /profile` exercises, so it surfaces at seed time
-        whether a persona is deliberately incomplete or accidentally broken. A rules-engine
+        whether a persona is deliberately incomplete or accidentally broken. A validation-engine
         outage is reported, not raised: it must not fail a seed.
         """
         try:
-            payload = map_flat_to_rules_engine_payload(db_user)
+            payload = map_flat_to_validation_engine_payload(db_user)
             response = requests.post(
-                f"{ENDPOINT_RULES_ENGINE}/validate-form",
+                f"{ENDPOINT_VALIDATION_ENGINE}/validate-form",
                 json=payload,
                 params={"validate_entire_form": True},
                 timeout=15,
@@ -483,7 +483,7 @@ class DemoSeedService:
                 "detail": body,
             }
         except Exception as exc:
-            logger.warning("Rules-engine submittability check unavailable: %s", exc)
+            logger.warning("Validation-engine submittability check unavailable: %s", exc)
             return {"checked": False, "reason": str(exc)}
 
     @staticmethod

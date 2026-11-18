@@ -13,7 +13,7 @@ echo "🧹 [2/3] Ensuring critical ports are clear..."
 # 8001: Document Intelligence Service
 # 8002: Toolbox MCP
 # 8003: Auth Service
-# 8004: Rules Engine
+# 8004: Validation Engine
 # 8005: Translation Service
 # 8080: Orchestration Middleware
 PORTS=(8000 8001 8002 8003 8004 8005 8080)

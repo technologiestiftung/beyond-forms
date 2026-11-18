@@ -442,16 +442,16 @@ def test_chat_stream_reports_failed_llm_call(mock_completion, mock_conv_service,
 
 
 @pytest.fixture(autouse=True)
-def rules_engine():
-    """The rules engine's next step; unreachable unless a test says otherwise."""
+def validation_engine():
+    """The validation engine's next step; unreachable unless a test says otherwise."""
     with patch("src.routes.llm.evaluate", return_value=None) as evaluate:
         yield evaluate
 
 
 @pytest.fixture
-def profile_row(rules_engine):
+def profile_row(validation_engine):
     row = DbUser()
-    rules_engine.return_value = {"next_step": "step_applicant_name"}
+    validation_engine.return_value = {"next_step": "step_applicant_name"}
     with patch("src.routes.llm._load_user_row", return_value=row):
         yield row
 
@@ -543,9 +543,9 @@ def test_chat_stream_offers_no_card_without_a_profile(mock_completion, mock_conv
 )
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
 def test_chat_stream_offers_no_card_when_the_rules_have_none(
-    mock_completion, evaluation, mock_conv_service, mock_conv, profile_row, rules_engine
+    mock_completion, evaluation, mock_conv_service, mock_conv, profile_row, validation_engine
 ):
-    rules_engine.return_value = evaluation
+    validation_engine.return_value = evaluation
     mock_completion.return_value = _text_stream("Hallo!")
 
     client.post("/chat/stream", json=_run_input("Hallo"))
@@ -555,9 +555,9 @@ def test_chat_stream_offers_no_card_when_the_rules_have_none(
 
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
 def test_chat_stream_tells_the_model_when_the_application_is_complete(
-    mock_completion, mock_conv_service, mock_conv, profile_row, rules_engine
+    mock_completion, mock_conv_service, mock_conv, profile_row, validation_engine
 ):
-    rules_engine.return_value = {"next_step": "END"}
+    validation_engine.return_value = {"next_step": "END"}
     mock_completion.return_value = _text_stream("Alles ist ausgefüllt.")
 
     client.post("/chat/stream", json=_run_input("Weiter"))
@@ -674,10 +674,10 @@ _OPEN_CARD_CONTEXT = [
 @patch("src.routes.llm.write_profile_payload", wraps=write_profile_payload)
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
 def test_chat_stream_saves_a_card_answer_and_continues(
-    mock_completion, mock_write, mock_conv_service, mock_conv, profile_row, rules_engine
+    mock_completion, mock_write, mock_conv_service, mock_conv, profile_row, validation_engine
 ):
     mock_conv_service.get_conversation_context.return_value = _OPEN_CARD_CONTEXT
-    rules_engine.return_value = {"next_step": "step_applicant_dob"}
+    validation_engine.return_value = {"next_step": "step_applicant_dob"}
     mock_completion.return_value = _text_stream("Danke, Anna.")
 
     response = client.post(
@@ -700,7 +700,7 @@ def test_chat_stream_saves_a_card_answer_and_continues(
 
 
 @patch("src.routes.llm.acompletion", new_callable=AsyncMock)
-def test_chat_stream_offers_an_answered_card_again_while_the_rules_engine_stops_there(
+def test_chat_stream_offers_an_answered_card_again_while_the_validation_engine_stops_there(
     mock_completion, mock_conv_service, mock_conv, profile_row
 ):
     mock_conv_service.get_conversation_context.return_value = [

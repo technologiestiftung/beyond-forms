@@ -67,7 +67,7 @@ async def test_get_application_status_success(mock_db):
     # Mock user query (by authentik_id) followed by application query
     mock_db.query.return_value.filter.return_value.first.side_effect = [mock_user, mock_application]
 
-    # Mock rules engine response via shared http_client
+    # Mock validation engine response via shared http_client
     mock_response = MagicMock()
     mock_response.json.return_value = {
         "status": "error",

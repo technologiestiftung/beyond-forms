@@ -86,7 +86,7 @@ curl -O https://raw.githubusercontent.com/technologiestiftung/beyond-forms/main/
 
 Installers resolve against the default branch, so changes only become installable once merged to `main`. While editing the skill, point your agent at the working copy instead of reinstalling — Hermes via `skills.external_dirs` in `~/.hermes/config.yaml`, Claude Code via a symlink at `.claude/skills/beyond-forms`.
 
-The middleware and auth hostnames are public, so the demo-persona workflow works as soon as the skill is installed. The rules-engine, document-intelligence and forms-filling services are internal Cloud Run addresses that accept unauthenticated requests — they are deliberately **not** committed anywhere in this repo, and the skill resolves them at runtime from the project instead:
+The middleware and auth hostnames are public, so the demo-persona workflow works as soon as the skill is installed. The validation-engine, document-intelligence and forms-filling services are internal Cloud Run addresses that accept unauthenticated requests — they are deliberately **not** committed anywhere in this repo, and the skill resolves them at runtime from the project instead:
 
 ```bash
 gcloud run services list --project beyond-forms-staging --region europe-west10

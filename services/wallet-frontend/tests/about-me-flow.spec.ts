@@ -25,9 +25,9 @@ test.describe("About Me Progressive Wizard E2E & Accessibility Audits", () => {
 		});
 	});
 
-	// Skipped: the wizard blanks out after Page 1 because rules-engine's
+	// Skipped: the wizard blanks out after Page 1 because validation-engine's
 	// /wizard/evaluate ignores current_step_id and always starts from the
-	// Eligibility Check section, so orchestration-middleware/rules-engine
+	// Eligibility Check section, so orchestration-middleware/validation-engine
 	// return a next_step the frontend doesn't recognize. Known broken;
 	// re-enable once the wizard step-evaluation is fixed.
 	test.skip("Should complete the entire About Me wizard flow (German citizen happy path) with zero a11y errors", async ({

@@ -8,7 +8,7 @@ from unittest.mock import Mock
 
 logger = logging.getLogger(__name__)
 
-# `users.previous_benefits_period` is free text, but the rules engine's
+# `users.previous_benefits_period` is free text, but the validation engine's
 # `ElderlyDisabledWelfareForm` requires a `PastDate` in `previous_benefits_end_date`
 # whenever `has_received_benefits_before` is true. Without a value there, every
 # applicant who has received benefits before is rejected as un-submittable.
@@ -62,7 +62,7 @@ def parse_previous_benefits_end(period: Optional[str]) -> Optional[str]:
     return max(past).isoformat()
 
 
-def map_flat_to_rules_engine_payload(db_user: DbUser) -> dict:
+def map_flat_to_validation_engine_payload(db_user: DbUser) -> dict:
     gender_val = None
     if db_user.legal_gender is not None:
         try:

@@ -14,7 +14,7 @@ from app.validation.error_formatting import format_validation_errors
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Rules-Engine")
+app = FastAPI(title="Validation-Engine")
 
 logger.info(f"Registry initialized with {len(domain.field_registry._registry)} fields.")
 

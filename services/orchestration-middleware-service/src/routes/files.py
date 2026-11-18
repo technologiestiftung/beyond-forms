@@ -627,7 +627,7 @@ def verify_document(
     doc: UserDocuments = Depends(get_user_document),
     db: Session = Depends(get_db),
 ):
-    ENDPOINT_RULES_ENGINE = os.environ.get("ENDPOINT_RULES_ENGINE", "http://rules-engine:8080")
+    ENDPOINT_VALIDATION_ENGINE = os.environ.get("ENDPOINT_VALIDATION_ENGINE", "http://validation-engine:8080")
 
     DB_GENDER_FORMAT_MAPPING = {"MALE": "Male", "FEMALE": "Female", "NON_BINARY": "Diverse"}
 
@@ -667,10 +667,10 @@ def verify_document(
     profile_sync = {}
     if payload.verified_fields:
         verified_subset = {field: local_raw_data[field] for field in payload.verified_fields if field in local_raw_data}
-        rules_engine_headers = {}
-        rules_engine_token = get_google_id_token(ENDPOINT_RULES_ENGINE)
-        if rules_engine_token:
-            rules_engine_headers["Authorization"] = f"Bearer {rules_engine_token}"
+        validation_engine_headers = {}
+        validation_engine_token = get_google_id_token(ENDPOINT_VALIDATION_ENGINE)
+        if validation_engine_token:
+            validation_engine_headers["Authorization"] = f"Bearer {validation_engine_token}"
 
         request_body: dict = {"fields": verified_subset}
         if dis_document_type:
@@ -678,9 +678,9 @@ def verify_document(
 
         try:
             response = requests.post(
-                f"{ENDPOINT_RULES_ENGINE}/validate-fields",
+                f"{ENDPOINT_VALIDATION_ENGINE}/validate-fields",
                 json=request_body,
-                headers=rules_engine_headers,
+                headers=validation_engine_headers,
                 timeout=5,
             )
             if response.status_code == 422:
@@ -699,7 +699,7 @@ def verify_document(
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Failed to communicate with rules-engine: {e}")
+            logger.error(f"Failed to communicate with validation-engine: {e}")
             raise HTTPException(
                 status_code=502,
                 detail="Validation service is temporarily unavailable. Could not verify fields.",

@@ -30,7 +30,7 @@ def override_dependencies():
 @patch("requests.post")
 def test_update_profile_firewall_401(mock_post):
     """
-    Test that a 401 from rules engine is mapped to 502.
+    Test that a 401 from validation engine is mapped to 502.
     """
     mock_response = MagicMock()
     mock_response.status_code = 401
@@ -47,7 +47,7 @@ def test_update_profile_firewall_401(mock_post):
 @patch("requests.post")
 def test_update_profile_firewall_403(mock_post):
     """
-    Test that a 403 from rules engine is mapped to 502.
+    Test that a 403 from validation engine is mapped to 502.
     """
     mock_response = MagicMock()
     mock_response.status_code = 403
@@ -64,7 +64,7 @@ def test_update_profile_firewall_403(mock_post):
 @patch("requests.post")
 def test_update_profile_firewall_500(mock_post):
     """
-    Test that a 500 from rules engine is mapped to 502.
+    Test that a 500 from validation engine is mapped to 502.
     """
     mock_response = MagicMock()
     mock_response.status_code = 500
@@ -83,7 +83,7 @@ def test_update_profile_firewall_500(mock_post):
 @patch("requests.post")
 def test_update_profile_firewall_timeout(mock_post):
     """
-    Test that a timeout from rules engine is mapped to 504.
+    Test that a timeout from validation engine is mapped to 504.
     """
     mock_post.side_effect = requests.exceptions.Timeout("Connection timed out")
 
@@ -96,7 +96,7 @@ def test_update_profile_firewall_timeout(mock_post):
 @patch("requests.post")
 def test_update_profile_validation_error_422(mock_post):
     """
-    Test that a 422 validation failure from rules engine is handled and returned.
+    Test that a 422 validation failure from validation engine is handled and returned.
     """
     mock_response = MagicMock()
     mock_response.status_code = 422

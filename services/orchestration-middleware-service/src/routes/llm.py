@@ -68,7 +68,7 @@ _ENUM_ALLOWED_VALUES: dict[str, str] = {
 MAX_TOOL_CALL_ROUNDS = 5
 CHAT_CONTEXT_WINDOW_SIZE = int(os.getenv("CHAT_CONTEXT_WINDOW_SIZE", "20"))
 MAX_CARD_ANSWER_LENGTH = 4000
-# the rules engine answers from a local decision tree in milliseconds; past this the reply
+# the validation engine answers from a local decision tree in milliseconds; past this the reply
 # goes out without a card instead of keeping the user waiting
 CARD_EVALUATION_TIMEOUT_SECONDS = 3
 
@@ -304,7 +304,7 @@ def _load_user_row(db: Session, user_service: UserService, current_user: AuthUse
 
 
 async def _next_card(form_content: Optional[dict], answered_card_ids: set[str]) -> tuple[Optional[str], str]:
-    """The step the rules engine stops at, if it is a card, and what the model is told about it."""
+    """The step the validation engine stops at, if it is a card, and what the model is told about it."""
     if form_content is None:
         return None, ""
     evaluation = await asyncio.to_thread(evaluate, form_content, CARD_EVALUATION_TIMEOUT_SECONDS)

@@ -18,7 +18,7 @@ from src.services.user_service import (
     write_profile_payload,
 )
 from src.utils import get_google_id_token
-from src.mappers import map_flat_to_rules_engine_payload
+from src.mappers import map_flat_to_validation_engine_payload
 from src.services.wizard_rules import evaluate, evaluation_payload
 from src.tasks.cleanup import run_background_gcs_cleanup
 from src.gcs import get_gcs_client
@@ -38,7 +38,7 @@ def _delete_gcs_files_sync(files: list[tuple[str, str]]):
 
 logger = logging.getLogger(__name__)
 
-ENDPOINT_RULES_ENGINE = os.environ.get("ENDPOINT_RULES_ENGINE", "http://rules-engine:8080")
+ENDPOINT_VALIDATION_ENGINE = os.environ.get("ENDPOINT_VALIDATION_ENGINE", "http://validation-engine:8080")
 
 router = APIRouter(tags=["user"])
 
@@ -80,7 +80,7 @@ def get_profile(
 
 @router.get("/validate")
 def validate_user_data(current_user: AuthUser = Depends(require_authenticated_user)):
-    # TODO: fetch all the information related to the form and validate via rule engine
+    # TODO: fetch all the information related to the form and validate via validation engine
     return {"status": "work in progress"}
 
 
@@ -91,7 +91,7 @@ def update_user_profile(
     db: Session = Depends(get_db),
 ):
     """
-    Update user profile data after validation by the rules engine
+    Update user profile data after validation by the validation engine
     """
     db_user = db.query(DbUser).filter(DbUser.phone_number == current_user.user_name).first()
     if not db_user:
@@ -109,16 +109,16 @@ def update_user_profile(
     )
     db.commit()
 
-    # Construct payload for Rules Engine from updated DB user
-    rules_engine_payload = map_flat_to_rules_engine_payload(db_user)
+    # Construct payload for Validation Engine from updated DB user
+    validation_engine_payload = map_flat_to_validation_engine_payload(db_user)
 
-    validate_url = f"{ENDPOINT_RULES_ENGINE}/validate-form"
+    validate_url = f"{ENDPOINT_VALIDATION_ENGINE}/validate-form"
     params = {}
     if payload.validate_entire_form is not None:
         params["validate_entire_form"] = payload.validate_entire_form
 
     headers = {}
-    token = get_google_id_token(ENDPOINT_RULES_ENGINE)
+    token = get_google_id_token(ENDPOINT_VALIDATION_ENGINE)
     if token:
         headers["Authorization"] = f"Bearer {token}"
 
@@ -129,7 +129,7 @@ def update_user_profile(
         # Perform downstream calls concurrently to minimize latency
         with ThreadPoolExecutor(max_workers=2) as executor:
             future_validate = executor.submit(
-                requests.post, validate_url, json=rules_engine_payload, params=params, headers=headers, timeout=10
+                requests.post, validate_url, json=validation_engine_payload, params=params, headers=headers, timeout=10
             )
             future_evaluate = executor.submit(evaluate, evaluation_payload(db_user))
 
@@ -140,7 +140,7 @@ def update_user_profile(
             try:
                 wizard_data = future_evaluate.result() or {}
             except Exception as eval_err:
-                logger.warning(f"Failed to fetch wizard evaluation from rules engine: {eval_err}")
+                logger.warning(f"Failed to fetch wizard evaluation from validation engine: {eval_err}")
 
         # Coerce wizard_data mock structures inside unit tests
         if not isinstance(wizard_data, dict):
@@ -148,7 +148,7 @@ def update_user_profile(
 
         # Downstream authentication check
         if response.status_code in (401, 403):
-            logger.error(f"Middleware failed to authenticate with Rules Engine: {response.status_code}")
+            logger.error(f"Middleware failed to authenticate with Validation Engine: {response.status_code}")
             raise HTTPException(status_code=502, detail="Upstream service authentication failure.")
 
         # Handle validation errors
@@ -184,13 +184,13 @@ def update_user_profile(
         return JSONResponse(status_code=200, content=combined_response)
 
     except requests.exceptions.Timeout as e:
-        logger.error(f"Gateway Timeout calling rules engine: {str(e)}", exc_info=True)
+        logger.error(f"Gateway Timeout calling validation engine: {str(e)}", exc_info=True)
         raise HTTPException(status_code=504, detail="Gateway Timeout: Could not reach upstream service.")
     except requests.exceptions.HTTPError as e:
-        logger.error(f"HTTP error from rules engine: {str(e)}", exc_info=True)
+        logger.error(f"HTTP error from validation engine: {str(e)}", exc_info=True)
         raise HTTPException(status_code=502, detail="Upstream service returned an error.")
     except requests.exceptions.RequestException as e:
-        logger.error(f"Failed to call rules engine: {str(e)}", exc_info=True)
+        logger.error(f"Failed to call validation engine: {str(e)}", exc_info=True)
         raise HTTPException(status_code=504, detail="Gateway Timeout: Could not reach upstream service.")
 
 

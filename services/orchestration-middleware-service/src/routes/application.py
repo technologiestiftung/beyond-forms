@@ -14,7 +14,7 @@ from src.utils import get_google_id_token
 
 logger = logging.getLogger(__name__)
 
-ENDPOINT_RULES_ENGINE = os.environ.get("ENDPOINT_RULES_ENGINE", "http://rules-engine:8080")
+ENDPOINT_VALIDATION_ENGINE = os.environ.get("ENDPOINT_VALIDATION_ENGINE", "http://validation-engine:8080")
 
 GENERIC_DOCUMENTS_FORM_TYPE = "profile_documents"
 
@@ -57,9 +57,9 @@ async def evaluate_wizard_endpoint(
     """
     Public endpoint to evaluate the wizard decision tree (used for eligibility checklist and dynamic step transitions).
     """
-    url = f"{ENDPOINT_RULES_ENGINE}/wizard/evaluate"
+    url = f"{ENDPOINT_VALIDATION_ENGINE}/wizard/evaluate"
     headers = {}
-    token = get_google_id_token(ENDPOINT_RULES_ENGINE)
+    token = get_google_id_token(ENDPOINT_VALIDATION_ENGINE)
     if token:
         headers["Authorization"] = f"Bearer {token}"
     try:
@@ -69,7 +69,7 @@ async def evaluate_wizard_endpoint(
             raise HTTPException(status_code=response.status_code, detail="Failed to evaluate wizard rules downstream.")
         return response.json()
     except Exception as e:
-        logger.exception("Error calling downstream rules engine evaluate:")
+        logger.exception("Error calling downstream validation engine evaluate:")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -119,27 +119,27 @@ async def get_application_status(
     if not application:
         raise HTTPException(status_code=404, detail="Application not found")
 
-    rules_engine_payload = {
+    validation_engine_payload = {
         "form_type": application.form_type,
         "form_content": application.form_data or {},
     }
 
-    url = f"{ENDPOINT_RULES_ENGINE}/validate-form"
+    url = f"{ENDPOINT_VALIDATION_ENGINE}/validate-form"
     params = {"validate_entire_form": True}
     headers = {}
-    token = get_google_id_token(ENDPOINT_RULES_ENGINE)
+    token = get_google_id_token(ENDPOINT_VALIDATION_ENGINE)
     if token:
         headers["Authorization"] = f"Bearer {token}"
     try:
         # Use shared global HTTP client to prevent connection exhaustion
         client: httpx.AsyncClient = request.app.state.http_client
-        response = await client.post(url, json=rules_engine_payload, params=params, headers=headers, timeout=10.0)
+        response = await client.post(url, json=validation_engine_payload, params=params, headers=headers, timeout=10.0)
 
         if response.status_code not in [200, 422]:
             response.raise_for_status()
         rules_data = response.json()
     except Exception as e:
-        logger.warning(f"Rules engine unreachable, applying bulletproof MVP fallback: {str(e)}")
+        logger.warning(f"Validation engine unreachable, applying bulletproof MVP fallback: {str(e)}")
         rules_data = {
             "is_submittable": True,
             "required_documents": ["ID_CARD"],

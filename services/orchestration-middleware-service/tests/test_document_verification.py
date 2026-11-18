@@ -72,7 +72,7 @@ def test_verify_document_updates_user_and_cleans_raw_data(mock_post, mock_db):
 
     mock_db.query.side_effect = db_query_side_effect
 
-    # Mock Rules Engine batch validation call
+    # Mock Validation Engine batch validation call
     mock_resp = Mock()
     mock_resp.status_code = 200
     mock_resp.json.return_value = {
@@ -141,7 +141,7 @@ def test_verify_document_safe_type_coercion_for_empty_strings(mock_post, mock_db
 
     mock_db.query.side_effect = db_query_side_effect
 
-    # Mock Rules Engine batch validation call
+    # Mock Validation Engine batch validation call
     mock_resp = Mock()
     mock_resp.status_code = 200
     mock_resp.json.return_value = {"status": "success", "profile_sync": {"date_of_birth": None, "rent_total": None}}
@@ -215,7 +215,7 @@ def test_delete_document_endpoint_transaction_safety(mock_db):
 @patch("requests.post")
 def test_verify_document_validation_error_reverse_mappings(mock_post, mock_db):
     """
-    Test that validation errors from the Rules Engine are passed through to the client
+    Test that validation errors from the Validation Engine are passed through to the client
     using the same field keys that were submitted for verification.
     """
     document_id = uuid.uuid4()
@@ -238,7 +238,7 @@ def test_verify_document_validation_error_reverse_mappings(mock_post, mock_db):
 
     mock_db.query.side_effect = db_query_side_effect
 
-    # Mock Rules Engine returning a 422 error keyed by DB fields
+    # Mock Validation Engine returning a 422 error keyed by DB fields
     mock_resp = Mock()
     mock_resp.status_code = 422
     mock_resp.json.return_value = {
@@ -310,7 +310,7 @@ def test_verify_document_validation_error_list_reverse_mappings(mock_post, mock_
 
     mock_db.query.side_effect = db_query_side_effect
 
-    # Mock rules engine response with validation error list format
+    # Mock validation engine response with validation error list format
     mock_resp = MagicMock()
     mock_resp.status_code = 422
     mock_resp.json.return_value = {

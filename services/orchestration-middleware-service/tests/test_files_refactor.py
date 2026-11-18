@@ -144,7 +144,7 @@ def test_upload_file_db_failure_deletes_gcs_blob(mock_storage_client, mock_publi
 def test_verify_document_defers_mutations_until_validated(mock_post, mock_db):
     """
     Verify that verify_document does not commit or perform DB mutations (like updating User profile)
-    until AFTER the rules engine validation request successfully returns.
+    until AFTER the validation engine validation request successfully returns.
     """
     document_id = uuid.uuid4()
     mock_user = DbUser(id=uuid.uuid4(), first_name="OldName")
@@ -161,12 +161,12 @@ def test_verify_document_defers_mutations_until_validated(mock_post, mock_db):
 
     mock_db.query.side_effect = db_query_side_effect
 
-    # We track rules engine post call, user first_name updates, and db commits
+    # We track validation engine post call, user first_name updates, and db commits
     events = []
 
     def mock_post_side_effect(url, *args, **kwargs):
-        events.append("rules_engine_called")
-        assert mock_user.first_name == "OldName", "User name mutated before rules engine validation!"
+        events.append("validation_engine_called")
+        assert mock_user.first_name == "OldName", "User name mutated before validation engine validation!"
 
         resp = Mock()
         resp.status_code = 200
@@ -196,8 +196,8 @@ def test_verify_document_defers_mutations_until_validated(mock_post, mock_db):
         response = client.post(f"/api/v1/documents/{document_id}/verify", json=payload)
         assert response.status_code == 200
 
-    # Check order: rules engine validation request, then mutation
-    assert events == ["rules_engine_called", "user_mutated"]
+    # Check order: validation engine validation request, then mutation
+    assert events == ["validation_engine_called", "user_mutated"]
 
 
 @patch("src.routes.files.publish_document_event")

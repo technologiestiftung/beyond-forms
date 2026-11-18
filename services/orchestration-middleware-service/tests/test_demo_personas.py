@@ -6,7 +6,7 @@ fails the image build rather than surfacing as a confusing 500 at seed time.
 
 The valuable assertion here is the `raw_data` check: it goes through the exact same
 registry lookup and strict validation that `validate_document_verified_fields` uses in
-the rules engine, so a fixture that passes here also survives a real user re-verifying
+the validation engine, so a fixture that passes here also survives a real user re-verifying
 the document through the UI.
 """
 

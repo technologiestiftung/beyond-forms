@@ -8,7 +8,7 @@ The middleware will eventually manage the lifecycle of a user request by coordin
 
 - **Document Intelligence Service**: For OCR and data extraction.
 - **Form Filler Service**: For automated document completion.
-- **Rule Engine Service**: For logic validation and business rules.
+- **Validation Engine Service**: For logic validation and business rules.
 - **LLM Service**: For intent classification, function calling and general chat functionality.
 
 ## Key Features
@@ -38,7 +38,7 @@ Retrieve the current user's profile.
 
 #### `POST /profile`
 
-Update the user's profile data after validation by the Rules Engine.
+Update the user's profile data after validation by the Validation Engine.
 
 - **Requires Authentication**: Yes
 - **Example Request Body**:
@@ -54,7 +54,7 @@ Update the user's profile data after validation by the Rules Engine.
 }
 ```
 
-- **Response**: Returns the validation result from the Rules Engine. If the status is `"success"`, the data is persisted to the database.
+- **Response**: Returns the validation result from the Validation Engine. If the status is `"success"`, the data is persisted to the database.
 
 ### Form Export
 

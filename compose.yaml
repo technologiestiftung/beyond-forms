@@ -59,18 +59,18 @@ services:
       - app-network
     restart: unless-stopped
 
-  rules-engine:
+  validation-engine:
     build:
       context: .
-      dockerfile: ./services/rules-engine/Dockerfile
-    image: rules-engine:latest
-    container_name: rules-engine
+      dockerfile: ./services/validation-engine/Dockerfile
+    image: validation-engine:latest
+    container_name: validation-engine
     ports:
       - "8004:8080"
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
-      - ./services/rules-engine:/app/services/rules-engine
+      - ./services/validation-engine:/app/services/validation-engine
       - ./libs/document-schemas:/app/libs/document-schemas
     command:
       [
@@ -105,7 +105,7 @@ services:
       - GCLOUD_PROJECT=beyond-forms-staging
       - AUTHENTIK_SERVER_URL=${AUTHENTIK_SERVER_URL:-http://authentik-server:9000}
       - AUTHENTIK_PUBLIC_KEY_PATH=${AUTHENTIK_PUBLIC_KEY_PATH:-/app/auth/certs/pub/oidc_public.pem}
-      - ENDPOINT_RULES_ENGINE=http://rules-engine:8080
+      - ENDPOINT_VALIDATION_ENGINE=http://validation-engine:8080
       - ENDPOINT_FORMS_FILLER=http://forms-filling-service:8080
       - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-3.7-flash}
       - CHAT_CONTEXT_WINDOW_SIZE=20
@@ -173,7 +173,7 @@ services:
       - GCLOUD_PROJECT=beyond-forms-staging
       - AUTHENTIK_SERVER_URL=${AUTHENTIK_SERVER_URL:-http://authentik-server:9000}
       - AUTHENTIK_PUBLIC_KEY_PATH=${AUTHENTIK_PUBLIC_KEY_PATH:-/app/auth/certs/pub/oidc_public.pem}
-      - ENDPOINT_RULES_ENGINE=http://rules-engine:8080
+      - ENDPOINT_VALIDATION_ENGINE=http://validation-engine:8080
       - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-3.7-flash}
       - POSTGRES_USER=devuser
       - POSTGRES_PASSWORD=devpassword

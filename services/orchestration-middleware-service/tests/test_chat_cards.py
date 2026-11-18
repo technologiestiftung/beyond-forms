@@ -12,7 +12,7 @@ from src.services.wizard_rules import RULES_PATH, application_start_step, evalua
 
 pytestmark = pytest.mark.skipif(not RULES_PATH.exists(), reason="rules file is not part of this checkout")
 
-# The rules engine skips these on its own (`is_field_required`).
+# The validation engine skips these on its own (`is_field_required`).
 OPTIONAL_FIELDS = (".birth_name", ".applicant_last_resided_address")
 
 

@@ -337,7 +337,7 @@ resource "google_cloud_run_v2_service" "middleware_service" {
       }
 
       env {
-        name  = "ENDPOINT_RULES_ENGINE"
+        name  = "ENDPOINT_VALIDATION_ENGINE"
         value = "https://${var.app_name}-${each.key}-rules-engine-xk7qpppwga-oe.a.run.app"
       }
       env {

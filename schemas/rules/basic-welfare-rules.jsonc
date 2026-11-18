@@ -651,7 +651,7 @@
         "applicant_accommodation.applicant_tenancy_status",
         "applicant_accommodation.applicant_landlord_name"
       ],
-      // the rules engine skips tenancy and landlord for a free right of residence
+      // the validation engine skips tenancy and landlord for a free right of residence
       "columns": [
         {
           "column": "tenancy_status",

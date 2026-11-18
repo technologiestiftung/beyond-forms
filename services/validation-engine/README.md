@@ -1,4 +1,4 @@
-# Rules Engine Service
+# Validation Engine Service
 
 Service for single field and form validation.
 
@@ -68,7 +68,7 @@ The API returns a standardized response format for all errors:
 
 ### Cloud Run
 
-To deploy the service to Google Cloud Run, run the following command from the rules-engine service root.
+To deploy the service to Google Cloud Run, run the following command from the validation-engine service root.
 
 ```bash
 gcloud builds submit --config infrastructure/cloudbuild.yaml --region=europe-west10 .
@@ -85,6 +85,6 @@ poetry run uvicorn src.api.main:app --host 0.0.0.0 --port 8080
 OR
 
 ```bash
-cd services/rules-engine/src
+cd services/validation-engine/src
 uv run fastapi dev --port 8004
 ```

@@ -93,7 +93,7 @@ def test_get_profile_not_found(mock_cleanup, mock_db):
 
 @patch("requests.post")
 def test_update_profile_success(mock_post, mock_db):
-    # Setup mock for rules engine response
+    # Setup mock for validation engine response
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.json.return_value = {"status": "success", "message": "Validation successful"}
@@ -356,7 +356,7 @@ def test_update_profile_validate_entire_form(mock_post, mock_db):
     assert response.status_code == 200
     assert response.json()["validation_status"] == "valid"
 
-    # Verify rules engine call params had validate_entire_form=True
+    # Verify validation engine call params had validate_entire_form=True
     assert mock_post.call_count >= 1
     validate_call = next((call for call in mock_post.call_args_list if "/validate-form" in call[0][0]), None)
     assert validate_call is not None, "validate-form endpoint was not called"

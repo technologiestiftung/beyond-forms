@@ -7,28 +7,28 @@ WORKDIR /app
 # anonymous volume is needed (Docker never refreshes those on rebuild).
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv
 ADD . /app
-WORKDIR /app/services/rules-engine
+WORKDIR /app/services/validation-engine
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --package rules-engine --frozen --no-dev
+    uv sync --package validation-engine --frozen --no-dev
 
 FROM builder AS test
-WORKDIR /app/services/rules-engine
+WORKDIR /app/services/validation-engine
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --package rules-engine --frozen
+    uv sync --package validation-engine --frozen
 RUN uv run python -m pytest
 
 FROM python:3.13-slim-bookworm
 
 RUN useradd -u 10001 -m app
 
-COPY --from=test /app/services/rules-engine/pyproject.toml /dev/null
-COPY --from=builder --chown=app:app /app/services/rules-engine /app/services/rules-engine
+COPY --from=test /app/services/validation-engine/pyproject.toml /dev/null
+COPY --from=builder --chown=app:app /app/services/validation-engine /app/services/validation-engine
 COPY --from=builder --chown=app:app /app/libs/document-schemas /app/libs/document-schemas
 COPY --from=builder --chown=app:app /app/schemas/rules /app/schemas/rules
 COPY --from=builder --chown=app:app /opt/venv /opt/venv
-WORKDIR /app/services/rules-engine
+WORKDIR /app/services/validation-engine
 ENV PATH="/opt/venv/bin:$PATH"
-ENV PYTHONPATH="/app/services/rules-engine"
+ENV PYTHONPATH="/app/services/validation-engine"
 
 USER app
 

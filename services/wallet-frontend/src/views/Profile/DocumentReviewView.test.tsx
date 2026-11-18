@@ -148,7 +148,7 @@ describe("DocumentReviewView - Validation & Smart Error Handling", () => {
 		expect(input).toBeInTheDocument();
 	});
 
-	it("smartly parses rules-engine dictionary validation details, highlights inputs, and displays localized validation errors", async () => {
+	it("smartly parses validation-engine dictionary validation details, highlights inputs, and displays localized validation errors", async () => {
 		(
 			authenticatedFetch as unknown as ReturnType<typeof vi.fn>
 		).mockResolvedValueOnce({

@@ -19,7 +19,7 @@ from src.models import (
     IncomeType,
 )
 from unittest.mock import patch
-from src.mappers import map_flat_to_rules_engine_payload
+from src.mappers import map_flat_to_validation_engine_payload
 from tests.http_mocks import validate_fields_error_response, validate_fields_success_response
 
 client = TestClient(app)
@@ -61,7 +61,7 @@ def test_verify_document_syncs_mapped_keys_and_coerces_types(mock_post, mock_db)
     """
     Tests that:
     1. Document keys are translated to DB columns (given_names -> first_name, monthly_total_rent -> rent_total).
-    2. Raw OCR inputs are batch validated via the Rules Engine.
+    2. Raw OCR inputs are batch validated via the Validation Engine.
     3. Safe conversions are resolved before database saving.
     """
     document_id = uuid.uuid4()
@@ -110,7 +110,7 @@ def test_verify_document_syncs_mapped_keys_and_coerces_types(mock_post, mock_db)
 
     mock_db.query.side_effect = db_query_side_effect
 
-    # Mock Rules Engine Batch Validation HTTP response
+    # Mock Validation Engine Batch Validation HTTP response
     mock_resp = validate_fields_success_response(
         validated_fields={
             "given_names": "Helmut",
@@ -200,7 +200,7 @@ def test_verify_document_safety_gates(mock_post, mock_db):
 
     mock_db.query.side_effect = db_query_side_effect
 
-    # Mock Rules Engine Response
+    # Mock Validation Engine Response
     mock_post.return_value = validate_fields_success_response(
         profile_sync={"first_name": "Helmut"},
     )
@@ -228,14 +228,14 @@ def test_verify_document_safety_gates(mock_post, mock_db):
 
 
 # ==================================================
-# UNIT TESTS: mappers.py Rules Engine Casing Mapping
+# UNIT TESTS: mappers.py Validation Engine Casing Mapping
 # ==================================================
 
 
-def test_map_flat_to_rules_engine_payload_case_and_enum_alignment():
+def test_map_flat_to_validation_engine_payload_case_and_enum_alignment():
     """
     Verifies that the flat database representation (which uses Mixed Case or different words)
-    is translated correctly to what rules-engine expects to prevent 422 validation crashes.
+    is translated correctly to what validation-engine expects to prevent 422 validation crashes.
     """
     db_user = MagicMock(spec=DbUser)
     db_user.first_name = "Helmut"
@@ -272,7 +272,7 @@ def test_map_flat_to_rules_engine_payload_case_and_enum_alignment():
     db_user.one_time_payments_expected_amount = decimal.Decimal("1000.00")
     db_user.one_time_payments_expected_date = datetime.date(2026, 7, 1)
 
-    payload = map_flat_to_rules_engine_payload(db_user)
+    payload = map_flat_to_validation_engine_payload(db_user)
 
     content = payload["form_content"]
     identity = content["applicant_identity"]
@@ -283,7 +283,7 @@ def test_map_flat_to_rules_engine_payload_case_and_enum_alignment():
     income_information = content["income_information"]
 
     # 1. Assert Gender Casing mapping
-    assert identity["gender"] == "MALE"  # "Male" (DB) -> "MALE" (Rules Engine)
+    assert identity["gender"] == "MALE"  # "Male" (DB) -> "MALE" (Validation Engine)
 
     # 2. Assert Country Code mapping & country of birth derived from nationality.
     assert identity["nationality"] == "DEUTSCH"
@@ -324,7 +324,7 @@ def test_map_flat_to_rules_engine_payload_case_and_enum_alignment():
     assert expected_payments["one-time_payments_expected_date"] == "2026-07-01"
 
 
-def test_map_flat_to_rules_engine_payload_null_monthly_income():
+def test_map_flat_to_validation_engine_payload_null_monthly_income():
     db_user = MagicMock(spec=DbUser)
     db_user.first_name = "Helmut"
     db_user.last_name = "Klar"
@@ -356,7 +356,7 @@ def test_map_flat_to_rules_engine_payload_null_monthly_income():
     db_user.one_time_payments_expected_date = None
     db_user.has_applied_for_asylum_benefits = None
 
-    payload = map_flat_to_rules_engine_payload(db_user)
+    payload = map_flat_to_validation_engine_payload(db_user)
     assert payload["form_content"]["applicant_finances"]["pension_income"] == 0.0
 
 
@@ -365,7 +365,7 @@ def test_verify_document_extracts_and_verifies_address(mock_post, mock_db):
     """
     Tests that:
     1. A verified field "address" is parsed into street, house_number, zip_code, and city.
-    2. These subfields are sent to rules-engine for validation.
+    2. These subfields are sent to validation-engine for validation.
     3. The database User record is updated with these individual fields.
     4. The Berlin district is correctly synced.
     """
@@ -395,7 +395,7 @@ def test_verify_document_extracts_and_verifies_address(mock_post, mock_db):
 
     mock_db.query.side_effect = db_query_side_effect
 
-    # Mock Rules Engine Batch Validation response
+    # Mock Validation Engine Batch Validation response
     mock_post.return_value = validate_fields_success_response(
         validated_fields={"address": "Hauptstraße 12, 10115 Berlin"},
         profile_sync={
@@ -418,10 +418,10 @@ def test_verify_document_extracts_and_verifies_address(mock_post, mock_db):
 
     assert response.status_code == 200
 
-    # Assert Rules Engine is called with individual parsed fields
+    # Assert Validation Engine is called with individual parsed fields
     mock_post.assert_called()
-    rules_engine_call = next(call for call in mock_post.call_args_list if "validate-fields" in call.args[0])
-    called_json = rules_engine_call.kwargs["json"]
+    validation_engine_call = next(call for call in mock_post.call_args_list if "validate-fields" in call.args[0])
+    called_json = validation_engine_call.kwargs["json"]
     assert "fields" in called_json
     assert called_json["fields"] == {"address": "Hauptstraße 12, 10115 Berlin"}
     assert called_json["document_type"] == "identity_document"
@@ -466,7 +466,7 @@ def test_verify_document_custom_field_mappings(mock_post, mock_db):
 
     mock_db.query.side_effect = db_query_side_effect
 
-    # Mock Rules Engine Batch Validation response
+    # Mock Validation Engine Batch Validation response
     mock_post.return_value = validate_fields_success_response(
         validated_fields={"monthly_total_rent": 550.50},
         profile_sync={
@@ -484,10 +484,10 @@ def test_verify_document_custom_field_mappings(mock_post, mock_db):
 
     assert response.status_code == 200
 
-    # Assert Rules Engine is called with mapped fields
+    # Assert Validation Engine is called with mapped fields
     mock_post.assert_called()
-    rules_engine_call = next(call for call in mock_post.call_args_list if "validate-fields" in call.args[0])
-    called_json = rules_engine_call.kwargs["json"]
+    validation_engine_call = next(call for call in mock_post.call_args_list if "validate-fields" in call.args[0])
+    called_json = validation_engine_call.kwargs["json"]
     assert "fields" in called_json
     assert called_json["fields"] == {"monthly_total_rent": "550.50"}
     assert called_json["document_type"] == "rental_contract"
@@ -582,7 +582,7 @@ def test_pension_row_with_amount_zero_means_no_pension(amount, receives_pension)
     db_user.income_entries = [IncomeEntries(income_type=IncomeType.PENSION, monthly_amount=amount)]
     db_user.has_permanent_reduction_in_earning_capacity = False
 
-    applicant = map_flat_to_rules_engine_payload(db_user)["form_content"]["applicant_information"]
+    applicant = map_flat_to_validation_engine_payload(db_user)["form_content"]["applicant_information"]
 
     assert applicant["applicant_receives_old_age_pension"] is receives_pension
 
@@ -597,7 +597,7 @@ def test_zero_pension_rows_do_not_take_monthly_income():
     db_user.monthly_income = decimal.Decimal("900.00")
     db_user.has_permanent_reduction_in_earning_capacity = False
 
-    finances = map_flat_to_rules_engine_payload(db_user)["form_content"]["applicant_finances"]
+    finances = map_flat_to_validation_engine_payload(db_user)["form_content"]["applicant_finances"]
 
     assert finances["pension_income"] == 0
     assert finances["non_self_employed_income"] == 900

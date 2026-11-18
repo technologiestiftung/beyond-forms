@@ -77,7 +77,7 @@ jobs:
             auth-service \
             gcs-emulator \
             pubsub-emulator \
-            rules-engine \
+            validation-engine \
             forms-filling-service \
             document-intelligence-service \
             orchestration-middleware-service \
